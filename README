@@ -1,1 +1,5 @@
 celements-photo
+
+Used for image manipulations as a plugin of celements.
+
+Next steps will be to add lots of unit tests. Transform the plugin into a component and than refactor the whole thing.
