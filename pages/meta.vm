@@ -1,0 +1,38 @@
+#set($detailImage = "id")
+
+#set($images = $xwiki.celementsphoto.getImageListExclThumbs($doc.name))
+
+<font color=blue>Nur 1 tag:</font>
+
+<table border=1 bordercolor=blue>
+  #foreach($image in $images)
+    #set($tag = $xwiki.celementsphoto.getMetatag($doc.name, $image.id, "Contrast"))
+    <tr>
+      <td>$image.name</td>
+      <td>$tag.name</td>
+      <td>$tag.description</td>
+    </tr>
+    #set($detailImage = $image.id)
+  #end
+</table>
+
+<hr>
+#set($metadata = $xwiki.celementsphoto.getMetadata($doc.name, $detailImage))
+<table border=1>
+#foreach($metadate in $metadata)
+  <tr>
+  <td>$metadate.name</td><td>$metadate.description</td>
+  </tr>
+#end
+</table>
+
+<hr>
+<font color=red>Mit Junk:</font>
+#set($data = $xwiki.celementsphoto.getFullMetadata($doc.name, $detailImage))
+<table border=1 bordercolor=red>
+#foreach($date in $data)
+  <tr>
+  <td>$date.name</td><td>$date.description</td>
+  </tr>
+#end
+</table>

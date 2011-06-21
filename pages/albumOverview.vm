@@ -1,0 +1,16 @@
+#if($xwiki.celementsphoto.isImageDeleted($doc.name, "4e4122066a222bff2720142b563a467e030d6b5bccbfe07c23d12dd2265177f2c625d92206b1"))
+  $xwiki.celementsphoto.setImageDeleted($doc.name, "4e4122066a222bff2720142b563a467e030d6b5bccbfe07c23d12dd2265177f2c625d92206b1", false)
+#else
+  $xwiki.celementsphoto.setImageDeleted($doc.name, "4e4122066a222bff2720142b563a467e030d6b5bccbfe07c23d12dd2265177f2c625d92206b1", true)
+#end
+
+#set($images = $xwiki.celementsphoto.getImageList($doc.name, 100, 100))
+<table><tr>
+#foreach($image in $images)
+  #if($velocityCount%6 == 0)
+    </tr><tr>
+  #end
+<td><a href="$image.url"><img src="$image.thumb" alt="$image.name"/></a>
+</td>
+#end
+</tr></table>
