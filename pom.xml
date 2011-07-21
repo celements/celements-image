@@ -3,12 +3,12 @@
   <parent>
       <groupId>com.celements</groupId>
       <artifactId>celements</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>  
   <groupId>com.celements</groupId>
   <artifactId>celements-photo</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <description>Celements Photo</description> 
   <dependencies>    
     <!-- Add here all your dependencies -->
