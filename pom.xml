@@ -15,7 +15,7 @@
     <dependency>
       <groupId>com.celements</groupId>
   	  <artifactId>celements-core</artifactId>
-  	  <version>1.5-SNAPSHOT</version>
+  	  <version>1.6-SNAPSHOT</version>
   	  <scope>provided</scope>
     </dependency>
     <dependency>
