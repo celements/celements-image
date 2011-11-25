@@ -63,9 +63,9 @@ public class GenerateThumbnail {
     HashMap<String, String> map = new HashMap<String, String>();
     map.put("gif", "GIF");
     map.put("image/gif", "GIF");
-    map.put("jpg", "JPEG");
-    map.put("jpeg", "JPEG");
-    map.put("image/jpeg", "JPEG");
+//    map.put("jpg", "JPEG");
+//    map.put("jpeg", "JPEG");
+//    map.put("image/jpeg", "JPEG");
     map.put("png", "PNG");
     map.put("image/png", "PNG");
     return map;
