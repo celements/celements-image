@@ -54,6 +54,9 @@ public class GenerateThumbnail {
   
   private static final Log mLogger = LogFactory.getFactory().getInstance(GenerateThumbnail.class);
 
+  /**
+   * saveTypes : image types which can be preserved resizing the image
+   */
   public static final Map<String, String> saveTypes = getSaveTypes();
 
   static Map<String, String> getSaveTypes() {
@@ -264,16 +267,17 @@ public class GenerateThumbnail {
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
       String type) {
     if(!saveTypes.containsKey(type.toLowerCase())) {
+      mLogger.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
       type = "png"; //default for all not jpeg or gif files
     }
     try {
       ImageIO.write(image, saveTypes.get(type.toLowerCase()), out);
     } catch (IOException ioe) {
-      mLogger.error("Could not save image as PNG! " + ioe);
+      mLogger.error("Could not save image as [" + type + "]! " + ioe);
       try {
         ImageIO.write(fallback, saveTypes.get(type.toLowerCase()), out);
       } catch (IOException e) {
-        mLogger.error("Could not save fallback image as PNG! " + e);
+        mLogger.error("Could not save fallback image as [" + type + "]! " + e);
       }
     }
   }
