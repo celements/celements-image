@@ -50,18 +50,11 @@ public class ComputeImageCommand {
       defaultBg = new Color(r, g, b);
     }
     
-    if ((sheight != null && sheight.length() > 0)
-        || (swidth != null && swidth.length() > 0)) {      
+    int height = parseIntWithDefault(sheight, 0);
+    int width = parseIntWithDefault(swidth, 0);
+
+    if ((height > 0) || (width > 0)) {
       try {
-        int height = 0;
-        int width = 0;
-        if (sheight != null) {
-          height = Integer.parseInt(sheight);
-        }
-        if (swidth != null) {
-          width = Integer.parseInt(swidth);
-        }
-        
         attachmentClone = (XWikiAttachment) attachment.clone();
         GenerateThumbnail thumbGen = new GenerateThumbnail();
         ByteArrayInputStream in = new ByteArrayInputStream(attachmentClone.getContent(
@@ -94,6 +87,20 @@ public class ComputeImageCommand {
       }
     }
     return attachmentClone;
+  }
+
+  int parseIntWithDefault(String sheight, int defValue) {
+    int height = defValue;
+    if ((sheight != null) && (sheight.length() > 0)) {
+      if (sheight != null) {
+        try {
+          height = Integer.parseInt(sheight);
+        } catch (NumberFormatException numExp) {
+          mLogger.debug("Failed to parse height [" + sheight + "].", numExp);
+        }
+      }
+    }
+    return height;
   }
 
   void injectImageCacheCmd(ImageCacheCommand mockImgCacheCmd) {
