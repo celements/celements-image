@@ -11,8 +11,9 @@
   <version>1.4-SNAPSHOT</version>
   <description>Celements Photo</description> 
   <scm>
-    <developerConnection>scm:git:git://github.com/celements/celements-photo</developerConnection>
-    <connection>scm:git:git@github.com:celements/celements-photo.git</connection>
+    <connection>scm:git:git://github.com/celements/celements-photo</connection>
+    <developerConnection>scm:git:ssh://git@github.com:celements/celements-photo.git</developerConnection>
+    <url></url>
   </scm>
   <dependencies>    
     <!-- Add here all your dependencies -->
