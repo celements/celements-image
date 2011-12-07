@@ -12,7 +12,7 @@
   <description>Celements Photo</description> 
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
-    <developerConnection>scm:git:ssh://git@github.com:celements/celements-photo.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
     <url></url>
   </scm>
   <dependencies>    
