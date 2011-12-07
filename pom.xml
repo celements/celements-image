@@ -13,7 +13,7 @@
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
-    <url></url>
+    <url>https://github.com/celements/celements-photo</url>
   </scm>
   <dependencies>    
     <!-- Add here all your dependencies -->
