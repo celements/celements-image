@@ -107,7 +107,8 @@ public class CelementsPhotoPluginAPI extends Api {
     String fURL = "";
     if(context.getDoc().getAttachmentList().size() > 0){
       String fname = ((XWikiAttachment)context.getDoc().getAttachment(name)).getFilename();
-      fURL = context.getDoc().getAttachmentURL(fname, ImageLibStrings.XWIKI_URL_DOWNLOAD, context);
+      fURL = context.getDoc().getAttachmentURL(fname, ImageLibStrings.XWIKI_URL_DOWNLOAD,
+          context);
     }
     return fURL;
   }

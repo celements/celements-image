@@ -123,8 +123,11 @@ public class GenerateThumbnail {
    * @param maxWidth Maximum allowed width.
    * @param maxHeight Maximum allowed height.
    * @return ImageDimensions object specifying width and height.
+   * 
+   * TODO implement preserving aspect ratio!!! see commented test in GenerateThumbnailTest
    */
-  public ImageDimensions getThumbnailDimensions(int imgWidth, int imgHeight, int maxWidth, int maxHeight){
+  public ImageDimensions getThumbnailDimensions(int imgWidth, int imgHeight, int maxWidth,
+      int maxHeight) {
     int thumbWidth = imgWidth;
     int thumbHeight = imgHeight;
 
@@ -290,7 +293,7 @@ public class GenerateThumbnail {
    * @param copyright String to add as a copyright to the image.
    * @return The BufferedImage representation of the Image.
    */
-  private BufferedImage convertImageToBufferedImage(Image thumbImg, String watermark, 
+  BufferedImage convertImageToBufferedImage(Image thumbImg, String watermark, 
       String copyright, Color defaultBg) {
     BufferedImage thumb = new BufferedImage(thumbImg.getWidth(null), 
         thumbImg.getHeight(null), BufferedImage.TYPE_INT_RGB);
