@@ -10,6 +10,10 @@
   <artifactId>celements-photo</artifactId>
   <version>1.4-SNAPSHOT</version>
   <description>Celements Photo</description> 
+  <scm>
+    <developerConnection>scm:git:git://github.com/celements/celements-photo</developerConnection>
+    <connection>scm:git:git@github.com:celements/celements-photo.git</connection>
+  </scm>
   <dependencies>    
     <!-- Add here all your dependencies -->
     <dependency>
