@@ -45,6 +45,7 @@ import org.apache.commons.logging.LogFactory;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.utilities.Util;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * This class is used to generate a thumbnail. Until now it only works for jpeg
@@ -82,8 +83,9 @@ public class GenerateThumbnail {
    * @param maxWidth Maximum allowed width.
    * @param maxHeight Maximum allowed height.
    * @return ImageDimensions object specifying width and height.
+   * @throws XWikiException 
    */
-  public ImageDimensions getThumbnailDimensions(InputStream in, int maxWidth, int maxHeight){
+  public ImageDimensions getThumbnailDimensions(InputStream in, int maxWidth, int maxHeight) throws XWikiException{
     BufferedImage img = decodeImage(in);
     return getThumbnailDimensions(img, maxWidth, maxHeight);
   }
@@ -156,8 +158,9 @@ public class GenerateThumbnail {
    * @see com.celements.photo.plugin.container.ImageDimensions
    * @param in InputStream of the image.
    * @return ImageDimensions object containing width and height of the image.
+   * @throws XWikiException 
    */
-  public ImageDimensions getImageDimensions(InputStream in){
+  public ImageDimensions getImageDimensions(InputStream in) throws XWikiException{
     BufferedImage img = decodeImage(in);
     return new ImageDimensions(img.getWidth(), img.getHeight());
   }
@@ -178,8 +181,9 @@ public class GenerateThumbnail {
    *
    * @param in InputStream of the image.
    * @return BufferedImage representation of the image.
+   * @throws XWikiException 
    */
-  public BufferedImage decodeInputStream(InputStream in){
+  public BufferedImage decodeInputStream(InputStream in) throws XWikiException{
     return decodeImage(in);
   }
   
@@ -195,10 +199,11 @@ public class GenerateThumbnail {
    * @param copyright String to add as a copyright to the image.
    * @return An ImageSize object representing the size of the thumbnail.
    * @throws IOException
+   * @throws XWikiException 
    */
   public ImageDimensions createThumbnail(InputStream in, OutputStream out, int width, 
       int height, String watermark, String copyright, String type, Color defaultBg) 
-      throws IOException {
+      throws IOException, XWikiException {
     return createThumbnail(decodeInputStream(in), out, width, height, watermark, 
         copyright, type, defaultBg);
   }
@@ -214,10 +219,11 @@ public class GenerateThumbnail {
    * @param copyright String to add as a copyright to the image.
    * @return An ImageSize object representing the size of the thumbnail.
    * @throws IOException
+   * @throws XWikiException 
    */
   public void createThumbnail(InputStream in, OutputStream out, 
       ImageDimensions dimensions, String watermark, String copyright, String type, 
-      Color defaultBg) throws IOException {
+      Color defaultBg) throws IOException, XWikiException {
     createThumbnail(decodeInputStream(in), out, dimensions, watermark, copyright, type,
         defaultBg);
   }
@@ -422,13 +428,16 @@ public class GenerateThumbnail {
    * 
    * @param in InputStream representation of a jpeg image.
    * @return Decoded jpeg as BufferedImage.
+   * @throws XWikiException 
    */
-  public BufferedImage decodeImage(InputStream in) {
+  public BufferedImage decodeImage(InputStream in) throws XWikiException {
     BufferedImage bufferedImage = null;
     try {
       bufferedImage = ImageIO.read(in);
     } catch (IOException e) {
-      mLogger.error("Could not open the file! " + e);
+      mLogger.error("Could not open the file! ", e);
+      throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+          XWikiException.ERROR_XWIKI_UNKNOWN, "Could not decode the image file.", e);
     }
     return bufferedImage;
   }
@@ -447,8 +456,9 @@ public class GenerateThumbnail {
    * @param in InputStream with the image to hash.
    * @return Hash code of the specified image, excluding metainformation.
    * @throws IOException
+   * @throws XWikiException 
    */
-  public String hashImage(InputStream in) throws IOException{
+  public String hashImage(InputStream in) throws IOException, XWikiException{
     BufferedImage img = decodeImage(in);
     
     String hash = "";
