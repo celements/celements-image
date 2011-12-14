@@ -28,6 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.container.ImageStrings;
@@ -47,6 +50,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * The photo plugin provides methods to create and manage galleries in XWiki.
  */
 public class CelementsPhotoPluginAPI extends Api {
+
+  private static final Log mLogger = LogFactory.getFactory().getInstance(
+      CelementsPhotoPluginAPI.class);
+
   private CelementsPhotoPlugin photoPlugin;
 
   // PLUGIN .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
@@ -278,8 +285,13 @@ public class CelementsPhotoPluginAPI extends Api {
     photoPlugin.unzipFileToAttachment(zipFile, unzipFileName, attachToDoc.getDocument(), width, height, context);
   }
 
-  public ImageDimensions getDimension(String imageFullName) throws XWikiException {
-    return photoPlugin.getDimension(imageFullName, context);
+  public ImageDimensions getDimension(String imageFullName) {
+    try {
+      return photoPlugin.getDimension(imageFullName, context);
+    } catch (XWikiException exp) {
+      mLogger.warn("Failed to getDimension for [" + imageFullName + "].", exp);
+    }
+    return null;
   }
 
   //TODO
