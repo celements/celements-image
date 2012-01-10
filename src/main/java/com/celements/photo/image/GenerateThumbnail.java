@@ -162,7 +162,10 @@ public class GenerateThumbnail {
    */
   public ImageDimensions getImageDimensions(InputStream in) throws XWikiException{
     BufferedImage img = decodeImage(in);
-    return new ImageDimensions(img.getWidth(), img.getHeight());
+    if (img != null) {
+      return new ImageDimensions(img.getWidth(), img.getHeight());
+    }
+    return null;
   }
 
   /**
