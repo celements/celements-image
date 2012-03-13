@@ -74,7 +74,7 @@ public class ImageScriptService implements ScriptService {
       LOGGER.error("Failed to get image dimensions for image [" + imgRef + "].", exp);
     }
     jsonBuilder.addStringProperty(IMAGE_FILE_SIZE, getCelWebService(
-        ).getHumanReadableSize((long)imgAttachment.getFilesize(), true));
+        ).getHumanReadableSize(imgAttachment.getFilesize(), true));
     jsonBuilder.addStringProperty(IMAGE_MIME_TYPE, imgAttachment.getMimeType());
     jsonBuilder.closeDictionary();
   }
