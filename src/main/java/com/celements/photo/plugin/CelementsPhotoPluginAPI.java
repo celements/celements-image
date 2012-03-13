@@ -51,7 +51,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class CelementsPhotoPluginAPI extends Api {
 
-  private static final Log mLogger = LogFactory.getFactory().getInstance(
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsPhotoPluginAPI.class);
 
   private CelementsPhotoPlugin photoPlugin;
@@ -285,11 +285,15 @@ public class CelementsPhotoPluginAPI extends Api {
     photoPlugin.unzipFileToAttachment(zipFile, unzipFileName, attachToDoc.getDocument(), width, height, context);
   }
 
+  /**
+   * @deprecated instead use ImageScriptService.getDimension(String) 
+   */
+  @Deprecated
   public ImageDimensions getDimension(String imageFullName) {
     try {
       return photoPlugin.getDimension(imageFullName, context);
     } catch (XWikiException exp) {
-      mLogger.warn("Failed to getDimension for [" + imageFullName + "].", exp);
+      LOGGER.warn("Failed to getDimension for [" + imageFullName + "].", exp);
     }
     return null;
   }

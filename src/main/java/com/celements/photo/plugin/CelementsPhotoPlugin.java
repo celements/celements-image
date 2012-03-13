@@ -42,6 +42,7 @@ import com.celements.photo.image.Image;
 import com.celements.photo.image.Thumbnail;
 import com.celements.photo.metadata.Metainfo;
 import com.celements.photo.plugin.cmd.ComputeImageCommand;
+import com.celements.photo.service.IImageService;
 import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.ImportFileObject;
 import com.celements.photo.utilities.Unzip;
@@ -54,10 +55,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   
-  private static final Log mLogger = LogFactory.getFactory().getInstance(
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsPhotoPlugin.class);
 
   /**
@@ -130,7 +132,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       generatePhotoImageClass(context);
     } catch(XWikiException xe){
       //no problem, class can be generated later or manually
-      mLogger.error(xe);
+      LOGGER.error(xe);
     }
   }
   
@@ -389,7 +391,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
         resultList.add(file);
       }
     } else{
-      mLogger.error("zipFile='null' - galleryDoc='" + galleryDoc.getFullName() + "'");
+      LOGGER.error("zipFile='null' - galleryDoc='" + galleryDoc.getFullName() + "'");
     }
     
     return resultList;
@@ -433,7 +435,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    */
   public void unzipFileToAttachment(XWikiAttachment zipFile, String unzipFileName, XWikiDocument attachToDoc,
       int width, int height, XWikiContext context) throws XWikiException {
-    mLogger.info("START: zip='" + zipFile.getFilename() + "' file='" + unzipFileName + "' gallery='" + attachToDoc + "' " +
+    LOGGER.info("START: zip='" + zipFile.getFilename() + "' file='" + unzipFileName + "' gallery='" + attachToDoc + "' " +
         "width='" + width + "' height='" + height + "'");
     try {
       ByteArrayInputStream imgFullSize = null;
@@ -449,20 +451,20 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       if((unzipFileName.lastIndexOf('.') > -1) && (!unzipFileName.endsWith("."))) {
         mimeType = unzipFileName.substring(unzipFileName.lastIndexOf('.') + 1);
       }
-      mLogger.debug("unzip mimetype is " + mimeType);
+      LOGGER.debug("unzip mimetype is " + mimeType);
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       ImageDimensions id = (new GenerateThumbnail()).createThumbnail(imgFullSize, out, 
           width, height, null, null, mimeType, null);
-      mLogger.info("width='" + id.width + "' height='" + id.height + "'");
-      mLogger.info("output stream size: " + out.size());
+      LOGGER.info("width='" + id.width + "' height='" + id.height + "'");
+      LOGGER.info("output stream size: " + out.size());
       unzipFileName = unzipFileName.replace(System.getProperty("file.separator"), ".");
       unzipFileName = context.getWiki().clearName(unzipFileName, false, true, context);
       XWikiAttachment att = (new AddAttachmentToDoc()).addAtachment(attachToDoc, out.toByteArray(), unzipFileName, context);
-      mLogger.info("attachment='" + att.getFilename() + "', gallery='" + att.getDoc().getFullName() + "' size='" + att.getFilesize() + "'");
+      LOGGER.info("attachment='" + att.getFilename() + "', gallery='" + att.getDoc().getFullName() + "' size='" + att.getFilesize() + "'");
     } catch (IOException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
-    mLogger.info("END file='" + unzipFileName + "'");
+    LOGGER.info("END file='" + unzipFileName + "'");
   }
   
   private boolean isZipFile(XWikiAttachment file, XWikiContext context) {
@@ -488,26 +490,18 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
         || fileName.toLowerCase().endsWith("." + ImageLibStrings.MIME_PNG);
   }
 
+  private IImageService getImageService() {
+    return Utils.getComponent(IImageService.class);
+  }
+
+  /**
+   * @deprecated instead use getDimension from ImageService.
+   */
+  @Deprecated
   public ImageDimensions getDimension(String imageFullName, XWikiContext context
       ) throws XWikiException {
-    String fullName = imageFullName.split(";")[0];
-    XWikiDocument theDoc = context.getWiki().getDocument(fullName, context);
-    String imageFileName = imageFullName.split(";")[1];
-    XWikiAttachment theAttachment = theDoc.getAttachment(imageFileName);
-    byte[] data;
-    try {
-        data = theAttachment.getContent(context);
-    } catch (XWikiException e) {
-        Object[] args = {theAttachment.getFilename()};
-        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-            XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-            "Attachment content {0} not found", null, args);
-    }
-    GenerateThumbnail genThumbnail = new GenerateThumbnail();
-    ByteArrayInputStream imageInStream = new ByteArrayInputStream(data);
-    ImageDimensions imageDimensions = genThumbnail.getImageDimensions(imageInStream);
-    imageInStream.reset();
-    return imageDimensions;
+    LOGGER.warn("deprecated getDimension used!");
+    return getImageService().getDimension(imageFullName);
   }
 
 }
