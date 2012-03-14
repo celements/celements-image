@@ -11,7 +11,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.ImageDimensions;
-import com.celements.web.sajson.Builder;
+import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

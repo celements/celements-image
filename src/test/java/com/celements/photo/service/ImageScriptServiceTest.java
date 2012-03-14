@@ -14,7 +14,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.photo.container.ImageDimensions;
-import com.celements.web.sajson.Builder;
+import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
