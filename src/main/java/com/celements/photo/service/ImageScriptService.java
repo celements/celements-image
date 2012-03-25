@@ -57,25 +57,34 @@ public class ImageScriptService implements ScriptService {
     URL theAttUrl = urlFactory.createAttachmentURL(imgAttachment.getFilename(),
         theDoc.getSpace(), theDoc.getName(), "download", "", getContext());
     jsonBuilder.openDictionary();
-    jsonBuilder.addStringProperty(IMAGE_SRC, urlFactory.getURL(theAttUrl, getContext()));
-    jsonBuilder.addStringProperty(IMAGE_FILENAME, imgAttachment.getFilename());
-    jsonBuilder.addStringProperty(IMAGE_ATT_VERSION, imgAttachment.getVersion());
-    jsonBuilder.addStringProperty(IMAGE_CHANGED_BY, getContext().getWiki(
-        ).getLocalUserName(imgAttachment.getAuthor(), null, false, getContext()));
-    AttachmentReference imgRef = new AttachmentReference(imgAttachment.getFilename(),
-        theDoc.getDocumentReference());
     try {
-      ImageDimensions imgDim = imageService.getDimension(imgRef);
-      jsonBuilder.openProperty(IMAGE_HEIGHT);
-      jsonBuilder.addInteger((int)Math.floor(imgDim.getHeight()));
-      jsonBuilder.openProperty(IMAGE_WIDTH);
-      jsonBuilder.addInteger((int)Math.floor(imgDim.getWidth()));
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get image dimensions for image [" + imgRef + "].", exp);
+      jsonBuilder.addStringProperty(IMAGE_SRC, urlFactory.getURL(theAttUrl, getContext()));
+      jsonBuilder.addStringProperty(IMAGE_FILENAME, imgAttachment.getFilename());
+      jsonBuilder.addStringProperty(IMAGE_ATT_VERSION, imgAttachment.getVersion());
+      jsonBuilder.addStringProperty(IMAGE_CHANGED_BY, getContext().getWiki(
+          ).getLocalUserName(imgAttachment.getAuthor(), null, false, getContext()));
+      AttachmentReference imgRef = new AttachmentReference(imgAttachment.getFilename(),
+          theDoc.getDocumentReference());
+      try {
+        ImageDimensions imgDim = imageService.getDimension(imgRef);
+        if (imgDim != null) {
+          jsonBuilder.openProperty(IMAGE_HEIGHT);
+          jsonBuilder.addInteger((int)Math.floor(imgDim.getHeight()));
+          jsonBuilder.openProperty(IMAGE_WIDTH);
+          jsonBuilder.addInteger((int)Math.floor(imgDim.getWidth()));
+        } else {
+          LOGGER.error("unable to read dimension for image [" + imgRef + "].");
+        }
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to get image dimensions for image [" + imgRef + "].", exp);
+      }
+      jsonBuilder.addStringProperty(IMAGE_FILE_SIZE, getCelWebService(
+          ).getHumanReadableSize(imgAttachment.getFilesize(), true));
+      jsonBuilder.addStringProperty(IMAGE_MIME_TYPE, imgAttachment.getMimeType());
+    } catch (Exception exp) {
+      LOGGER.error("Failed to addImage [" + imgAttachment.getFilename() + "] to json.",
+          exp);
     }
-    jsonBuilder.addStringProperty(IMAGE_FILE_SIZE, getCelWebService(
-        ).getHumanReadableSize(imgAttachment.getFilesize(), true));
-    jsonBuilder.addStringProperty(IMAGE_MIME_TYPE, imgAttachment.getMimeType());
     jsonBuilder.closeDictionary();
   }
 
