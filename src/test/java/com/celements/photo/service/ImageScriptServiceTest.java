@@ -110,11 +110,25 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testAddImage_Dimension() throws Exception {
+  public void testAddImage_no_Dimension() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
     replayAll(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
+    String imgJSON = jsonBuilder.getJSON();
+    assertFalse("must NOT contain maxHeight property. JSON: " + imgJSON, imgJSON.contains(
+        "\"maxHeight\" : 200"));
+    assertFalse("must NOT contain maxWidth property. JSON: " + imgJSON, imgJSON.contains(
+        "\"maxWidth\" : 100"));
+    verifyAll(imgAttachment);
+  }
+
+  @Test
+  public void testAddImage_Dimension() throws Exception {
+    Builder jsonBuilder = new Builder();
+    Attachment imgAttachment = createTestAttachment();
+    replayAll(imgAttachment);
+    imageScriptService.addImage(jsonBuilder, imgAttachment, true);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain maxHeight property. JSON: " + imgJSON, imgJSON.contains(
         "\"maxHeight\" : 200"));
