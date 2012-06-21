@@ -62,8 +62,8 @@ public class GenerateThumbnail {
 
   static Map<String, String> getSaveTypes() {
     HashMap<String, String> map = new HashMap<String, String>();
-    map.put("gif", "GIF");
-    map.put("image/gif", "GIF");
+//    map.put("gif", "GIF");
+//    map.put("image/gif", "GIF");
 //    map.put("jpg", "JPEG");
 //    map.put("jpeg", "JPEG");
 //    map.put("image/jpeg", "JPEG");
@@ -142,10 +142,10 @@ public class GenerateThumbnail {
     if((widthImgThumbRatio >= 1.0) || (heightImgThumbRatio >= 1.0)){
       if(widthImgThumbRatio > heightImgThumbRatio){
         thumbWidth = maxWidth;
-        thumbHeight = (int)(imgHeight / widthImgThumbRatio);
+        thumbHeight = (int) Math.ceil(imgHeight / widthImgThumbRatio);
       } else{
         thumbHeight = maxHeight;
-        thumbWidth = (int)(imgWidth / heightImgThumbRatio);
+        thumbWidth = (int)Math.ceil(imgWidth / heightImgThumbRatio);
       }
     }
     
@@ -262,6 +262,9 @@ public class GenerateThumbnail {
       // The "-1" is used to resize maintaining the aspect ratio.
       thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
     }
+    mLogger.debug("width ziel: " + imgSize.getWidth() + ", height ziel: " + 
+        imgSize.getHeight() + "; width: " + thumbImg.getWidth(null) + ", height: " + 
+        thumbImg.getHeight(null));
     BufferedImage buffThumb = convertImageToBufferedImage(thumbImg, watermark, copyright,
         defaultBg);
     encodeImage(out, buffThumb, img, type);
@@ -305,14 +308,12 @@ public class GenerateThumbnail {
   BufferedImage convertImageToBufferedImage(Image thumbImg, String watermark, 
       String copyright, Color defaultBg) {
     BufferedImage thumb = new BufferedImage(thumbImg.getWidth(null), 
-        thumbImg.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        thumbImg.getHeight(null), BufferedImage.TYPE_INT_ARGB);
     Graphics2D g2d = thumb.createGraphics();
-    if(defaultBg == null) {
-      defaultBg = Color.WHITE;
+    if(defaultBg != null) {
+      g2d.setColor(defaultBg);
+      g2d.fillRect(0, 0, thumbImg.getWidth(null), thumbImg.getHeight(null));
     }
-//    g2d.setBackground(Color.WHITE); -> has no effect
-    g2d.setColor(defaultBg);
-    g2d.fillRect(0, 0, thumbImg.getWidth(null), thumbImg.getHeight(null));
     g2d.drawImage(thumbImg, 0, 0, null);
     
     if((watermark != null) && (!watermark.equals(""))){

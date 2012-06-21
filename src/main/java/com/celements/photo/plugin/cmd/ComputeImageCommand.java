@@ -62,13 +62,11 @@ public class ComputeImageCommand {
         BufferedImage img = thumbGen.decodeImage(in);
         in.close();
         
-        //TODO default background mit einbeziehen
-        ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
-        mLogger.debug("dimension: target width=" + width + "; target height=" + height
-            + "; resized width=" + dimension.getWidth() + "; resized height="
-            + dimension.getHeight());
-        String key = getImageCacheCmd(context).getCacheKey(attachmentClone, dimension,
-            copyright, watermark, context);
+//        mLogger.debug("dimension: target width=" + width + "; target height=" + height
+//            + "; resized width=" + dimension.getWidth() + "; resized height="
+//            + dimension.getHeight());
+        String key = getImageCacheCmd(context).getCacheKey(attachmentClone,
+            new ImageDimensions(width, height), copyright, watermark, context);
         mLogger.debug("attachment key: '" + key + "'");
         
         byte[] data = getImageCacheCmd(context).getImageForKey(key, context);
@@ -76,6 +74,7 @@ public class ComputeImageCommand {
           mLogger.info("Found image in Cache.");
           attachmentClone.setContent(data);
         } else {
+          ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
           mLogger.info("No cached image.");
           attachmentClone.setContent(getThumbAttachment(img, dimension, thumbGen, 
               attachmentClone.getMimeType(context), watermark, copyright, defaultBg));
