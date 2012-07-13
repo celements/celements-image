@@ -45,7 +45,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class ImageCacheCommand {
 
-  private static final Log mLogger = LogFactory.getFactory().getInstance(
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(
       ImageCacheCommand.class);
 
   /**
@@ -90,7 +90,7 @@ public class ImageCacheCommand {
     try {
       imgTempDir.mkdirs();
     } catch (Exception ex) {
-      mLogger.warn("Cannot create temporary files", ex);
+      LOGGER.warn("Cannot create temporary files", ex);
     }
     configuration.put("cache.path", imgTempDir.getAbsolutePath());
     
@@ -105,7 +105,7 @@ public class ImageCacheCommand {
     try {
       imageCache = getCacheManager().createNewCache(configuration);
     } catch (CacheException exp) {
-      mLogger.error("Error initializing the image cache", exp);
+      LOGGER.error("Error initializing the image cache", exp);
     }
     initializedCache = true;
   }
@@ -118,7 +118,7 @@ public class ImageCacheCommand {
         return Integer.parseInt(capacityParam);
       }
     } catch (NumberFormatException ex) {
-      mLogger.error("Error in ImagePlugin reading capacity: " + capacityParam, ex);
+      LOGGER.error("Error in ImagePlugin reading capacity: " + capacityParam, ex);
     }
     return defaultValue;
   }
@@ -129,10 +129,10 @@ public class ImageCacheCommand {
         getImageCache().set(key, IOUtils.toByteArray(attachment.getContentInputStream(
             getContext())));
       } catch (IOException exp) {
-        mLogger.error("Failed to cache image [" + key + "].", exp);
+        LOGGER.error("Failed to cache image [" + key + "].", exp);
       }
     } else {
-      mLogger.info("Caching of images deactivated.");
+      LOGGER.info("Caching of images deactivated.");
     }
   }
 

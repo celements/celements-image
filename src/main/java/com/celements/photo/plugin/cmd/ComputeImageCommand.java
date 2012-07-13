@@ -35,7 +35,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class ComputeImageCommand {
 
-  private static final Log mLogger = LogFactory.getFactory().getInstance(
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(
       ComputeImageCommand.class);
 
   private ImageCacheCommand imgCacheCmd;
@@ -63,11 +63,11 @@ public class ComputeImageCommand {
 //            + dimension.getHeight());
         String key = getImageCacheCmd().getCacheKey(attachmentClone,
             new ImageDimensions(width, height), copyright, watermark);
-        mLogger.debug("attachment key: '" + key + "'");
+        LOGGER.debug("attachment key: '" + key + "'");
         
         InputStream data = getImageCacheCmd().getImageForKey(key);
         if (data != null) {
-          mLogger.info("Found image in Cache.");
+          LOGGER.info("Found image in Cache.");
           attachmentClone.setContent(data);
         } else {
           GenerateThumbnail thumbGen = new GenerateThumbnail();
@@ -75,14 +75,14 @@ public class ComputeImageCommand {
           BufferedImage img = thumbGen.decodeImage(in);
           in.close();
           ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
-          mLogger.info("No cached image.");
+          LOGGER.info("No cached image.");
           byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
               attachmentClone.getMimeType(context), watermark, copyright, defaultBg);
           attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
           getImageCacheCmd().addToCache(key, attachmentClone);
         }
       } catch (Exception exp) {
-        mLogger.error("Error, could not resize / cache image", exp);
+        LOGGER.error("Error, could not resize / cache image", exp);
         attachmentClone = attachment;
       }
     }
@@ -96,7 +96,7 @@ public class ComputeImageCommand {
         try {
           height = Integer.parseInt(sheight);
         } catch (NumberFormatException numExp) {
-          mLogger.debug("Failed to parse height [" + sheight + "].", numExp);
+          LOGGER.debug("Failed to parse height [" + sheight + "].", numExp);
         }
       }
     }
