@@ -21,6 +21,7 @@ package com.celements.photo.plugin.cmd;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
@@ -56,10 +57,6 @@ public class ComputeImageCommand {
     if ((height > 0) || (width > 0)) {
       try {
         attachmentClone = (XWikiAttachment) attachment.clone();
-        GenerateThumbnail thumbGen = new GenerateThumbnail();
-        InputStream in = attachmentClone.getContentInputStream(context);
-        BufferedImage img = thumbGen.decodeImage(in);
-        in.close();
         
 //        mLogger.debug("dimension: target width=" + width + "; target height=" + height
 //            + "; resized width=" + dimension.getWidth() + "; resized height="
@@ -73,10 +70,15 @@ public class ComputeImageCommand {
           mLogger.info("Found image in Cache.");
           attachmentClone.setContent(data);
         } else {
+          GenerateThumbnail thumbGen = new GenerateThumbnail();
+          InputStream in = attachmentClone.getContentInputStream(context);
+          BufferedImage img = thumbGen.decodeImage(in);
+          in.close();
           ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
           mLogger.info("No cached image.");
-          attachmentClone.setContent(getThumbAttachment(img, dimension, thumbGen, 
-              attachmentClone.getMimeType(context), watermark, copyright, defaultBg));
+          byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
+              attachmentClone.getMimeType(context), watermark, copyright, defaultBg);
+          attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
           getImageCacheCmd().addToCache(key, attachmentClone);
         }
       } catch (Exception exp) {
