@@ -56,11 +56,6 @@ public class ComputeImageCommand {
     if ((height > 0) || (width > 0)) {
       try {
         attachmentClone = (XWikiAttachment) attachment.clone();
-        GenerateThumbnail thumbGen = new GenerateThumbnail();
-        ByteArrayInputStream in = new ByteArrayInputStream(attachmentClone.getContent(
-            context));
-        BufferedImage img = thumbGen.decodeImage(in);
-        in.close();
         
 //        mLogger.debug("dimension: target width=" + width + "; target height=" + height
 //            + "; resized width=" + dimension.getWidth() + "; resized height="
@@ -74,6 +69,11 @@ public class ComputeImageCommand {
           mLogger.info("Found image in Cache.");
           attachmentClone.setContent(data);
         } else {
+          GenerateThumbnail thumbGen = new GenerateThumbnail();
+          ByteArrayInputStream in = new ByteArrayInputStream(attachmentClone.getContent(
+              context));
+          BufferedImage img = thumbGen.decodeImage(in);
+          in.close();
           ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
           mLogger.info("No cached image.");
           attachmentClone.setContent(getThumbAttachment(img, dimension, thumbGen, 
