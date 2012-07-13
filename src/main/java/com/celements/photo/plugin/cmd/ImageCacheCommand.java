@@ -19,22 +19,29 @@
  */
 package com.celements.photo.plugin.cmd;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.context.Execution;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.plugin.CelementsPhotoPlugin.SupportedFormat;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.web.Utils;
 
 public class ImageCacheCommand {
 
@@ -49,29 +56,36 @@ public class ImageCacheCommand {
   private boolean initializedCache;
 
   /**
-   * The size of the cache. This parameter can be configured using the key <tt>xwiki.plugin.image.cache.capacity</tt>.
+   * The size of the cache. This parameter can be configured using
+   * the key <tt>xwiki.plugin.image.cache.capacity</tt>.
    */
   private int capacity = 50;
+
+  /**
+   * The time to live (seconds) of a cache entry after last access. This parameter can be
+   * configured using the key <tt>xwiki.plugin.image.cache.ttl</tt>.
+   */
+  private Integer ttlConfig = 2500000;
 
   public ImageCacheCommand() {
     initializedCache = false;
   }
 
-  Cache<byte[]> getImageCache(XWikiContext context) {
+  Cache<byte[]> getImageCache() {
     if (!initializedCache) {
-      initCache(context);
+      initCache();
     }
     return imageCache;
   }
 
   /* Copy, Paste & Customize from com.xpn.xwiki.plugin.image */
-  synchronized void initCache(XWikiContext context) {
+  synchronized void initCache() {
     CacheConfiguration configuration = new CacheConfiguration();
     
     configuration.setConfigurationId("celements.photo");
     
     // Set folder o store cache
-    File tempDir = context.getWiki().getTempDirectory(context);
+    File tempDir = getContext().getWiki().getTempDirectory(getContext());
     File imgTempDir = new File(tempDir, configuration.getConfigurationId());
     try {
       imgTempDir.mkdirs();
@@ -82,46 +96,58 @@ public class ImageCacheCommand {
     
     // Set cache constraints
     LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-    
-    String capacityParam = "";
-    try {
-      capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
-      if ((capacityParam != null) && (!capacityParam.equals(""))) {
-        capacity = Integer.parseInt(capacityParam);
-      }
-    } catch (NumberFormatException ex) {
-      mLogger.error("Error in ImagePlugin reading capacity: " + capacityParam, ex);
-    }
+    capacity = readIntegerValue("xwiki.plugin.image.cache.capacity", capacity);
     lru.setMaxEntries(capacity);
-    
+    ttlConfig = readIntegerValue("xwiki.plugin.image.cache.ttl", ttlConfig);
+    lru.setTimeToLive(ttlConfig);
+    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
     try {
-      imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
-    } catch (CacheException e) {
-      mLogger.error("Error initializing the image cache", e);
+      imageCache = getCacheManager().createNewCache(configuration);
+    } catch (CacheException exp) {
+      mLogger.error("Error initializing the image cache", exp);
     }
     initializedCache = true;
   }
 
-  public void addToCache(String key, XWikiAttachment attachment, XWikiContext context
-      ) throws XWikiException {
-    if (getImageCache(context) != null) {
-      getImageCache(context).set(key, attachment.getContent(context));
+  private Integer readIntegerValue(String paramKey, Integer defaultValue) {
+    String capacityParam = "";
+    try {
+      capacityParam = getContext().getWiki().Param(paramKey);
+      if ((capacityParam != null) && (!capacityParam.equals(""))) {
+        return Integer.parseInt(capacityParam);
+      }
+    } catch (NumberFormatException ex) {
+      mLogger.error("Error in ImagePlugin reading capacity: " + capacityParam, ex);
+    }
+    return defaultValue;
+  }
+
+  public void addToCache(String key, XWikiAttachment attachment) throws XWikiException {
+    if (getImageCache() != null) {
+      try {
+        getImageCache().set(key, IOUtils.toByteArray(attachment.getContentInputStream(
+            getContext())));
+      } catch (IOException exp) {
+        mLogger.error("Failed to cache image [" + key + "].", exp);
+      }
     } else {
       mLogger.info("Caching of images deactivated.");
     }
   }
 
-  public byte[] getImageForKey(String key, XWikiContext context) {
-    if (getImageCache(context) != null) {
-      return getImageCache(context).get(key);
+  public InputStream getImageForKey(String key) {
+    if (getImageCache() != null) {
+      byte[] cachedData = getImageCache().get(key);
+      if (cachedData != null) {
+        return new ByteArrayInputStream(cachedData);
+      }
     }
     return null;
   }
 
-  String getCacheKey(XWikiAttachment attachment,
-      ImageDimensions dimension, String copyright, String watermark,
-      XWikiContext context) throws NoSuchAlgorithmException {
+  String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension,
+      String copyright, String watermark) throws NoSuchAlgorithmException {
     String securityHash = "";
     if(((watermark != null) && (watermark.length() > 0))
         || ((copyright != null) && (copyright.length() > 0))){
@@ -134,7 +160,7 @@ public class ImageCacheCommand {
     }
     String key = attachment.getId() 
         + "-" + attachment.getVersion()
-        + "-" + getType(attachment.getMimeType(context))
+        + "-" + getType(attachment.getMimeType(getContext()))
         + "-" + attachment.getDate().getTime()
         + "-" + dimension.getWidth()
         + "-" + dimension.getHeight()
@@ -143,7 +169,8 @@ public class ImageCacheCommand {
   }
 
   /**
-   * @return the type of the image, as an integer code, used in the generation of the key of the image cache
+   * @return the type of the image, as an integer code, used in the generation
+   *  of the key of the image cache
    */
   public static int getType(String mimeType)
   {
@@ -160,6 +187,15 @@ public class ImageCacheCommand {
       imageCache.removeAll();
     }
     imageCache = null;
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
+  }
+
+  private CacheManager getCacheManager() {
+    return Utils.getComponent(CacheManager.class);
   }
 
 }
