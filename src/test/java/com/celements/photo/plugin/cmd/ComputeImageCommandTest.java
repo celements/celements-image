@@ -51,18 +51,18 @@ public class ComputeImageCommandTest extends AbstractBridgedComponentTestCase {
   public void testGetImageCacheCmd() {
     computeImgCmd.injectImageCacheCmd(null);
     replay(xwiki, mockImgCacheCmd);
-    assertNotNull(computeImgCmd.getImageCacheCmd(context));
+    assertNotNull(computeImgCmd.getImageCacheCmd());
     verify(xwiki, mockImgCacheCmd);
   }
 
   @Test
   public void testFlushCache() {
-    ImageCacheCommand cacheCmdBefore = computeImgCmd.getImageCacheCmd(context);
+    ImageCacheCommand cacheCmdBefore = computeImgCmd.getImageCacheCmd();
     mockImgCacheCmd.flushCache();
     expectLastCall().once();
     replay(xwiki, mockImgCacheCmd);
     computeImgCmd.flushCache();
-    assertNotSame(cacheCmdBefore, computeImgCmd.getImageCacheCmd(context));
+    assertNotSame(cacheCmdBefore, computeImgCmd.getImageCacheCmd());
     verify(xwiki, mockImgCacheCmd);
   }
 

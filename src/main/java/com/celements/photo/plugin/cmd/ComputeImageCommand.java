@@ -21,8 +21,8 @@ package com.celements.photo.plugin.cmd;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,19 +57,18 @@ public class ComputeImageCommand {
       try {
         attachmentClone = (XWikiAttachment) attachment.clone();
         GenerateThumbnail thumbGen = new GenerateThumbnail();
-        ByteArrayInputStream in = new ByteArrayInputStream(attachmentClone.getContent(
-            context));
+        InputStream in = attachmentClone.getContentInputStream(context);
         BufferedImage img = thumbGen.decodeImage(in);
         in.close();
         
 //        mLogger.debug("dimension: target width=" + width + "; target height=" + height
 //            + "; resized width=" + dimension.getWidth() + "; resized height="
 //            + dimension.getHeight());
-        String key = getImageCacheCmd(context).getCacheKey(attachmentClone,
-            new ImageDimensions(width, height), copyright, watermark, context);
+        String key = getImageCacheCmd().getCacheKey(attachmentClone,
+            new ImageDimensions(width, height), copyright, watermark);
         mLogger.debug("attachment key: '" + key + "'");
         
-        byte[] data = getImageCacheCmd(context).getImageForKey(key, context);
+        InputStream data = getImageCacheCmd().getImageForKey(key);
         if (data != null) {
           mLogger.info("Found image in Cache.");
           attachmentClone.setContent(data);
@@ -78,7 +77,7 @@ public class ComputeImageCommand {
           mLogger.info("No cached image.");
           attachmentClone.setContent(getThumbAttachment(img, dimension, thumbGen, 
               attachmentClone.getMimeType(context), watermark, copyright, defaultBg));
-          getImageCacheCmd(context).addToCache(key, attachmentClone, context);
+          getImageCacheCmd().addToCache(key, attachmentClone);
         }
       } catch (Exception exp) {
         mLogger.error("Error, could not resize / cache image", exp);
@@ -106,7 +105,7 @@ public class ComputeImageCommand {
     imgCacheCmd = mockImgCacheCmd;
   }
 
-  ImageCacheCommand getImageCacheCmd(XWikiContext context) {
+  ImageCacheCommand getImageCacheCmd() {
     if (imgCacheCmd == null) {
       imgCacheCmd = new ImageCacheCommand();
     }
