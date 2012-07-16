@@ -100,12 +100,15 @@ public class ImageCacheCommand {
     lru.setMaxEntries(capacity);
     ttlConfig = readIntegerValue("xwiki.plugin.image.cache.ttl", ttlConfig);
     lru.setTimeToLive(ttlConfig);
+    LOGGER.debug("creating an image cache with capacity [" + lru.getMaxEntries()
+        + "] and ttl [" + lru.getTimeToLive() + "] and cache.path ["
+        + lru.get("cache.path") + "].");
     configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
     try {
       imageCache = getCacheManager().createNewCache(configuration);
     } catch (CacheException exp) {
-      LOGGER.error("Error initializing the image cache", exp);
+      LOGGER.error("Error initializing the image cache.", exp);
     }
     initializedCache = true;
   }
