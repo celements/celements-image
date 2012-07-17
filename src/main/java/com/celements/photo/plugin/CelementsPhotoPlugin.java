@@ -141,6 +141,10 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   }
   
   public void flushCache() {
+    //DO NOT FLUSH IMAGE CACHE, BECAUSE IT IS ON DISK AND DOES NOT HELP TO FREE MEMORY!
+  }
+  
+  public void flushImageCache() {
     getComputeImgCmd().flushCache();
   }
   
