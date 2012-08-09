@@ -79,4 +79,18 @@ public class CropImage implements ICropImage {
     }
     return xAtt;
   }
+
+  public void outputCroppedImage(Document srcDoc, String srcFilename, int x, int y,
+      int w, int h) {
+    XWikiAttachment xAtt = getAttachment(srcDoc, srcFilename);
+    if(xAtt != null){
+      try {
+        getContext().getResponse().setContentType("image/png");//output is always png
+        crop((XWikiAttachment)xAtt.clone(), x, y, w, h, getContext().getResponse(
+            ).getOutputStream());
+      } catch (IOException e) {
+        LOGGER.error("Error writing cropped image to response stream.", e);
+      }
+    }
+  }
 }

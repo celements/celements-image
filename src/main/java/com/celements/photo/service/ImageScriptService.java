@@ -126,4 +126,16 @@ public class ImageScriptService implements ScriptService {
       OutputStream out) {
     cropImage.crop(srcDoc, srcFilename, x, y, w, h, out);
   }
+  
+  public void outputCroppedImage(Document srcDoc, String srcFilename) {
+    int x = Integer.parseInt(getContext().getRequest().get("cropX"));
+    if(x < 0) { x = 0; }
+    int y = Integer.parseInt(getContext().getRequest().get("cropY"));
+    if(y < 0) { y = 0; }
+    int w = Integer.parseInt(getContext().getRequest().get("cropW"));
+    if(w <= 0) { w = 1; }
+    int h = Integer.parseInt(getContext().getRequest().get("cropH"));
+    if(h <= 0) { h = 1; }
+    cropImage.outputCroppedImage(srcDoc, srcFilename, x, y, w, h);
+  }
 }

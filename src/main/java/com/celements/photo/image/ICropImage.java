@@ -16,4 +16,7 @@ public interface ICropImage {
   
   public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h, 
       OutputStream out);
+
+  public void outputCroppedImage(Document srcDoc, String srcFilename, int x, int y,
+      int w, int h);
 }
