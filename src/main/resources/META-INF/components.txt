@@ -1,2 +1,3 @@
 com.celements.photo.service.ImageScriptService
 com.celements.photo.service.ImageService
+com.celements.photo.image.CropImage

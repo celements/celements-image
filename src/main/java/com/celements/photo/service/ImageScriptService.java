@@ -1,5 +1,10 @@
 package com.celements.photo.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 
 import org.apache.commons.logging.Log;
@@ -11,12 +16,15 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.ImageDimensions;
+import com.celements.photo.image.ICropImage;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component("celementsphoto")
@@ -39,6 +47,9 @@ public class ImageScriptService implements ScriptService {
 
   @Requirement("celementsweb")
   ScriptService celementsService;
+
+  @Requirement
+  ICropImage cropImage;
 
   private CelementsWebScriptService getCelWebService() {
     return (CelementsWebScriptService) celementsService;
@@ -103,5 +114,22 @@ public class ImageScriptService implements ScriptService {
     }
     return null;
   }
-
+  
+  public void crop(Document srcDoc, String srcFilename, OutputStream out) {
+    int x = Integer.parseInt(getContext().getRequest().get("cropX"));
+    if(x < 0) { x = 0; }
+    int y = Integer.parseInt(getContext().getRequest().get("cropY"));
+    if(y < 0) { y = 0; }
+    int w = Integer.parseInt(getContext().getRequest().get("cropW"));
+    if(w <= 0) { w = 1; }
+    int h = Integer.parseInt(getContext().getRequest().get("cropH"));
+    if(h <= 0) { h = 1; }
+    LOGGER.debug("Cropping to " + x + ":" + y + " " + w + "x" + h);
+    cropImage.crop(srcDoc, srcFilename, x, y, w, h, out);
+  }
+  
+  public void crop(Document srcDoc, String srcFilename, int x, int y, int w, int h,
+      OutputStream out) {
+    cropImage.crop(srcDoc, srcFilename, x, y, w, h, out);
+  }
 }
