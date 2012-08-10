@@ -53,6 +53,8 @@ public class ComputeImageCommand {
     int cropW = parseIntWithDefault(context.getRequest().get("cropW"), -1);
     int cropH = parseIntWithDefault(context.getRequest().get("cropH"), -1);
     boolean needsCropping = needsCropping(cropX, cropY, cropW, cropH);
+    LOGGER.debug("Crop needed: " + needsCropping + " -> " + cropX + ":" + cropY + " " + 
+        cropW + "x" + cropH);
     // resize params
     if((defaultBgString != null) && defaultBgString.matches("[0-9A-Fa-f]{6}")) {
       int r = Integer.parseInt(defaultBgString.substring(1, 3), 16);
@@ -82,10 +84,12 @@ public class ComputeImageCommand {
         in.close();
         ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
         if(needsCropping) {
-          OutputStream out = new ByteArrayOutputStream();
+          ByteArrayOutputStream out = new ByteArrayOutputStream();
           ICropImage cropComp = Utils.getComponent(ICropImage.class);
           cropComp.crop(img, cropX, cropY, cropW, cropH, attachmentClone.getMimeType(
               context), out);
+          attachmentClone.setContent(new ByteArrayInputStream(((ByteArrayOutputStream)out
+              ).toByteArray()));
         }
         if ((height > 0) || (width > 0)) {
           byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
@@ -105,18 +109,16 @@ public class ComputeImageCommand {
     return (cropX >= 0) && (cropY >= 0) && (cropW > 0) && (cropH > 0);
   }
 
-  int parseIntWithDefault(String sheight, int defValue) {
-    int height = defValue;
-    if ((sheight != null) && (sheight.length() > 0)) {
-      if (sheight != null) {
-        try {
-          height = Integer.parseInt(sheight);
-        } catch (NumberFormatException numExp) {
-          LOGGER.debug("Failed to parse height [" + sheight + "].", numExp);
-        }
+  int parseIntWithDefault(String stringValue, int defValue) {
+    int parsedValue = defValue;
+    if ((stringValue != null) && (stringValue.length() > 0)) {
+      try {
+        parsedValue = Integer.parseInt(stringValue);
+      } catch (NumberFormatException numExp) {
+        LOGGER.debug("Failed to parse height [" + stringValue + "].", numExp);
       }
     }
-    return height;
+    return parsedValue;
   }
 
   void injectImageCacheCmd(ImageCacheCommand mockImgCacheCmd) {
