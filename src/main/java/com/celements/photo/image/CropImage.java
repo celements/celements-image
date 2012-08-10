@@ -30,7 +30,8 @@ public class CropImage implements ICropImage {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
   
-  public void crop(BufferedImage img, int x, int y, int w, int h, String type, OutputStream out) {
+  public void crop(BufferedImage img, int x, int y, int w, int h, String type, 
+      OutputStream out)  {
     BufferedImage buffCropped = img.getSubimage(x, y, w, h);
     (new GenerateThumbnail()).encodeImage(out, buffCropped, img, type);
   }

@@ -150,25 +150,43 @@ public class ImageCacheCommand {
   }
 
   String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension,
-      String copyright, String watermark) throws NoSuchAlgorithmException {
-    String securityHash = "";
-    if(((watermark != null) && (watermark.length() > 0))
-        || ((copyright != null) && (copyright.length() > 0))){
-      MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update((watermark + copyright).getBytes());
-      byte[] digest = md.digest();
-      for(int i = 0; i < digest.length; i++){
-        securityHash += Integer.toHexString(Math.abs((int)digest[i]));
-      }
-    }
+      String copyright, String watermark, int cropX, int cropY, int cropW, int cropH
+      ) throws NoSuchAlgorithmException {
     String key = attachment.getId() 
         + "-" + attachment.getVersion()
         + "-" + getType(attachment.getMimeType(getContext()))
         + "-" + attachment.getDate().getTime()
         + "-" + dimension.getWidth()
         + "-" + dimension.getHeight()
-        + "-" + securityHash;
+        + "-" + getAditionalInfoHash(copyright, watermark, cropX, cropY, cropW, cropH);
     return key;
+  }
+
+  String getAditionalInfoHash(String copyright, String watermark, int cropX, int cropY, 
+      int cropW, int cropH) throws NoSuchAlgorithmException {
+    String hashValue = null;
+    if(((watermark != null) && (watermark.length() > 0))
+        || ((copyright != null) && (copyright.length() > 0))){
+      hashValue = watermark + "<:>" + copyright;
+    }
+    if((cropX >= 0) && (cropY >= 0) && (cropW > 0) && (cropH > 0)){
+      if(hashValue != null) {
+        hashValue += "<:>";
+      } else {
+        hashValue = "";
+      }
+      hashValue += cropX + ":" + cropY + "_" + cropW + "x" + cropH;
+    }
+    String hash = "";
+    if(hashValue != null) {
+      MessageDigest md = MessageDigest.getInstance("MD5");
+      md.update(hashValue.getBytes());
+      byte[] digest = md.digest();
+      for(int i = 0; i < digest.length; i++){
+        hash += Integer.toHexString(Math.abs((int)digest[i]));
+      }
+    }
+    return hash;
   }
 
   /**
