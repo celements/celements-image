@@ -20,8 +20,7 @@
     <dependency>
       <groupId>com.celements</groupId>
   	  <artifactId>celements-core</artifactId>
-  	  <version>1.24</version>
-  	  <scope>provided</scope>
+  	  <version>1.29-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.drewnoakes</groupId>
