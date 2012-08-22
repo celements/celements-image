@@ -24,10 +24,11 @@ public class BarcodeScriptService implements ScriptService {
         out, "image/png", 300, BufferedImage.TYPE_BYTE_GRAY, true, 0);
     DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
     String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" +
-      "<module-width>0.4mm</module-width></ean13></barcode>";
+      "<module-width>0.4mm</module-width></ean8></barcode>";
     InputStream in = new ByteArrayInputStream(xmlConf.getBytes());
     try {
       Configuration cfg = builder.build(in);
+      in.close();
       BarcodeGenerator gen = BarcodeUtil.getInstance().createBarcodeGenerator(cfg);
       gen.generateBarcode(provider, number);
       provider.finish();
