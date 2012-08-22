@@ -35,6 +35,20 @@ public class BarcodeScriptService implements ScriptService {
   @Requirement
   Execution execution;
   
+  public int getEAN8Checksum(int number) {
+    String nrStr = Integer.toString(number);
+    while(nrStr.length() < 7) {
+      nrStr = "0" + nrStr;
+    }
+    if(nrStr.length() > 7) {
+      nrStr = nrStr.substring(0, 7);
+    }
+    byte[] nr = nrStr.getBytes();
+    int s1 = nr[1] + nr[3] + nr[5];
+    int s2 = 3 * (nr[0] + nr[2] + nr[4] + nr[6]);
+    return (10 - ((s1 + s2) % 10)) % 10;
+  }
+  
   public void generate(String number, OutputStream out) {
     String moduleHeight = getContext().getRequest().get("moduleHeight");
     if((moduleHeight == null) || "".equals(moduleHeight.trim())) {
@@ -45,7 +59,7 @@ public class BarcodeScriptService implements ScriptService {
       moduleWidth = MODULE_WIDTH;
     }
     BitmapCanvasProvider provider = new BitmapCanvasProvider(
-        out, "image/png", 72, BufferedImage.TYPE_BYTE_GRAY, true, 0);
+        out, "image/png", 150, BufferedImage.TYPE_BYTE_GRAY, true, 0);
     DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
     String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" +
       "<height>" + moduleHeight + "</height>" +
