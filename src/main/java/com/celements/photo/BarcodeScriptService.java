@@ -15,16 +15,30 @@ import org.krysalis.barcode4j.BarcodeUtil;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 @Component("barcode")
 public class BarcodeScriptService implements ScriptService {
+  private String MODUL_WIDTH = "0.4mm";
+  
+  @Requirement
+  Execution execution;
+  
   public void generate(String number, OutputStream out) {
+    String modulWidth = getContext().getRequest().get("moduleWidth");
+    if((modulWidth == null) || "".equals(modulWidth.trim())) {
+      modulWidth = MODUL_WIDTH;
+    }
     BitmapCanvasProvider provider = new BitmapCanvasProvider(
         out, "image/png", 300, BufferedImage.TYPE_BYTE_GRAY, true, 0);
     DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
     String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" +
-      "<module-width>0.4mm</module-width></ean8></barcode>";
+      "<module-width>" + modulWidth + "</module-width></ean8></barcode>";
     InputStream in = new ByteArrayInputStream(xmlConf.getBytes());
     try {
       Configuration cfg = builder.build(in);
@@ -45,5 +59,10 @@ public class BarcodeScriptService implements ScriptService {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+  }
+  
+  private XWikiContext getContext() {
+    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
   }
 }
