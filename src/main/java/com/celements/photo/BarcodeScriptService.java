@@ -24,21 +24,41 @@ import com.xpn.xwiki.web.Utils;
 
 @Component("barcode")
 public class BarcodeScriptService implements ScriptService {
-  private String MODUL_WIDTH = "0.4mm";
+  private String MODULE_WIDTH = "0.33mm";
+  private String MODULE_HEIGHT = "15mm";
+  private String HUMAN_READABLE_FONT = "Helvetica";
+  private String HUMAN_READABLE_SIZE = "8pt";
   
   @Requirement
   Execution execution;
   
   public void generate(String number, OutputStream out) {
-    String modulWidth = getContext().getRequest().get("moduleWidth");
-    if((modulWidth == null) || "".equals(modulWidth.trim())) {
-      modulWidth = MODUL_WIDTH;
+    String moduleHeight = getContext().getRequest().get("moduleHeight");
+    if((moduleHeight == null) || "".equals(moduleHeight.trim())) {
+      moduleHeight = MODULE_HEIGHT;
+    }
+    String moduleWidth = getContext().getRequest().get("moduleWidth");
+    if((moduleWidth == null) || "".equals(moduleWidth.trim())) {
+      moduleWidth = MODULE_WIDTH;
+    }
+    String font = getContext().getRequest().get("font");
+    if((font == null) || "".equals(font.trim())) {
+      font = HUMAN_READABLE_FONT;
+    }
+    String size = getContext().getRequest().get("size");
+    if((size == null) || "".equals(size.trim())) {
+      size = HUMAN_READABLE_SIZE;
     }
     BitmapCanvasProvider provider = new BitmapCanvasProvider(
         out, "image/png", 300, BufferedImage.TYPE_BYTE_GRAY, true, 0);
     DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
     String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" +
-      "<module-width>" + modulWidth + "</module-width></ean8></barcode>";
+      "<height>" + moduleHeight + "</height>" +
+      "<module-width>" + moduleWidth + "</module-width>" +
+      "<human-readable>" +
+      "<font-name>" + font + "</font-name>" +
+      "<font-size>" + size + "</font-size>" +
+      "</human-readable></ean8></barcode>";
     InputStream in = new ByteArrayInputStream(xmlConf.getBytes());
     try {
       Configuration cfg = builder.build(in);
