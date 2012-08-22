@@ -26,8 +26,6 @@ import com.xpn.xwiki.web.Utils;
 public class BarcodeScriptService implements ScriptService {
   private String MODULE_WIDTH = "0.33mm";
   private String MODULE_HEIGHT = "15mm";
-  private String HUMAN_READABLE_FONT = "Helvetica";
-  private String HUMAN_READABLE_SIZE = "8pt";
   
   @Requirement
   Execution execution;
@@ -41,24 +39,13 @@ public class BarcodeScriptService implements ScriptService {
     if((moduleWidth == null) || "".equals(moduleWidth.trim())) {
       moduleWidth = MODULE_WIDTH;
     }
-    String font = getContext().getRequest().get("font");
-    if((font == null) || "".equals(font.trim())) {
-      font = HUMAN_READABLE_FONT;
-    }
-    String size = getContext().getRequest().get("size");
-    if((size == null) || "".equals(size.trim())) {
-      size = HUMAN_READABLE_SIZE;
-    }
     BitmapCanvasProvider provider = new BitmapCanvasProvider(
-        out, "image/png", 300, BufferedImage.TYPE_BYTE_GRAY, true, 0);
+        out, "image/png", 72, BufferedImage.TYPE_BYTE_GRAY, true, 0);
     DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
     String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" +
       "<height>" + moduleHeight + "</height>" +
       "<module-width>" + moduleWidth + "</module-width>" +
-      "<human-readable>" +
-      "<font-name>" + font + "</font-name>" +
-      "<font-size>" + size + "</font-size>" +
-      "</human-readable></ean8></barcode>";
+      "</ean8></barcode>";
     InputStream in = new ByteArrayInputStream(xmlConf.getBytes());
     try {
       Configuration cfg = builder.build(in);
