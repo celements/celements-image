@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>  
   <groupId>com.celements</groupId>
   <artifactId>celements-photo</artifactId>
-  <version>1.12-SNAPSHOT</version>
+  <version>1.16-SNAPSHOT</version>
   <description>Celements Photo</description> 
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
@@ -20,7 +20,8 @@
     <dependency>
       <groupId>com.celements</groupId>
   	  <artifactId>celements-core</artifactId>
-  	  <version>1.29-SNAPSHOT</version>
+  	  <version>1.33</version>
+  	  <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.drewnoakes</groupId>
@@ -40,5 +41,16 @@
       <scope>runtime</scope>
     </dependency>
  -->
-   </dependencies>  
+    <dependency>
+      <groupId>net.sf.barcode4j</groupId>
+      <artifactId>barcode4j</artifactId>
+      <version>2.1</version>
+      <exclusions>
+        <exclusion>  <!-- declare the exclusion here -->
+				  <groupId>commons-lang</groupId>
+				  <artifactId>commons-lang</artifactId>
+        </exclusion>
+      </exclusions> 
+    </dependency>
+  </dependencies>  
 </project>

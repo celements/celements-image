@@ -24,7 +24,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,7 +81,6 @@ public class ComputeImageCommand {
         InputStream in = attachmentClone.getContentInputStream(context);
         BufferedImage img = thumbGen.decodeImage(in);
         in.close();
-        ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
         if(needsCropping) {
           ByteArrayOutputStream out = new ByteArrayOutputStream();
           ICropImage cropComp = Utils.getComponent(ICropImage.class);
@@ -90,8 +88,12 @@ public class ComputeImageCommand {
               context), out);
           attachmentClone.setContent(new ByteArrayInputStream(((ByteArrayOutputStream)out
               ).toByteArray()));
+          in = attachmentClone.getContentInputStream(context);
+          img = thumbGen.decodeImage(in);
+          in.close();
         }
         if ((height > 0) || (width > 0)) {
+          ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
           byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
               attachmentClone.getMimeType(context), watermark, copyright, defaultBg);
           attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
