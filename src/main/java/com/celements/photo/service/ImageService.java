@@ -88,7 +88,7 @@ public class ImageService implements IImageService {
   
   /**
    * getRandomImages computes a set of <num> randomly chosen images
-   * from the given AttachmentList. It chooses the Images without dubilcats if
+   * from the given AttachmentList. It chooses the Images without duplicates if
    * possible.
    */
   public List<Attachment> getRandomImages(DocumentReference galleryRef, int num) {
