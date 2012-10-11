@@ -79,7 +79,8 @@ public class ComputeImageCommand {
         LOGGER.info("No cached image.");
         GenerateThumbnail thumbGen = new GenerateThumbnail();
         InputStream in = attachmentClone.getContentInputStream(context);
-        BufferedImage img = thumbGen.decodeImage(in);
+//        BufferedImage img = thumbGen.decodeImage(in);
+        BufferedImage img = (new DecodeImageCommand()).readImage(attachmentClone, context);
         in.close();
         if(needsCropping) {
           ByteArrayOutputStream out = new ByteArrayOutputStream();
