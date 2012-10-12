@@ -430,10 +430,13 @@ public class GenerateThumbnail {
   /**
    * Decodes a jpeg from an InputStream to a BufferedImage.
    * 
+   * Replaced by DecodeImageCommand which can handle CMYK images and embedded profiles.
+   * 
    * @param in InputStream representation of a jpeg image.
    * @return Decoded jpeg as BufferedImage.
    * @throws XWikiException 
    */
+  @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
     BufferedImage bufferedImage = null;
     try {
