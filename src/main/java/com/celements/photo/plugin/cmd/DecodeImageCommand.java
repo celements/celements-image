@@ -7,8 +7,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,6 +34,7 @@ public class DecodeImageCommand {
   public static final int COLOR_TYPE_YCCK = 3;
 
   private int colorType = COLOR_TYPE_RGB;
+  private String cmykProfile = "ECI_Offset_2009/ISOcoated_v2_300_eci.icc";
   
   public BufferedImage readImage(XWikiAttachment att, XWikiContext context
       ) throws IOException, ImageReadException, XWikiException {
@@ -137,7 +136,7 @@ public class DecodeImageCommand {
       ) throws IOException {
     if (cmykProfile == null) {
       cmykProfile = ICC_Profile.getInstance(getClass(
-          ).getClassLoader().getResourceAsStream("ISOcoated_v2_300_eci.icc"));
+          ).getClassLoader().getResourceAsStream(getCMYKProfile()));
     }
     if (cmykProfile.getProfileClass() != ICC_Profile.CLASS_DISPLAY) {
       // Need to clone entire profile, due to a JDK 7 bug
@@ -157,6 +156,14 @@ public class DecodeImageCommand {
     ColorConvertOp cmykToRgb = new ColorConvertOp(cmykCS, rgbCS, null);
     cmykToRgb.filter(cmykRaster, rgbRaster);
     return rgbImage;
+  }
+
+  public String getCMYKProfile() {
+    return cmykProfile;
+  }
+  
+  public void setCMYKProfile(String cmykProfile) {
+    this.cmykProfile = cmykProfile;
   }
 
   void intToBigEndian(int value, byte[] array, int index) {
