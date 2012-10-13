@@ -32,7 +32,12 @@ public class CropImage implements ICropImage {
   
   public void crop(BufferedImage img, int x, int y, int w, int h, String type, 
       OutputStream out)  {
-    BufferedImage buffCropped = img.getSubimage(x, y, w, h);
+    BufferedImage buffCropped = img;
+    w = Math.min(w, (img.getWidth()-x));
+    h = Math.min(h, (img.getHeight()-y));
+    if((x < img.getWidth()) && (y < img.getHeight())) {
+      buffCropped = img.getSubimage(x, y, w, h);
+    }
     (new GenerateThumbnail()).encodeImage(out, buffCropped, img, type);
   }
 
