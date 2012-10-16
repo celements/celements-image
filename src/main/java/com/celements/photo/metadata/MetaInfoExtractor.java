@@ -51,7 +51,8 @@ public class MetaInfoExtractor {
    * @return An arry of Tags.
    * @throws MetadataException
    */
-  public List<Tag> getDirectoryTagsAsTagArray(InputStream imageFile, Class directory) throws MetadataException{    
+  public List<Tag> getDirectoryTagsAsTagArray(InputStream imageFile, Class directory
+      ) throws MetadataException{    
     Metadata metadata = getMetadata(imageFile);
     Directory dir = metadata.getDirectory(directory);
     List<Tag> data = new ArrayList<Tag>();
@@ -68,7 +69,8 @@ public class MetaInfoExtractor {
    * @return Hashtable containing the directorys data.
    * @throws MetadataException
    */
-  public Hashtable<String, String> getAllTags(InputStream imageFile) throws MetadataException{  
+  public Hashtable<String, String> getAllTags(InputStream imageFile
+      ) throws MetadataException{  
     Metadata data = getMetadata(imageFile);
     Hashtable<String, String> tags = new Hashtable<String, String>();
     for(Directory dir : data.getDirectories()) {
@@ -104,7 +106,7 @@ public class MetaInfoExtractor {
   Hashtable<String, String> getDirsTags(Directory dir) throws MetadataException{
     Hashtable<String, String> metadata = new Hashtable<String, String>();
     for (Tag tag : dir.getTags()) {
-      metadata.put(tag.getTagName(), tag.getDescription());
+      metadata.put(tag.getTagName(), tag.toString());
     }
     return metadata;
   }
