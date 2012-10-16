@@ -1,4 +1,5 @@
-com.celements.photo.service.ImageScriptService
 com.celements.photo.service.ImageService
+com.celements.photo.service.ImageScriptService
+com.celements.photo.service.MetaInfoScriptService
 com.celements.photo.image.CropImage
 com.celements.photo.BarcodeScriptService
