@@ -41,6 +41,7 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * Provides methods to access metadata.
  */
+@Deprecated 
 public class Metainfo {
   /**
    * Get a specified Metadate from an image.
