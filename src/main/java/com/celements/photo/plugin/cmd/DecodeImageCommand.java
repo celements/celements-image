@@ -19,6 +19,7 @@
  */
 package com.celements.photo.plugin.cmd;
 
+import java.awt.color.CMMException;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
@@ -26,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.media.jai.JAI;
 
 import org.apache.sanselan.ImageReadException;
 import org.apache.sanselan.Sanselan;
@@ -43,6 +46,8 @@ import org.apache.sanselan.common.byteSources.ByteSourceInputStream;
 import org.apache.sanselan.formats.jpeg.JpegImageParser;
 import org.apache.sanselan.formats.jpeg.segments.UnknownSegment;
 
+import com.sun.media.jai.codec.SeekableStream;
+import com.sun.media.jai.codec.FileCacheSeekableStream;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -65,14 +70,17 @@ public class DecodeImageCommand {
     while (iter.hasNext()) {
       ImageReader reader = iter.next();
       reader.setInput(stream);
-
       BufferedImage image;
       ICC_Profile profile = null;
       try {
-        image = reader.read(0);
-      } catch(IIOException e) {
+        try {
+          image = reader.read(0);
+        } catch(CMMException cmmExcp) {
+          image = readUsingJAI(att, context);
+        }
+      } catch(IIOException iioExcp) {
         colorType = COLOR_TYPE_CMYK;
-        hasAdobeMarker = checkAdobeMarker(att.getContentInputStream(context), 
+        hasAdobeMarker = hasAdobeMarker(att.getContentInputStream(context), 
             att.getFilename());
         profile = Sanselan.getICCProfile(att.getContentInputStream(context), 
             att.getFilename());
@@ -89,8 +97,22 @@ public class DecodeImageCommand {
     }
     return null;
   }
+
+  // Requires Java Advanced Imaging - used as fallback for certain jpeg files containing 
+  // conflicting information on where the actual image data begins (JFIF != EXIF)
+  BufferedImage readUsingJAI(XWikiAttachment att, XWikiContext context)
+      throws IOException, XWikiException {
+    BufferedImage image;
+    SeekableStream seekableStream = new FileCacheSeekableStream(
+        att.getContentInputStream(context));
+    ParameterBlock paramBlock = new ParameterBlock();
+    paramBlock.add(seekableStream);
+    image = JAI.create(att.getMimeType(context).replaceAll("image/", ""), paramBlock
+        ).getAsBufferedImage();
+    return image;
+  }
   
-  boolean checkAdobeMarker(InputStream imgIn, String filename
+  boolean hasAdobeMarker(InputStream imgIn, String filename
       ) throws IOException, ImageReadException {
     boolean hasAdobeMarker = true;
     JpegImageParser parser = new JpegImageParser();
@@ -153,20 +175,7 @@ public class DecodeImageCommand {
 
   BufferedImage convertCmykToRgb(Raster cmykRaster, ICC_Profile cmykProfile
       ) throws IOException {
-    if (cmykProfile == null) {
-      cmykProfile = ICC_Profile.getInstance(getClass(
-          ).getClassLoader().getResourceAsStream(getCMYKProfile()));
-    }
-    if (cmykProfile.getProfileClass() != ICC_Profile.CLASS_DISPLAY) {
-      // Need to clone entire profile, due to a JDK 7 bug
-      byte[] profileData = cmykProfile.getData();
-
-      if (profileData[ICC_Profile.icHdrRenderingIntent] == ICC_Profile.icPerceptual) {
-        intToBigEndian(ICC_Profile.icSigDisplayClass, profileData, 
-            ICC_Profile.icHdrDeviceClass); // Header is first
-        cmykProfile = ICC_Profile.getInstance(profileData);
-      }
-    }
+    cmykProfile = getICCProfile(cmykProfile);
     ICC_ColorSpace cmykCS = new ICC_ColorSpace(cmykProfile);
     BufferedImage rgbImage = new BufferedImage(cmykRaster.getWidth(), 
         cmykRaster.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -177,18 +186,35 @@ public class DecodeImageCommand {
     return rgbImage;
   }
 
+  ICC_Profile getICCProfile(ICC_Profile cmykProfile) throws IOException {
+    if (cmykProfile == null) {
+      cmykProfile = ICC_Profile.getInstance(getClass(
+          ).getClassLoader().getResourceAsStream(getCMYKProfile()));
+    }
+    if (cmykProfile.getProfileClass() != ICC_Profile.CLASS_DISPLAY) {
+      // Need to clone entire profile, due to a JDK 7 bug
+      byte[] profileData = cmykProfile.getData();
+      if (profileData[ICC_Profile.icHdrRenderingIntent] == ICC_Profile.icPerceptual) {
+        intToBigEndian(ICC_Profile.icSigDisplayClass, profileData, 
+            ICC_Profile.icHdrDeviceClass); // Header is first
+        cmykProfile = ICC_Profile.getInstance(profileData);
+      }
+    }
+    return cmykProfile;
+  }
+  
+  void intToBigEndian(int value, byte[] array, int index) {
+    array[index]   = (byte) (value >> 24);
+    array[index+1] = (byte) (value >> 16);
+    array[index+2] = (byte) (value >>  8);
+    array[index+3] = (byte) (value);
+  }
+
   public String getCMYKProfile() {
     return cmykProfile;
   }
   
   public void setCMYKProfile(String cmykProfile) {
     this.cmykProfile = cmykProfile;
-  }
-
-  void intToBigEndian(int value, byte[] array, int index) {
-    array[index]   = (byte) (value >> 24);
-    array[index+1] = (byte) (value >> 16);
-    array[index+2] = (byte) (value >>  8);
-    array[index+3] = (byte) (value);
   }
 }
