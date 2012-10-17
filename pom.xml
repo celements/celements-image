@@ -8,13 +8,13 @@
   <modelVersion>4.0.0</modelVersion>  
   <groupId>com.celements</groupId>
   <artifactId>celements-photo</artifactId>
-  <version>1.17</version>
+  <version>1.18-SNAPSHOT</version>
   <description>Celements Photo</description> 
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
     <url>https://github.com/celements/celements-photo</url>
-    <tag>celements-photo-1.17</tag>
+    <tag>HEAD</tag>
   </scm>
   <dependencies>    
     <!-- Add here all your dependencies -->
