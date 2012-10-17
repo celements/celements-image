@@ -21,11 +21,14 @@ package com.celements.photo.metadata;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
@@ -51,7 +54,7 @@ public class MetaInfoExtractor {
    * @return An arry of Tags.
    * @throws MetadataException
    */
-  public List<Tag> getDirectoryTagsAsTagArray(InputStream imageFile, Class directory
+  public List<Tag> getDirectoryTagsAsTagList(InputStream imageFile, Class directory
       ) throws MetadataException{    
     Metadata metadata = getMetadata(imageFile);
     Directory dir = metadata.getDirectory(directory);
@@ -69,10 +72,10 @@ public class MetaInfoExtractor {
    * @return Hashtable containing the directorys data.
    * @throws MetadataException
    */
-  public Hashtable<String, String> getAllTags(InputStream imageFile
+  public Map<String, String> getAllTags(InputStream imageFile
       ) throws MetadataException{  
     Metadata data = getMetadata(imageFile);
-    Hashtable<String, String> tags = new Hashtable<String, String>();
+    Map<String, String> tags = new HashMap<String, String>();
     for(Directory dir : data.getDirectories()) {
       tags.putAll(getDirsTags(dir));
     }
