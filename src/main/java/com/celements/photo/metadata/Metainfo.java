@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.celements.photo.container.ImageLibStrings;
@@ -161,11 +162,9 @@ public class Metainfo {
     
     List<BaseObject> metadataObjs = celeMeta.getObjects(ImageLibStrings.METAINFO_CLASS);
     if(metadataObjs == null || metadataObjs.size() == 0){
-      Hashtable<String, String> metadata = extractAllMetadata(doc, dir + image, id, context);
+      Map<String, String> metadata = extractAllMetadata(doc, dir + image, id, context);
       
-      Enumeration<String> metadataEnum = metadata.keys();
-      while(metadataEnum.hasMoreElements()){
-        String key = (String)metadataEnum.nextElement();
+      for(String key : metadata.keySet()) {
         initNewObject(celeMeta, key, (String)metadata.get(key), context);
       }
       
@@ -198,7 +197,7 @@ public class Metainfo {
    * @throws IOException
    */
   @SuppressWarnings("unchecked")
-  private Hashtable<String, String> extractAllMetadata(XWikiDocument albumDoc, String image, String id, XWikiContext context) throws MetadataException, XWikiException, IOException{
+  private Map<String, String> extractAllMetadata(XWikiDocument albumDoc, String image, String id, XWikiContext context) throws MetadataException, XWikiException, IOException{
     InputStream imgAttachment = (new ZipAttachmentChanges()).getFromZip(albumDoc, image, id, context);
     if(imgAttachment != null){
       return (new MetaInfoExtractor()).getAllTags(imgAttachment);
