@@ -71,7 +71,11 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       JPEG(1, "image/jpeg"),
       PNG(2, "image/png"),
       GIF(3, "image/gif"),
-      BMP(4, "image/bmp");
+      BMP(4, "image/bmp");//,
+//      EPS(4, "application/postscript"),
+//      PDF(4, "application/pdf"),
+//      PSD(4, "image/x-photoshop"),
+//      TIF(4, "image/tiff");
 
       /**
        * The mime type associated to the supported format
@@ -150,6 +154,9 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   
   public XWikiAttachment downloadAttachment(XWikiAttachment attachment, 
       XWikiContext context) {
+
+//TODO check why in Debian resize of "problematic" images uses a lot more time than 
+//     resize AND crop
     if (this.isSupportedImageFormat(attachment.getMimeType(context))) {
       String sheight = context.getRequest().getParameter("celheight");
       String swidth = context.getRequest().getParameter("celwidth");

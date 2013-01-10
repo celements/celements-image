@@ -150,20 +150,21 @@ public class ImageCacheCommand {
   }
 
   String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension,
-      String copyright, String watermark, int cropX, int cropY, int cropW, int cropH
-      ) throws NoSuchAlgorithmException {
+      String copyright, String watermark, int cropX, int cropY, int cropW, int cropH,
+      boolean blackNwhite) throws NoSuchAlgorithmException {
     String key = attachment.getId() 
         + "-" + attachment.getVersion()
         + "-" + getType(attachment.getMimeType(getContext()))
         + "-" + attachment.getDate().getTime()
         + "-" + dimension.getWidth()
         + "-" + dimension.getHeight()
-        + "-" + getAditionalInfoHash(copyright, watermark, cropX, cropY, cropW, cropH);
+        + "-" + getAditionalInfoHash(copyright, watermark, cropX, cropY, cropW, cropH,
+            blackNwhite);
     return key;
   }
 
   String getAditionalInfoHash(String copyright, String watermark, int cropX, int cropY, 
-      int cropW, int cropH) throws NoSuchAlgorithmException {
+      int cropW, int cropH, boolean blackNwhite) throws NoSuchAlgorithmException {
     String hashValue = null;
     if(((watermark != null) && (watermark.length() > 0))
         || ((copyright != null) && (copyright.length() > 0))){
@@ -176,6 +177,9 @@ public class ImageCacheCommand {
         hashValue = "";
       }
       hashValue += cropX + ":" + cropY + "_" + cropW + "x" + cropH;
+    }
+    if(blackNwhite) {
+      hashValue += "<:>Black and White";
     }
     String hash = "";
     if(hashValue != null) {
