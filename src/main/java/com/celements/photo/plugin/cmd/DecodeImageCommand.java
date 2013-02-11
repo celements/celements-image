@@ -41,6 +41,8 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sanselan.ImageReadException;
 import org.apache.sanselan.Sanselan;
 import org.apache.sanselan.common.byteSources.ByteSource;
@@ -55,6 +57,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class DecodeImageCommand {
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(
+      DecodeImageCommand.class);
+  
   public static final int COLOR_TYPE_RGB = 1;
   public static final int COLOR_TYPE_CMYK = 2;
   public static final int COLOR_TYPE_YCCK = 3;
@@ -63,65 +68,81 @@ public class DecodeImageCommand {
   private String cmykProfile = "ECI_Offset_2009/ISOcoated_v2_300_eci.icc";
   
   public BufferedImage readImage(XWikiAttachment att, XWikiContext context
-      ) throws IOException, ImageReadException, XWikiException {
+      ) throws ImageReadException, XWikiException {
     return readImage(att.getContentInputStream(context), att.getFilename(), 
         att.getMimeType(context));
   }
   
   public BufferedImage readImage(InputStream imageStream, String filename, 
-      String mimeType) throws IOException, ImageReadException, 
-      XWikiException {
-    ByteArrayOutputStream createMarkStreamHelper = new ByteArrayOutputStream();
-    if(imageStream.markSupported()) {
-      imageStream.mark(Integer.MAX_VALUE);
-    } else {
-      byte[] buffer = new byte[1024];
-      int len;
-      while ((len = imageStream.read(buffer)) > -1 ) {
-        createMarkStreamHelper.write(buffer, 0, len);
+      String mimeType) throws ImageReadException, XWikiException {
+    BufferedImage image = null;
+    ByteArrayOutputStream createMarkStreamHelper = null;
+    try {
+      if(imageStream.markSupported()) {
+        imageStream.mark(Integer.MAX_VALUE);
+      } else {
+        createMarkStreamHelper = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = imageStream.read(buffer)) > -1 ) {
+          createMarkStreamHelper.write(buffer, 0, len);
+        }
+        createMarkStreamHelper.flush();
+        //NOTICE: ByteArrayInputStream supports mark and marks by default on position 0
+        imageStream = new ByteArrayInputStream(createMarkStreamHelper.toByteArray()); 
       }
-      createMarkStreamHelper.flush();
-      imageStream.close();
-      //NOTICE: ByteArrayInputStream supports mark and marks by default on position 0
-      imageStream = new ByteArrayInputStream(createMarkStreamHelper.toByteArray()); 
-    }
-    colorType = COLOR_TYPE_RGB;
-    boolean hasAdobeMarker = false;
-    ImageInputStream stream = ImageIO.createImageInputStream(imageStream);
-    Iterator<ImageReader> iter = ImageIO.getImageReaders(stream);
-    while (iter.hasNext()) {
-      ImageReader reader = iter.next();
-      reader.setInput(stream);
-      BufferedImage image;
-      ICC_Profile profile = null;
-      try {
+      colorType = COLOR_TYPE_RGB;
+      boolean hasAdobeMarker = false;
+      ImageInputStream stream = ImageIO.createImageInputStream(imageStream);
+      Iterator<ImageReader> iter = ImageIO.getImageReaders(stream);
+      while (iter.hasNext()) {
+        ImageReader reader = iter.next();
+        reader.setInput(stream);
+        ICC_Profile profile = null;
         try {
-          image = reader.read(0);
-        } catch(CMMException cmmExcp) {
+          try {
+            image = reader.read(0);
+          } catch(CMMException cmmExcp) {
+            imageStream.reset();
+            image = readUsingJAI(imageStream, mimeType);
+          }
+        } catch(IIOException iioExcp) {
+          colorType = COLOR_TYPE_CMYK;
           imageStream.reset();
-          image = readUsingJAI(imageStream, mimeType);
+          hasAdobeMarker = hasAdobeMarker(imageStream, filename);
+          imageStream.reset();
+          profile = Sanselan.getICCProfile(imageStream, filename);
+          WritableRaster raster = (WritableRaster) reader.readRaster(0, null);
+          if (colorType == COLOR_TYPE_YCCK) {
+            convertYcckToCmyk(raster);
+          }
+          if(hasAdobeMarker) {
+            convertInvertedColors(raster);
+          }
+          image = convertCmykToRgb(raster, profile);
         }
-      } catch(IIOException iioExcp) {
-        colorType = COLOR_TYPE_CMYK;
-        imageStream.reset();
-        hasAdobeMarker = hasAdobeMarker(imageStream, filename);
-        imageStream.reset();
-        profile = Sanselan.getICCProfile(imageStream, filename);
-        WritableRaster raster = (WritableRaster) reader.readRaster(0, null);
-        if (colorType == COLOR_TYPE_YCCK) {
-          convertYcckToCmyk(raster);
+        if(image != null) {
+          break;
         }
-        if(hasAdobeMarker) {
-          convertInvertedColors(raster);
-        }
-        image = convertCmykToRgb(raster, profile);
       }
-      imageStream.close();
-      createMarkStreamHelper.close();
-      return image;
+    } catch(IOException ioe) {
+      
+    }finally {
+      if(imageStream != null) {
+        try {
+          imageStream.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Exception cloasing in stream.", ioe);
+        }
+      }
+      if(createMarkStreamHelper != null) {
+        try {
+          createMarkStreamHelper.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Exception cloasing out stream.", ioe);
+        }
+      }
     }
-    imageStream.close();
-    createMarkStreamHelper.close();
     return null;
   }
 
