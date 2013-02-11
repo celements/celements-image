@@ -28,6 +28,8 @@ import java.awt.image.ColorConvertOp;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -46,8 +48,8 @@ import org.apache.sanselan.common.byteSources.ByteSourceInputStream;
 import org.apache.sanselan.formats.jpeg.JpegImageParser;
 import org.apache.sanselan.formats.jpeg.segments.UnknownSegment;
 
-import com.sun.media.jai.codec.SeekableStream;
 import com.sun.media.jai.codec.FileCacheSeekableStream;
+import com.sun.media.jai.codec.SeekableStream;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -62,37 +64,49 @@ public class DecodeImageCommand {
   
   public BufferedImage readImage(XWikiAttachment att, XWikiContext context
       ) throws IOException, ImageReadException, XWikiException {
-    return readImage(stream, att.getFilename(), context);
+    return readImage(att.getContentInputStream(context), att.getFilename(), 
+        att.getMimeType(context));
   }
   
-  public BufferedImage readImage(InputStream imgFullSize, XWikiContext context) {
-    //TODO is nach iis
-    return readImage(, context);
-  }
-  
-  public BufferedImage readImage(InputStream imageStream, String filename, XWikiContext context) {
+  public BufferedImage readImage(InputStream imageStream, String filename, 
+      String mimeType) throws IOException, ImageReadException, 
+      XWikiException {
+    ByteArrayOutputStream createMarkStreamHelper = new ByteArrayOutputStream();
+    if(imageStream.markSupported()) {
+      imageStream.mark(Integer.MAX_VALUE);
+    } else {
+      byte[] buffer = new byte[1024];
+      int len;
+      while ((len = imageStream.read(buffer)) > -1 ) {
+        createMarkStreamHelper.write(buffer, 0, len);
+      }
+      createMarkStreamHelper.flush();
+      imageStream.close();
+      //NOTICE: ByteArrayInputStream supports mark and marks by default on position 0
+      imageStream = new ByteArrayInputStream(createMarkStreamHelper.toByteArray()); 
+    }
     colorType = COLOR_TYPE_RGB;
     boolean hasAdobeMarker = false;
-    ImageInputStream stream = ImageIO.createImageInputStream(att.getContentInputStream(
-        context));
-    Iterator<ImageReader> iter = ImageIO.getImageReaders(imageStream);
+    ImageInputStream stream = ImageIO.createImageInputStream(imageStream);
+    Iterator<ImageReader> iter = ImageIO.getImageReaders(stream);
     while (iter.hasNext()) {
       ImageReader reader = iter.next();
-      reader.setInput(imageStream);
+      reader.setInput(stream);
       BufferedImage image;
       ICC_Profile profile = null;
       try {
         try {
           image = reader.read(0);
         } catch(CMMException cmmExcp) {
-          image = readUsingJAI(att, context);
+          imageStream.reset();
+          image = readUsingJAI(imageStream, mimeType);
         }
       } catch(IIOException iioExcp) {
         colorType = COLOR_TYPE_CMYK;
-        hasAdobeMarker = hasAdobeMarker(att.getContentInputStream(context), 
-            filename);
-        profile = Sanselan.getICCProfile(att.getContentInputStream(context), 
-            filename);
+        imageStream.reset();
+        hasAdobeMarker = hasAdobeMarker(imageStream, filename);
+        imageStream.reset();
+        profile = Sanselan.getICCProfile(imageStream, filename);
         WritableRaster raster = (WritableRaster) reader.readRaster(0, null);
         if (colorType == COLOR_TYPE_YCCK) {
           convertYcckToCmyk(raster);
@@ -102,21 +116,24 @@ public class DecodeImageCommand {
         }
         image = convertCmykToRgb(raster, profile);
       }
+      imageStream.close();
+      createMarkStreamHelper.close();
       return image;
     }
+    imageStream.close();
+    createMarkStreamHelper.close();
     return null;
   }
 
   // Requires Java Advanced Imaging - used as fallback for certain jpeg files containing 
   // conflicting information on where the actual image data begins (JFIF != EXIF)
-  BufferedImage readUsingJAI(XWikiAttachment att, XWikiContext context)
+  BufferedImage readUsingJAI(InputStream inputStream, String mimeType)
       throws IOException, XWikiException {
     BufferedImage image;
-    SeekableStream seekableStream = new FileCacheSeekableStream(
-        att.getContentInputStream(context));
+    SeekableStream seekableStream = new FileCacheSeekableStream(inputStream);
     ParameterBlock paramBlock = new ParameterBlock();
     paramBlock.add(seekableStream);
-    image = JAI.create(att.getMimeType(context).replaceAll("image/", ""), paramBlock
+    image = JAI.create(mimeType.replaceAll("image/", ""), paramBlock
         ).getAsBufferedImage();
     return image;
   }

@@ -27,9 +27,12 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -41,9 +44,11 @@ import javax.media.jai.UnpackedImageData;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sanselan.ImageReadException;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
+import com.celements.photo.plugin.cmd.DecodeImageCommand;
 import com.celements.photo.utilities.Util;
 import com.xpn.xwiki.XWikiException;
 
@@ -439,8 +444,25 @@ public class GenerateThumbnail {
   @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
     BufferedImage bufferedImage = null;
+    ByteArrayOutputStream convertOut = new ByteArrayOutputStream();
     try {
-      bufferedImage = ImageIO.read(in);
+      //URLConnection.guessContentTypeFromStream needs a stream supporting mark
+      if(!in.markSupported()) {
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = in.read(buffer)) > -1 ) {
+          convertOut.write(buffer, 0, len);
+        }
+        convertOut.flush();
+        in.close();
+        //NOTICE: ByteArrayInputStream supports mark and marks by default on position 0
+        in = new ByteArrayInputStream(convertOut.toByteArray()); 
+      }
+      DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
+      bufferedImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
+      convertOut.close();
+    } catch (ImageReadException e) {
+      mLogger.error("Could not read image!", e);
     } catch (IOException e) {
       mLogger.error("Could not open the file! ", e);
       throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
