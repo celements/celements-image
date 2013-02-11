@@ -62,14 +62,23 @@ public class DecodeImageCommand {
   
   public BufferedImage readImage(XWikiAttachment att, XWikiContext context
       ) throws IOException, ImageReadException, XWikiException {
+    return readImage(stream, att.getFilename(), context);
+  }
+  
+  public BufferedImage readImage(InputStream imgFullSize, XWikiContext context) {
+    //TODO is nach iis
+    return readImage(, context);
+  }
+  
+  public BufferedImage readImage(InputStream imageStream, String filename, XWikiContext context) {
     colorType = COLOR_TYPE_RGB;
     boolean hasAdobeMarker = false;
     ImageInputStream stream = ImageIO.createImageInputStream(att.getContentInputStream(
         context));
-    Iterator<ImageReader> iter = ImageIO.getImageReaders(stream);
+    Iterator<ImageReader> iter = ImageIO.getImageReaders(imageStream);
     while (iter.hasNext()) {
       ImageReader reader = iter.next();
-      reader.setInput(stream);
+      reader.setInput(imageStream);
       BufferedImage image;
       ICC_Profile profile = null;
       try {
@@ -81,9 +90,9 @@ public class DecodeImageCommand {
       } catch(IIOException iioExcp) {
         colorType = COLOR_TYPE_CMYK;
         hasAdobeMarker = hasAdobeMarker(att.getContentInputStream(context), 
-            att.getFilename());
+            filename);
         profile = Sanselan.getICCProfile(att.getContentInputStream(context), 
-            att.getFilename());
+            filename);
         WritableRaster raster = (WritableRaster) reader.readRaster(0, null);
         if (colorType == COLOR_TYPE_YCCK) {
           convertYcckToCmyk(raster);
