@@ -20,7 +20,9 @@
 package com.celements.photo.plugin.cmd;
 
 import java.awt.Color;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -42,6 +44,8 @@ public class ComputeImageCommand {
 
   private ImageCacheCommand imgCacheCmd;
 
+  
+  //TODO -> ALLES cachen, Bilder mit Profil bearbeiten, ausser wenn format=raw
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
@@ -54,6 +58,8 @@ public class ComputeImageCommand {
     boolean needsCropping = needsCropping(cropX, cropY, cropW, cropH);
     LOGGER.debug("Crop needed: " + needsCropping + " -> " + cropX + ":" + cropY + " " + 
         cropW + "x" + cropH);
+    boolean blackAndWhite = parseIntWithDefault(context.getRequest().get("BnW"), 0) == 1;
+    LOGGER.debug("Get image as Black & White: " + blackAndWhite);
     // resize params
     if((defaultBgString != null) && defaultBgString.matches("[0-9A-Fa-f]{6}")) {
       int r = Integer.parseInt(defaultBgString.substring(1, 3), 16);
@@ -69,7 +75,8 @@ public class ComputeImageCommand {
 //          + "; resized width=" + dimension.getWidth() + "; resized height="
 //          + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(
-          width, height), copyright, watermark, cropX, cropY, cropW, cropH);
+          width, height), copyright, watermark, cropX, cropY, cropW, cropH, 
+          blackAndWhite);
       LOGGER.debug("attachment key: '" + key + "'");
       InputStream data = getImageCacheCmd().getImageForKey(key);
       if (data != null) {
@@ -78,10 +85,11 @@ public class ComputeImageCommand {
       } else {
         LOGGER.info("No cached image.");
         GenerateThumbnail thumbGen = new GenerateThumbnail();
-        InputStream in = attachmentClone.getContentInputStream(context);
+        long timeLast = System.currentTimeMillis();
+        LOGGER.info("start loading image " + timeLast);
         DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
         BufferedImage img = decodeImageCommand.readImage(attachmentClone, context);
-        in.close();
+        timeLast = logRuntime(timeLast, "image decoded after ");
         if(needsCropping) {
           ByteArrayOutputStream out = new ByteArrayOutputStream();
           ICropImage cropComp = Utils.getComponent(ICropImage.class);
@@ -89,23 +97,44 @@ public class ComputeImageCommand {
               context), out);
           attachmentClone.setContent(new ByteArrayInputStream(((ByteArrayOutputStream)out
               ).toByteArray()));
-          in = attachmentClone.getContentInputStream(context);
           img = decodeImageCommand.readImage(attachmentClone, context);
-          in.close();
         }
+        timeLast = logRuntime(timeLast, "image cropped after ");
         if ((height > 0) || (width > 0)) {
           ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
+          timeLast = logRuntime(timeLast, "got image dimensions after ");
           byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
               attachmentClone.getMimeType(context), watermark, copyright, defaultBg);
+          timeLast = logRuntime(timeLast, "resize done after ");
           attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
+          timeLast = logRuntime(timeLast, "new attachment content set after ");
+        }
+        if(blackAndWhite) {
+          img = decodeImageCommand.readImage(attachmentClone, context);
+          ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);  
+          ColorConvertOp op = new ColorConvertOp(cs, null);
+          BufferedImage bNwImg = op.filter(img, null);
+          ByteArrayOutputStream out = new ByteArrayOutputStream();
+          thumbGen.encodeImage(out, bNwImg, img, attachmentClone.getMimeType(context));
+          byte[] bNwImage = out.toByteArray();
+          attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
+          timeLast = logRuntime(timeLast, "image changed to black & white after ");
         }
         getImageCacheCmd().addToCache(key, attachmentClone);
+        timeLast = logRuntime(timeLast, "image in cache after ");
       }
     } catch (Exception exp) {
       LOGGER.error("Error, could not resize / cache image", exp);
       attachmentClone = attachment;
     }
     return attachmentClone;
+  }
+
+  long logRuntime(long timeLast, String message) {
+    long timeNow = System.currentTimeMillis();
+    LOGGER.info(message + (timeNow - timeLast) + " milliseconds " + "(time: " + timeNow 
+        + ")");
+    return timeNow;
   }
 
   private boolean needsCropping(int cropX, int cropY, int cropW, int cropH) {

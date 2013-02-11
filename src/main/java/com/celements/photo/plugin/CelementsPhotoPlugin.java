@@ -20,6 +20,7 @@
 package com.celements.photo.plugin;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import com.celements.photo.image.Image;
 import com.celements.photo.image.Thumbnail;
 import com.celements.photo.metadata.Metainfo;
 import com.celements.photo.plugin.cmd.ComputeImageCommand;
+import com.celements.photo.plugin.cmd.DecodeImageCommand;
 import com.celements.photo.service.IImageService;
 import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.ImportFileObject;
@@ -464,7 +466,9 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       }
       LOGGER.debug("unzip mimetype is " + mimeType);
       ByteArrayOutputStream out = new ByteArrayOutputStream();
-      ImageDimensions id = (new GenerateThumbnail()).createThumbnail(imgFullSize, out, 
+      DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
+      BufferedImage img = decodeImageCommand.readImage(imgFullSize, context);
+      ImageDimensions id = (new GenerateThumbnail()).createThumbnail(img, out, 
           width, height, null, null, mimeType, null);
       LOGGER.info("width='" + id.width + "' height='" + id.height + "'");
       LOGGER.info("output stream size: " + out.size());

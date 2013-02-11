@@ -2,6 +2,10 @@ package com.celements.photo.service;
 
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -9,12 +13,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.ImageDimensions;
+import com.celements.photo.container.Metadate;
 import com.celements.photo.image.ICropImage;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
+import com.drew.metadata.Tag;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -36,6 +43,9 @@ public class ImageScriptService implements ScriptService {
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       ImageScriptService.class);
 
+  @Requirement
+  IMetaInfoService metaInfoSrv;
+  
   @Requirement
   IImageService imageService;
 
@@ -137,5 +147,51 @@ public class ImageScriptService implements ScriptService {
     int h = Integer.parseInt(getContext().getRequest().get("cropH"));
     if(h <= 0) { h = 1; }
     cropImage.outputCroppedImage(srcDoc, srcFilename, x, y, w, h);
+  }
+  
+  public Metadate getTag(DocumentReference docRef, String filename, String tag) {
+    return new Metadate(metaInfoSrv.getMetaTag(docRef, filename, tag));
+  }
+  
+  public Metadate getTag(Attachment attachment, String tag) {
+    return new Metadate(metaInfoSrv.getMetaTag(attachment.getAttachment(), tag));
+  }
+  
+  public List<Metadate> getDirectoryTags(DocumentReference docRef, String filename, 
+      String directory) {
+    List<Metadate> metaList = new ArrayList<Metadate>();
+    List<Tag> tagList = metaInfoSrv.getDirectoryTags(docRef, filename, directory);
+    for (Tag tag : tagList) {
+      metaList.add(new Metadate(tag));
+    }
+    return metaList;
+  }
+
+  public List<Metadate> getDirectoryTags(Attachment attachment, String directory) {
+    List<Metadate> metaList = new ArrayList<Metadate>();
+    List<Tag> tagList = metaInfoSrv.getDirectoryTags(attachment.getAttachment(), 
+        directory);
+    for (Tag tag : tagList) {
+      metaList.add(new Metadate(tag));
+    }
+    return metaList;
+  }
+
+  public Map<String, Metadate> getAllTags(DocumentReference docRef, String filename) {
+    Map<String, Metadate> metaMap = new HashMap<String, Metadate>();
+    Map<String, Tag> tagMap = metaInfoSrv.getAllTags(docRef, filename);
+    for (String tag : tagMap.keySet()) {
+      metaMap.put(tag, new Metadate(tagMap.get(tag)));
+    }
+    return metaMap;
+  }
+
+  public Map<String, Metadate> getAllTags(Attachment attachment) {
+    Map<String, Metadate> metaMap = new HashMap<String, Metadate>();
+    Map<String, Tag> tagMap = metaInfoSrv.getAllTags(attachment.getAttachment());
+    for (String tag : tagMap.keySet()) {
+      metaMap.put(tag, new Metadate(tagMap.get(tag)));
+    }
+    return metaMap;
   }
 }
