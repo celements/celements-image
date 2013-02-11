@@ -448,8 +448,9 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       int width, int height, XWikiContext context) throws XWikiException {
     LOGGER.info("START: zip='" + zipFile.getFilename() + "' file='" + unzipFileName + "' gallery='" + attachToDoc + "' " +
         "width='" + width + "' height='" + height + "'");
+    ByteArrayInputStream imgFullSize = null;
+    ByteArrayOutputStream out = null;
     try {
-      ByteArrayInputStream imgFullSize = null;
       if(isZipFile(zipFile, context)){
         imgFullSize = new ByteArrayInputStream(
           (new Unzip()).getFile(zipFile.getContent(context), unzipFileName).toByteArray());
@@ -463,7 +464,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
         mimeType = unzipFileName.substring(unzipFileName.lastIndexOf('.') + 1);
       }
       LOGGER.debug("unzip mimetype is " + mimeType);
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      out = new ByteArrayOutputStream();
       ImageDimensions id = (new GenerateThumbnail()).createThumbnail(imgFullSize, out, 
           width, height, null, null, mimeType, null);
       LOGGER.info("width='" + id.width + "' height='" + id.height + "'");
@@ -474,6 +475,21 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       LOGGER.info("attachment='" + att.getFilename() + "', gallery='" + att.getDoc().getFullName() + "' size='" + att.getFilesize() + "'");
     } catch (IOException e) {
       LOGGER.error(e);
+    } finally {
+      if(imgFullSize != null) {
+        try {
+          imgFullSize.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Could not close input stream.", ioe);
+        }
+      }
+      if(out != null) {
+        try {
+          out.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Could not close output stream.", ioe);
+        }
+      }
     }
     LOGGER.info("END file='" + unzipFileName + "'");
   }
