@@ -58,7 +58,7 @@ import com.xpn.xwiki.XWikiException;
  */
 public class GenerateThumbnail {
   
-  private static final Log mLogger = LogFactory.getFactory().getInstance(GenerateThumbnail.class);
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(GenerateThumbnail.class);
 
   /**
    * saveTypes : image types which can be preserved resizing the image
@@ -113,7 +113,7 @@ public class GenerateThumbnail {
       width = img.getWidth();
       height = img.getHeight();
     }
-    mLogger.debug("img width=" + width + "; img height=" + height);
+    LOGGER.debug("img width=" + width + "; img height=" + height);
     return getThumbnailDimensions(width, height, maxWidth, maxHeight);
   }
 
@@ -262,12 +262,12 @@ public class GenerateThumbnail {
       Color defaultBg) {
     Image thumbImg = img; 
     // Only generates a thumbnail if the image is larger than the desired thumbnail.
-    mLogger.debug("img: " + img + " - imgSize: " + imgSize);
+    LOGGER.debug("img: " + img + " - imgSize: " + imgSize);
     if((img.getWidth() > (int)imgSize.getWidth()) || (img.getHeight() > (int)imgSize.getHeight())){
       // The "-1" is used to resize maintaining the aspect ratio.
       thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
     }
-    mLogger.debug("width ziel: " + imgSize.getWidth() + ", height ziel: " + 
+    LOGGER.debug("width ziel: " + imgSize.getWidth() + ", height ziel: " + 
         imgSize.getHeight() + "; width: " + thumbImg.getWidth(null) + ", height: " + 
         thumbImg.getHeight(null));
     BufferedImage buffThumb = convertImageToBufferedImage(thumbImg, watermark, copyright,
@@ -287,17 +287,17 @@ public class GenerateThumbnail {
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
       String type) {
     if(!saveTypes.containsKey(type.toLowerCase())) {
-      mLogger.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
+      LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
       type = "png"; //default for all not jpeg or gif files
     }
     try {
       ImageIO.write(image, saveTypes.get(type.toLowerCase()), out);
     } catch (IOException ioe) {
-      mLogger.error("Could not save image as [" + type + "]! " + ioe);
+      LOGGER.error("Could not save image as [" + type + "]! " + ioe);
       try {
         ImageIO.write(fallback, saveTypes.get(type.toLowerCase()), out);
       } catch (IOException e) {
-        mLogger.error("Could not save fallback image as [" + type + "]! " + e);
+        LOGGER.error("Could not save fallback image as [" + type + "]! " + e);
       }
     }
   }
@@ -328,7 +328,7 @@ public class GenerateThumbnail {
     if((copyright != null) && (!copyright.equals(""))){
       drawCopyright(copyright, g2d, thumb.getWidth(), thumb.getHeight());
     }
-    mLogger.info("thumbDimensions: " + thumb.getHeight() + "x" + thumb.getWidth());
+    LOGGER.info("thumbDimensions: " + thumb.getHeight() + "x" + thumb.getWidth());
     return thumb;
   }
 
@@ -444,29 +444,44 @@ public class GenerateThumbnail {
   @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
     BufferedImage bufferedImage = null;
-    ByteArrayOutputStream convertOut = new ByteArrayOutputStream();
+    ByteArrayOutputStream convertOut = null;
+    boolean markSupported = in.markSupported();
     try {
+      convertOut = new ByteArrayOutputStream();
       //URLConnection.guessContentTypeFromStream needs a stream supporting mark
-      if(!in.markSupported()) {
+      if(!markSupported) {
         byte[] buffer = new byte[1024];
         int len;
         while ((len = in.read(buffer)) > -1 ) {
           convertOut.write(buffer, 0, len);
         }
         convertOut.flush();
-        in.close();
         //NOTICE: ByteArrayInputStream supports mark and marks by default on position 0
         in = new ByteArrayInputStream(convertOut.toByteArray()); 
       }
       DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
       bufferedImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
-      convertOut.close();
     } catch (ImageReadException e) {
-      mLogger.error("Could not read image!", e);
+      LOGGER.error("Could not read image!", e);
     } catch (IOException e) {
-      mLogger.error("Could not open the file! ", e);
+      LOGGER.error("Could not open the file! ", e);
       throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
           XWikiException.ERROR_XWIKI_UNKNOWN, "Could not decode the image file.", e);
+    } finally {
+      if(!markSupported) {
+        try {
+          in.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Closing input stream failed", ioe);
+        }
+      }
+      if(convertOut != null) {
+        try {
+          convertOut.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Closing input stream failed", ioe);
+        }
+      }
     }
     return bufferedImage;
   }
@@ -494,7 +509,7 @@ public class GenerateThumbnail {
     try {
       hash = Util.getUtil().hashToHex(getHashOfImage(img));
     } catch (NoSuchAlgorithmException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     
     return hash;
