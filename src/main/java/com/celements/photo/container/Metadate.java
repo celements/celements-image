@@ -19,6 +19,8 @@
  */
 package com.celements.photo.container;
 
+import com.drew.metadata.Tag;
+
 /**
  * Container used to simplify the velocity access. Represents a metatag, 
  * containing the tag's name and description.
@@ -35,6 +37,17 @@ public class Metadate {
     name = "";
     description = "";
     empty = true;
+  }
+  
+  /**
+   * Set the name and description of the metatag.
+   * 
+   * @param Tag to initialize with
+   */
+  public Metadate(Tag tag){
+    name = tag.getTagName();
+    description = tag.getDescription();
+    empty = false;
   }
   
   /**
