@@ -143,7 +143,7 @@ public class DecodeImageCommand {
         }
       }
     }
-    return null;
+    return image;
   }
 
   // Requires Java Advanced Imaging - used as fallback for certain jpeg files containing 

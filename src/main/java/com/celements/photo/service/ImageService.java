@@ -1,6 +1,7 @@
 package com.celements.photo.service;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -68,21 +68,23 @@ public class ImageService implements IImageService {
     DocumentReference docRef = (DocumentReference) imgRef.getParent();
     XWikiDocument theDoc = getContext().getWiki().getDocument(docRef, getContext());
     XWikiAttachment theAttachment = theDoc.getAttachment(imgRef.getName());
-    byte[] data;
-    try {
-      data = theAttachment.getContent(getContext());
-    } catch (XWikiException exp) {
-      LOGGER.warn("getDimension Image Attachment content [" + theAttachment.getFilename()
-          + "] not found.", exp);
-      Object[] args = { theAttachment.getFilename() };
-      throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-          XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-          "Attachment content {0} not found", exp, args);
-    }
+    ImageDimensions imageDimensions = null;
     GenerateThumbnail genThumbnail = new GenerateThumbnail();
-    ByteArrayInputStream imageInStream = new ByteArrayInputStream(data);
-    ImageDimensions imageDimensions = genThumbnail.getImageDimensions(imageInStream);
-    imageInStream.reset();
+    InputStream imageInStream = null;
+    try {
+      imageInStream = theAttachment.getContentInputStream(getContext());
+      imageDimensions = genThumbnail.getImageDimensions(imageInStream);
+    } finally {
+      if(imageInStream != null) {
+        try {
+          imageInStream.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Error closing InputStream.", ioe);
+        }
+      } else {
+        imageDimensions = new ImageDimensions();
+      }
+    }
     return imageDimensions;
   }
   
