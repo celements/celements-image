@@ -24,7 +24,6 @@ import java.io.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.celements.photo.plugin.CelementsPhotoPlugin;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -34,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Used to add data as a new XWikiAttachment to an XWikiDocument.
  */
 public class AddAttachmentToDoc {
-  private static final Log mLogger = 
+  private static final Log LOGGER = 
       LogFactory.getFactory().getInstance(AddAttachmentToDoc.class);
   
   /**
@@ -65,6 +64,9 @@ public class AddAttachmentToDoc {
    *           attachment.
    * @return The attachment containing the given data.
    * @throws XWikiException
+   * 
+   * TODO move to celementsWeb AttachmentService and check that AttachmentEvents
+   *      are fired for lucene!
    */
   public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename, 
       XWikiContext context) throws XWikiException{
@@ -76,7 +78,7 @@ public class AddAttachmentToDoc {
         olddoc.getAttachmentList().add(attachment);
     }
     
-    mLogger.info("filename='" + filename + "' contentsize='" + data.length + "'");
+    LOGGER.info("filename='" + filename + "' contentsize='" + data.length + "'");
     attachment.setContent(data);
     attachment.setFilename(filename);
     attachment.setAuthor(context.getUser());
