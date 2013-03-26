@@ -200,12 +200,8 @@ public class BaseObjectHandler {
   public boolean getImageBoolean(XWikiDocument doc, String tag) throws XWikiException {
     BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
     if(obj != null){
-      String s = obj.getStringValue(tag);
-      if(s.equals("Yes")){
-        return true;
-      }
+      return obj.getIntValue(tag) == 1;
     }
-    
     return false;
   }
   
@@ -218,15 +214,11 @@ public class BaseObjectHandler {
    * @param context XWikiContext
    * @throws XWikiException
    */
-  public void setImageBoolean(XWikiDocument doc, String tag, boolean value, XWikiContext context) throws XWikiException {
+  public void setImageBoolean(XWikiDocument doc, String tag, boolean value, 
+      XWikiContext context) throws XWikiException {
     BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
     if(obj != null){
-      String stringValue = "No";
-      if(value){
-        stringValue = "Yes";
-      }
-      
-      obj.setStringValue(tag, stringValue);
+      obj.setIntValue(tag, (value? 1 : 0));
         context.getWiki().saveDocument(doc, context);
     }
   }
