@@ -28,15 +28,13 @@ import com.drew.metadata.Tag;
 public class Metadate {
   private String name;
   private String description;
-  private boolean empty;
   
   /**
    * Initialises an empty metatag.
    */
   public Metadate(){
-    name = "";
+    name = null;
     description = "";
-    empty = true;
   }
   
   /**
@@ -47,7 +45,6 @@ public class Metadate {
   public Metadate(Tag tag){
     name = tag.getTagName();
     description = tag.getDescription();
-    empty = false;
   }
   
   /**
@@ -59,7 +56,6 @@ public class Metadate {
   public Metadate(String name, String description) {
     this.name = name;
     this.description = description;
-    empty = false;
   }
   
   /**
@@ -77,7 +73,7 @@ public class Metadate {
    * @return The name of the metatag.
    */
   public String getName() {
-    return name;
+    return (name == null) ? "" : name;
   }
   
   /**
@@ -87,6 +83,6 @@ public class Metadate {
    * @return true if this is an empty Metadate.
    */
   public boolean isEmpty() {
-    return empty;
+    return name == null;
   }
 }
