@@ -19,6 +19,10 @@
  */
 package com.celements.photo.container;
 
+import org.python.antlr.PythonParser.return_stmt_return;
+
+import com.celements.sajson.Builder;
+
 /**
  * Container used to simplify the velocity access. Contains the name of the 
  * image, its URL and the URL to its thumbnail.
@@ -34,7 +38,6 @@ public class ImageStrings {
   
   /**
    * Initialises image's id, name, URL and thumbnail URL.
-   * 
    * @param id Id of the image. 
    * @param name Name of the image.
    * @param url URL to the image.
@@ -50,7 +53,6 @@ public class ImageStrings {
   /**
    * Get the id of the image. The id is a unique identifier String with a
    * length of 64 character.
-   * 
    * @return id of the image.
    */
   public String getId(){
@@ -59,7 +61,6 @@ public class ImageStrings {
 
   /**
    * Get the name of the image.
-   * 
    * @return Name of the image.
    */
   public String getName() {
@@ -68,23 +69,40 @@ public class ImageStrings {
 
   /**
    * Get the URL to the thumbnail.
-   * 
    * @return URL to the thumbnail.
    */
-  public String getThumb() {
+  public String getThumbURL() {
     return thumb;
   }
 
   /**
    * Get the URL to the image.
-   * 
    * @return URL to the image.
    */
-  public String getUrl() {
+  public String getURL() {
     return url;
   }
 
+  /**
+   * Set the URL to the thumbnail
+   * @param thumb URL to the thumbnail
+   */
   public void setThumb(String thumb) {
     this.thumb = thumb;
+  }
+  
+  /**
+   * Get the JSON for the image
+   * @return URL to the image.
+   */
+  public String getJSON() {
+    Builder jsonBuilder = new Builder();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addStringProperty("id", getId());
+    jsonBuilder.addStringProperty("name", getName());
+    jsonBuilder.addStringProperty("URL", getURL());
+    jsonBuilder.addStringProperty("thumbURL", getThumbURL());
+    jsonBuilder.closeDictionary();
+    return jsonBuilder.getJSON();
   }
 }
