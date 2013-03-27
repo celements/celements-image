@@ -59,7 +59,7 @@ public class Image {
     ImageStrings[] imageArray = getImageListExclThumbs(doc, context);
     
     for (int i = 0; i < imageArray.length; i++) {
-      imageArray[i].setThumb(thumb.getUrl(doc, imageArray[i].getId(), width, height, 
+      imageArray[i].setThumbURL(thumb.getUrl(doc, imageArray[i].getId(), width, height, 
           context));
     }
     

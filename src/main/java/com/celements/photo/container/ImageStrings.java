@@ -19,8 +19,6 @@
  */
 package com.celements.photo.container;
 
-import org.python.antlr.PythonParser.return_stmt_return;
-
 import com.celements.sajson.Builder;
 
 /**
@@ -87,7 +85,7 @@ public class ImageStrings {
    * Set the URL to the thumbnail
    * @param thumb URL to the thumbnail
    */
-  public void setThumb(String thumb) {
+  public void setThumbURL(String thumb) {
     this.thumb = thumb;
   }
   
