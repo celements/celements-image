@@ -54,11 +54,13 @@ public class Image {
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageList(XWikiDocument doc, int width, int height, Thumbnail thumb, XWikiContext context) throws XWikiException, IOException{
+  public ImageStrings[] getImageList(XWikiDocument doc, int width, int height, 
+      Thumbnail thumb, XWikiContext context) throws XWikiException, IOException{
     ImageStrings[] imageArray = getImageListExclThumbs(doc, context);
     
     for (int i = 0; i < imageArray.length; i++) {
-      imageArray[i].setThumb(thumb.getUrl(doc, imageArray[i].getId(), width, height, context));
+      imageArray[i].setThumb(thumb.getUrl(doc, imageArray[i].getId(), width, height, 
+          context));
     }
     
     return imageArray;
@@ -76,12 +78,14 @@ public class Image {
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageListExclThumbs(XWikiDocument doc, XWikiContext context) throws XWikiException, IOException{
+  public ImageStrings[] getImageListExclThumbs(XWikiDocument doc, XWikiContext context
+      ) throws XWikiException, IOException{
     String album = doc.getName();
     (new ZipAttachmentChanges()).checkZipAttatchmentChanges(doc, context);
     
     List<XWikiDocument> images = new Vector<XWikiDocument>();
-    List<String> imageList = context.getWiki().getSpaceDocsName(ImageLibStrings.getPhotoSpace(doc), context);
+    List<String> imageList = context.getWiki().getSpaceDocsName(
+        ImageLibStrings.getPhotoSpace(doc), context);
     getImagesFromAlbum(doc, album, images, imageList, context);
     
     BaseObjectHandler handler = new BaseObjectHandler();
@@ -101,8 +105,10 @@ public class Image {
       for (Iterator<String> iter = imageList.iterator(); iter.hasNext();) {
         String image = iter.next();
         if(image.lastIndexOf(album + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE) == 0){
-          XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), image, context); 
-          if(!isDeleted(doc, image.substring(image.lastIndexOf(ImageLibStrings.DOCUMENT_SEPARATOR)+1), context)){
+          XWikiDocument imageDoc = context.getWiki().getDocument(
+              ImageLibStrings.getPhotoSpace(doc), image, context); 
+          if(!isDeleted(doc, image.substring(image.lastIndexOf(
+              ImageLibStrings.DOCUMENT_SEPARATOR)+1), context)){
             images.add(imageDoc);
           }
         }
@@ -115,8 +121,10 @@ public class Image {
       XWikiContext context) throws XWikiException {
     String id = handler.getImageString(element, ImageLibStrings.PHOTO_IMAGE_HASH);
     String name = handler.getImageString(element, ImageLibStrings.PHOTO_IMAGE_FILENAME);
-    String zipFilename = handler.getImageString(element, ImageLibStrings.PHOTO_IMAGE_ZIPNAME);
-    String origUrl = (new ZipAttachmentChanges()).getZipExplorerPluginApi(context).getFileLink(new Document(doc, context), zipFilename, name);
+    String zipFilename = handler.getImageString(element, 
+        ImageLibStrings.PHOTO_IMAGE_ZIPNAME);
+    String origUrl = (new ZipAttachmentChanges()).getZipExplorerPluginApi(context
+        ).getFileLink(new Document(doc, context), zipFilename, name);
     return new ImageStrings(id, name, origUrl, "");
   }
 
@@ -129,9 +137,13 @@ public class Image {
    * @return true if the image is tagged as deleted.
    * @throws XWikiException
    */
-  public boolean isDeleted(XWikiDocument doc, String id, XWikiContext context) throws XWikiException {
-    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
-    return new BaseObjectHandler().getImageBoolean(celementsMetaDoc, ImageLibStrings.PHOTO_IMAGE_DELETED);
+  public boolean isDeleted(XWikiDocument doc, String id, XWikiContext context
+      ) throws XWikiException {
+    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(
+        ImageLibStrings.getPhotoSpace(doc), doc.getName() + 
+        ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    return new BaseObjectHandler().getImageBoolean(celementsMetaDoc, 
+        ImageLibStrings.PHOTO_IMAGE_DELETED);
   }
 
   /**
@@ -143,8 +155,12 @@ public class Image {
    * @param context XWikiContext
    * @throws XWikiException
    */
-  public void setDeleted(XWikiDocument doc, String id, boolean deleted, XWikiContext context) throws XWikiException {
-    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
-    new BaseObjectHandler().setImageBoolean(celementsMetaDoc, ImageLibStrings.PHOTO_IMAGE_DELETED, deleted, context);
+  public void setDeleted(XWikiDocument doc, String id, boolean deleted, 
+      XWikiContext context) throws XWikiException {
+    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(
+        ImageLibStrings.getPhotoSpace(doc), doc.getName() + 
+        ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    new BaseObjectHandler().setImageBoolean(celementsMetaDoc, 
+        ImageLibStrings.PHOTO_IMAGE_DELETED, deleted, context);
   }
 }
