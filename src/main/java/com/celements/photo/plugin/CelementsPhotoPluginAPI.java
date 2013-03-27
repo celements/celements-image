@@ -112,7 +112,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @param deleted true to tag the image as deleted.
    * @throws XWikiException
    */
-  public void setImageDeleted(Document album, String id, boolean deleted) throws XWikiException{
+  public void setImageDeleted(Document album, String id, boolean deleted
+      ) throws XWikiException{
     photoPlugin.setImageDeleted(album.getDocument(), id, deleted, context);
   }
 
@@ -127,7 +128,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageListExclThumbs(Document album) throws XWikiException, IOException{
+  public ImageStrings[] getImageListExclThumbs(Document album
+      ) throws XWikiException, IOException{
     return photoPlugin.getImageListExclThumbs(album.getDocument(), context);
   }
   
@@ -142,7 +144,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageList(Document album, int width, int height) throws XWikiException, IOException{
+  public ImageStrings[] getImageList(Document album, int width, int height
+      ) throws XWikiException, IOException{
     return photoPlugin.getImageList(album.getDocument(), width, height, context);
   }
   
@@ -159,7 +162,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @throws XWikiException
    * @throws IOException
    */
-  public String getThumbnailURL(Document album, String id, int width, int height) throws XWikiException, IOException{
+  public String getThumbnailURL(Document album, String id, int width, int height
+      ) throws XWikiException, IOException{
     return photoPlugin.getThumbnailUrl(album.getDocument(), id, width, height, context);
   }
 
@@ -177,7 +181,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @throws MetadataException
    * @throws IOException
    */
-  public Metadate getMetatag(Document album, String id, String tag) throws XWikiException, MetadataException, IOException{
+  public Metadate getMetatag(Document album, String id, String tag
+      ) throws XWikiException, MetadataException, IOException{
     return photoPlugin.getMetatag(album.getDocument(), id, tag, context);
   }
   
@@ -192,7 +197,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @throws MetadataException
    * @throws IOException
    */
-  public Metadate[] getMetadata(Document album, String id) throws XWikiException, MetadataException, IOException{
+  public Metadate[] getMetadata(Document album, String id
+      ) throws XWikiException, MetadataException, IOException{
     return photoPlugin.getMetadata(album.getDocument(), id, context);
   }
 
@@ -207,7 +213,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @throws MetadataException
    * @throws IOException
    */
-  public Metadate[] getMetadataFull(Document album, String id) throws XWikiException, MetadataException, IOException{
+  public Metadate[] getMetadataFull(Document album, String id
+      ) throws XWikiException, MetadataException, IOException{
     return photoPlugin.getMetadataFull(album.getDocument(), id, context);
   }
   
@@ -220,7 +227,8 @@ public class CelementsPhotoPluginAPI extends Api {
    * @throws XWikiException
    * @throws IOException
    */
-  public void forceClearMetadata(Document doc, String id) throws XWikiException, IOException{
+  public void forceClearMetadata(Document doc, String id
+      ) throws XWikiException, IOException{
     photoPlugin.forceClearMetadata(doc.getDocument(), id, context);
   }
   
@@ -235,9 +243,11 @@ public class CelementsPhotoPluginAPI extends Api {
    * @return List of {@link ImportFileObject} for each file.
    * @throws XWikiException
    */
-  public List<ImportFileObject> getAttachmentFileListWithActions(Document attachmentDoc, String attachmentName, Document galleryDoc) throws XWikiException{
+  public List<ImportFileObject> getAttachmentFileListWithActions(Document attachmentDoc, 
+      String attachmentName, Document galleryDoc) throws XWikiException{
     XWikiAttachment zipFile = attachmentDoc.getDocument().getAttachment(attachmentName);
-    return photoPlugin.getAttachmentFileListWithActions(zipFile, galleryDoc.getDocument(), context);
+    return photoPlugin.getAttachmentFileListWithActions(zipFile, galleryDoc.getDocument(),
+        context);
   }
 
   /**
@@ -251,9 +261,12 @@ public class CelementsPhotoPluginAPI extends Api {
    * @param height Height (max - aspect ratio is maintained) to resize the image to.
    * @throws XWikiException
    */
-  public void unzipFileToAttachment(Document zipDoc, String attachmentName, String unzipFileName, Document attachToDoc, int width, int height) throws XWikiException, IOException{
+  public void unzipFileToAttachment(Document zipDoc, String attachmentName, 
+      String unzipFileName, Document attachToDoc, int width, int height
+      ) throws XWikiException, IOException{
     XWikiAttachment zipFile = zipDoc.getDocument().getAttachment(attachmentName);
-    photoPlugin.unzipFileToAttachment(zipFile, unzipFileName, attachToDoc.getDocument(), width, height, context);
+    photoPlugin.unzipFileToAttachment(zipFile, unzipFileName, attachToDoc.getDocument(), 
+        width, height, context);
   }
 
   /**
