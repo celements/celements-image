@@ -33,20 +33,17 @@ import org.apache.commons.logging.LogFactory;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.container.ImageStrings;
-import com.celements.photo.container.Metadate;
 import com.celements.photo.container.PhotoAlbumClass;
 import com.celements.photo.container.PhotoImageClass;
 import com.celements.photo.container.PhotoMetainfoClass;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.image.Image;
 import com.celements.photo.image.Thumbnail;
-import com.celements.photo.metadata.Metainfo;
 import com.celements.photo.plugin.cmd.ComputeImageCommand;
 import com.celements.photo.service.IImageService;
 import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.ImportFileObject;
 import com.celements.photo.utilities.Unzip;
-import com.drew.metadata.MetadataException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -106,7 +103,6 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   
   private Image image;
   private Thumbnail thumbnail;
-  private Metainfo metainfo;
 
   private ComputeImageCommand computeImgCmd;
   
@@ -115,7 +111,6 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
     super(name,className,context);
     image = new Image();
     thumbnail = new Thumbnail();
-    metainfo = new Metainfo();
     init(context);
   }
   
@@ -265,57 +260,6 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    */
   public String getThumbnailUrl(XWikiDocument doc, String id, int width, int height, XWikiContext context) throws XWikiException, IOException{
     return thumbnail.getUrl(doc, id, width, height, context);
-  }
-
-  // METADATA .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
-  /**
-   * Returns the specified metatag. If there is no metatag with the specified
-   * name an empty metadate is returned.
-   * 
-   * @see com.celements.photo.plugin.container.Metadate
-   * @param doc XWikiDocument of the album.
-   * @param id Id of the image.
-   * @param tag The name of the desired metatag.
-   * @param context XWikiContext
-   * @return The specified metatag as a Metadate object.
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException
-   */
-  public Metadate getMetatag(XWikiDocument doc, String id, String tag, XWikiContext context) throws XWikiException, MetadataException, IOException{
-    return metainfo.getTag(doc, id, tag, context);
-  }
-
-  /**
-   * Returns all metatags contained in the image, excluding "Unknown tag" tags.
-   * 
-   * @see com.celements.photo.plugin.container.Metadate
-   * @param doc XWikiDocument of the album.
-   * @param id Id of the image.
-   * @param XWikiContext
-   * @return Array of Metadate objects.
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException
-   */
-  public Metadate[] getMetadata(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, MetadataException, IOException{
-    return metainfo.getMetadataWithCondition(doc, id, ImageLibStrings.METATAG_UNKNOWN_TAG, context);
-  }
-
-  /**
-   * Returns all metatags contained in the image, including "Unknown tag" tags.
-   * 
-   * @see com.celements.photo.plugin.container.Metadate
-   * @param doc XWikiDocument of the album.
-   * @param id Id of the image.
-   * @param XWikiContext
-   * @return Array of Metadate objects.
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException
-   */
-  public Metadate[] getMetadataFull(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, MetadataException, IOException{
-    return metainfo.getMetadataWithCondition(doc, id, "", context);
   }
   
   // DATA MANIPULATION .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:

@@ -166,57 +166,6 @@ public class CelementsPhotoPluginAPI extends Api {
       ) throws XWikiException, IOException{
     return photoPlugin.getThumbnailUrl(album.getDocument(), id, width, height, context);
   }
-
-  // METADATA .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
-  /**
-   * Returns the specified metatag. If there is no metatag with the specified
-   * name an empty metadate is returned.
-   * 
-   * @see com.celements.photo.plugin.container.Metadate
-   * @param doc Document of the album.
-   * @param id Id of the image.
-   * @param tag The name of the desired metatag.
-   * @return The specified metatag as a Metadate object.
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException
-   */
-  public Metadate getMetatag(Document album, String id, String tag
-      ) throws XWikiException, MetadataException, IOException{
-    return photoPlugin.getMetatag(album.getDocument(), id, tag, context);
-  }
-  
-  /**
-   * Returns all metatags contained in the image, excluding "Unknown tag" tags.
-   * 
-   * @see com.celements.photo.plugin.container.Metadate
-   * @param doc Document of the album.
-   * @param id Id of the image.
-   * @return Array of Metadate objects.
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException
-   */
-  public Metadate[] getMetadata(Document album, String id
-      ) throws XWikiException, MetadataException, IOException{
-    return photoPlugin.getMetadata(album.getDocument(), id, context);
-  }
-
-  /**
-   * Returns all metatags contained in the image, including "Unknown tag" tags.
-   * 
-   * @see com.celements.photo.plugin.container.Metadate
-   * @param doc Document of the album.
-   * @param id Id of the image.
-   * @return Array of Metadate objects.
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException
-   */
-  public Metadate[] getMetadataFull(Document album, String id
-      ) throws XWikiException, MetadataException, IOException{
-    return photoPlugin.getMetadataFull(album.getDocument(), id, context);
-  }
   
   // DATA MANIPULATION .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
   /**
