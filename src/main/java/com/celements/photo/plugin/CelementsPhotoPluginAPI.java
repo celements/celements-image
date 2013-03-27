@@ -91,35 +91,6 @@ public class CelementsPhotoPluginAPI extends Api {
     return albums;
   }
   
-  /**
-   * Returns the URL to the album with the given name.
-   * 
-   * @param albumName Name of the album, the link should point to.
-   * @return Link to the album.
-   * @throws XWikiException
-   */
-  public String getAlbumURL(String space, String albumName) throws XWikiException{
-    XWikiDocument doc = context.getWiki().getDocument(space, albumName, context);
-    return doc.getURL(ImageLibStrings.XWIKI_URL_VIEW, context);
-  }
-
-  // ATTACHMENT .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
-  /**
-   * Returns the downlad URL to the specified attachment.
-   * 
-   * @param name Name of the atachment.
-   * @return URL of the specified attachment.
-   */
-  public String getAttachmentURL(String name){
-    String fURL = "";
-    if(context.getDoc().getAttachmentList().size() > 0){
-      String fname = ((XWikiAttachment)context.getDoc().getAttachment(name)).getFilename();
-      fURL = context.getDoc().getAttachmentURL(fname, ImageLibStrings.XWIKI_URL_DOWNLOAD,
-          context);
-    }
-    return fURL;
-  }
-  
   // IMAGE .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
   /**
    * Returns wether the specified image is marked as deleted or not.
@@ -297,10 +268,4 @@ public class CelementsPhotoPluginAPI extends Api {
     }
     return null;
   }
-
-  //TODO
-//  getThumb
-  
-//  getMetaTag
-  
 }
