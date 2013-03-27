@@ -22,18 +22,14 @@ package com.celements.photo.container;
 import java.util.Iterator;
 import java.util.List;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
-//TODO Refactor and make configurable where possible.
 public class ImageLibStrings {
-  
-  //XWiki
-  public static final String XWIKI_URL_VIEW = "view";
-  public static final String XWIKI_URL_DOWNLOAD = "download";
-  
   //Spaces
   public static final String XWIKI_CLASS_SPACE = "Classes";
 
@@ -49,12 +45,6 @@ public class ImageLibStrings {
   
   //Hashing
   public static final String HASHING_ALGORITHM = "SHA-256";
-  
-  //Document 
-  public static final String DOCUMENT_SEPARATOR = "_";
-  public static final String DOCUMENT_SEPARATOR_ALBUM = DOCUMENT_SEPARATOR + "alb";
-  public static final String DOCUMENT_SEPARATOR_IMAGE = DOCUMENT_SEPARATOR + "img" + DOCUMENT_SEPARATOR;
-  public static final String DOCUMENT_SEPARATOR_ZIP = DOCUMENT_SEPARATOR + "zip" + DOCUMENT_SEPARATOR;
   
   //Classes
   public static final String METAINFO_CLASS = XWIKI_CLASS_SPACE + "." + "PhotoMetainfoClass";
@@ -93,12 +83,14 @@ public class ImageLibStrings {
   public static final String METATAG_IMAGE_HASH = "Image Hash";
   
   public static String getPhotoSpace(String space, String album, XWikiContext context) throws XWikiException {
-    XWikiDocument doc = context.getWiki().getDocument(space, album, context);
+    XWikiDocument doc = context.getWiki().getDocument(getWebUtils(
+        ).resolveDocumentReference(space + "." + album), context);
     return getPhotoSpace(doc);
   }
   
   public static String getPhotoSpace(XWikiDocument doc) {
-    List<BaseObject> objList = doc.getObjects(PHOTO_ALBUM_CLASS);
+    List<BaseObject> objList = doc.getXObjects(getWebUtils(
+        ).resolveDocumentReference(PHOTO_ALBUM_CLASS));
     for (Iterator<BaseObject> iter = objList.iterator(); iter.hasNext();) {
       BaseObject element = (BaseObject) iter.next();
       if(element != null){
@@ -106,5 +98,9 @@ public class ImageLibStrings {
       }
     }
     return "";
+  }
+  
+  static IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 }
