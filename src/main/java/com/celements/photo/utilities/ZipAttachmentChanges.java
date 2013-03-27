@@ -62,7 +62,7 @@ public class ZipAttachmentChanges {
   public void checkZipAttatchmentChanges(XWikiDocument doc, XWikiContext context) throws XWikiException, IOException {
 
     //1. are there new / deleted zips? -> yes: read / delete
-    XWikiDocument albumDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_ALBUM, context);
+    XWikiDocument albumDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_alb_", context);
 
     /* This strange (and a bit ugly) construct of List and loops is
      * necessary because actualAttachments is not independant from
@@ -129,7 +129,7 @@ public class ZipAttachmentChanges {
       List<String> fileList = context.getWiki().getSpaceDocsName(ImageLibStrings.getPhotoSpace(doc), context);
       if(fileList != null){
         Iterator<String> iterator = fileList.iterator();
-        while(iterator.hasNext() && !filename.equals(doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_ZIP + getFilenameHash(element.getStringValue(ImageLibStrings.METAINFO_CLASS_DESCRIPTION)))){
+        while(iterator.hasNext() && !filename.equals(doc.getName() + "_zip_" + getFilenameHash(element.getStringValue(ImageLibStrings.METAINFO_CLASS_DESCRIPTION)))){
           filename = iterator.next();
         }
       }
@@ -162,7 +162,7 @@ public class ZipAttachmentChanges {
 
   private void updateOrDeleteMetaData(String imageHash, XWikiDocument doc,
       XWikiContext context) throws XWikiException {
-    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + imageHash, context);
+    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + imageHash, context);
     int revision = (new BaseObjectHandler()).getImageInteger(celementsMetaDoc, ImageLibStrings.PHOTO_IMAGE_REVISION);
     if(revision <= 1){
       context.getWiki().deleteDocument(celementsMetaDoc, context);
@@ -175,7 +175,7 @@ public class ZipAttachmentChanges {
       XWikiAttachment att = null;
       for (Iterator<XWikiAttachment> attIter = attachmentList.iterator(); attIter.hasNext();) {
         att = attIter.next();
-        XWikiDocument zipAttDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_ZIP + getFilenameHash(att.getFilename()), context);
+        XWikiDocument zipAttDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_zip_" + getFilenameHash(att.getFilename()), context);
         filenameInMeta = handler.getDescriptionFromBaseObjectList(zipAttDoc, imageHash);
         if(filenameInMeta != null){
           break;
@@ -237,7 +237,7 @@ public class ZipAttachmentChanges {
       for (Iterator<String> iterator = hashes.iterator(); iterator.hasNext();) {
         String hash = iterator.next();
         
-        XWikiDocument imgDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + hash, context);
+        XWikiDocument imgDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + hash, context);
         String dir = handler.getImageString(imgDoc, ImageLibStrings.PHOTO_IMAGE_ZIPDIRECTORY);
         String filename = handler.getImageString(imgDoc, ImageLibStrings.PHOTO_IMAGE_FILENAME);
         
@@ -270,7 +270,7 @@ public class ZipAttachmentChanges {
       String hash = (new GenerateThumbnail()).hashImage(image);
       hashes.add(hash);
       
-      XWikiDocument imgMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + hash, context);
+      XWikiDocument imgMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + hash, context);
       
       if(imgMetaDoc.isNew()){
         imgMetaDoc.newObject(ImageLibStrings.PHOTO_IMAGE_CLASS, context);
@@ -286,10 +286,10 @@ public class ZipAttachmentChanges {
 
   private XWikiDocument writeHashesToMetaDoc(XWikiAttachment element,
       XWikiDocument doc, XWikiContext context) throws XWikiException {
-    XWikiDocument zipMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_ZIP + getFilenameHash(element.getFilename()), context);
+    XWikiDocument zipMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_zip_" + getFilenameHash(element.getFilename()), context);
     if(!zipMetaDoc.isNew()){
       context.getWiki().deleteDocument(zipMetaDoc, context);
-      zipMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_ZIP + getFilenameHash(element.getFilename()), context);
+      zipMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_zip_" + getFilenameHash(element.getFilename()), context);
     }
     return zipMetaDoc;
   }
@@ -334,7 +334,7 @@ public class ZipAttachmentChanges {
    */
   @SuppressWarnings("unchecked")
   public XWikiAttachment getContainingZip(XWikiDocument doc, String id, XWikiContext context) throws XWikiException {
-    XWikiDocument imageMeta = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    XWikiDocument imageMeta = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
     String zipName = (new BaseObjectHandler()).getImageString(imageMeta, ImageLibStrings.PHOTO_IMAGE_ZIPNAME);
     
     List<XWikiAttachment> attachments = doc.getAttachmentList();
@@ -379,7 +379,7 @@ public class ZipAttachmentChanges {
    * @throws XWikiException
    */
   private void deleteMetainfo(XWikiDocument doc, String imageHash, XWikiContext context) throws XWikiException {
-    XWikiDocument metaDocument = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + imageHash, context);
+    XWikiDocument metaDocument = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + imageHash, context);
     if(!metaDocument.isNew()){
       
       metaDocument.removeObjects(ImageLibStrings.METAINFO_CLASS);
@@ -396,7 +396,7 @@ public class ZipAttachmentChanges {
    * @throws XWikiException
    */
   private void deleteThumbnail(XWikiDocument doc, String imageHash, XWikiContext context) throws XWikiException {
-    XWikiDocument thumbDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + imageHash, context);
+    XWikiDocument thumbDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + imageHash, context);
   
     List<XWikiAttachment> thumbnails = thumbDoc.getAttachmentList();  
     for (Iterator<XWikiAttachment> deleteIter = thumbnails.iterator(); deleteIter.hasNext();) {

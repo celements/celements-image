@@ -68,7 +68,7 @@ public class Thumbnail {
     
     XWikiDocument celeMetaDoc = context.getWiki().getDocument(
         ImageLibStrings.getPhotoSpace(doc), 
-        album + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+        album + "_img_" + id, context);
     if(imgSize.isEmpty()){
       String dir = (new BaseObjectHandler()).getImageString(celeMetaDoc, 
           ImageLibStrings.PHOTO_IMAGE_ZIPDIRECTORY);
@@ -108,7 +108,7 @@ public class Thumbnail {
     }
     
     String imageURL = celeMetaDoc.getAttachmentURL(thumbnail.getFilename(), 
-        ImageLibStrings.XWIKI_URL_DOWNLOAD, context);
+        "download", context);
     
     return imageURL;
   }
@@ -157,7 +157,7 @@ public class Thumbnail {
    * @throws XWikiException
    */
   private ImageDimensions getThumbnailDimensions(XWikiDocument doc, String id, int width, int height, GenerateThumbnail thumbGenerator, XWikiContext context) throws XWikiException{
-    XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
     
     BaseObjectHandler handler = new BaseObjectHandler();
     
@@ -177,7 +177,7 @@ public class Thumbnail {
    * @throws XWikiException
    */
   private void writeImageDimensionsToMetadata(XWikiDocument doc, String id, ImageDimensions imgDim, XWikiContext context) throws XWikiException{
-    XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
     
     BaseObject metainfoObj = imageDoc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
     metainfoObj.setIntValue(ImageLibStrings.PHOTO_IMAGE_WIDTH, (int)imgDim.getWidth());

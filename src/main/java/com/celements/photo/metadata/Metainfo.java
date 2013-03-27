@@ -126,7 +126,7 @@ public class Metainfo {
   public List<BaseObject> getMetadataList(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, MetadataException, IOException {
     extractMetaToDoc(doc, id, context);
     
-    XWikiDocument metaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    XWikiDocument metaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
     List<BaseObject> metainfos = metaDoc.getObjects(ImageLibStrings.METAINFO_CLASS);
     //return an empty List if no metainfo objects are attached.
     if(metainfos == null){
@@ -149,7 +149,7 @@ public class Metainfo {
    */
   public void extractMetaToDoc(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, MetadataException, IOException{
     String album = doc.getName();
-    XWikiDocument celeMeta = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), album + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    XWikiDocument celeMeta = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), album + "_img_" + id, context);
     String dir = (new BaseObjectHandler()).getImageString(celeMeta, ImageLibStrings.PHOTO_IMAGE_ZIPDIRECTORY);
     String image = (new BaseObjectHandler()).getImageString(celeMeta, ImageLibStrings.PHOTO_IMAGE_FILENAME);
     if(image == null){
@@ -219,7 +219,7 @@ public class Metainfo {
    * @throws IOException
    */
   private void clearOutdatedMetadata(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, IOException{
-    XWikiDocument metadataDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    XWikiDocument metadataDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
 
     if(!metadataDoc.isNew()){
       com.xpn.xwiki.doc.XWikiAttachment containingZip = (new ZipAttachmentChanges()).getContainingZip(doc, id, context);

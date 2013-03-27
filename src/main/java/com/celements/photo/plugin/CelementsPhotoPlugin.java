@@ -275,7 +275,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * @throws IOException
    */
   public void forceClearMetadata(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, IOException{
-    XWikiDocument metadataDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + ImageLibStrings.DOCUMENT_SEPARATOR_IMAGE + id, context);
+    XWikiDocument metadataDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
     context.getWiki().deleteDocument(metadataDoc, context);
   }
   
