@@ -52,7 +52,10 @@ public class ImageLibStrings {
   public static final String METAINFO_CLASS_NAME_PRETTY = "Name";
   public static final String METAINFO_CLASS_DESCRIPTION = "description";
   public static final String METAINFO_CLASS_DESCRIPTION_PRETTY = "Description";
-  public static final String PHOTO_ALBUM_CLASS = XWIKI_CLASS_SPACE + "." + "PhotoAlbumClass";
+  public static final String PHOTO_ALBUM_CLASS_SPACE = XWIKI_CLASS_SPACE;
+  public static final String PHOTO_ALBUM_CLASS_NAME = "PhotoAlbumClass";
+  public static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "." + 
+      PHOTO_ALBUM_CLASS_NAME;
   public static final String PHOTO_ALBUM_COPYRIGHT = "copyright";
   public static final String PHOTO_ALBUM_COPYRIGHT_PRETTY = "Copyright";
   public static final String PHOTO_ALBUM_SPACE_NAME = "space_name";

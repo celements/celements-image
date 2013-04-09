@@ -19,6 +19,8 @@
  */
 package com.celements.photo.container;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,19 +44,18 @@ public class PhotoAlbumClass {
     XWikiDocument doc;
     XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classDocRef = new DocumentReference(context.getDatabase(), 
+        ImageLibStrings.PHOTO_ALBUM_CLASS_SPACE, ImageLibStrings.PHOTO_ALBUM_CLASS_NAME);
     
     try {
-      doc = xwiki.getDocument(ImageLibStrings.PHOTO_ALBUM_CLASS, context);
+      doc = xwiki.getDocument(classDocRef, context);
     } catch (XWikiException e) {
-      doc = new XWikiDocument();
-      String[] metainfoClass = ImageLibStrings.PHOTO_ALBUM_CLASS.split("\\.");
-      doc.setSpace(metainfoClass[0]);
-      doc.setName(metainfoClass[1]);
+      doc = new XWikiDocument(classDocRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName(ImageLibStrings.PHOTO_ALBUM_CLASS);
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(classDocRef);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_SPACE_NAME, ImageLibStrings.PHOTO_ALBUM_SPACE_NAME_PRETTY, 50);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_COPYRIGHT, ImageLibStrings.PHOTO_ALBUM_COPYRIGHT_PRETTY, 50);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_WATERMARK, ImageLibStrings.PHOTO_ALBUM_WATERMARK_PRETTY, 50);
