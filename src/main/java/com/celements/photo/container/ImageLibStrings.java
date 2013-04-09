@@ -22,6 +22,8 @@ package com.celements.photo.container;
 import java.util.Iterator;
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -47,14 +49,14 @@ public class ImageLibStrings {
   public static final String HASHING_ALGORITHM = "SHA-256";
   
   //Classes
-  public static final String METAINFO_CLASS = XWIKI_CLASS_SPACE + "." + "PhotoMetainfoClass";
+  private static final String METAINFO_CLASS = XWIKI_CLASS_SPACE + "." + "PhotoMetainfoClass";
   public static final String METAINFO_CLASS_NAME = "name";
   public static final String METAINFO_CLASS_NAME_PRETTY = "Name";
   public static final String METAINFO_CLASS_DESCRIPTION = "description";
   public static final String METAINFO_CLASS_DESCRIPTION_PRETTY = "Description";
   public static final String PHOTO_ALBUM_CLASS_SPACE = XWIKI_CLASS_SPACE;
   public static final String PHOTO_ALBUM_CLASS_NAME = "PhotoAlbumClass";
-  public static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "." + 
+  private static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "." + 
       PHOTO_ALBUM_CLASS_NAME;
   public static final String PHOTO_ALBUM_COPYRIGHT = "copyright";
   public static final String PHOTO_ALBUM_COPYRIGHT_PRETTY = "Copyright";
@@ -62,7 +64,7 @@ public class ImageLibStrings {
   public static final String PHOTO_ALBUM_SPACE_NAME_PRETTY = "Space Name";
   public static final String PHOTO_ALBUM_WATERMARK = "watermark";
   public static final String PHOTO_ALBUM_WATERMARK_PRETTY = "Watermark";
-  public static final String PHOTO_IMAGE_CLASS = XWIKI_CLASS_SPACE + "." + "PhotoImageClass";
+  private static final String PHOTO_IMAGE_CLASS = XWIKI_CLASS_SPACE + "." + "PhotoImageClass";
   public static final String PHOTO_IMAGE_HASH = "image_hash";
   public static final String PHOTO_IMAGE_HASH_PRETTY = "Image Hash";
   public static final String PHOTO_IMAGE_FILENAME = "image_filename";
@@ -89,6 +91,18 @@ public class ImageLibStrings {
     XWikiDocument doc = context.getWiki().getDocument(getWebUtils(
         ).resolveDocumentReference(space + "." + album), context);
     return getPhotoSpace(doc);
+  }
+  
+  public static DocumentReference getMetainfoClassDocRef() {
+    return getWebUtils().resolveDocumentReference(METAINFO_CLASS); 
+  }
+  
+  public static DocumentReference getAlbumClassDocRef() {
+    return getWebUtils().resolveDocumentReference(PHOTO_ALBUM_CLASS); 
+  }
+  
+  public static DocumentReference getImageClassDocRef() {
+    return getWebUtils().resolveDocumentReference(PHOTO_IMAGE_CLASS); 
   }
   
   public static String getPhotoSpace(XWikiDocument doc) {

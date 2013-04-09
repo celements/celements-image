@@ -19,6 +19,8 @@
  */
 package com.celements.photo.container;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,19 +44,17 @@ public class PhotoImageClass {
     XWikiDocument doc;
     XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classDocRef = ImageLibStrings.getImageClassDocRef();
     
     try {
-      doc = xwiki.getDocument(ImageLibStrings.PHOTO_IMAGE_CLASS, context);
+      doc = xwiki.getDocument(classDocRef, context);
     } catch (XWikiException e) {
-      doc = new XWikiDocument();
-      String[] metainfoClass = ImageLibStrings.PHOTO_IMAGE_CLASS.split("\\.");
-      doc.setSpace(metainfoClass[0]);
-      doc.setName(metainfoClass[1]);
+      doc = new XWikiDocument(classDocRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(classDocRef);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_IMAGE_FILENAME, ImageLibStrings.PHOTO_IMAGE_FILENAME_PRETTY, 50);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_IMAGE_HASH, ImageLibStrings.PHOTO_IMAGE_HASH_PRETTY, 50);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_IMAGE_ZIPNAME, ImageLibStrings.PHOTO_IMAGE_ZIPNAME_PRETTY, 50);

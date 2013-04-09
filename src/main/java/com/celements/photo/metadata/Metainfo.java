@@ -57,15 +57,19 @@ public class Metainfo {
    * @throws MetadataException
    * @throws IOException
    */
-  public Metadate getTag(XWikiDocument doc, String id, String tag, XWikiContext context) throws XWikiException, MetadataException, IOException {
+  public Metadate getTag(XWikiDocument doc, String id, String tag, XWikiContext context
+      ) throws XWikiException, MetadataException, IOException {
     List<BaseObject> metainfos = getMetadataList(doc, id, context);
 
     Metadate metatag = new Metadate();
     
     for (int i = 0; i < metainfos.size(); i++) {
       BaseObject metadate = (BaseObject) metainfos.get(i);
-      if((metadate != null) && (metadate.getStringValue(ImageLibStrings.METAINFO_CLASS_NAME).equals(tag))){
-        metatag = new Metadate(metadate.getStringValue(ImageLibStrings.METAINFO_CLASS_NAME), metadate.getStringValue(ImageLibStrings.METAINFO_CLASS_DESCRIPTION));
+      if((metadate != null) && (metadate.getStringValue(
+          ImageLibStrings.METAINFO_CLASS_NAME).equals(tag))){
+        metatag = new Metadate(metadate.getStringValue(
+            ImageLibStrings.METAINFO_CLASS_NAME), metadate.getStringValue(
+            ImageLibStrings.METAINFO_CLASS_DESCRIPTION));
         break;
       }
     }
@@ -88,7 +92,9 @@ public class Metainfo {
    * @throws MetadataException
    * @throws IOException
    */
-  public Metadate[] getMetadataWithCondition(XWikiDocument doc, String id, String conditionTag, XWikiContext context) throws XWikiException, MetadataException, IOException {
+  public Metadate[] getMetadataWithCondition(XWikiDocument doc, String id, 
+      String conditionTag, XWikiContext context) throws XWikiException, 
+      MetadataException, IOException {
     List<BaseObject> metainfos = getMetadataList(doc, id, context);
     List<Metadate> resultList = new Vector<Metadate>();
     boolean condition = false;
@@ -102,11 +108,15 @@ public class Metainfo {
     return resultList.toArray(new Metadate[resultList.size()]);
   }
 
-  private void getAvailableNotExcludedTags(String conditionTag, boolean condition, List<BaseObject> metainfos, List<Metadate> resultList) {
+  private void getAvailableNotExcludedTags(String conditionTag, boolean condition, 
+      List<BaseObject> metainfos, List<Metadate> resultList) {
     for (Iterator<BaseObject> iter = metainfos.iterator(); iter.hasNext();) {
       BaseObject metadate = (BaseObject) iter.next();
-      if((metadate != null) && (condition || !metadate.getStringValue(ImageLibStrings.METAINFO_CLASS_NAME).startsWith(conditionTag))){
-        resultList.add(new Metadate(metadate.getStringValue(ImageLibStrings.METAINFO_CLASS_NAME), metadate.getStringValue(ImageLibStrings.METAINFO_CLASS_DESCRIPTION)));
+      if((metadate != null) && (condition || !metadate.getStringValue(
+          ImageLibStrings.METAINFO_CLASS_NAME).startsWith(conditionTag))){
+        resultList.add(new Metadate(metadate.getStringValue(
+            ImageLibStrings.METAINFO_CLASS_NAME), metadate.getStringValue(
+            ImageLibStrings.METAINFO_CLASS_DESCRIPTION)));
       }
     }
   }
@@ -123,11 +133,14 @@ public class Metainfo {
    * @throws MetadataException
    * @throws IOException 
    */
-  public List<BaseObject> getMetadataList(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, MetadataException, IOException {
+  public List<BaseObject> getMetadataList(XWikiDocument doc, String id, 
+      XWikiContext context) throws XWikiException, MetadataException, IOException {
     extractMetaToDoc(doc, id, context);
     
-    XWikiDocument metaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
-    List<BaseObject> metainfos = metaDoc.getObjects(ImageLibStrings.METAINFO_CLASS);
+    XWikiDocument metaDoc = context.getWiki().getDocument(
+        ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
+    List<BaseObject> metainfos = metaDoc.getXObjects(
+        ImageLibStrings.getMetainfoClassDocRef());
     //return an empty List if no metainfo objects are attached.
     if(metainfos == null){
       metainfos = java.util.Collections.emptyList();
@@ -147,11 +160,15 @@ public class Metainfo {
    * @throws MetadataException
    * @throws IOException
    */
-  public void extractMetaToDoc(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, MetadataException, IOException{
+  public void extractMetaToDoc(XWikiDocument doc, String id, XWikiContext context
+      ) throws XWikiException, MetadataException, IOException{
     String album = doc.getName();
-    XWikiDocument celeMeta = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), album + "_img_" + id, context);
-    String dir = (new BaseObjectHandler()).getImageString(celeMeta, ImageLibStrings.PHOTO_IMAGE_ZIPDIRECTORY);
-    String image = (new BaseObjectHandler()).getImageString(celeMeta, ImageLibStrings.PHOTO_IMAGE_FILENAME);
+    XWikiDocument celeMeta = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(
+        doc), album + "_img_" + id, context);
+    String dir = (new BaseObjectHandler()).getImageString(celeMeta, 
+        ImageLibStrings.PHOTO_IMAGE_ZIPDIRECTORY);
+    String image = (new BaseObjectHandler()).getImageString(celeMeta, 
+        ImageLibStrings.PHOTO_IMAGE_FILENAME);
     if(image == null){
       (new ZipAttachmentChanges()).checkZipAttatchmentChanges(doc, context);
     }
@@ -160,7 +177,8 @@ public class Metainfo {
     // TODO ugly, but otherwise updating files seems not to work properly
     context.getWiki().flushCache(context);
     
-    List<BaseObject> metadataObjs = celeMeta.getObjects(ImageLibStrings.METAINFO_CLASS);
+    List<BaseObject> metadataObjs = celeMeta.getXObjects(
+        ImageLibStrings.getMetainfoClassDocRef());
     if(metadataObjs == null || metadataObjs.size() == 0){
       Map<String, String> metadata = extractAllMetadata(doc, dir + image, id, context);
       
@@ -168,16 +186,19 @@ public class Metainfo {
         initNewObject(celeMeta, key, (String)metadata.get(key), context);
       }
       
-      //If there is no metadata, this prevents from trying to extract metadata on each image load.
+      //If there is no metadata, this prevents from trying to extract metadata on each 
+      //image load.
       if(metadata.size() == 0){
-        celeMeta.newObject(ImageLibStrings.METAINFO_CLASS, context);
+        celeMeta.newXObject(ImageLibStrings.getMetainfoClassDocRef(), context);
       }
       context.getWiki().saveDocument(celeMeta, context);
     }
   }
 
-  private void initNewObject(XWikiDocument celeMeta, String key, String value, XWikiContext context) throws XWikiException {
-    BaseObject metainfoObj = celeMeta.newObject(ImageLibStrings.METAINFO_CLASS, context);
+  private void initNewObject(XWikiDocument celeMeta, String key, String value, 
+      XWikiContext context) throws XWikiException {
+    BaseObject metainfoObj = celeMeta.newXObject(ImageLibStrings.getMetainfoClassDocRef(),
+        context);
     metainfoObj.set(ImageLibStrings.METAINFO_CLASS_NAME, key, context);
     metainfoObj.set(ImageLibStrings.METAINFO_CLASS_DESCRIPTION, value, context);
   }
@@ -196,13 +217,15 @@ public class Metainfo {
    * @throws XWikiException
    * @throws IOException
    */
-  @SuppressWarnings("unchecked")
-  private Map<String, String> extractAllMetadata(XWikiDocument albumDoc, String image, String id, XWikiContext context) throws MetadataException, XWikiException, IOException{
-    InputStream imgAttachment = (new ZipAttachmentChanges()).getFromZip(albumDoc, image, id, context);
+  private Map<String, String> extractAllMetadata(XWikiDocument albumDoc, String image, 
+      String id, XWikiContext context) throws MetadataException, XWikiException, 
+      IOException{
+    InputStream imgAttachment = (new ZipAttachmentChanges()).getFromZip(albumDoc, image, 
+        id, context);
     if(imgAttachment != null){
       return (new MetaInfoExtractor()).getAllTags(imgAttachment);
     }
-    return new Hashtable(Collections.emptyMap());
+    return Collections.emptyMap();
   }
   
   /**
@@ -218,16 +241,19 @@ public class Metainfo {
    * @throws XWikiException
    * @throws IOException
    */
-  private void clearOutdatedMetadata(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, IOException{
-    XWikiDocument metadataDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
+  private void clearOutdatedMetadata(XWikiDocument doc, String id, XWikiContext context
+      ) throws XWikiException, IOException{
+    XWikiDocument metadataDoc = context.getWiki().getDocument(
+        ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
 
     if(!metadataDoc.isNew()){
-      com.xpn.xwiki.doc.XWikiAttachment containingZip = (new ZipAttachmentChanges()).getContainingZip(doc, id, context);
+      com.xpn.xwiki.doc.XWikiAttachment containingZip = (new ZipAttachmentChanges()
+          ).getContainingZip(doc, id, context);
       java.util.Date metaDate = metadataDoc.getDate();
       java.util.Date zipDate = containingZip.getDate();
       
       if(metaDate.before(zipDate)){
-        metadataDoc.removeObjects(ImageLibStrings.METAINFO_CLASS);
+        metadataDoc.removeXObjects(ImageLibStrings.getMetainfoClassDocRef());
         context.getWiki().saveDocument(metadataDoc, context);
       }
     }

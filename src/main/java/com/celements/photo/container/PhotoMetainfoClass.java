@@ -19,6 +19,8 @@
  */
 package com.celements.photo.container;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,19 +42,17 @@ public class PhotoMetainfoClass {
     XWikiDocument doc;
     XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classDocRef = ImageLibStrings.getMetainfoClassDocRef();
     
     try {
-      doc = xwiki.getDocument(ImageLibStrings.METAINFO_CLASS, context);
+      doc = xwiki.getDocument(classDocRef, context);
     } catch (XWikiException e) {
-      doc = new XWikiDocument();
-      String[] metainfoClass = ImageLibStrings.METAINFO_CLASS.split("\\.");
-      doc.setSpace(metainfoClass[0]);
-      doc.setName(metainfoClass[1]);
+      doc = new XWikiDocument(classDocRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName(ImageLibStrings.METAINFO_CLASS);
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(classDocRef);
     needsUpdate |= bclass.addTextField(ImageLibStrings.METAINFO_CLASS_NAME, ImageLibStrings.METAINFO_CLASS_NAME_PRETTY, 50);
     needsUpdate |= bclass.addTextAreaField(ImageLibStrings.METAINFO_CLASS_DESCRIPTION, ImageLibStrings.METAINFO_CLASS_DESCRIPTION_PRETTY, 50, 10);
     

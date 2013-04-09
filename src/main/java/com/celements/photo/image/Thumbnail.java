@@ -179,7 +179,7 @@ public class Thumbnail {
   private void writeImageDimensionsToMetadata(XWikiDocument doc, String id, ImageDimensions imgDim, XWikiContext context) throws XWikiException{
     XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
     
-    BaseObject metainfoObj = imageDoc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseObject metainfoObj = imageDoc.getXObject(ImageLibStrings.getImageClassDocRef());
     metainfoObj.setIntValue(ImageLibStrings.PHOTO_IMAGE_WIDTH, (int)imgDim.getWidth());
     metainfoObj.setIntValue(ImageLibStrings.PHOTO_IMAGE_HEIGHT, (int)imgDim.getHeight());
     
@@ -197,7 +197,7 @@ public class Thumbnail {
    */
   private String getObjctDescription(XWikiDocument doc, String tagName) throws XWikiException {
     if(!doc.isNew()){
-      List<BaseObject> tags = doc.getObjects(ImageLibStrings.PHOTO_ALBUM_CLASS);
+      List<BaseObject> tags = doc.getXObjects(ImageLibStrings.getAlbumClassDocRef());
       for (Iterator<BaseObject> iter = tags.iterator(); iter.hasNext();) {
         BaseObject tag = iter.next();
         if((tag != null)){
