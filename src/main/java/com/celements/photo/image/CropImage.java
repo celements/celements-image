@@ -3,15 +3,16 @@ package com.celements.photo.image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sanselan.ImageReadException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
+import com.celements.photo.plugin.cmd.DecodeImageCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -25,6 +26,9 @@ public class CropImage implements ICropImage {
 
   @Requirement
   Execution execution;
+  
+  @Requirement
+  DecodeImageCommand decoder;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -59,15 +63,13 @@ public class CropImage implements ICropImage {
     public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h,
         OutputStream out) {
     try {
-      InputStream in = xAtt.getContentInputStream(getContext());
-      BufferedImage img = new GenerateThumbnail().decodeImage(in);
-      in.close();
+      BufferedImage img = decoder.readImage(xAtt, getContext());
       crop(img, x, y, w, h, xAtt.getMimeType(getContext()), out);
-    } catch (XWikiException e) {
+    } catch (XWikiException xwe) {
       LOGGER.error("Error getting attachment content and decoding it into an " +
-          "BufferedImage", e);
-    } catch (IOException e) {
-      LOGGER.error("Error in input our output stream.", e);
+          "BufferedImage", xwe);
+    } catch (ImageReadException ire) {
+      LOGGER.error("Error while reading image.", ire);
     }
     return out;
   }
