@@ -59,7 +59,7 @@ public class BaseObjectHandler {
    */
   @SuppressWarnings("unchecked")
   public BaseObject getBaseObjectFromBaseObjectList(XWikiDocument doc, String tagName) throws XWikiException {
-    List<BaseObject> metaTags = doc.getObjects(ImageLibStrings.METAINFO_CLASS);
+    List<BaseObject> metaTags = doc.getXObjects(ImageLibStrings.getMetainfoClassDocRef());
     if(metaTags != null){
       for (Iterator iter = metaTags.iterator(); iter.hasNext();) {
         BaseObject tag = (BaseObject) iter.next();
@@ -85,7 +85,7 @@ public class BaseObjectHandler {
   public List<BaseObject> getAllFromBaseObjectList(XWikiDocument doc, String tagName){
     List<BaseObject> resultTags = new Vector<BaseObject>();
     
-    List<BaseObject> metaTags = doc.getObjects(ImageLibStrings.METAINFO_CLASS);
+    List<BaseObject> metaTags = doc.getXObjects(ImageLibStrings.getMetainfoClassDocRef());
     if(metaTags != null){
       for (Iterator iter = metaTags.iterator(); iter.hasNext();) {
         BaseObject tag = (BaseObject) iter.next();
@@ -110,7 +110,8 @@ public class BaseObjectHandler {
    * @throws XWikiException
    */
   public BaseObject addBaseObject(XWikiDocument doc, String name, String value, XWikiContext context) throws XWikiException{
-    BaseObject celementsMeta = doc.newObject(ImageLibStrings.METAINFO_CLASS, context);
+    BaseObject celementsMeta = doc.newXObject(ImageLibStrings.getMetainfoClassDocRef(), 
+        context);
     
     celementsMeta.set(ImageLibStrings.METAINFO_CLASS_NAME, name, context);
     celementsMeta.set(ImageLibStrings.METAINFO_CLASS_DESCRIPTION, value, context);
@@ -163,7 +164,7 @@ public class BaseObjectHandler {
    * @throws XWikiException
    */
   public String getImageString(XWikiDocument doc, String tag) throws XWikiException {
-    BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseObject obj = doc.getXObject(ImageLibStrings.getImageClassDocRef());
     if(obj != null){
       return obj.getStringValue(tag);
     }
@@ -181,7 +182,7 @@ public class BaseObjectHandler {
    * @throws XWikiException
    */
   public void setImageString(XWikiDocument doc, String tag, String value, XWikiContext context) throws XWikiException {
-    BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseObject obj = doc.getXObject(ImageLibStrings.getImageClassDocRef());
     if(obj != null){
       obj.setStringValue(tag, value);
         context.getWiki().saveDocument(doc, context);
@@ -198,7 +199,7 @@ public class BaseObjectHandler {
    * @throws XWikiException
    */
   public boolean getImageBoolean(XWikiDocument doc, String tag) throws XWikiException {
-    BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseObject obj = doc.getXObject(ImageLibStrings.getImageClassDocRef());
     if(obj != null){
       return obj.getIntValue(tag) == 1;
     }
@@ -216,7 +217,7 @@ public class BaseObjectHandler {
    */
   public void setImageBoolean(XWikiDocument doc, String tag, boolean value, 
       XWikiContext context) throws XWikiException {
-    BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseObject obj = doc.getXObject(ImageLibStrings.getImageClassDocRef());
     if(obj != null){
       obj.setIntValue(tag, (value? 1 : 0));
         context.getWiki().saveDocument(doc, context);
@@ -233,7 +234,7 @@ public class BaseObjectHandler {
    * @throws XWikiException
    */
   public int getImageInteger(XWikiDocument doc, String tag) throws XWikiException {
-    BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseObject obj = doc.getXObject(ImageLibStrings.getImageClassDocRef());
     if(obj != null){
       return obj.getIntValue(tag);
     }
@@ -251,7 +252,7 @@ public class BaseObjectHandler {
    * @throws XWikiException
    */
   public void setImageInteger(XWikiDocument doc, String tag, int value, XWikiContext context) throws XWikiException {
-    BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS);
+    BaseObject obj = doc.getXObject(ImageLibStrings.getImageClassDocRef());
     if(obj != null){
       obj.setIntValue(tag, value);
         context.getWiki().saveDocument(doc, context);
@@ -268,7 +269,7 @@ public class BaseObjectHandler {
    * @throws XWikiException
    */
   public String getAlbumDataSpaceName(XWikiDocument doc) throws XWikiException {
-    BaseObject obj = doc.getObject(ImageLibStrings.PHOTO_ALBUM_CLASS);
+    BaseObject obj = doc.getXObject(ImageLibStrings.getAlbumClassDocRef());
     if(obj != null){
       return obj.getStringValue(ImageLibStrings.PHOTO_ALBUM_SPACE_NAME);
     }

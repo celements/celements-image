@@ -273,9 +273,9 @@ public class ZipAttachmentChanges {
       XWikiDocument imgMetaDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + hash, context);
       
       if(imgMetaDoc.isNew()){
-        imgMetaDoc.newObject(ImageLibStrings.PHOTO_IMAGE_CLASS, context);
+        imgMetaDoc.newXObject(ImageLibStrings.getImageClassDocRef(), context);
         handler.setImageString(imgMetaDoc, ImageLibStrings.PHOTO_IMAGE_HASH, hash, context);
-      }else if(imgMetaDoc.getObject(ImageLibStrings.PHOTO_IMAGE_CLASS) != null){
+      }else if(imgMetaDoc.getXObject(ImageLibStrings.getImageClassDocRef()) != null){
         deleteThumbnail(doc, hash, context);
         deleteMetainfo(doc, hash, context);
       }
@@ -382,7 +382,7 @@ public class ZipAttachmentChanges {
     XWikiDocument metaDocument = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + imageHash, context);
     if(!metaDocument.isNew()){
       
-      metaDocument.removeObjects(ImageLibStrings.METAINFO_CLASS);
+      metaDocument.removeXObjects(ImageLibStrings.getMetainfoClassDocRef());
       context.getWiki().saveDocument(metaDocument, context);
     }
   }

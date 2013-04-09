@@ -30,13 +30,12 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.container.ImageStrings;
-import com.celements.photo.container.Metadate;
 import com.celements.photo.utilities.ImportFileObject;
-import com.drew.metadata.MetadataException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -82,8 +81,10 @@ public class CelementsPhotoPluginAPI extends Api {
     
     for (Iterator<String> iter = docs.iterator(); iter.hasNext();) {
       String docName = iter.next();
-      XWikiDocument doc = context.getWiki().getDocument(space, docName, context);
-      if(doc.getObject(ImageLibStrings.PHOTO_ALBUM_CLASS) != null){
+      DocumentReference docRef = new DocumentReference(context.getDatabase(), space, 
+          docName);
+      XWikiDocument doc = context.getWiki().getDocument(docRef, context);
+      if(doc.getXObject(ImageLibStrings.getAlbumClassDocRef()) != null){
         albums.add(docName);
       }
     }
