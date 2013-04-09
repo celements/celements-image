@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
@@ -275,7 +277,10 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * @throws IOException
    */
   public void forceClearMetadata(XWikiDocument doc, String id, XWikiContext context) throws XWikiException, IOException{
-    XWikiDocument metadataDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), 
+        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
+        "_img_" + id);
+    XWikiDocument metadataDoc = context.getWiki().getDocument(docRef, context);
     context.getWiki().deleteDocument(metadataDoc, context);
   }
   
@@ -325,28 +330,38 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * @return List of {@link ImportFileObject} for each file.
    * @throws XWikiException
    */
-  public List<ImportFileObject>getAttachmentFileListWithActions(XWikiAttachment importFile, XWikiDocument galleryDoc, XWikiContext context) throws XWikiException{
+  public List<ImportFileObject>getAttachmentFileListWithActions(
+      XWikiAttachment importFile, XWikiDocument galleryDoc, XWikiContext context
+      ) throws XWikiException{
     List<ImportFileObject> resultList = new ArrayList<ImportFileObject>();
     
     if(importFile != null){
       if(isZipFile(importFile, context)){
-        List<String> fileList = (new Unzip()).getZipContentList(importFile.getContent(context));
-        
-        String fileSep = System.getProperty("file.separator");
-        for (Iterator<String> fileIterator = fileList.iterator(); fileIterator.hasNext();) {
-          String fileName = (String) fileIterator.next();
-          if(!fileName.endsWith(fileSep)
-              && !fileName.startsWith(".") && !fileName.contains(fileSep + ".")){
-            ImportFileObject file = new ImportFileObject(fileName, getActionForFile(fileName, galleryDoc, context));
-            resultList.add(file);
+        List<String> fileList;
+        try {
+          fileList = (new Unzip()).getZipContentList(
+              IOUtils.toByteArray(importFile.getContentInputStream(context)));
+          String fileSep = System.getProperty("file.separator");
+          for (Iterator<String> fileIterator = fileList.iterator(); fileIterator.hasNext();) {
+            String fileName = (String) fileIterator.next();
+            if(!fileName.endsWith(fileSep)
+                && !fileName.startsWith(".") && !fileName.contains(fileSep + ".")){
+              ImportFileObject file = new ImportFileObject(fileName, getActionForFile(
+                  fileName, galleryDoc, context));
+              resultList.add(file);
+            }
           }
+        } catch (IOException ioe) {
+          LOGGER.error("Error reading file.", ioe);
         }
       } else if(isImgFile(importFile, context)){
-        ImportFileObject file = new ImportFileObject(importFile.getFilename(), getActionForFile(importFile.getFilename(), galleryDoc, context));
+        ImportFileObject file = new ImportFileObject(importFile.getFilename(), 
+            getActionForFile(importFile.getFilename(), galleryDoc, context));
         resultList.add(file);
       }
     } else{
-      LOGGER.error("zipFile='null' - galleryDoc='" + galleryDoc.getFullName() + "'");
+      LOGGER.error("zipFile='null' - galleryDoc='" + galleryDoc.getDocumentReference() + 
+          "'");
     }
     
     return resultList;
@@ -360,7 +375,8 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * @param galleryDoc Document of the gallery to check if the file already exists.
    * @return action when importing: -1 skip, 0 overwrite, 1 add
    */
-  private short getActionForFile(String fileName, XWikiDocument galleryDoc, XWikiContext context) {
+  private short getActionForFile(String fileName, XWikiDocument galleryDoc, 
+      XWikiContext context) {
     short action = ImportFileObject.ACTION_SKIP;
     if(isImgFile(fileName)){
       fileName = fileName.replace(System.getProperty("file.separator"), ".");
@@ -388,18 +404,22 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * @param context XWikiContezt
    * @throws XWikiException
    */
-  public void unzipFileToAttachment(XWikiAttachment zipFile, String unzipFileName, XWikiDocument attachToDoc,
-      int width, int height, XWikiContext context) throws XWikiException {
-    LOGGER.info("START: zip='" + zipFile.getFilename() + "' file='" + unzipFileName + "' gallery='" + attachToDoc + "' " +
-        "width='" + width + "' height='" + height + "'");
+  public void unzipFileToAttachment(XWikiAttachment zipFile, String unzipFileName, 
+      XWikiDocument attachToDoc, int width, int height, XWikiContext context
+      ) throws XWikiException {
+    LOGGER.info("START: zip='" + zipFile.getFilename() + "' file='" + unzipFileName + 
+        "' gallery='" + attachToDoc + "' " + "width='" + width + "' height='" + height + 
+        "'");
     ByteArrayInputStream imgFullSize = null;
     ByteArrayOutputStream out = null;
     try {
       if(isZipFile(zipFile, context)){
-        imgFullSize = new ByteArrayInputStream(
-          (new Unzip()).getFile(zipFile.getContent(context), unzipFileName).toByteArray());
+        
+        imgFullSize = new ByteArrayInputStream((new Unzip()).getFile(IOUtils.toByteArray(
+            zipFile.getContentInputStream(context)), unzipFileName).toByteArray());
       } else if(isImgFile(zipFile, context)){
-        imgFullSize = new ByteArrayInputStream(zipFile.getContent(context));
+        imgFullSize = new ByteArrayInputStream(IOUtils.toByteArray(
+            zipFile.getContentInputStream(context)));
       }
       //TODO is there a better way to find the mime type of the file in the in stream?
       //      -> look at http://tika.apache.org/ or maybe in image magic?
@@ -415,8 +435,10 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       LOGGER.info("output stream size: " + out.size());
       unzipFileName = unzipFileName.replace(System.getProperty("file.separator"), ".");
       unzipFileName = context.getWiki().clearName(unzipFileName, false, true, context);
-      XWikiAttachment att = (new AddAttachmentToDoc()).addAtachment(attachToDoc, out.toByteArray(), unzipFileName, context);
-      LOGGER.info("attachment='" + att.getFilename() + "', gallery='" + att.getDoc().getFullName() + "' size='" + att.getFilesize() + "'");
+      XWikiAttachment att = (new AddAttachmentToDoc()).addAtachment(attachToDoc, 
+          out.toByteArray(), unzipFileName, context);
+      LOGGER.info("attachment='" + att.getFilename() + "', gallery='" + att.getDoc(
+          ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
     } catch (IOException e) {
       LOGGER.error(e);
     } finally {
