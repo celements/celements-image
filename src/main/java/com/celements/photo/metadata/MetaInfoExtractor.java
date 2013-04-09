@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
@@ -54,8 +53,8 @@ public class MetaInfoExtractor {
    * @return An arry of Tags.
    * @throws MetadataException
    */
-  public List<Tag> getDirectoryTagsAsTagList(InputStream imageFile, Class directory
-      ) throws MetadataException{    
+  public List<Tag> getDirectoryTagsAsTagList(InputStream imageFile, 
+      Class<Directory> directory) throws MetadataException{
     Metadata metadata = getMetadata(imageFile);
     Directory dir = metadata.getDirectory(directory);
     List<Tag> data = new ArrayList<Tag>();
