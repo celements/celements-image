@@ -46,13 +46,13 @@ public class GenerateThumbnailTest {
   @Test
   public void testCreateThumbnail() throws Exception {
     InputStream in = getClass().getClassLoader().getResourceAsStream("Home.Home2.jpg");
-    BufferedImage img = genThum.decodeImage(in);
+    BufferedImage img = genThum.decodeInputStream(in);
     in.close();
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     genThum.createThumbnail(img, out, new ImageDimensions(497, 247), null, null, "PNG",
         null);
-    BufferedImage outImg = genThum.decodeImage(new ByteArrayInputStream(out.toByteArray(
-        )));
+    BufferedImage outImg = genThum.decodeInputStream(new ByteArrayInputStream(
+        out.toByteArray()));
     out.close();
     assertEquals(497, outImg.getWidth(null));
     assertEquals(247, outImg.getHeight(null));
