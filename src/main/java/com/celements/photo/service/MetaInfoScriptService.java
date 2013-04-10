@@ -160,7 +160,7 @@ public class MetaInfoScriptService implements ScriptService {
   //TODO move out of ScriptService
   
   List<Tag> getDirectoryTagsAsTagListInternal(InputStream imageFile, 
-      Class directory) {
+      Class<Directory> directory) {
     try {
       return new MetaInfoExtractor().getDirectoryTagsAsTagList(imageFile, directory);
     } catch (MetadataException mde) {
