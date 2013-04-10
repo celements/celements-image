@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.container.ImageStrings;
 import com.celements.photo.utilities.BaseObjectHandler;
@@ -80,7 +82,7 @@ public class Image {
    */
   public ImageStrings[] getImageListExclThumbs(XWikiDocument doc, XWikiContext context
       ) throws XWikiException, IOException{
-    String album = doc.getName();
+    String album = doc.getDocumentReference().getName();
     (new ZipAttachmentChanges()).checkZipAttatchmentChanges(doc, context);
     
     List<XWikiDocument> images = new Vector<XWikiDocument>();
@@ -105,8 +107,9 @@ public class Image {
       for (Iterator<String> iter = imageList.iterator(); iter.hasNext();) {
         String image = iter.next();
         if(image.lastIndexOf(album + "_img_") == 0){
-          XWikiDocument imageDoc = context.getWiki().getDocument(
-              ImageLibStrings.getPhotoSpace(doc), image, context); 
+          DocumentReference imgDocRef = new DocumentReference(context.getDatabase(), 
+              ImageLibStrings.getPhotoSpace(doc), image);
+          XWikiDocument imageDoc = context.getWiki().getDocument(imgDocRef, context); 
           if(!isDeleted(doc, image.substring(image.lastIndexOf(
               "_")+1), context)){
             images.add(imageDoc);
@@ -139,8 +142,10 @@ public class Image {
    */
   public boolean isDeleted(XWikiDocument doc, String id, XWikiContext context
       ) throws XWikiException {
-    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(
-        ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
+    DocumentReference metaDocRef = new DocumentReference(context.getDatabase(), 
+        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
+        "_img_" + id);
+    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(metaDocRef, context);
     return new BaseObjectHandler().getImageBoolean(celementsMetaDoc, 
         ImageLibStrings.PHOTO_IMAGE_DELETED);
   }
@@ -156,8 +161,10 @@ public class Image {
    */
   public void setDeleted(XWikiDocument doc, String id, boolean deleted, 
       XWikiContext context) throws XWikiException {
-    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(
-        ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
+    DocumentReference metaDocRef = new DocumentReference(context.getDatabase(), 
+        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
+        "_img_" + id);
+    XWikiDocument celementsMetaDoc = context.getWiki().getDocument(metaDocRef, context);
     new BaseObjectHandler().setImageBoolean(celementsMetaDoc, 
         ImageLibStrings.PHOTO_IMAGE_DELETED, deleted, context);
   }
