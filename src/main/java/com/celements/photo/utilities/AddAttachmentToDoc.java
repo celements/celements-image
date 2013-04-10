@@ -19,12 +19,13 @@
  */
 package com.celements.photo.utilities;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.celements.photo.plugin.CelementsPhotoPlugin;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -34,8 +35,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Used to add data as a new XWikiAttachment to an XWikiDocument.
  */
 public class AddAttachmentToDoc {
-  private static final Log mLogger = 
-      LogFactory.getFactory().getInstance(AddAttachmentToDoc.class);
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(
+      AddAttachmentToDoc.class);
   
   /**
    * Converts the given ByteArrayOutputStream to an XWikiAttachment and adds
@@ -75,9 +76,22 @@ public class AddAttachmentToDoc {
         attachment = new XWikiAttachment();
         olddoc.getAttachmentList().add(attachment);
     }
-    
-    mLogger.info("filename='" + filename + "' contentsize='" + data.length + "'");
-    attachment.setContent(data);
+    LOGGER.info("filename='" + filename + "' contentsize='" + data.length + "'");
+    ByteArrayInputStream dataStream = null;
+    try {
+      dataStream = new ByteArrayInputStream(data);
+      attachment.setContent(dataStream);
+    } catch (IOException ioe) {
+      LOGGER.error("Error setting Attachment content", ioe);
+    } finally {
+      if(dataStream != null) {
+        try {
+          dataStream.close();
+        } catch (IOException ioe) {
+          LOGGER.error("Exception cloasing stream.", ioe);
+        }
+      }
+    }
     attachment.setFilename(filename);
     attachment.setAuthor(context.getUser());
 
