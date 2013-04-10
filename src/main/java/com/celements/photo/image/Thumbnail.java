@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.utilities.AddAttachmentToDoc;
@@ -58,17 +60,16 @@ public class Thumbnail {
    */
   public String getUrl(XWikiDocument doc, String id, int width, int height, 
       XWikiContext context) throws XWikiException, IOException {
-    String album = doc.getName();
+    String album = doc.getDocumentReference().getName();
     ZipAttachmentChanges zipAttChanges = new ZipAttachmentChanges();
     GenerateThumbnail thumbGenerator = new GenerateThumbnail();
     XWikiAttachment zipAttachment = zipAttChanges.getContainingZip(doc, id, context);
     
     ImageDimensions imgSize = getThumbnailDimensions(doc, id, width, height, 
         thumbGenerator, context);
-    
-    XWikiDocument celeMetaDoc = context.getWiki().getDocument(
-        ImageLibStrings.getPhotoSpace(doc), 
-        album + "_img_" + id, context);
+    DocumentReference metaDocRef = new DocumentReference(context.getDatabase(), 
+        ImageLibStrings.getPhotoSpace(doc), album + "_img_" + id);
+    XWikiDocument celeMetaDoc = context.getWiki().getDocument(metaDocRef, context);
     if(imgSize.isEmpty()){
       String dir = (new BaseObjectHandler()).getImageString(celeMetaDoc, 
           ImageLibStrings.PHOTO_IMAGE_ZIPDIRECTORY);
@@ -128,7 +129,8 @@ public class Thumbnail {
    * @return String to add to the image as a watermark.
    * @throws XWikiException 
    */
-  private String getWatermark(XWikiDocument doc, XWikiContext context) throws XWikiException {
+  private String getWatermark(XWikiDocument doc, XWikiContext context
+      ) throws XWikiException {
     return getObjctDescription(doc, ImageLibStrings.PHOTO_ALBUM_WATERMARK);
   }
 
@@ -140,7 +142,8 @@ public class Thumbnail {
    * @return String to add to the image as copyright information.
    * @throws XWikiException 
    */
-  private String getCopyright(XWikiDocument doc, XWikiContext context) throws XWikiException {
+  private String getCopyright(XWikiDocument doc, XWikiContext context
+      ) throws XWikiException {
     return getObjctDescription(doc, ImageLibStrings.PHOTO_ALBUM_COPYRIGHT);
   }
 
@@ -156,8 +159,13 @@ public class Thumbnail {
    * @return ImageDimensions object containing the dimensions of the thumbnail. 
    * @throws XWikiException
    */
-  private ImageDimensions getThumbnailDimensions(XWikiDocument doc, String id, int width, int height, GenerateThumbnail thumbGenerator, XWikiContext context) throws XWikiException{
-    XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
+  private ImageDimensions getThumbnailDimensions(XWikiDocument doc, String id, int width, 
+      int height, GenerateThumbnail thumbGenerator, XWikiContext context
+      ) throws XWikiException{
+    DocumentReference imgDocRef = new DocumentReference(context.getDatabase(), 
+        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
+        "_img_" + id);
+    XWikiDocument imageDoc = context.getWiki().getDocument(imgDocRef, context);
     
     BaseObjectHandler handler = new BaseObjectHandler();
     
@@ -176,9 +184,12 @@ public class Thumbnail {
    * @param context XWikiContext
    * @throws XWikiException
    */
-  private void writeImageDimensionsToMetadata(XWikiDocument doc, String id, ImageDimensions imgDim, XWikiContext context) throws XWikiException{
-    XWikiDocument imageDoc = context.getWiki().getDocument(ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
-    
+  private void writeImageDimensionsToMetadata(XWikiDocument doc, String id, 
+      ImageDimensions imgDim, XWikiContext context) throws XWikiException{
+    DocumentReference imgDocRef = new DocumentReference(context.getDatabase(), 
+        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
+        "_img_" + id);
+    XWikiDocument imageDoc = context.getWiki().getDocument(imgDocRef, context);
     BaseObject metainfoObj = imageDoc.getXObject(ImageLibStrings.getImageClassDocRef());
     metainfoObj.setIntValue(ImageLibStrings.PHOTO_IMAGE_WIDTH, (int)imgDim.getWidth());
     metainfoObj.setIntValue(ImageLibStrings.PHOTO_IMAGE_HEIGHT, (int)imgDim.getHeight());
@@ -195,7 +206,8 @@ public class Thumbnail {
    * @return The description of the specified tag.
    * @throws XWikiException
    */
-  private String getObjctDescription(XWikiDocument doc, String tagName) throws XWikiException {
+  private String getObjctDescription(XWikiDocument doc, String tagName
+      ) throws XWikiException {
     if(!doc.isNew()){
       List<BaseObject> tags = doc.getXObjects(ImageLibStrings.getAlbumClassDocRef());
       for (Iterator<BaseObject> iter = tags.iterator(); iter.hasNext();) {
