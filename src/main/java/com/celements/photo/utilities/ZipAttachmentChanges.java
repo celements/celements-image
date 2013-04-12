@@ -477,7 +477,7 @@ public class ZipAttachmentChanges {
       MessageDigest digest = MessageDigest.getInstance(ImageLibStrings.HASHING_ALGORITHM);
       digest.update(filename.getBytes());
       String hashraw = new String(digest.digest());
-      return Util.getUtil().hashToHex(hashraw);
+      return new Util().hashToHex(hashraw);
     } catch (NoSuchAlgorithmException e) {
       mLogger.error(e);
     }

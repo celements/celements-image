@@ -507,7 +507,7 @@ public class GenerateThumbnail {
     
     String hash = "";
     try {
-      hash = Util.getUtil().hashToHex(getHashOfImage(img));
+      hash = new Util().hashToHex(getHashOfImage(img));
     } catch (NoSuchAlgorithmException e) {
       LOGGER.error(e);
     }
