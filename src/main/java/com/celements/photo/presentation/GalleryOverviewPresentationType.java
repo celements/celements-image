@@ -2,6 +2,7 @@ package com.celements.photo.presentation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -13,6 +14,7 @@ import com.celements.rendering.RenderCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("galleryOverview")
 public class GalleryOverviewPresentationType implements IPresentationTypeRole {
@@ -51,6 +53,9 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole {
     String templatePath = webUtilsService.getInheritedTemplatedPath(
         getImageGalleryOverviewRef());
     try {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      XWikiDocument galleryDoc = getContext().getWiki().getDocument(docRef, getContext());
+      vcontext.put("gallerydoc", galleryDoc.newDocument(getContext()));
       return getRenderCommand().renderTemplatePath(templatePath, getContext(
           ).getLanguage());
     } catch (XWikiException exp) {

@@ -17,6 +17,7 @@ import com.celements.rendering.RenderCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -69,6 +70,7 @@ public class GalleryOverviewPresentationTypeTest
   @Test
   public void testWriteNodeContent() throws Exception {
     context.setLanguage("fr");
+    context.put("vcontext", new VelocityContext());
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
         "Content", "MyPage");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -88,12 +90,17 @@ public class GalleryOverviewPresentationTypeTest
     expect(xwiki.exists(eq(templateRef), same(context))).andReturn(true).once();
     expect(renderCmdMock.renderTemplatePath(eq("Templates.ImageGalleryOverview"),
         eq("fr"))).andReturn(expectedNodeContent).once();
+    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc
+        ).atLeastOnce();
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf,
         1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
         + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    Document galleryDoc = (Document) vcontext.get("gallerydoc");
+    assertEquals(currentDocRef, galleryDoc.getDocumentReference());
     verifyDefault();
   }
 
