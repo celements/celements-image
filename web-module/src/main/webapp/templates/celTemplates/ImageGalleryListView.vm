@@ -1,0 +1,70 @@
+#set($overwritePresCmCssClass = '')
+#set($overwriteNavCMcssClass = 'cel_cm_gallery')
+#set($emptyDictKeySuffix = '_gallery_list')
+<div class="gallery">
+<div class="pfeil_links"></div>
+<div class="pfeil_rechts"></div>
+
+<h1>Gallery</h1>
+
+<ul style="display:none;">
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <img src="/download/Content_attachments/FileBaseDoc/bild.png" />
+            <span class="background"></span>
+            <span class="text">St. Patricks Day<br/>2012</span>
+        </a>
+    </li>
+</ul>
+
+#parse('celTemplates/PresentationView.vm')
+</div>
