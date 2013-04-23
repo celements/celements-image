@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.container.ImageStrings;
+import com.celements.photo.unpack.UnpackComponentRole;
 import com.celements.photo.utilities.ImportFileObject;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,6 +43,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * The CelementsPhotoPluginAPI acts as an Interface between the functionality, 
@@ -211,12 +213,14 @@ public class CelementsPhotoPluginAPI extends Api {
    * @param height Height (max - aspect ratio is maintained) to resize the image to.
    * @throws XWikiException
    */
+  @Deprecated
   public void unzipFileToAttachment(Document zipDoc, String attachmentName, 
       String unzipFileName, Document attachToDoc, int width, int height
       ) throws XWikiException, IOException{
-    XWikiAttachment zipFile = zipDoc.getDocument().getAttachment(attachmentName);
-    photoPlugin.unzipFileToAttachment(zipFile, unzipFileName, attachToDoc.getDocument(), 
-        width, height, context);
+    UnpackComponentRole comp = (UnpackComponentRole)Utils.getComponent(
+        UnpackComponentRole.class);
+    comp.unzipFileToAttachment(zipDoc.getDocumentReference(), attachmentName, 
+        unzipFileName, attachToDoc.getDocumentReference());
   }
 
   /**

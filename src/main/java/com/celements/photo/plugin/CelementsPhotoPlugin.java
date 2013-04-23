@@ -404,6 +404,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * @param context XWikiContezt
    * @throws XWikiException
    */
+  @Deprecated
   public void unzipFileToAttachment(XWikiAttachment zipFile, String unzipFileName, 
       XWikiDocument attachToDoc, int width, int height, XWikiContext context
       ) throws XWikiException {

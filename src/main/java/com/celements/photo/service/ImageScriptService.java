@@ -1,3 +1,4 @@
+
 package com.celements.photo.service;
 
 import java.io.OutputStream;
@@ -9,16 +10,19 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.ICropImage;
+import com.celements.photo.unpack.UnpackComponentRole;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component("celementsphoto")
@@ -44,6 +48,9 @@ public class ImageScriptService implements ScriptService {
 
   @Requirement
   ICropImage cropImage;
+  
+  @Requirement
+  UnpackComponentRole unpack;
 
   private CelementsWebScriptService getCelWebService() {
     return (CelementsWebScriptService) celementsService;
@@ -137,5 +144,26 @@ public class ImageScriptService implements ScriptService {
     int h = Integer.parseInt(getContext().getRequest().get("cropH"));
     if(h <= 0) { h = 1; }
     cropImage.outputCroppedImage(srcDoc, srcFilename, x, y, w, h);
+  }
+
+  /**
+   * Get a specified image file in a zip archive, extract it, change it to the 
+   * desired size and save it as an attachment to the given page.
+   * 
+   * @param zipSourceDoc D
+   * @param attachmentName Filename of the zip archive file.
+   * @param unzipFileName Filename of the file to extract from the zip.
+   * @param destinationDoc Document to attach the extracted file to.
+   */
+  public void unzipFileToAttachment(DocumentReference zipSrcDocRef, String attachmentName, 
+      String unzipFileName, DocumentReference destDocRef) {
+    XWikiAttachment zipFile;
+    try {
+      zipFile = getContext().getWiki().getDocument(zipSrcDocRef,
+          getContext()).getAttachment(attachmentName);
+      unpack.unzipFileToAttachment(zipFile, unzipFileName, destDocRef);
+    } catch (XWikiException xwe) {
+      LOGGER.error("Exception getting zip attachment document.", xwe);
+    }
   }
 }
