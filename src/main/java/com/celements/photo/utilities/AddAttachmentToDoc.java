@@ -26,6 +26,7 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -73,10 +74,14 @@ public class AddAttachmentToDoc {
   public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename, 
       XWikiContext context) throws XWikiException{
     XWikiDocument olddoc = (XWikiDocument) doc.clone();
+    if(olddoc.isNew()) {
+      olddoc = new CreateDocumentCommand().createDocument(olddoc.getDocumentReference(), 
+          "DMS-Document");
+    }
     XWikiAttachment attachment = olddoc.getAttachment(filename);
-
-    if (attachment==null) {
+    if (attachment == null) {
         attachment = new XWikiAttachment();
+        attachment.setDoc(olddoc);
         olddoc.getAttachmentList().add(attachment);
     }
     LOGGER.info("filename='" + filename + "' contentsize='" + data.length + "'");
@@ -97,16 +102,8 @@ public class AddAttachmentToDoc {
     }
     attachment.setFilename(filename);
     attachment.setAuthor(context.getUser());
-
-    attachment.setDoc(olddoc);
-    
     olddoc.setAuthor(context.getUser());
-    if (olddoc.isNew()) {
-        olddoc.setCreator(context.getUser());
-    }
-    
     olddoc.saveAttachmentContent(attachment, context);
-        
     return attachment;
   }
 }
