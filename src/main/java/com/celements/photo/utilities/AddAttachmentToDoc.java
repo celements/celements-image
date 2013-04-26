@@ -82,6 +82,7 @@ public class AddAttachmentToDoc {
     if (attachment == null) {
         attachment = new XWikiAttachment();
         attachment.setDoc(olddoc);
+        attachment.setFilename(filename);
         olddoc.getAttachmentList().add(attachment);
     }
     LOGGER.info("filename='" + filename + "' contentsize='" + data.length + "'");
@@ -100,7 +101,6 @@ public class AddAttachmentToDoc {
         }
       }
     }
-    attachment.setFilename(filename);
     attachment.setAuthor(context.getUser());
     olddoc.setAuthor(context.getUser());
     olddoc.saveAttachmentContent(attachment, context);
