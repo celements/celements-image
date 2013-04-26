@@ -1,9 +1,11 @@
 package com.celements.photo.unpack;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 
+@ComponentRole
 public interface UnpackComponentRole {
   public void unzipFileToAttachment(DocumentReference zipSourceDoc, String attachmentName, 
       String unzipFileName, DocumentReference destinationDoc);
