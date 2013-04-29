@@ -22,6 +22,7 @@ package com.celements.photo.metadata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import com.celements.photo.utilities.ZipAttachmentChanges;
 import com.drew.metadata.MetadataException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -245,10 +247,10 @@ public class Metainfo {
         ImageLibStrings.getPhotoSpace(doc), doc.getName() + "_img_" + id, context);
 
     if(!metadataDoc.isNew()){
-      com.xpn.xwiki.doc.XWikiAttachment containingZip = (new ZipAttachmentChanges()
+      XWikiAttachment containingZip = (new ZipAttachmentChanges()
           ).getContainingZip(doc, id, context);
-      java.util.Date metaDate = metadataDoc.getDate();
-      java.util.Date zipDate = containingZip.getDate();
+      Date metaDate = metadataDoc.getDate();
+      Date zipDate = containingZip.getDate();
       
       if(metaDate.before(zipDate)){
         metadataDoc.removeXObjects(ImageLibStrings.getMetainfoClassDocRef());
