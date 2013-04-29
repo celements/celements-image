@@ -35,7 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.container.ImageStrings;
-import com.celements.photo.unpack.UnpackComponentRole;
+import com.celements.photo.unpack.IUnpackComponentRole;
 import com.celements.photo.utilities.ImportFileObject;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -217,8 +217,8 @@ public class CelementsPhotoPluginAPI extends Api {
   public void unzipFileToAttachment(Document zipDoc, String attachmentName, 
       String unzipFileName, Document attachToDoc, int width, int height
       ) throws XWikiException, IOException{
-    UnpackComponentRole comp = (UnpackComponentRole)Utils.getComponent(
-        UnpackComponentRole.class);
+    IUnpackComponentRole comp = (IUnpackComponentRole)Utils.getComponent(
+        IUnpackComponentRole.class);
     comp.unzipFileToAttachment(zipDoc.getDocumentReference(), attachmentName, 
         unzipFileName, attachToDoc.getDocumentReference());
   }

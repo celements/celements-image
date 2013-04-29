@@ -6,7 +6,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 @ComponentRole
-public interface UnpackComponentRole {
+public interface IUnpackComponentRole {
   public void unzipFileToAttachment(DocumentReference zipSourceDoc, String attachmentName, 
       String unzipFileName, DocumentReference destinationDoc);
 

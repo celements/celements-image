@@ -15,7 +15,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.ICropImage;
-import com.celements.photo.unpack.UnpackComponentRole;
+import com.celements.photo.unpack.IUnpackComponentRole;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.xpn.xwiki.XWikiContext;
@@ -50,7 +50,7 @@ public class ImageScriptService implements ScriptService {
   ICropImage cropImage;
   
   @Requirement
-  UnpackComponentRole unpack;
+  IUnpackComponentRole unpack;
 
   private CelementsWebScriptService getCelWebService() {
     return (CelementsWebScriptService) celementsService;

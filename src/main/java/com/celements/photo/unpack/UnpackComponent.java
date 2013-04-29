@@ -20,7 +20,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
-public class UnpackComponent implements UnpackComponentRole {
+public class UnpackComponent implements IUnpackComponentRole {
   
   @Requirement
   Execution execution;
