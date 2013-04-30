@@ -55,6 +55,8 @@ public class PhotoMetainfoClass {
     bclass.setXClassReference(classDocRef);
     needsUpdate |= bclass.addTextField(ImageLibStrings.METAINFO_CLASS_NAME, ImageLibStrings.METAINFO_CLASS_NAME_PRETTY, 50);
     needsUpdate |= bclass.addTextAreaField(ImageLibStrings.METAINFO_CLASS_DESCRIPTION, ImageLibStrings.METAINFO_CLASS_DESCRIPTION_PRETTY, 50, 10);
+    needsUpdate |= bclass.addTextField("lang", "Language", 50);
+    needsUpdate |= bclass.addTextField("source", "Tag Source", 50);
     
     if (needsUpdate){
       xwiki.saveDocument(doc, context);
