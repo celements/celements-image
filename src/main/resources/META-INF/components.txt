@@ -5,3 +5,4 @@ com.celements.photo.image.CropImage
 com.celements.photo.BarcodeScriptService
 com.celements.photo.presentation.GalleryOverviewPresentationType
 com.celements.photo.unpack.UnpackComponent
+com.celements.photo.metadata.MetadataDocument

@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.Metadate;
+import com.celements.photo.metadata.IMetadataDocumentRole;
 import com.celements.photo.metadata.MetaInfoExtractor;
 import com.drew.metadata.Directory;
 import com.drew.metadata.MetadataException;
@@ -56,6 +57,9 @@ public class MetaInfoScriptService implements ScriptService {
   
   @Requirement
   Execution execution;
+  
+  @Requirement
+  IMetadataDocumentRole metaDocComp;
   
   public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename, 
       String directory) {
@@ -134,28 +138,21 @@ public class MetaInfoScriptService implements ScriptService {
     throw new NotImplementedException();
   }
   
-  /**
-   * Extract metadata from an image and write it to objects, attached to a 
-   * XWikiDocument.
-   * 
-   * @param doc XWikiDocument of the album.
-   * @param id Hashcode of the image.
-   * @param imageMethods Used to get the image.
-   * @param context XWikiContext
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException
-   */
-  public void extractMetaToDoc(XWikiDocument doc, String id, XWikiContext context) {
-    //TODO implement
-    throw new NotImplementedException();
-  }
-  
   public Tag getMetaTag() {
     //TODO implement
     throw new NotImplementedException();
   }
 
+  public void extractMetadataToDocument(DocumentReference source, String filename, 
+      DocumentReference destination, boolean filteredImport) {
+    metaDocComp.extractMetadataToDocument(source, filename, destination, filteredImport);
+  }
+
+  public void extractMetadataToDocument(DocumentReference source, String filename, 
+      DocumentReference destination) {
+    extractMetadataToDocument(source, filename, destination, true);
+  }
+  
   
   //TODO move out of ScriptService
   

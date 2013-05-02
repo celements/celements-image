@@ -71,8 +71,7 @@ public class MetaInfoExtractor {
    * @return Hashtable containing the directorys data.
    * @throws MetadataException
    */
-  public Map<String, String> getAllTags(InputStream imageFile
-      ) throws MetadataException{  
+  public Map<String, String> getAllTags(InputStream imageFile) throws MetadataException{
     Metadata data = getMetadata(imageFile);
     Map<String, String> tags = new HashMap<String, String>();
     for(Directory dir : data.getDirectories()) {
