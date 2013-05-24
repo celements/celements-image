@@ -1,3 +1,6 @@
+#if("$!request.deleted" == '1')
+$xwiki.celementsweb.flushCache()
+#end
 #if("$!celldoc" != '')
 #set($contentDoc = $celldoc)
 #else   
