@@ -48,7 +48,7 @@
     <tag>HEAD</tag>
   </scm>
   <properties>    
-    <platform.core.version>2.30</platform.core.version>
+    <platform.core.version>2.31</platform.core.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
@@ -56,7 +56,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-photo</artifactId>
-      <version>1.20-SNAPSHOT</version>
+      <version>1.20</version>
     </dependency>
   </dependencies>
   <build>
