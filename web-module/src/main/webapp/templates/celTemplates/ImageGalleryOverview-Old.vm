@@ -8,7 +8,7 @@
 <div class="celements_gallery_overview">
 <div class="celements_gallery_left">
 <div class="celements_gallery_thumbnail">
-<a class="celements_gallery_link" href="$galleryLink">
+<span class="celements_gallery_link">
 #if($gallerydoc.attachmentList.size() > 0)
 #set($attach = $gallerydoc.attachmentList.get(0))
 #if("$!imgGalcount" == '')
@@ -22,7 +22,7 @@
 $adminMsg.get('cel_gal_no_pictures')##
   </span>
 #end
-</a>
+</span>
 </div>
 <p class="galleryDescription">$!title</p>
 <br />

@@ -111,3 +111,40 @@ a.celements_gallery_link_slideshow {
   border:none;
 }
 
+/**
+ * additon for new presentation based listing
+ **/
+.gallery .presentationList ul,
+.gallery .presentationList ul li  {
+  padding: 0;
+  margin: 0;
+}
+.gallery .presentationList ul li {
+  list-style-type: none;
+}
+
+/* Gallery Overlay fixes */
+.celanim_overlay_wrapper .highslide-html,
+body .highslide-container .highslide-wrapper {
+  background: transparent; 
+}
+
+.highslide-container .celanim_slideShow_navLeft,
+.highslide-container .celanim_slideShow_navRight {
+  position: absolute;
+  width: 40px !important;
+  z-index: 9;
+  background-repeat: no-repeat;
+  background-position: center;
+  top: 0px;
+}
+
+.highslide-container .celanim_slideShow_navRight {
+  right: -66px;
+  background-image: url('/file/resources/layouts/gallery/galleryOverlayRightArrow.png');
+}
+
+.highslide-container .celanim_slideShow_navLeft {
+  left: -66px;
+  background-image: url('/file/resources/layouts/gallery/galleryOverlayLeftArrow.png');
+}
