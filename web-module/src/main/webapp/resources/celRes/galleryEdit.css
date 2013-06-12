@@ -1,0 +1,18 @@
+.celements3_tabMenu .editblock {
+  padding: 0px;
+  border: none;
+}
+div.celements3_tabMenu form dl {
+  margin: 0;
+  padding: 0;
+}
+div.celements3_tabMenu form dl dt {
+  float: left;
+  width: 265px;
+  margin: 0;
+  padding: 0;
+}
+.celements3_tabMenu .editblock:hover,
+.celements3_tabMenu .focus {
+  background-color: transparent;
+}

@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/galleryEdit.css', 'file')" type="text/css" media="screen" />
 #if("$!request.get('xredirect')" != '')
 #set($xredirect = $!request.getParameter('xredirect'))
 #else
@@ -38,7 +39,7 @@
  $album_obj.set("photoWidth", $!request.get("photoWidth"))
  $album_obj.set("description", $!request.get("description"))
  $album_obj.set('hasOverview',$!request.get('XWiki.PhotoAlbumClass_0_hasOverview'))
- $album_obj.set('thumbDescription',$!request.get('XWiki.PhotoAlbumClass_0_thumbDescription'))
+ $album_obj.set('thumbDescription',$!request.get('thumbDescription'))
  $album_obj.set('theme',$!request.get('XWiki.PhotoAlbumClass_0_theme'))
  $doc.save()
  ## redirect to edit album
@@ -46,14 +47,14 @@
 #end
 <div class="celements2_box editGallery_box c3_scrollable">
   #set($title = $!doc.getTitle())
-<div class="celements2_box_title">$msg.get('gallery_edit_gallery') #if("$!doc.getTitle()" != '')${doc.getTitle()}#else${doc.getName()}#end</div>
-<div class="celements2_box_subtitle">$msg.get('gallery_pictures')</div>
+<div class="celements2_box_title">$adminMsg.get('gallery_edit_gallery') #if("$!doc.getTitle()" != '')${doc.getTitle()}#else${doc.getName()}#end</div>
+<div class="celements2_box_subtitle">$adminMsg.get('gallery_pictures')</div>
 <div class="editGallery_table_box">
 <table cellpadding="0" cellspacing="0" border="0" class="celements2_table">
 <tr>
   <th class="celements2_line" style="text-align:left;width:120px;">&nbsp;</th>
-  <th class="celements2_line" style="text-align:left;">$msg.get("filename")</th>
-  <th class="celements2_line" style="text-align:left;">$msg.get("size")</th>
+  <th class="celements2_line" style="text-align:left;">$adminMsg.get("filename")</th>
+  <th class="celements2_line" style="text-align:left;">$adminMsg.get("size")</th>
   <th class="celements2_line" style="text-align:left;">&nbsp;</th> 
 </tr>
 #set($gallery_attachmentList = $celementsweb.getAttachmentListSorted($doc, 'AttachmentAscendingNameComparator'))
@@ -73,7 +74,7 @@
   <td class="celements2_line" style="text-align:left;">
     $services.celementsweb.getHumanReadableSize($attach.filesize, true, $admin_language)
   </td>
-  <td class="celements2_line" style="text-align:left;"><a href="$doc.getAttachmentURL("${attach.filename}", 'delattachment')?xredirect=$doc.getURL('edit', $redirectStr)" onclick="return confirm('$msg.get("confirmdelattachment")');">$msg.get("delete")</a></td>
+  <td class="celements2_line" style="text-align:left;"><a href="$doc.getAttachmentURL("${attach.filename}", 'delattachment')?xredirect=$doc.getURL('edit', $redirectStr)" onclick="return confirm('$adminMsg.get("confirmdelattachment")');">$adminMsg.get("delete")</a></td>
 </tr>
 #set( $counter = $counter + 1)
 #end
@@ -84,12 +85,12 @@
 #end
 </table>
 </div> <!-- editGallery_table_box -->
-<div class="celements2_box_subtitle">$msg.get('gallery_upload_picture')</div>
+<div class="celements2_box_subtitle">$adminMsg.get('gallery_upload_picture')</div>
 <form action="$doc.getURL('import')" method="post">
   <input type="hidden" name="xredirect" value="$doc.getURL('edit', $redirectStr)" />
-  <input type="submit" value="$msg.get('gallery_import_link')" />
+  <input type="submit" value="$adminMsg.get('gallery_import_link')" />
 </form>
-<div class="celements2_box_subtitle">$msg.get('gallery_gallery_properties')</div>
+<div class="celements2_box_subtitle">$adminMsg.get('gallery_gallery_properties')</div>
 $celementsweb.addExtJSfileOnce(':celJS/prototype.js')
 $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 ## ATTENTION - Includes for old wikis - 
@@ -104,48 +105,57 @@ $celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('validation.js', 's
 #set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
 <table cellspacing="0" cellpadding="0" border="0" class="celements2_table">
 <tr>
- <td class="celements2_text">$msg.get('gallery_album_title')</td>
+ <td class="celements2_text">$adminMsg.get('gallery_album_title')</td>
   #set($title = $!doc.getTitle())
  <td><input name="title" type="text" value="$!title" class="celements2_input" /></td>
 </tr>
 <tr>
- <td class="celements2_text">$msg.get('gallery_album_description')</td>
+ <td class="celements2_text">$adminMsg.get('gallery_album_description')</td>
  <td><textarea name="description" class="celements2_input">$!albumobj.getProperty("description").getValue()</textarea></td>
 </tr>
 <tr>
- <td class="celements2_text">$msg.get('gallery_with_overview')</td>
+ <td class="celements2_text">$adminMsg.get('gallery_with_overview')</td>
     #set($pretagFixStr = '')
     #set($pretagFixStr = $!doc.display('hasOverview','edit',$albumobj))
  <td>${pretagFixStr.replaceAll('\{/?pre\}','')}</td>
 </tr>
 <tr>
- <td class="celements2_text">$msg.get('gallery_thumbnail_width')</td>
+ <td class="celements2_text">$adminMsg.get('gallery_thumbnail_width')</td>
  <td><input name="thumbWidth" type="text" value="$!albumobj.getProperty("thumbWidth").getValue()" class="celements2_input validate-number" /></td>
 </tr>
- <td class="celements2_text">$msg.get('gallery_thumbnail_height')</td>
+ <td class="celements2_text">$adminMsg.get('gallery_thumbnail_height')</td>
  <td><input name="height" type="text" value="$!albumobj.getProperty("height").getValue()" class="celements2_input validate-number" /></td>
 </tr>
 <tr>
- <td class="celements2_text">$msg.get('gallery_picture_height')</td>
+ <td class="celements2_text">$adminMsg.get('gallery_picture_height')</td>
  <td><input name="height2" type="text" value="$!albumobj.getProperty("height2").getValue()" class="celements2_input validate-number" /></td>
 </tr>
 <tr>
- <td class="celements2_text">$msg.get('gallery_picture_width')</td>
+ <td class="celements2_text">$adminMsg.get('gallery_picture_width')</td>
  <td><input name="photoWidth" type="text" value="$!albumobj.getProperty("photoWidth").getValue()" class="celements2_input validate-number" /></td>
 </tr>
 
 <tr class="galleryDescriptionEdit">
- <td class="celements2_text">$msg.get('gallery_thumbnail_desc')</td>
-     #set($pretagFixStr = '')
-    #set($pretagFixStr = $!doc.display('thumbDescription','edit',$albumobj))
- <td>${pretagFixStr.replaceAll('\{/?pre\}','')}</td>
+ <td class="celements2_text">$adminMsg.get('gallery_thumbnail_desc')</td>
+<td><input name="thumbDescription" type="checkbox" ##
+ #if("$!albumobj.getProperty('thumbDescription').getValue()" == '1')
+   checked="checked" ##
+ #end
+  value="1" class="celements2_input" /></td>
 </tr>
 
 <tr class="galleryDescriptionEdit">
- <td class="celements2_text">$msg.get('gallery_theme')</td>
-     #set($pretagFixStr = '')
-    #set($pretagFixStr = $!doc.display('theme','edit',$albumobj))
- <td>${pretagFixStr.replaceAll('\{/?pre\}','')}</td>
+ <td colspan="2">
+#set($cel_editobj_dict_prefix = 'gallery_editor_')
+#set($cel_editobj_externalForm = true)  
+#set($cel_embedded_editobj = true)
+#set($cel_editobj_title = $adminMsg.get('gallery_gallery_properties'))
+#set($cel_editobj_hasObjAddLink = false)
+#set($cel_editobj_hasObjRemoveLink = false)
+#set($cel_editobj_classname = "XWiki.PhotoAlbumClass")
+#set($cel_editobj_nb = $albumobj.getNumber())
+#set($cel_editobj_properties = "theme")
+ $xwiki.includeForm('celements2web:Templates.ObjectEdit',false)</td>
 </tr>
 
 
