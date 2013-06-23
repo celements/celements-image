@@ -143,10 +143,10 @@ body .highslide-container .highslide-wrapper {
 
 .highslide-container .celanim_slideShow_navRight {
   right: -66px;
-  background-image: url('/file/resources/layouts/gallery/galleryOverlayRightArrow.png');
+  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayRightArrow.png');
 }
 
 .highslide-container .celanim_slideShow_navLeft {
   left: -66px;
-  background-image: url('/file/resources/layouts/gallery/galleryOverlayLeftArrow.png');
+  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayLeftArrow.png');
 }
