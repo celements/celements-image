@@ -128,8 +128,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   }
   
   public void virtualInit(XWikiContext context){
-    //TODO move to where it's first needed, not all are using these classes
-    // set up the wiki for the photo plugin
+    //TODO move to a new class collection component extending AbstractClassCollection 
     try{
       generatePhotoMetainfoClass(context);
       generatePhotoAlbumClass(context);
