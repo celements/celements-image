@@ -5,7 +5,7 @@
 #else
   #set($galleryLink = "$!xwiki.getURL($galleryFN, 'view')?diapo=1")
 #end
-<a class="celements_gallery_link" href="$galleryLink">
+<span class="celements_gallery_link" href="$galleryLink">
 #if($gallerydoc.attachmentList.size() > 0)
 #set($attach = $gallerydoc.attachmentList.get(0))
 #if("$!imgGalcount" == '')
@@ -21,4 +21,4 @@ $adminMsg.get('cel_gal_no_pictures')##
 #end
   <span class="background"></span>
   <span class="text">$!title</span>
-</a>
+</span>
