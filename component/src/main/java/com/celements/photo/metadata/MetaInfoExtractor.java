@@ -74,8 +74,11 @@ public class MetaInfoExtractor {
   public Map<String, String> getAllTags(InputStream imageFile) throws MetadataException{
     Metadata data = getMetadata(imageFile);
     Map<String, String> tags = new HashMap<String, String>();
-    for(Directory dir : data.getDirectories()) {
-      tags.putAll(getDirsTags(dir));
+    if(data != null) {
+      Iterable<Directory> dirs = data.getDirectories();
+      for(Directory dir : dirs) {
+        tags.putAll(getDirsTags(dir));
+      }
     }
     return tags;
   }
