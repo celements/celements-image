@@ -40,8 +40,9 @@ public class UnpackComponent implements IUnpackComponentRole {
     }
   }
   
-  public void unzipFileToAttachment(XWikiAttachment zipSrcFile, String attName,
+  public String unzipFileToAttachment(XWikiAttachment zipSrcFile, String attName,
       DocumentReference destDocRef) {
+    String cleanName = attName;
     if(zipSrcFile != null) {
       LOGGER.info("START unzip: zip='" + zipSrcFile.getFilename() + "' file='" + attName + 
           "'");
@@ -50,8 +51,9 @@ public class UnpackComponent implements IUnpackComponentRole {
         try {
           newAttOutStream = (new Unzip()).getFile(IOUtils.toByteArray(
               zipSrcFile.getContentInputStream(getContext())), attName);
-          attName = attName.replace(System.getProperty("file.separator"), ".");
-          attName = getContext().getWiki().clearName(attName, false, true, getContext());
+          cleanName = attName.replace(System.getProperty("file.separator"), ".");
+          cleanName = getContext().getWiki().clearName(cleanName, false, true, 
+              getContext());
           XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
               getContext());
           XWikiAttachment att = (new AddAttachmentToDoc()).addAtachment(destDoc, 
@@ -76,7 +78,8 @@ public class UnpackComponent implements IUnpackComponentRole {
       LOGGER.error("Source document which should contain zip file is null: [" 
           + zipSrcFile + "]");
     }
-    LOGGER.info("END unzip: file='" + attName + "'");
+    LOGGER.info("END unzip: file='" + attName + "', cleaned name is '" + cleanName + "'");
+    return cleanName;
   }
   
   boolean isZipFile(XWikiAttachment file) {

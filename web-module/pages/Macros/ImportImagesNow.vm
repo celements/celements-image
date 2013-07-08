@@ -4,10 +4,10 @@
 #foreach($param in $request.getParameterNames())
   #if(("$!param.indexOf('filename_')" == '0') && ("$!request.get($param)" != ''))
     <li>$request.get($param)</li>
-    #set($attDocRef = $services.model.resolveDocumentReference("$request.attDoc"))
+    #set($attDocRef = $services.model.resolveDocument("$request.attDoc"))
     #set($destDocRef = $celementsweb.getNextTitledPageDocRef("Images", "Img")))
-    $services.celementsphoto.unzipFileToAttachment($attDocRef, "$!request.filename", "$!request.get($param)", $destDocRef)
-    $services.celmetatags.extractMetadataToDocument($destDocRef, "$!request.filename", $destDocRef)
+    #set($effectiveName = $services.celementsphoto.unzipFileToAttachment($attDocRef, "$!request.filename", "$!request.get($param)", $destDocRef))
+    $services.celmetatags.extractMetadataToDocument($destDocRef, $effectiveName, $destDocRef)
     #if("$!request.gallery" != '')
       TODO Bilder $request.gallery hinzufuegen
     #end

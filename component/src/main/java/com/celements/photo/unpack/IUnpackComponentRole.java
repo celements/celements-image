@@ -10,6 +10,6 @@ public interface IUnpackComponentRole {
   public void unzipFileToAttachment(DocumentReference zipSourceDoc, String attachmentName, 
       String unzipFileName, DocumentReference destinationDoc);
 
-  public void unzipFileToAttachment(XWikiAttachment zipSrcFile, String attachmentName, 
+  public String unzipFileToAttachment(XWikiAttachment zipSrcFile, String attachmentName, 
       DocumentReference destDoc);
 }

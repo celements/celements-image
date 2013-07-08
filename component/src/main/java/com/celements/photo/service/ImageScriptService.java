@@ -154,16 +154,18 @@ public class ImageScriptService implements ScriptService {
    * @param attachmentName Filename of the zip archive file.
    * @param unzipFileName Filename of the file to extract from the zip.
    * @param destinationDoc Document to attach the extracted file to.
+   * @return The final attachment name (with added zip folder info and cleared by xwiki).
    */
-  public void unzipFileToAttachment(DocumentReference zipSrcDocRef, String attachmentName, 
-      String unzipFileName, DocumentReference destDocRef) {
+  public String unzipFileToAttachment(DocumentReference zipSrcDocRef, 
+      String attachmentName, String unzipFileName, DocumentReference destDocRef) {
     XWikiAttachment zipFile;
     try {
       zipFile = getContext().getWiki().getDocument(zipSrcDocRef,
           getContext()).getAttachment(attachmentName);
-      unpack.unzipFileToAttachment(zipFile, unzipFileName, destDocRef);
+      return unpack.unzipFileToAttachment(zipFile, unzipFileName, destDocRef);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception getting zip attachment document.", xwe);
+      return unzipFileName;
     }
   }
 }
