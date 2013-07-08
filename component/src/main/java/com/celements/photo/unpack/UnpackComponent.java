@@ -57,7 +57,7 @@ public class UnpackComponent implements IUnpackComponentRole {
           XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
               getContext());
           XWikiAttachment att = (new AddAttachmentToDoc()).addAtachment(destDoc, 
-              newAttOutStream.toByteArray(), attName, getContext());
+              newAttOutStream.toByteArray(), cleanName, getContext());
           LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
               ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
         } catch (IOException ioe) {
