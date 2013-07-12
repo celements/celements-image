@@ -49,7 +49,7 @@ public class ComputeImageCommand {
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
-      String defaultBgString) {
+      String defaultBgStr) {
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -60,13 +60,12 @@ public class ComputeImageCommand {
         cropW + "x" + cropH);
     boolean blackAndWhite = parseIntWithDefault(context.getRequest().get("BnW"), 0) == 1;
     LOGGER.debug("Get image as Black & White: " + blackAndWhite);
-    // resize params
-    if((defaultBgString != null) && defaultBgString.matches("[0-9A-Fa-f]{6}")) {
-      int r = Integer.parseInt(defaultBgString.substring(1, 3), 16);
-      int g = Integer.parseInt(defaultBgString.substring(3, 5), 16);
-      int b = Integer.parseInt(defaultBgString.substring(5), 16);
-      defaultBg = new Color(r, g, b);
-    }
+    defaultBg = getBackgroundColour(defaultBg, defaultBgStr);
+    boolean lowerBound = 1 == parseIntWithDefault(context.getRequest().get("lowBound"), 
+        0);
+    Integer lowerBoundPositioning = parseIntWithDefault(context.getRequest(
+        ).get("lowBoundPos"), null);
+    boolean raw = 1 == parseIntWithDefault(context.getRequest().get("raw"), 0);
     int height = parseIntWithDefault(sheight, 0);
     int width = parseIntWithDefault(swidth, 0);
     try {
@@ -75,8 +74,8 @@ public class ComputeImageCommand {
 //          + "; resized width=" + dimension.getWidth() + "; resized height="
 //          + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(
-          width, height), copyright, watermark, cropX, cropY, cropW, cropH, 
-          blackAndWhite);
+          width, height), copyright, watermark, cropX, cropY, cropW, cropH, blackAndWhite,
+          defaultBg, lowerBound, lowerBoundPositioning, raw);
       LOGGER.debug("attachment key: '" + key + "'");
       InputStream data = getImageCacheCmd().getImageForKey(key);
       if (data != null) {
@@ -84,41 +83,47 @@ public class ComputeImageCommand {
         attachmentClone.setContent(data);
       } else {
         LOGGER.info("No cached image.");
-        GenerateThumbnail thumbGen = new GenerateThumbnail();
         long timeLast = System.currentTimeMillis();
-        LOGGER.info("start loading image " + timeLast);
-        DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
-        BufferedImage img = decodeImageCommand.readImage(attachmentClone, context);
-        timeLast = logRuntime(timeLast, "image decoded after ");
-        if(needsCropping) {
-          ByteArrayOutputStream out = new ByteArrayOutputStream();
-          ICropImage cropComp = Utils.getComponent(ICropImage.class);
-          cropComp.crop(img, cropX, cropY, cropW, cropH, attachmentClone.getMimeType(
-              context), out);
-          attachmentClone.setContent(new ByteArrayInputStream(((ByteArrayOutputStream)out
-              ).toByteArray()));
-          img = decodeImageCommand.readImage(attachmentClone, context);
-        }
-        timeLast = logRuntime(timeLast, "image cropped after ");
-        if ((height > 0) || (width > 0)) {
-          ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, height);
-          timeLast = logRuntime(timeLast, "got image dimensions after ");
-          byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
-              attachmentClone.getMimeType(context), watermark, copyright, defaultBg);
-          timeLast = logRuntime(timeLast, "resize done after ");
-          attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
-          timeLast = logRuntime(timeLast, "new attachment content set after ");
-        }
-        if(blackAndWhite) {
-          img = decodeImageCommand.readImage(attachmentClone, context);
-          ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);  
-          ColorConvertOp op = new ColorConvertOp(cs, null);
-          BufferedImage bNwImg = op.filter(img, null);
-          ByteArrayOutputStream out = new ByteArrayOutputStream();
-          thumbGen.encodeImage(out, bNwImg, img, attachmentClone.getMimeType(context));
-          byte[] bNwImage = out.toByteArray();
-          attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
-          timeLast = logRuntime(timeLast, "image changed to black & white after ");
+        if(!raw) {
+          GenerateThumbnail thumbGen = new GenerateThumbnail();
+          LOGGER.info("start loading image " + timeLast);
+          DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
+          BufferedImage img = decodeImageCommand.readImage(attachmentClone, context);
+          timeLast = logRuntime(timeLast, "image decoded after ");
+          if(needsCropping) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ICropImage cropComp = Utils.getComponent(ICropImage.class);
+            cropComp.crop(img, cropX, cropY, cropW, cropH, attachmentClone.getMimeType(
+                context), out);
+            attachmentClone.setContent(new ByteArrayInputStream(
+                ((ByteArrayOutputStream)out).toByteArray()));
+            img = decodeImageCommand.readImage(attachmentClone, context);
+          }
+          timeLast = logRuntime(timeLast, "image cropped after ");
+          if ((height > 0) || (width > 0)) {
+            ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, 
+                height, lowerBound);
+            timeLast = logRuntime(timeLast, "got image dimensions after ");
+            byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
+                attachmentClone.getMimeType(context), watermark, copyright, defaultBg,
+                lowerBound, lowerBoundPositioning);
+            timeLast = logRuntime(timeLast, "resize done after ");
+            attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
+            timeLast = logRuntime(timeLast, "new attachment content set after ");
+          }
+          if(blackAndWhite) {
+            img = decodeImageCommand.readImage(attachmentClone, context);
+            ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);  
+            ColorConvertOp op = new ColorConvertOp(cs, null);
+            BufferedImage bNwImg = op.filter(img, null);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            thumbGen.encodeImage(out, bNwImg, img, attachmentClone.getMimeType(context));
+            byte[] bNwImage = out.toByteArray();
+            attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
+            timeLast = logRuntime(timeLast, "image changed to black & white after ");
+          }
+        } else {
+          LOGGER.info("Raw image! No alterations done.");
         }
         getImageCacheCmd().addToCache(key, attachmentClone);
         timeLast = logRuntime(timeLast, "image in cache after ");
@@ -128,6 +133,21 @@ public class ComputeImageCommand {
       attachmentClone = attachment;
     }
     return attachmentClone;
+  }
+
+  Color getBackgroundColour(Color defaultBg, String defaultBgStr) {
+    if((defaultBgStr != null) && defaultBgStr.matches(
+        "[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?")) {
+      int r = Integer.parseInt(defaultBgStr.substring(1, 3), 16);
+      int g = Integer.parseInt(defaultBgStr.substring(3, 5), 16);
+      int b = Integer.parseInt(defaultBgStr.substring(5, 7), 16);
+      if(defaultBgStr.length() == 8) {
+        defaultBg = new Color(r, g, b, Integer.parseInt(defaultBgStr.substring(7), 16));
+      } else {
+        defaultBg = new Color(r, g, b);
+      }
+    }
+    return defaultBg;
   }
 
   long logRuntime(long timeLast, String message) {
@@ -141,9 +161,9 @@ public class ComputeImageCommand {
     return (cropX >= 0) && (cropY >= 0) && (cropW > 0) && (cropH > 0);
   }
 
-  int parseIntWithDefault(String stringValue, int defValue) {
-    int parsedValue = defValue;
-    if ((stringValue != null) && (stringValue.length() > 0)) {
+  Integer parseIntWithDefault(String stringValue, Integer defValue) {
+    Integer parsedValue = defValue;
+    if((stringValue != null) && (stringValue.length() > 0)) {
       try {
         parsedValue = Integer.parseInt(stringValue);
       } catch (NumberFormatException numExp) {
@@ -173,10 +193,10 @@ public class ComputeImageCommand {
 
   private byte[] getThumbAttachment(BufferedImage img, ImageDimensions dim, 
       GenerateThumbnail thumbGen, String mimeType, String watermark, String copyright,
-      Color defaultBg) {
+      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning) {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    thumbGen.createThumbnail(img, out, dim, watermark, copyright, 
-        mimeType, defaultBg);
+    thumbGen.createThumbnail(img, out, dim, watermark, copyright, mimeType, defaultBg, 
+        lowerBound, lowerBoundPositioning);
     return out.toByteArray();
   }
 

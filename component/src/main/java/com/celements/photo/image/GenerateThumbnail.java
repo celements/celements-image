@@ -90,9 +90,10 @@ public class GenerateThumbnail {
    * @return ImageDimensions object specifying width and height.
    * @throws XWikiException 
    */
-  public ImageDimensions getThumbnailDimensions(InputStream in, int maxWidth, int maxHeight) throws XWikiException{
+  public ImageDimensions getThumbnailDimensions(InputStream in, int maxWidth, 
+      int maxHeight, boolean lowerBounds) throws XWikiException {
     BufferedImage img = decodeImage(in);
-    return getThumbnailDimensions(img, maxWidth, maxHeight);
+    return getThumbnailDimensions(img, maxWidth, maxHeight, lowerBounds);
   }
 
   /**
@@ -106,7 +107,8 @@ public class GenerateThumbnail {
    * @param maxHeight Maximum allowed height.
    * @return ImageDimensions object specifying width and height.
    */
-  public ImageDimensions getThumbnailDimensions(BufferedImage img, int maxWidth, int maxHeight){
+  public ImageDimensions getThumbnailDimensions(BufferedImage img, int maxWidth, 
+      int maxHeight, boolean lowerBounds) {
     int width = maxWidth;
     int height = maxHeight;
     if(img != null) {
@@ -114,7 +116,7 @@ public class GenerateThumbnail {
       height = img.getHeight();
     }
     LOGGER.debug("img width=" + width + "; img height=" + height);
-    return getThumbnailDimensions(width, height, maxWidth, maxHeight);
+    return getThumbnailDimensions(width, height, maxWidth, maxHeight, lowerBounds);
   }
 
   /**
@@ -134,26 +136,34 @@ public class GenerateThumbnail {
    * TODO implement preserving aspect ratio!!! see commented test in GenerateThumbnailTest
    */
   public ImageDimensions getThumbnailDimensions(int imgWidth, int imgHeight, int maxWidth,
-      int maxHeight) {
+      int maxHeight, boolean isLowerBound) {
     int thumbWidth = imgWidth;
     int thumbHeight = imgHeight;
 
     if(maxWidth <= 0){ maxWidth = imgWidth; }
     if(maxHeight <= 0){ maxHeight = imgHeight; }
-    
-    double widthImgThumbRatio = imgWidth / (double)maxWidth;
-    double heightImgThumbRatio = imgHeight / (double)maxHeight;
-    
-    if((widthImgThumbRatio >= 1.0) || (heightImgThumbRatio >= 1.0)){
-      if(widthImgThumbRatio > heightImgThumbRatio){
-        thumbWidth = maxWidth;
-        thumbHeight = (int) Math.ceil(imgHeight / widthImgThumbRatio);
-      } else{
+    if(!isLowerBound) {
+      double widthImgThumbRatio = imgWidth / (double)maxWidth;
+      double heightImgThumbRatio = imgHeight / (double)maxHeight;
+      if((widthImgThumbRatio >= 1.0) || (heightImgThumbRatio >= 1.0)){
+        if(widthImgThumbRatio > heightImgThumbRatio){
+          thumbWidth = maxWidth;
+          thumbHeight = (int) Math.ceil(imgHeight / widthImgThumbRatio);
+        } else{
+          thumbHeight = maxHeight;
+          thumbWidth = (int)Math.ceil(imgWidth / heightImgThumbRatio);
+        }
+      }
+    } else {
+      if((maxWidth < imgWidth) && (maxHeight < imgHeight)) {
         thumbHeight = maxHeight;
-        thumbWidth = (int)Math.ceil(imgWidth / heightImgThumbRatio);
+        thumbWidth = maxWidth;
+      } else if(maxWidth < imgWidth) { // and maxHeight > imgHeight
+        thumbWidth = maxWidth;
+      } else if(maxHeight < imgHeight) { // and maxWidth > imgWidth
+        thumbHeight = maxHeight;
       }
     }
-    
     return new ImageDimensions(thumbWidth, thumbHeight);
   }
 
@@ -210,10 +220,11 @@ public class GenerateThumbnail {
    * @throws XWikiException 
    */
   public ImageDimensions createThumbnail(InputStream in, OutputStream out, int width, 
-      int height, String watermark, String copyright, String type, Color defaultBg) 
-      throws IOException, XWikiException {
+      int height, String watermark, String copyright, String type, Color defaultBg, 
+      boolean lowerBound, Integer lowerBoundPositioning
+      ) throws IOException, XWikiException {
     return createThumbnail(decodeInputStream(in), out, width, height, watermark, 
-        copyright, type, defaultBg);
+        copyright, type, defaultBg, lowerBound, lowerBoundPositioning);
   }
   
   /**
@@ -231,9 +242,10 @@ public class GenerateThumbnail {
    */
   public void createThumbnail(InputStream in, OutputStream out, 
       ImageDimensions dimensions, String watermark, String copyright, String type, 
-      Color defaultBg) throws IOException, XWikiException {
+      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning
+      ) throws IOException, XWikiException {
     createThumbnail(decodeInputStream(in), out, dimensions, watermark, copyright, type,
-        defaultBg);
+        defaultBg, lowerBound, lowerBoundPositioning);
   }
   
   /**
@@ -250,22 +262,56 @@ public class GenerateThumbnail {
    * @throws IOException
    */
   public ImageDimensions createThumbnail(BufferedImage img, OutputStream out, int width, 
-      int height, String watermark, String copyright, String type, Color defaultBg) 
-      throws IOException {
-    ImageDimensions imgSize = getThumbnailDimensions(img, width, height);
-    createThumbnail(img, out, imgSize, watermark, copyright, type, defaultBg);
+      int height, String watermark, String copyright, String type, Color defaultBg, 
+      boolean lowerBound, Integer lowerBoundPositioning) throws IOException {
+    ImageDimensions imgSize = getThumbnailDimensions(img, width, height, lowerBound);
+    createThumbnail(img, out, imgSize, watermark, copyright, type, defaultBg, lowerBound, 
+        lowerBoundPositioning);
     return imgSize;
   }
 
   public BufferedImage createThumbnail(BufferedImage img, OutputStream out, 
       ImageDimensions imgSize, String watermark, String copyright, String type, 
-      Color defaultBg) {
+      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning) {
     Image thumbImg = img; 
     // Only generates a thumbnail if the image is larger than the desired thumbnail.
     LOGGER.debug("img: " + img + " - imgSize: " + imgSize);
-    if((img.getWidth() > (int)imgSize.getWidth()) || (img.getHeight() > (int)imgSize.getHeight())){
-      // The "-1" is used to resize maintaining the aspect ratio.
-      thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
+    if(!lowerBound) {
+      if((img.getWidth() > (int)imgSize.getWidth()) 
+          || (img.getHeight() > (int)imgSize.getHeight())) {
+        // The "-1" is used to resize maintaining the aspect ratio.
+        thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
+      }
+    } else {
+      int overWidth = img.getWidth() - imgSize.getSize().width;
+      int overHeight = img.getHeight() - imgSize.getSize().height;
+      Image tmpI = img;
+      if((img.getWidth() > (int)imgSize.getWidth()) 
+          && (img.getHeight() > (int)imgSize.getHeight())) {
+        if((img.getWidth() / imgSize.getWidth()) < (img.getHeight() / imgSize.getHeight())
+            ) {
+          tmpI = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
+          overWidth = 0;
+          overHeight = tmpI.getHeight(null) - imgSize.getSize().height;
+        } else {
+          tmpI = img.getScaledInstance((int)imgSize.getHeight(), -1, Image.SCALE_SMOOTH);
+          overWidth = tmpI.getWidth(null) - imgSize.getSize().width;
+          overHeight = 0;
+        }
+      }
+      thumbImg = new BufferedImage(imgSize.getSize().width, imgSize.getSize().height, 
+          BufferedImage.TYPE_INT_ARGB);
+      if(overWidth > overHeight) {
+        if(lowerBoundPositioning == null) {
+          lowerBoundPositioning = overWidth / 2;
+        }
+        thumbImg.getGraphics().drawImage(tmpI, lowerBoundPositioning, 0, null);
+      } else {
+        if(lowerBoundPositioning == null) {
+          lowerBoundPositioning = overHeight / 2;
+        }
+        thumbImg.getGraphics().drawImage(tmpI, 0, lowerBoundPositioning, null);
+      }
     }
     LOGGER.debug("width ziel: " + imgSize.getWidth() + ", height ziel: " + 
         imgSize.getHeight() + "; width: " + thumbImg.getWidth(null) + ", height: " + 

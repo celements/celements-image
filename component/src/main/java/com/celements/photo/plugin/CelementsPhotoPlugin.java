@@ -430,7 +430,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       LOGGER.debug("unzip mimetype is " + mimeType);
       out = new ByteArrayOutputStream();
       ImageDimensions id = (new GenerateThumbnail()).createThumbnail(imgFullSize, out, 
-          width, height, null, null, mimeType, null);
+          width, height, null, null, mimeType, null, false, null);
       LOGGER.info("width='" + id.width + "' height='" + id.height + "'");
       LOGGER.info("output stream size: " + out.size());
       unzipFileName = unzipFileName.replace(System.getProperty("file.separator"), ".");

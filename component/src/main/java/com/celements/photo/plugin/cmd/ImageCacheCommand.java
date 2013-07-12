@@ -19,6 +19,7 @@
  */
 package com.celements.photo.plugin.cmd;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -151,7 +152,8 @@ public class ImageCacheCommand {
 
   String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension,
       String copyright, String watermark, int cropX, int cropY, int cropW, int cropH,
-      boolean blackNwhite) throws NoSuchAlgorithmException {
+      boolean blackNwhite, Color defaultBg, boolean lowerBounds, Integer lowBoundPos, 
+      boolean raw) throws NoSuchAlgorithmException {
     String key = attachment.getId() 
         + "-" + attachment.getVersion()
         + "-" + getType(attachment.getMimeType(getContext()))
@@ -159,30 +161,39 @@ public class ImageCacheCommand {
         + "-" + dimension.getWidth()
         + "-" + dimension.getHeight()
         + "-" + getAditionalInfoHash(copyright, watermark, cropX, cropY, cropW, cropH,
-            blackNwhite);
+            blackNwhite, defaultBg, lowerBounds, lowBoundPos, raw);
     return key;
   }
 
   String getAditionalInfoHash(String copyright, String watermark, int cropX, int cropY, 
-      int cropW, int cropH, boolean blackNwhite) throws NoSuchAlgorithmException {
-    String hashValue = null;
-    if(((watermark != null) && (watermark.length() > 0))
-        || ((copyright != null) && (copyright.length() > 0))){
-      hashValue = watermark + "<:>" + copyright;
-    }
-    if((cropX >= 0) && (cropY >= 0) && (cropW > 0) && (cropH > 0)){
-      if(hashValue != null) {
-        hashValue += "<:>";
-      } else {
-        hashValue = "";
+      int cropW, int cropH, boolean blackNwhite, Color defaultBg, boolean lowerBounds, 
+      Integer lowBoundPos, boolean raw) throws NoSuchAlgorithmException {
+    String hashValue = "";
+    if(raw) {
+      hashValue += "<:>raw image";
+    } else {
+      if(((watermark != null) && (watermark.length() > 0))
+          || ((copyright != null) && (copyright.length() > 0))){
+        hashValue += "<:>" + watermark + "<:>" + copyright;
       }
-      hashValue += cropX + ":" + cropY + "_" + cropW + "x" + cropH;
-    }
-    if(blackNwhite) {
-      hashValue += "<:>Black and White";
+      if((cropX >= 0) && (cropY >= 0) && (cropW > 0) && (cropH > 0)){
+        hashValue += "<:>" + cropX + ":" + cropY + "_" + cropW + "x" + cropH;
+      }
+      if(blackNwhite) {
+        hashValue += "<:>Black and White";
+      }
+      if(defaultBg != null) {
+        hashValue += "<:>col" + defaultBg.getRGB() + defaultBg.getAlpha();
+      }
+      if(lowerBounds) {
+        hashValue += "<:>lower bounds";
+        if(lowBoundPos != null) {
+          hashValue += "<:>pos=" + lowBoundPos;
+        }
+      }
     }
     String hash = "";
-    if(hashValue != null) {
+    if("".equals(hashValue)) {
       MessageDigest md = MessageDigest.getInstance("MD5");
       md.update(hashValue.getBytes());
       byte[] digest = md.digest();

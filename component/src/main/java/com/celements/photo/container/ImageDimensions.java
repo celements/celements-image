@@ -52,6 +52,6 @@ public class ImageDimensions extends Dimension{
    * @return true if width and height are 0.
    */
   public boolean isEmpty(){
-    return width + height == 0;
+    return Math.abs(width) + Math.abs(height) == 0;
   }
 }

@@ -65,7 +65,7 @@ public class Thumbnail {
     GenerateThumbnail thumbGenerator = new GenerateThumbnail();
     XWikiAttachment zipAttachment = zipAttChanges.getContainingZip(doc, id, context);
     
-    ImageDimensions imgSize = getThumbnailDimensions(doc, id, width, height, 
+    ImageDimensions imgSize = getThumbnailDimensions(doc, id, width, height, false,
         thumbGenerator, context);
     DocumentReference metaDocRef = new DocumentReference(context.getDatabase(), 
         ImageLibStrings.getPhotoSpace(doc), album + "_img_" + id);
@@ -76,14 +76,14 @@ public class Thumbnail {
       String image = (new BaseObjectHandler()).getImageString(celeMetaDoc, 
           ImageLibStrings.PHOTO_IMAGE_FILENAME);
       
-      try{
+      try {
         BufferedImage original = 
             thumbGenerator.decodeInputStream(zipAttChanges.getFromZip(zipAttachment, 
             dir + image, context));
         imgSize = thumbGenerator.getImageDimensions(original);
         writeImageDimensionsToMetadata(doc, id, imgSize, context);
-        imgSize = thumbGenerator.getThumbnailDimensions(original, width, height);
-      }catch(Exception e){
+        imgSize = thumbGenerator.getThumbnailDimensions(original, width, height, false);
+      } catch(Exception e) {
         throw new IOException(image + "^^" + id);
       }
     }
@@ -101,9 +101,9 @@ public class Thumbnail {
           thumbGenerator.decodeInputStream(zipAttChanges.getFromZip(zipAttachment, 
           dir + filename, context));
       ByteArrayOutputStream out = new ByteArrayOutputStream();
-      thumbGenerator.createThumbnail(original, out, width, height, 
-          getWatermark(doc, context), getCopyright(doc, context), 
-          zipAttachment.getMimeType(context), null);
+      thumbGenerator.createThumbnail(original, out, width, height, getWatermark(doc, 
+          context), getCopyright(doc, context), zipAttachment.getMimeType(context), null, 
+          false, null);
       thumbnail = (new AddAttachmentToDoc()).addAtachment(celeMetaDoc, out, 
           thumbImageName, context);
     }
@@ -160,8 +160,8 @@ public class Thumbnail {
    * @throws XWikiException
    */
   private ImageDimensions getThumbnailDimensions(XWikiDocument doc, String id, int width, 
-      int height, GenerateThumbnail thumbGenerator, XWikiContext context
-      ) throws XWikiException{
+      int height, boolean lowerBound, GenerateThumbnail thumbGenerator, 
+      XWikiContext context) throws XWikiException {
     DocumentReference imgDocRef = new DocumentReference(context.getDatabase(), 
         ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
         "_img_" + id);
@@ -172,7 +172,8 @@ public class Thumbnail {
     int imgWidth = handler.getImageInteger(imageDoc, ImageLibStrings.PHOTO_IMAGE_WIDTH);
     int imgHeight = handler.getImageInteger(imageDoc, ImageLibStrings.PHOTO_IMAGE_HEIGHT);
     
-    return thumbGenerator.getThumbnailDimensions(imgWidth, imgHeight, width, height);
+    return thumbGenerator.getThumbnailDimensions(imgWidth, imgHeight, width, height, 
+        lowerBound);
   }
   
   /**

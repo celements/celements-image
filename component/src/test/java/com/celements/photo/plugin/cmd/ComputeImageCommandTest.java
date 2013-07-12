@@ -68,22 +68,27 @@ public class ComputeImageCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testParseIntWithDefault_NumberFormatExcp() {
-    assertEquals(50, computeImgCmd.parseIntWithDefault("abc", 50));
+    assertEquals(new Integer(50), computeImgCmd.parseIntWithDefault("abc", 50));
+  }
+
+  @Test
+  public void testParseIntWithDefault_mull() {
+    assertNull(computeImgCmd.parseIntWithDefault("hi", null));
   }
 
   @Test
   public void testParseIntWithDefault_emptyString() {
-    assertEquals(0, computeImgCmd.parseIntWithDefault("", 0));
+    assertEquals(new Integer(0), computeImgCmd.parseIntWithDefault("", 0));
   }
 
   @Test
   public void testParseIntWithDefault_correctValue() {
-    assertEquals(65, computeImgCmd.parseIntWithDefault("65", 10));
+    assertEquals(new Integer(65), computeImgCmd.parseIntWithDefault("65", 10));
   }
 
   @Test
   public void testParseIntWithDefault_null() {
-    assertEquals(0, computeImgCmd.parseIntWithDefault(null, 0));
+    assertEquals(new Integer(0), computeImgCmd.parseIntWithDefault(null, 0));
   }
 
 }
