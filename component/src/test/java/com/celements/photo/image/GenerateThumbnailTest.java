@@ -3,6 +3,7 @@ package com.celements.photo.image;
 
 import static org.junit.Assert.*;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,54 +25,69 @@ public class GenerateThumbnailTest {
 
   @Test
   public void testGetThumbnailDimensions() {
-    ImageDimensions imgDim = genThum.getThumbnailDimensions(498, 248, 995, 496, false);
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(498, 248, 995, 496, false, 
+        null);
     assertEquals(498, imgDim.getSize().width);
     assertEquals(248, imgDim.getSize().height);
-    imgDim = genThum.getThumbnailDimensions(498, 248, 995, 496, true);
+    imgDim = genThum.getThumbnailDimensions(498, 248, 995, 496, true, null);
     assertEquals(498, imgDim.getSize().width);
     assertEquals(248, imgDim.getSize().height);
   }
 
   @Test
   public void testGetThumbnailDimensions_getWidth() {
-    ImageDimensions imgDim = genThum.getThumbnailDimensions(498, 248, 995, 496, false);
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(498, 248, 995, 496, false, 
+        null);
     assertEquals(498, (int)imgDim.getWidth());
     assertEquals(248, (int)imgDim.getHeight());
   }
   
   @Test
   public void testGetThumbnailDimensions_aspectRatio() {
-    ImageDimensions imgDim = genThum.getThumbnailDimensions(995, 496, 497, 247, false);
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(995, 496, 497, 247, false, 
+        null);
     assertEquals(496, imgDim.getSize().width);
     assertEquals(247, imgDim.getSize().height);
   }
   
   @Test
   public void testGetThumbnailDimensions_lowerBoundsMax() {
-    ImageDimensions imgDim = genThum.getThumbnailDimensions(995, 496, 497, 247, true);
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(995, 496, 497, 247, true, 
+        null);
     assertEquals(497, imgDim.getSize().width);
     assertEquals(247, imgDim.getSize().height);
   }
   
   @Test
   public void testGetThumbnailDimensions_lowerBoundsImg() {
-    ImageDimensions imgDim = genThum.getThumbnailDimensions(150, 200, 497, 247, true);
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(150, 200, 497, 247, true, 
+        null);
     assertEquals(150, imgDim.getSize().width);
     assertEquals(200, imgDim.getSize().height);
   }
   
   @Test
   public void testGetThumbnailDimensions_lowerBoundsMix() {
-    ImageDimensions imgDim = genThum.getThumbnailDimensions(320, 640, 995, 496, true);
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(320, 640, 995, 496, true, 
+        null);
     assertEquals(320, imgDim.getSize().width);
     assertEquals(496, imgDim.getSize().height);
   }
   
   @Test
   public void testGetThumbnailDimensions_lowerBoundsMixReverse() {
-    ImageDimensions imgDim = genThum.getThumbnailDimensions(995, 200, 497, 247, true);
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(995, 200, 497, 247, true, 
+        null);
     assertEquals(497, imgDim.getSize().width);
     assertEquals(200, imgDim.getSize().height);
+  }
+  
+  @Test
+  public void testGetThumbnailDimensions_withBg() {
+    ImageDimensions imgDim = genThum.getThumbnailDimensions(995, 200, 497, 247, true, 
+        new Color(0));
+    assertEquals(497, imgDim.getSize().width);
+    assertEquals(247, imgDim.getSize().height);
   }
 
   @Test

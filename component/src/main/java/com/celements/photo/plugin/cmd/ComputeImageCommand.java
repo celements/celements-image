@@ -101,8 +101,11 @@ public class ComputeImageCommand {
           }
           timeLast = logRuntime(timeLast, "image cropped after ");
           if ((height > 0) || (width > 0)) {
+            
+//            -> with BG set use fixed dimensions and fit image in
+            
             ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, 
-                height, lowerBound);
+                height, lowerBound, defaultBg);
             timeLast = logRuntime(timeLast, "got image dimensions after ");
             byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
                 attachmentClone.getMimeType(context), watermark, copyright, defaultBg,

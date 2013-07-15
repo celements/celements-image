@@ -91,9 +91,9 @@ public class GenerateThumbnail {
    * @throws XWikiException 
    */
   public ImageDimensions getThumbnailDimensions(InputStream in, int maxWidth, 
-      int maxHeight, boolean lowerBounds) throws XWikiException {
+      int maxHeight, boolean lowerBounds, Color defaultBg) throws XWikiException {
     BufferedImage img = decodeImage(in);
-    return getThumbnailDimensions(img, maxWidth, maxHeight, lowerBounds);
+    return getThumbnailDimensions(img, maxWidth, maxHeight, lowerBounds, defaultBg);
   }
 
   /**
@@ -105,10 +105,11 @@ public class GenerateThumbnail {
    * @param img BufferedImage representation of the image.
    * @param maxWidth Maximum allowed width.
    * @param maxHeight Maximum allowed height.
+   * @param defaultBg 
    * @return ImageDimensions object specifying width and height.
    */
   public ImageDimensions getThumbnailDimensions(BufferedImage img, int maxWidth, 
-      int maxHeight, boolean lowerBounds) {
+      int maxHeight, boolean lowerBounds, Color defaultBg) {
     int width = maxWidth;
     int height = maxHeight;
     if(img != null) {
@@ -116,7 +117,8 @@ public class GenerateThumbnail {
       height = img.getHeight();
     }
     LOGGER.debug("img width=" + width + "; img height=" + height);
-    return getThumbnailDimensions(width, height, maxWidth, maxHeight, lowerBounds);
+    return getThumbnailDimensions(width, height, maxWidth, maxHeight, lowerBounds, 
+        defaultBg);
   }
 
   /**
@@ -131,37 +133,43 @@ public class GenerateThumbnail {
    * @param imgHeight Height of the original image.
    * @param maxWidth Maximum allowed width.
    * @param maxHeight Maximum allowed height.
+   * @param defaultBg 
    * @return ImageDimensions object specifying width and height.
    * 
    * TODO implement preserving aspect ratio!!! see commented test in GenerateThumbnailTest
    */
   public ImageDimensions getThumbnailDimensions(int imgWidth, int imgHeight, int maxWidth,
-      int maxHeight, boolean isLowerBound) {
+      int maxHeight, boolean isLowerBound, Color defaultBg) {
     int thumbWidth = imgWidth;
     int thumbHeight = imgHeight;
 
     if(maxWidth <= 0){ maxWidth = imgWidth; }
     if(maxHeight <= 0){ maxHeight = imgHeight; }
-    if(!isLowerBound) {
-      double widthImgThumbRatio = imgWidth / (double)maxWidth;
-      double heightImgThumbRatio = imgHeight / (double)maxHeight;
-      if((widthImgThumbRatio >= 1.0) || (heightImgThumbRatio >= 1.0)){
-        if(widthImgThumbRatio > heightImgThumbRatio){
-          thumbWidth = maxWidth;
-          thumbHeight = (int) Math.ceil(imgHeight / widthImgThumbRatio);
-        } else{
-          thumbHeight = maxHeight;
-          thumbWidth = (int)Math.ceil(imgWidth / heightImgThumbRatio);
-        }
-      }
+    if(defaultBg != null) {
+      thumbWidth = maxWidth;
+      thumbHeight = maxHeight;
     } else {
-      if((maxWidth < imgWidth) && (maxHeight < imgHeight)) {
-        thumbHeight = maxHeight;
-        thumbWidth = maxWidth;
-      } else if(maxWidth < imgWidth) { // and maxHeight > imgHeight
-        thumbWidth = maxWidth;
-      } else if(maxHeight < imgHeight) { // and maxWidth > imgWidth
-        thumbHeight = maxHeight;
+      if(!isLowerBound) {
+        double widthImgThumbRatio = imgWidth / (double)maxWidth;
+        double heightImgThumbRatio = imgHeight / (double)maxHeight;
+        if((widthImgThumbRatio >= 1.0) || (heightImgThumbRatio >= 1.0)){
+          if(widthImgThumbRatio > heightImgThumbRatio){
+            thumbWidth = maxWidth;
+            thumbHeight = (int) Math.ceil(imgHeight / widthImgThumbRatio);
+          } else{
+            thumbHeight = maxHeight;
+            thumbWidth = (int)Math.ceil(imgWidth / heightImgThumbRatio);
+          }
+        }
+      } else {
+        if((maxWidth < imgWidth) && (maxHeight < imgHeight)) {
+          thumbHeight = maxHeight;
+          thumbWidth = maxWidth;
+        } else if(maxWidth < imgWidth) { // and maxHeight > imgHeight
+          thumbWidth = maxWidth;
+        } else if(maxHeight < imgHeight) { // and maxWidth > imgWidth
+          thumbHeight = maxHeight;
+        }
       }
     }
     return new ImageDimensions(thumbWidth, thumbHeight);
@@ -264,7 +272,8 @@ public class GenerateThumbnail {
   public ImageDimensions createThumbnail(BufferedImage img, OutputStream out, int width, 
       int height, String watermark, String copyright, String type, Color defaultBg, 
       boolean lowerBound, Integer lowerBoundPositioning) throws IOException {
-    ImageDimensions imgSize = getThumbnailDimensions(img, width, height, lowerBound);
+    ImageDimensions imgSize = getThumbnailDimensions(img, width, height, lowerBound, 
+        defaultBg);
     createThumbnail(img, out, imgSize, watermark, copyright, type, defaultBg, lowerBound, 
         lowerBoundPositioning);
     return imgSize;
@@ -276,25 +285,21 @@ public class GenerateThumbnail {
     Image thumbImg = img; 
     // Only generates a thumbnail if the image is larger than the desired thumbnail.
     LOGGER.debug("img: " + img + " - imgSize: " + imgSize);
-    if(!lowerBound) {
-      if((img.getWidth() > (int)imgSize.getWidth()) 
-          || (img.getHeight() > (int)imgSize.getHeight())) {
-        // The "-1" is used to resize maintaining the aspect ratio.
-        thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
-      }
-    } else {
+    if(lowerBound) {
       int overWidth = img.getWidth() - imgSize.getSize().width;
       int overHeight = img.getHeight() - imgSize.getSize().height;
+      double widthRatio = (float)(img.getWidth() / imgSize.getWidth());
+      double heightRatio = (float)(img.getHeight() / imgSize.getHeight());
       Image tmpI = img;
       if((img.getWidth() > (int)imgSize.getWidth()) 
           && (img.getHeight() > (int)imgSize.getHeight())) {
-        if((img.getWidth() / imgSize.getWidth()) < (img.getHeight() / imgSize.getHeight())
-            ) {
+        if(widthRatio < heightRatio) {
           tmpI = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
           overWidth = 0;
           overHeight = tmpI.getHeight(null) - imgSize.getSize().height;
         } else {
-          tmpI = img.getScaledInstance((int)imgSize.getHeight(), -1, Image.SCALE_SMOOTH);
+          int newWidth = (int)Math.ceil(imgSize.getWidth() * (widthRatio / heightRatio));
+          tmpI = img.getScaledInstance(newWidth, -1, Image.SCALE_SMOOTH);
           overWidth = tmpI.getWidth(null) - imgSize.getSize().width;
           overHeight = 0;
         }
@@ -311,6 +316,35 @@ public class GenerateThumbnail {
           lowerBoundPositioning = overHeight / 2;
         }
         thumbImg.getGraphics().drawImage(tmpI, 0, lowerBoundPositioning, null);
+      }
+    } else if(defaultBg != null) {
+      Image tmpI = img;
+      int underWidth = img.getWidth() - imgSize.getSize().width;
+      int underHeight = img.getHeight() - imgSize.getSize().height;
+      double widthRatio = (float)(img.getWidth() / imgSize.getWidth());
+      double heightRatio = (float)(img.getHeight() / imgSize.getHeight());
+      if(widthRatio < heightRatio) {
+        int newWidth = (int)Math.ceil(imgSize.getWidth() * (widthRatio / heightRatio));
+        tmpI = img.getScaledInstance(newWidth, -1, Image.SCALE_SMOOTH);
+        underWidth = imgSize.getSize().width - tmpI.getWidth(null);
+        underHeight = 0;
+      } else {
+        tmpI = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
+        underWidth = 0;
+        underHeight = imgSize.getSize().height - tmpI.getHeight(null);
+      }
+      thumbImg = new BufferedImage(imgSize.getSize().width, imgSize.getSize().height, 
+          BufferedImage.TYPE_INT_ARGB);
+      if(underWidth > underHeight) {
+        thumbImg.getGraphics().drawImage(tmpI, underWidth / 2, 0, null);
+      } else {
+        thumbImg.getGraphics().drawImage(tmpI, 0, underHeight / 2, null);
+      }
+    } else {
+      if((img.getWidth() > (int)imgSize.getWidth()) 
+          || (img.getHeight() > (int)imgSize.getHeight())) {
+        // The "-1" is used to resize maintaining the aspect ratio.
+        thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
       }
     }
     LOGGER.debug("width ziel: " + imgSize.getWidth() + ", height ziel: " + 

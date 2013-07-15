@@ -82,7 +82,8 @@ public class Thumbnail {
             dir + image, context));
         imgSize = thumbGenerator.getImageDimensions(original);
         writeImageDimensionsToMetadata(doc, id, imgSize, context);
-        imgSize = thumbGenerator.getThumbnailDimensions(original, width, height, false);
+        imgSize = thumbGenerator.getThumbnailDimensions(original, width, height, false, 
+            null);
       } catch(Exception e) {
         throw new IOException(image + "^^" + id);
       }
@@ -173,7 +174,7 @@ public class Thumbnail {
     int imgHeight = handler.getImageInteger(imageDoc, ImageLibStrings.PHOTO_IMAGE_HEIGHT);
     
     return thumbGenerator.getThumbnailDimensions(imgWidth, imgHeight, width, height, 
-        lowerBound);
+        lowerBound, null);
   }
   
   /**
