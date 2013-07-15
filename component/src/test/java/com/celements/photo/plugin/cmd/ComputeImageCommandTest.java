@@ -20,8 +20,9 @@
 package com.celements.photo.plugin.cmd;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
+
+import java.awt.Color;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -91,4 +92,31 @@ public class ComputeImageCommandTest extends AbstractBridgedComponentTestCase {
     assertEquals(new Integer(0), computeImgCmd.parseIntWithDefault(null, 0));
   }
 
+  @Test
+  public void testGetBackgroundColour_null() {
+    assertNull(computeImgCmd.getBackgroundColour(null, null));
+  }
+
+  @Test
+  public void testGetBackgroundColour_noColour() {
+    assertNull(computeImgCmd.getBackgroundColour(null, ""));
+  }
+
+  @Test
+  public void testGetBackgroundColour_withoutAlpha() {
+    Color col = computeImgCmd.getBackgroundColour(null, "ff000A");
+    assertEquals(255, col.getRed());
+    assertEquals(0, col.getGreen());
+    assertEquals(10, col.getBlue());
+    assertEquals(255, col.getAlpha());
+  }
+
+  @Test
+  public void testGetBackgroundColour_withAlpha() {
+    Color col = computeImgCmd.getBackgroundColour(null, "0ffD13A0");
+    assertEquals(15, col.getRed());
+    assertEquals(253, col.getGreen());
+    assertEquals(19, col.getBlue());
+    assertEquals(160, col.getAlpha());
+  }
 }

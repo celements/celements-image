@@ -308,12 +308,12 @@ public class GenerateThumbnail {
           BufferedImage.TYPE_INT_ARGB);
       if(overWidth > overHeight) {
         if(lowerBoundPositioning == null) {
-          lowerBoundPositioning = overWidth / 2;
+          lowerBoundPositioning = -overWidth / 2;
         }
         thumbImg.getGraphics().drawImage(tmpI, lowerBoundPositioning, 0, null);
       } else {
         if(lowerBoundPositioning == null) {
-          lowerBoundPositioning = overHeight / 2;
+          lowerBoundPositioning = -overHeight / 2;
         }
         thumbImg.getGraphics().drawImage(tmpI, 0, lowerBoundPositioning, null);
       }

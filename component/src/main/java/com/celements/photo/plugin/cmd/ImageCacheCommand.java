@@ -183,7 +183,7 @@ public class ImageCacheCommand {
         hashValue += "<:>Black and White";
       }
       if(defaultBg != null) {
-        hashValue += "<:>col" + defaultBg.getRGB() + defaultBg.getAlpha();
+        hashValue += "<:>col" + defaultBg.getRGB() + ":" + defaultBg.getAlpha();
       }
       if(lowerBounds) {
         hashValue += "<:>lower bounds";
@@ -194,6 +194,7 @@ public class ImageCacheCommand {
     }
     String hash = "";
     if(!"".equals(hashValue)) {
+      LOGGER.debug("Hash key: [" + hashValue + "]");
       MessageDigest md = MessageDigest.getInstance("MD5");
       md.update(hashValue.getBytes());
       byte[] digest = md.digest();

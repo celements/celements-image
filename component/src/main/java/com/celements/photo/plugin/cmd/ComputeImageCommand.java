@@ -141,11 +141,11 @@ public class ComputeImageCommand {
   Color getBackgroundColour(Color defaultBg, String defaultBgStr) {
     if((defaultBgStr != null) && defaultBgStr.matches(
         "[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?")) {
-      int r = Integer.parseInt(defaultBgStr.substring(1, 3), 16);
-      int g = Integer.parseInt(defaultBgStr.substring(3, 5), 16);
-      int b = Integer.parseInt(defaultBgStr.substring(5, 7), 16);
+      int r = Integer.parseInt(defaultBgStr.substring(0, 2), 16);
+      int g = Integer.parseInt(defaultBgStr.substring(2, 4), 16);
+      int b = Integer.parseInt(defaultBgStr.substring(4, 6), 16);
       if(defaultBgStr.length() == 8) {
-        defaultBg = new Color(r, g, b, Integer.parseInt(defaultBgStr.substring(7), 16));
+        defaultBg = new Color(r, g, b, Integer.parseInt(defaultBgStr.substring(6), 16));
       } else {
         defaultBg = new Color(r, g, b);
       }
