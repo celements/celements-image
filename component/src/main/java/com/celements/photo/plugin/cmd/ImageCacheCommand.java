@@ -193,7 +193,7 @@ public class ImageCacheCommand {
       }
     }
     String hash = "";
-    if("".equals(hashValue)) {
+    if(!"".equals(hashValue)) {
       MessageDigest md = MessageDigest.getInstance("MD5");
       md.update(hashValue.getBytes());
       byte[] digest = md.digest();
