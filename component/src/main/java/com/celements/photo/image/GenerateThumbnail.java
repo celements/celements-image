@@ -308,14 +308,16 @@ public class GenerateThumbnail {
           BufferedImage.TYPE_INT_ARGB);
       if(overWidth > overHeight) {
         if(lowerBoundPositioning == null) {
-          lowerBoundPositioning = -overWidth / 2;
+          lowerBoundPositioning = overWidth / 2;
         }
-        thumbImg.getGraphics().drawImage(tmpI, lowerBoundPositioning, 0, null);
+        thumbImg.getGraphics().drawImage(tmpI, getLowerBoundFinalPositioning(
+            lowerBoundPositioning, tmpI.getWidth(null), imgSize.getSize().width), 0, null);
       } else {
         if(lowerBoundPositioning == null) {
-          lowerBoundPositioning = -overHeight / 2;
+          lowerBoundPositioning = overHeight / 2;
         }
-        thumbImg.getGraphics().drawImage(tmpI, 0, lowerBoundPositioning, null);
+        thumbImg.getGraphics().drawImage(tmpI, 0, getLowerBoundFinalPositioning(
+            lowerBoundPositioning, tmpI.getHeight(null), imgSize.getSize().height), null);
       }
     } else if(defaultBg != null) {
       Image tmpI = img;
@@ -325,21 +327,23 @@ public class GenerateThumbnail {
       double heightRatio = (float)(img.getHeight() / imgSize.getHeight());
       if(widthRatio < heightRatio) {
         int newWidth = (int)Math.ceil(imgSize.getWidth() * (widthRatio / heightRatio));
-        tmpI = img.getScaledInstance(newWidth, -1, Image.SCALE_SMOOTH);
-        underWidth = imgSize.getSize().width - tmpI.getWidth(null);
-        underHeight = 0;
+        if(newWidth < img.getWidth()) {
+          tmpI = img.getScaledInstance(newWidth, -1, Image.SCALE_SMOOTH);
+        } else {
+          tmpI = img;
+        }
       } else {
-        tmpI = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
-        underWidth = 0;
-        underHeight = imgSize.getSize().height - tmpI.getHeight(null);
+        int newWidth = img.getWidth();
+        if(imgSize.getWidth() < img.getWidth()) {
+          newWidth = (int)imgSize.getWidth();
+        }
+        tmpI = img.getScaledInstance(newWidth, -1, Image.SCALE_SMOOTH);
       }
+      underWidth = imgSize.getSize().width - tmpI.getWidth(null);
+      underHeight = imgSize.getSize().height - tmpI.getHeight(null);
       thumbImg = new BufferedImage(imgSize.getSize().width, imgSize.getSize().height, 
           BufferedImage.TYPE_INT_ARGB);
-      if(underWidth > underHeight) {
-        thumbImg.getGraphics().drawImage(tmpI, underWidth / 2, 0, null);
-      } else {
-        thumbImg.getGraphics().drawImage(tmpI, 0, underHeight / 2, null);
-      }
+      thumbImg.getGraphics().drawImage(tmpI, underWidth / 2, underHeight / 2, null);
     } else {
       if((img.getWidth() > (int)imgSize.getWidth()) 
           || (img.getHeight() > (int)imgSize.getHeight())) {
@@ -354,6 +358,19 @@ public class GenerateThumbnail {
         defaultBg);
     encodeImage(out, buffThumb, img, type);
     return buffThumb;
+  }
+  
+  int getLowerBoundFinalPositioning(int pos, int baseLength, int frameLength) {
+    //FIXME has a collision on 0 (left or right aligned?). Now 0 is left aligned and there
+    //      is no possibility for a position 0 pixels from right (workaround is to 
+    //      position from left, but you have to do it for each image separately).
+    if(pos < 0) {
+      LOGGER.error("Positioning: pos=" + pos + ", base=" + baseLength + ", frame=" + 
+          frameLength + " positioning=" + (-pos - (baseLength - frameLength)));
+      return -pos - (baseLength - frameLength);
+    } else {
+      return -pos;
+    }
   }
   
   /**
