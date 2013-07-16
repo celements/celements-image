@@ -135,8 +135,6 @@ public class GenerateThumbnail {
    * @param maxHeight Maximum allowed height.
    * @param defaultBg 
    * @return ImageDimensions object specifying width and height.
-   * 
-   * TODO implement preserving aspect ratio!!! see commented test in GenerateThumbnailTest
    */
   public ImageDimensions getThumbnailDimensions(int imgWidth, int imgHeight, int maxWidth,
       int maxHeight, boolean isLowerBound, Color defaultBg) {
