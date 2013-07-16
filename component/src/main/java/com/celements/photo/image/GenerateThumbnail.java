@@ -365,7 +365,7 @@ public class GenerateThumbnail {
     //      is no possibility for a position 0 pixels from right (workaround is to 
     //      position from left, but you have to do it for each image separately).
     if(pos < 0) {
-      LOGGER.error("Positioning: pos=" + pos + ", base=" + baseLength + ", frame=" + 
+      LOGGER.debug("Positioning: pos=" + pos + ", base=" + baseLength + ", frame=" + 
           frameLength + " positioning=" + (-pos - (baseLength - frameLength)));
       return -pos - (baseLength - frameLength);
     } else {
