@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.photo.BarcodeScriptService;
 
 public class BarcodeScriptServiceTest extends AbstractBridgedComponentTestCase {
   

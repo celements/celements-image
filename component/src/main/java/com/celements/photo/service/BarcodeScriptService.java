@@ -1,4 +1,4 @@
-package com.celements.photo;
+package com.celements.photo.service;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

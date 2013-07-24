@@ -2,7 +2,7 @@ com.celements.photo.service.ImageService
 com.celements.photo.service.ImageScriptService
 com.celements.photo.service.MetaInfoScriptService
 com.celements.photo.image.CropImage
-com.celements.photo.BarcodeScriptService
+com.celements.photo.service.BarcodeScriptService
 com.celements.photo.presentation.GalleryOverviewPresentationType
 com.celements.photo.unpack.UnpackComponent
 com.celements.photo.metadata.MetadataDocument
