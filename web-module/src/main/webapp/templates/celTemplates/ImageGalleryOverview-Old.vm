@@ -15,8 +15,8 @@
   #set($imgGalcount = 0)
 #end
 #set($imgGalcount = $imgGalcount + 1)
-  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::662:662" class="celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation" ##
-   src="$gallerydoc.getAttachmentURL($attach.filename, "download")?celwidth=170&celheight=170" alt="" />
+  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::662:662" class="celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation celanim_overlay_addCloseButton" ##
+   src="$gallerydoc.getAttachmentURL($attach.filename, "download")?celwidth=170&celheight=170&lowBound=1" alt="" />
 #else
   <span class="cel_gal_no_pictures_text">##
 $adminMsg.get('cel_gal_no_pictures')##
