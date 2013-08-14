@@ -39,7 +39,6 @@
  ## should we add menu item?
  #if("$!request.get('addMenuItem')" == 'true')
   ## determine position
-  #set($menu_parent = $!request.get("menu_parent"))
   #set($menu = $xwiki.celementsweb.getSubNodesForParent("$doc_parent", "$space"))
   #if($menu.size() > 0)
     #set($lastitemNum = $menu.size() - 1)
