@@ -30,7 +30,7 @@
     ## add menu item
     #set($menu_item_obj = $new_doc.getObject("Celements2.MenuItem", true))
     ## determine position
-    #set($menu = $xwiki.celementsweb.getSubNodesForParent($newGalleryDocRef.lastSpaceReference))
+    #set($menu = $xwiki.celementsweb.getSubNodesForParentRef($newGalleryDocRef.lastSpaceReference))
     #if($menu.size() > 0)
       #set($lastitemNum = $menu.size() - 1)
       #set($next_menu_item_nr = $menu.get($lastitemNum).getPosition() + 1)
