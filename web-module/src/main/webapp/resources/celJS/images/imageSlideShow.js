@@ -32,6 +32,7 @@ CELEMENTS.image.SlideShow = function(containerId) {
 (function() {
   CELEMENTS.image.SlideShow.prototype = {
       _openInOverlayBind : undefined,
+      _isOverlayRegistered : false,
 
       _init : function(containerId) {
         var _me = this;
@@ -40,8 +41,28 @@ CELEMENTS.image.SlideShow = function(containerId) {
 
       registerOpenInOverlay : function(htmlElem) {
         var _me = this;
+        if (!_me._isOverlayRegistered) {
+          _me.isOverlayRegistered = true;
+          var bodyElem = $$('body')[0];
+          bodyElem.observe('cel_slideShow:shouldRegister',
+              _me._checkIsImageSlideShowOverlay.bind(_me));
+          bodyElem.observe('cel_yuiOverlay:afterShowDialog_General',
+              _me._removeIsImageSlideShowOverlay.bind(_me));
+        }
         htmlElem.observe('click', _me._openInOverlayBind);
         htmlElem.observe('cel_ImageSlideShow:startSlideShow', _me._openInOverlayBind);
+      },
+
+      _checkIsImageSlideShowOverlay : function(event) {
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
+        if (openDialog.slideShowElem) {
+          event.stop();
+        }
+      },
+
+      _removeIsImageSlideShowOverlay : function() {
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
+        openDialog.updateOpenConfig({ 'slideShowElem' : null });
       },
 
       openInOverlay : function(event) {
@@ -49,7 +70,8 @@ CELEMENTS.image.SlideShow = function(containerId) {
         var htmlElem = event.element();
         var hasCloseButton = htmlElem.hasClassName('celimage_overlay_addCloseButton');
         var openDialog = CELEMENTS.presentation.getOverlayObj({
-          close : hasCloseButton
+          'close' : hasCloseButton,
+          'slideShowElem' : htmlElem
         });
         openDialog.open();
       }
