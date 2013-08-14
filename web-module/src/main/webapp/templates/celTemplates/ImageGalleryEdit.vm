@@ -9,7 +9,7 @@
 #end
 ##
 #set($galleryDoc = $doc)
-## #parse('celMacros/checkImageGalleryObjects.vm')
+#parse('celMacros/checkImageGalleryObjects.vm')
 ##
 <div class="celements2_box c3_scrollable">
 <div id="imageGalleryEditor">
