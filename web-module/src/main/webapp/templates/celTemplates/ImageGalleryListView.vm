@@ -1,3 +1,6 @@
+$celementsweb.addExtJSfileOnce(':celJS/celpresentation/celYuiOverlay.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/celpresentation/CelementsSlideShow.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/images/imageSlideShow.js', 'file')
 #if("$!request.deleted" == '1')
 $xwiki.celementsweb.flushCache()
 #end

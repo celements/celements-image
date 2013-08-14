@@ -10,6 +10,7 @@
 #if($gallerydoc.attachmentList.size() > 0)
 #set($attach = $gallerydoc.attachmentList.get(0))
 #set($firstImageLink = $gallerydoc.getAttachmentURL($attach.filename, "download"))
+#set($imgCssClasses = 'celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation celanim_overlay_addCloseButton')
 #elseif("$!services.pageType.getPageTypeRef($gallerydoc.documentReference).configName" == 'ImageGallery')
   #set($navObj = $!gallerydoc.getObject("Celements2.NavigationConfigClass"))
   #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
@@ -23,13 +24,14 @@
     #end
     #set($firstImageLink = $imageInSlide)
   #end
+  #set($imgCssClasses = 'celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton')
 #end
 #if("$!firstImageLink" != '')
 #if("$!imgGalcount" == '')
   #set($imgGalcount = 0)
 #end
 #set($imgGalcount = $imgGalcount + 1)
-  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::662:662" class="celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation celanim_overlay_addCloseButton" ##
+  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::662:662" class="$imgCssClasses" ##
    src="${firstImageLink}?celwidth=100&celheight=100&lowBound=1" alt="" />
 #else
   <span class="cel_gal_no_pictures_text">##
