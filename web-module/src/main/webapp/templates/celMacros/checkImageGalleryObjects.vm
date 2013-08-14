@@ -1,0 +1,27 @@
+#######################################################################################
+## add missing gallery objects (TODO: move to java)
+## INPUT: $galleryDoc
+#######################################################################################
+#set($needsSave = false)
+#if("$!galleryDoc.getObject('XWiki.PhotoAlbumClass')" == '')
+  ## create album object
+  #set($album_obj = $galleryDoc.newObject("XWiki.PhotoAlbumClass"))
+  $album_obj.set("thumbWidth", $!request.get("thumbWidth"))
+  $album_obj.set("height", $!request.get("height"))
+  $album_obj.set("height2", $!request.get("height2"))
+  $album_obj.set("photoWidth", $!request.get("photoWidth"))
+  $album_obj.set("description", $!request.get("description"))
+  #set($needsSave = true)
+#end
+#if("$!galleryDoc.getObject('Celements2.NavigationConfigClass')" == '')
+  #set($navObj = $galleryDoc.newObject('Celements2.NavigationConfigClass'))
+  $navObj.set('from_hierarchy_level', 1)
+  $navObj.set('to_hierarchy_level', 1)
+  $navObj.set('show_inactive_to_level', 1)
+  $navObj.set('menu_space', "$galleryDoc.getName()")
+  $navObj.set('presentation_type', "renderedContent")
+  #set($needsSave = true)
+#end
+#if($needsSave)
+  $galleryDoc.save()
+#end

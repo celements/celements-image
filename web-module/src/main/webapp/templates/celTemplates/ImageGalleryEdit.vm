@@ -1,106 +1,30 @@
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/galleryEdit.css', 'file')" type="text/css" media="screen" />
 #if("$!request.get('xredirect')" != '')
-#set($xredirect = $!request.getParameter('xredirect'))
+#set($xredirect = "$!request.getParameter('xredirect')")
 #else
 #set($xredirect = "$doc.getURL('view')")
 #end
-#set($redirectStr = "xredirect=$xredirect")
-#set($filled = $request.get("submitted") == "1")
-#set($complete = true)
-#set($valid = true)
-#if($filled && $complete && $valid)
- ## set album title
- $doc.setTitle($!request.get("title"))
- #set($pagetype_obj = $doc.getObject("Celements2.PageType"))
- #if(!$pagetype_obj)
-  #set($pagetype_obj = $doc.newObject("Celements2.PageType"))
-  $pagetype_obj.set("page_type", "Gallery")
- #end
- ## create album object
- #set($album_obj = $doc.getObject("XWiki.PhotoAlbumClass"))
- #if(!$album_obj)
-  #set($album_obj = $doc.newObject("XWiki.PhotoAlbumClass"))
- #end
- #if("$!album_obj.getProperty('id').getValue()" == '')
-   #set($allGalleries = $services.query.getXWQL("from doc.object('XWiki.PhotoAlbumClass') as album order by album.id desc").execute())
-   #set($nextId = 0)
-   #if($allGalleries.size() > 0))
-     #set($lastGalDoc = $xwiki.getDocument($allGalleries.get(0)))
-     #set($lastGalObj = $lastGalDoc.getObject('XWiki.PhotoAlbumClass'))
-     #if("$!lastGalObj.get('id')" != '')
-       #set($nextId = $xwiki.parseInt($lastGalObj.get('id')) + 1)
-     #end
-   #end
-   $album_obj.set('id', $nextId)
- #end
- $album_obj.set("thumbWidth", $!request.get("thumbWidth"))
- $album_obj.set("height", $!request.get("height"))
- $album_obj.set("height2", $!request.get("height2"))
- $album_obj.set("photoWidth", $!request.get("photoWidth"))
- $album_obj.set("description", $!request.get("description"))
- $album_obj.set('hasOverview',$!request.get('XWiki.PhotoAlbumClass_0_hasOverview'))
- $album_obj.set('thumbDescription',$!request.get('thumbDescription'))
- $album_obj.set('theme',$!request.get('XWiki.PhotoAlbumClass_0_theme'))
- $doc.save()
- ## redirect to edit album
- $context.getResponse().sendRedirect($doc.getURL("view"))
+#if("$!xredirect" == '')
+  #set($xredirect = '/')
 #end
+##
+#set($galleryDoc = $new_doc)
+#parse('celMacros/checkImageGalleryObjects.vm')
+##
 <div class="celements2_box editGallery_box c3_scrollable">
+<div id="imageGalleryEditor">
   #set($title = $!doc.getTitle())
 <div class="celements2_box_title">$adminMsg.get('gallery_edit_gallery') #if("$!doc.getTitle()" != '')${doc.getTitle()}#else${doc.getName()}#end</div>
 <div class="celements2_box_subtitle">$adminMsg.get('gallery_gallery_properties')</div>
 $celementsweb.addExtJSfileOnce(':celJS/prototype.js')
 $celementsweb.addExtJSfileOnce(':celJS/validation.js')
-<form id="edit" method="post" action="$xwiki.getURL($doc.getFullName(), 'save')" target="_parent">
+<form id="galleryEdit" method="post" action="$doc.getURL('save')" target="_parent">
   <input type="hidden" name="template" value="$!doc.getTemplate()" />
-  <input type="hidden" name="xredirect" value="$!xredirect" />
-  <input type="hidden" name="language" value="$!tdoc.language" />
  <input type="hidden" class="celEditorRedirect" name="xredirect" value="$xredirect" />
+  <input type="hidden" name="language" value="$!tdoc.language" />
 <input type="hidden" name="submitted" value="1" />
+<div class="galleryFieldsEditPart">
 #set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
-<table cellspacing="0" cellpadding="0" border="0" class="celements2_table">
-<tr>
- <td class="celements2_text">$adminMsg.get('gallery_album_title')</td>
-  #set($title = $!doc.getTitle())
- <td><input name="title" type="text" value="$!title" class="celements2_input" /></td>
-</tr>
-<tr>
- <td class="celements2_text">$adminMsg.get('gallery_album_description')</td>
- <td><textarea name="description" class="celements2_input">$!albumobj.getProperty("description").getValue()</textarea></td>
-</tr>
-<tr>
- <td class="celements2_text">$adminMsg.get('gallery_with_overview')</td>
-    #set($pretagFixStr = '')
-    #set($pretagFixStr = $!doc.display('hasOverview','edit',$albumobj))
- <td>${pretagFixStr.replaceAll('\{/?pre\}','')}</td>
-</tr>
-<tr>
- <td class="celements2_text">$adminMsg.get('gallery_thumbnail_width')</td>
- <td><input name="thumbWidth" type="text" value="$!albumobj.getProperty("thumbWidth").getValue()" class="celements2_input validate-number" /></td>
-</tr>
- <td class="celements2_text">$adminMsg.get('gallery_thumbnail_height')</td>
- <td><input name="height" type="text" value="$!albumobj.getProperty("height").getValue()" class="celements2_input validate-number" /></td>
-</tr>
-<tr>
- <td class="celements2_text">$adminMsg.get('gallery_picture_height')</td>
- <td><input name="height2" type="text" value="$!albumobj.getProperty("height2").getValue()" class="celements2_input validate-number" /></td>
-</tr>
-<tr>
- <td class="celements2_text">$adminMsg.get('gallery_picture_width')</td>
- <td><input name="photoWidth" type="text" value="$!albumobj.getProperty("photoWidth").getValue()" class="celements2_input validate-number" /></td>
-</tr>
-
-<tr class="galleryDescriptionEdit">
- <td class="celements2_text">$adminMsg.get('gallery_thumbnail_desc')</td>
-<td><input name="thumbDescription" type="checkbox" ##
- #if("$!albumobj.getProperty('thumbDescription').getValue()" == '1')
-   checked="checked" ##
- #end
-  value="1" class="celements2_input" /></td>
-</tr>
-
-<tr class="galleryDescriptionEdit">
- <td colspan="2">
 #set($cel_editobj_dict_prefix = 'gallery_editor_')
 #set($cel_editobj_externalForm = true)  
 #set($cel_embedded_editobj = true)
@@ -109,13 +33,10 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 #set($cel_editobj_hasObjRemoveLink = false)
 #set($cel_editobj_classname = "XWiki.PhotoAlbumClass")
 #set($cel_editobj_nb = $albumobj.getNumber())
-#set($cel_editobj_properties = "theme")
- $xwiki.includeForm('celements2web:Templates.ObjectEdit',false)</td>
-</tr>
-
-
-</table>
-  <div id="editablecode_container">
+#set($cel_editobj_properties = "title,description,hasOverview,thumbWidth,height,height2,photoWidth,theme")
+  $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
+</div>
+<div class="navigationFieldsEditPart">
   #set($cel_embedded_editobj = true)
   #set($cel_editobj_classname = "Celements2.NavigationConfigClass")
   #set($cel_editobj_nb = $navObj.getNumber())
@@ -126,7 +47,7 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
     #set($cel_editobj_readonly_properties = 'menu_space')
   #end
   $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
-  </div>
+</div>
   <div>
     <h1>$adminMsg.get('cel_presentation_reordering_title')</h1>
     <p>$adminMsg.get('cel_presentation_reordering_hint')</p>
@@ -183,4 +104,5 @@ $structNav.includeNavigation()
  var result = valid.validate();
  #end
 </script>
+</div>
 </div>
