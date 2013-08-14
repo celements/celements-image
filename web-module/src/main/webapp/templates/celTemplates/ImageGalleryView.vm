@@ -1,1 +1,24 @@
-Gallery Viw not yet available.
+#if("$!request.deleted" == '1')
+$xwiki.celementsweb.flushCache()
+#end
+#if("$!celldoc" != '')
+#set($contentDoc = $celldoc)
+#else   
+#set($contentDoc = $tdoc)
+#end
+#set($overwritePresCmCssClass = '')
+#set($overwriteNavCMcssClass = 'cel_cm_gallery')
+#set($emptyDictKeySuffix = '_gallery_overview')
+#set($overwriteNavPresentationType = 'galleryView')
+#if("$!galleryPresentationCount" == '')
+#set($galleryPresentationCount = 0)
+#end
+#set($galleryNav = $celementsweb.createNavigation())
+$galleryNav.loadConfigFromDoc($celldoc.documentReference)
+#set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
+#set($galleryPresentationCount = $galleryPresentationCount + 1)
+<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery">
+<div class="pfeil_links"></div>
+<div class="pfeil_rechts"></div>
+#parse('celTemplates/PresentationView.vm')
+</div>

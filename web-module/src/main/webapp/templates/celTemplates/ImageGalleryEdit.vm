@@ -15,7 +15,6 @@
 <div id="imageGalleryEditor">
   #set($title = $!doc.getTitle())
 <div class="celements2_box_title">$adminMsg.get('gallery_edit_gallery') #if("$!doc.getTitle()" != '')${doc.getTitle()}#else${doc.getName()}#end</div>
-<div class="celements2_box_subtitle">$adminMsg.get('gallery_gallery_properties')</div>
 $celementsweb.addExtJSfileOnce(':celJS/prototype.js')
 $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 <form id="galleryEdit" method="post" action="$doc.getURL('save')" target="_parent">
@@ -24,19 +23,26 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
   <input type="hidden" name="language" value="$!tdoc.language" />
 <input type="hidden" name="submitted" value="1" />
 <div class="galleryFieldsEditPart">
+<div id="con_titleEdit" class="editblock">$adminMsg.get('gallery_album_title')
+    <input id="pagetitle" name="title" class="fullwidth" value="$!xwiki.getFormEncoded($!tdoc.getTitle())" type="text">
+</div>
+<div class="celements2_box_subtitle">$adminMsg.get('gallery_gallery_properties')</div>
 #set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
 #set($cel_editobj_dict_prefix = 'gallery_editor_')
-#set($cel_editobj_externalForm = true)  
+#set($cel_editobj_externalForm = true)
 #set($cel_embedded_editobj = true)
 #set($cel_editobj_title = $adminMsg.get('gallery_gallery_properties'))
 #set($cel_editobj_hasObjAddLink = false)
 #set($cel_editobj_hasObjRemoveLink = false)
 #set($cel_editobj_classname = "XWiki.PhotoAlbumClass")
 #set($cel_editobj_nb = $albumobj.getNumber())
-#set($cel_editobj_properties = "title,description,hasOverview,thumbWidth,height,height2,photoWidth,theme")
+#set($cel_editobj_properties = "description,thumbWidth,height,height2,photoWidth")
   $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
 </div>
-<div class="navigationFieldsEditPart">
+#set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
+#if($isSuperAdmin)
+<div class="navigationFieldsEditPart" style="clear:both;">
+<div class="celements2_box_subtitle">$adminMsg.get('cel_gallery_presentation_space')</div>
   #set($cel_embedded_editobj = true)
   #set($cel_editobj_classname = "Celements2.NavigationConfigClass")
   #set($cel_editobj_nb = $navObj.getNumber())
@@ -48,8 +54,17 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
   #end
   $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
 </div>
-  <div>
-    <h1>$adminMsg.get('cel_presentation_reordering_title')</h1>
+#end
+<div class="reorderingEditPart" style="clear:both;">
+  <div class="celements2_box_subtitle">$adminMsg.get('cel_gallery_reordering_title')</div>
+## add new slide
+#set($gallerySpace = $navObj.getProperty('menu_space').getValue())
+#set($l = $doc.getURL('view', 'xpage=overlay&conf=AddPage'))
+#set($l = "${l}&space=${gallerySpace}")
+#set($l = "${l}&menu_position=&language=${default_language}&redirmode=newpageedit")
+#set($cmenu_pageLink = "${l}&xredirect=$escapetool.url($doc.getURL('view'))")
+<p style="float:right;"><a href="${cmenu_pageLink}" target="_blank">
+$adminMsg.get('gallery_editor_addNewSlide')</a></p>
     <p>$adminMsg.get('cel_presentation_reordering_hint')</p>
     <button class="cel_naveditor_button_cancel">$adminMsg.get('cel_cancel')</button>
     <button class="cel_naveditor_button_saveAndContinue">$adminMsg.get('cel_save')</button>
