@@ -48,7 +48,7 @@
  ## redirect to edit album
  $context.getResponse().sendRedirect($xredirect)
 #end
-<div class="celements2_box editGallery_box c3_scrollable">
+<div class="celements2_box c3_scrollable">
   #set($title = $!doc.getTitle())
 <div class="celements2_box_title">$adminMsg.get('gallery_edit_gallery') #if("$!doc.getTitle()" != '')${doc.getTitle()}#else${doc.getName()}#end</div>
 <div class="celements2_box_subtitle">$adminMsg.get('gallery_pictures')</div>
