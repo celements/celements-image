@@ -28,7 +28,7 @@
   ## should we add menu item?
   #if("$!request.get('addMenuItem')" == 'true')
     ## add menu item
-    #set($menu_item_obj = $galleryDoc.getObject("Celements2.MenuItem", true))
+    #set($menu_item_obj = $new_doc.getObject("Celements2.MenuItem", true))
     ## determine position
     #set($menu = $xwiki.celementsweb.getSubNodesForParent($newGalleryDocRef.lastSpaceReference))
     #if($menu.size() > 0)
