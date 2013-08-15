@@ -50,6 +50,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (!_me._isOverlayRegistered) {
           _me.isOverlayRegistered = true;
           _me._celSlideShowObj = getCelSlideShowObj();
+          _me._celSlideShowObj.setOverwritePageLayout('SimpleLayout');
           var bodyElem = $$('body')[0];
           bodyElem.observe('cel_slideShow:shouldRegister',
               _me._checkIsImageSlideShowOverlay.bind(_me));
@@ -67,6 +68,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (!_me._celSlideShowObj) {
           _me._celSlideShowObj = new new CELEMENTS.presentation.SlideShow(
               _me._currentHtmlElem.id);
+          _me._celSlideShowObj.setOverwritePageLayout('SimpleLayout');
         }
         return _me._celSlideShowObj;
       },
