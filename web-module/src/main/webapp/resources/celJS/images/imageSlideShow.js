@@ -105,7 +105,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var hasCloseButton = htmlElem.hasClassName('celimage_overlay_addCloseButton');
         var openDialog = CELEMENTS.presentation.getOverlayObj({
           'close' : hasCloseButton,
-          'slideShowElem' : htmlElem
+          'slideShowElem' : htmlElem,
+          'link' : htmlElem
         });
         openDialog.intermediatOpenHandler();
       },
