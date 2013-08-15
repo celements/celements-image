@@ -50,7 +50,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       registerOpenInOverlay : function(htmlElem) {
         var _me = this;
         if (!_me._isOverlayRegistered) {
-          _me.isOverlayRegistered = true;
+          _me._isOverlayRegistered = true;
           _me._celSlideShowObj = getCelSlideShowObj();
           _me._celSlideShowObj.setOverwritePageLayout('SimpleLayout');
           var bodyElem = $$('body')[0];
@@ -89,8 +89,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (_me._currentHtmlElem.hasClassName('celimage_addNavigation')) {
           var nextButton = new Element('div').addClassName('celPresSlideShow_next');
           var prevButton = new Element('div').addClassName('celPresSlideShow_prev');
-          _getContainerElement().insert({'bottom' : nextButton});
-          _getContainerElement().insert({'top' : prevButton});
+          _me._getContainerElement().insert({'bottom' : nextButton});
+          _me._getContainerElement().insert({'top' : prevButton});
+          console.log('_addNavigationButtons: done.', _me._getContainerElement());
         }
       },
 
