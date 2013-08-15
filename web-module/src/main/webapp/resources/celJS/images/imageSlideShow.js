@@ -54,7 +54,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           var bodyElem = $$('body')[0];
           bodyElem.observe('cel_slideShow:shouldRegister',
               _me._checkIsImageSlideShowOverlay.bind(_me));
-          bodyElem.observe('cel_yuiOverlay:afterShowDialog_General',
+          bodyElem.observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlay.bind(_me));
         }
         htmlElem.observe('click', _me._openInOverlayBind);
