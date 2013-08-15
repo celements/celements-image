@@ -1,0 +1,13 @@
+/** yui overlay **/
+body div.mask.cel-YuiOverlay {
+  background-color: black;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0.85;
+  filter: alpha(opacity = 85);
+  display: none;
+  top: 0px;
+  left: 0px;
+  z-index: 99;
+}
