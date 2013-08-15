@@ -33,6 +33,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
   CELEMENTS.image.SlideShow.prototype = {
       _openInOverlayBind : undefined,
       _imageSlideShowLoadFirstContentBind : undefined,
+      _addNavigationButtonsBind : undefined,
       _celSlideShowObj : null,
       _isOverlayRegistered : false,
       _currentHtmlElem : undefined,
@@ -43,6 +44,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
+        _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
       },
 
       registerOpenInOverlay : function(htmlElem) {
@@ -73,11 +75,32 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         return _me._celSlideShowObj;
       },
 
+      _getContainerElement : function() {
+        var _me = this;
+        if (_me._isOverlayRegistered) {
+          return _me._getCelSlideShowObj().getHtmlContainer();
+        } else {
+          return _me._currentHtmlElem;
+        }
+      },
+
+      _addNavigationButtons : function(event) {
+        var _me = this;
+        if (_me._currentHtmlElem.hasClassName('celimage_addNavigation')) {
+          var nextButton = new Element('div').addClassName('celPresSlideShow_next');
+          var prevButton = new Element('div').addClassName('celPresSlideShow_prev');
+          _getContainerElement().insert({'bottom' : nextButton});
+          _getContainerElement().insert({'top' : prevButton});
+        }
+      },
+
       _imageSlideShowLoadFirstContent : function(event) {
         var _me = this;
         var dialogConfig = event.memo;
         console.log('_imageSlideShowLoadFirstContent start ', dialogConfig);
         if (dialogConfig.slideShowElem) {
+          _me._getCelSlideShowObj().getHtmlContainer().observe(
+              'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
           var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 6, '');
           console.log('_imageSlideShowLoadFirstContent: ', gallerySpace);
           _me._getCelSlideShowObj().loadMainSlides(gallerySpace);
