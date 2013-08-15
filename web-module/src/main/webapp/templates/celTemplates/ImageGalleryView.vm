@@ -7,7 +7,7 @@ $xwiki.celementsweb.flushCache()
 #set($contentDoc = $tdoc)
 #end
 #set($overwritePresCmCssClass = '')
-#set($overwriteNavCMcssClass = 'cel_cm_gallery')
+#set($overwriteNavCMcssClass = 'cel_cm_gallery_view')
 #set($emptyDictKeySuffix = '_gallery_overview')
 #set($overwriteNavPresentationType = 'galleryView')
 #if("$!galleryPresentationCount" == '')
@@ -17,7 +17,7 @@ $xwiki.celementsweb.flushCache()
 $galleryNav.loadConfigFromDoc($celldoc.documentReference)
 #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
 #set($galleryPresentationCount = $galleryPresentationCount + 1)
-<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery">
+<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery_view">
 <div class="pfeil_links"></div>
 <div class="pfeil_rechts"></div>
 #parse('celTemplates/PresentationView.vm')
