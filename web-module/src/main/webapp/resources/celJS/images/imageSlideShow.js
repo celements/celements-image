@@ -75,8 +75,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       _imageSlideShowLoadFirstContent : function(event) {
         var _me = this;
-        console.log('_imageSlideShowLoadFirstContent start');
         var dialogConfig = event.memo;
+        console.log('_imageSlideShowLoadFirstContent start ', dialogConfig);
         if (dialogConfig.slideShowElem) {
           var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 6, '');
           console.log('_imageSlideShowLoadFirstContent: ', gallerySpace);
@@ -96,6 +96,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       },
 
       _removeIsImageSlideShowOverlay : function() {
+        console.log('_removeIsImageSlideShowOverlay removing slideShowElem from config');
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         openDialog.updateOpenConfig({ 'slideShowElem' : null });
       },
