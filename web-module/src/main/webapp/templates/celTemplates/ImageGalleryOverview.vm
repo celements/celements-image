@@ -7,6 +7,7 @@
 #end
 <span class="celements_gallery_link" href="$galleryLink">
 #set($firstImageLink = '')
+#set($gallerySpace = '')
 #if($gallerydoc.attachmentList.size() > 0)
 #set($attach = $gallerydoc.attachmentList.get(0))
 #set($firstImageLink = $gallerydoc.getAttachmentURL($attach.filename, "download"))
@@ -31,7 +32,7 @@
   #set($imgGalcount = 0)
 #end
 #set($imgGalcount = $imgGalcount + 1)
-  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::662:662" class="$imgCssClasses" ##
+  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::662:662:$!gallerySpace" class="$imgCssClasses" ##
    src="${firstImageLink}?celwidth=100&celheight=100&lowBound=1" alt="" />
 #else
   <span class="cel_gal_no_pictures_text">##
