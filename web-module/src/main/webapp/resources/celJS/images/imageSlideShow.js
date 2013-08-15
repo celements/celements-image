@@ -107,7 +107,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           'close' : hasCloseButton,
           'slideShowElem' : htmlElem
         });
-        openDialog.open();
+        openDialog.intermediatOpenHandler();
       },
 
       _getPart : function(elemId, num, defaultvalue) {
