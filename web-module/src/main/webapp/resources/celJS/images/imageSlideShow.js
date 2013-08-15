@@ -91,19 +91,16 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           var prevButton = new Element('div').addClassName('celPresSlideShow_prev');
           _me._getContainerElement().insert({'bottom' : nextButton});
           _me._getContainerElement().insert({'top' : prevButton});
-          console.log('_addNavigationButtons: done.', _me._getContainerElement());
         }
       },
 
       _imageSlideShowLoadFirstContent : function(event) {
         var _me = this;
         var dialogConfig = event.memo;
-        console.log('_imageSlideShowLoadFirstContent start ', dialogConfig);
         if (dialogConfig.slideShowElem) {
           _me._getCelSlideShowObj().getHtmlContainer().observe(
               'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
           var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 6, '');
-          console.log('_imageSlideShowLoadFirstContent: ', gallerySpace);
           _me._getCelSlideShowObj().loadMainSlides(gallerySpace);
           event.stop();
         }
@@ -111,16 +108,13 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       _checkIsImageSlideShowOverlay : function(event) {
         var _me = this;
-        console.log('_checkIsImageSlideShowOverlay start');
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         if (openDialog._dialogConfig.slideShowElem) {
-          console.log('_checkIsImageSlideShowOverlay is slideShowElem stopping event');
           event.stop();
         }
       },
 
       _removeIsImageSlideShowOverlay : function() {
-        console.log('_removeIsImageSlideShowOverlay removing slideShowElem from config');
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         openDialog.updateOpenConfig({ 'slideShowElem' : null });
       },
