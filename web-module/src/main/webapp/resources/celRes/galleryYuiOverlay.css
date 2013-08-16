@@ -76,9 +76,9 @@ body div.mask.cel-YuiOverlay {
 }
 .celPresSlideShow_next {
   right: 0px;
-  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayRightArrow.png');
+  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayRightArrowWhite.png');
 }
 .celPresSlideShow_prev {
   left: 0px;
-  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayLeftArrow.png');
+  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayLeftArrowWhite.png');
 }
