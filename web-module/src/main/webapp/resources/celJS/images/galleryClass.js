@@ -138,6 +138,14 @@ CiG.prototype = {
       };
     }
     return undefined;
+  },
+
+  isNewImageGallery : function() {
+    var _me = this;
+    if (_me._galleryData) {
+      return _me._galleryData.isNewImageGallery;
+    }
+    return undefined;
   }
 
 };
