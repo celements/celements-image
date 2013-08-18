@@ -43,7 +43,7 @@
 #if("$!photoHeight" == '')
 #set($photoHeight = "662")
 #end
-  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:$!gallerySpace" class="$imgCssClasses" ##
+  <img id="ImgGalery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!gallerySpace" class="$imgCssClasses" ##
    src="${firstImageLink}?celwidth=100&celheight=100&lowBound=1" alt="" />
 #else
   <span class="cel_gal_no_pictures_text">##

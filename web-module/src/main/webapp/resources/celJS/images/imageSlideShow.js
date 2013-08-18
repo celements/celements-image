@@ -100,7 +100,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (dialogConfig.slideShowElem) {
           _me._getCelSlideShowObj().getHtmlContainer().observe(
               'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
-          var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 6, '');
+          var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
           _me._getCelSlideShowObj().loadMainSlides(gallerySpace);
           event.stop();
         }
