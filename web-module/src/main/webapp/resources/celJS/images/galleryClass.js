@@ -151,7 +151,15 @@ CiG.prototype = {
       return _me._galleryData.isNewImageGallery;
     }
     return undefined;
-  }
+  },
+
+  getSpaceName : function() {
+    var _me = this;
+    if (_me._galleryData && _me.isNewImageGallery()) {
+      return _me._galleryData.spaceName;
+    }
+    return undefined;
+  } 
 
 };
 

@@ -1,6 +1,7 @@
 $response.setStatus(200)
 #set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
 #set($albumObj = $doc.getObject("XWiki.PhotoAlbumClass", true))
+#set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
 $jsonBuilder.openDictionary()
 $jsonBuilder.addStringProperty('title', "$!doc.getTitle()")
 $jsonBuilder.openProperty('thumbWidth')
@@ -20,6 +21,10 @@ $jsonBuilder.addStringProperty('theme', "$!albumObj.getProperty('theme').getValu
 $jsonBuilder.openProperty('isNewImageGallery')
 #set($isNewImageGallery = ("$!services.pageType.getPageTypeRef($doc.documentReference).configName" == 'ImageGallery'))
 $jsonBuilder.addBoolean($isNewImageGallery)
+#if($isNewImageGallery && ("$!navObj" != ''))
+  #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
+  $jsonBuilder.addStringProperty('spaceName', "$!gallerySpace")
+#end
 $jsonBuilder.openProperty('imageArray')
 $jsonBuilder.openArray()
 #set($attachments = $xwiki.celementsweb.getAttachmentListSorted($doc, 'AttachmentDescendingChangeDateComparator'))
@@ -30,7 +35,6 @@ $services.celementsphoto.addImage($jsonBuilder, $attach)
 #end ## if isImage
 #end ## foreach
 #elseif($isNewImageGallery)
-  #set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
   #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
   #set($gallerySlidesDocRef = $services.model.createDocumentReference('', "$!{gallerySpace}", ''))
   #set($slidesMenu = $xwiki.celementsweb.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
