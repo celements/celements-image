@@ -20,11 +20,32 @@ $jsonBuilder.addStringProperty('theme', "$!albumObj.getProperty('theme').getValu
 $jsonBuilder.openProperty('imageArray')
 $jsonBuilder.openArray()
 #set($attachments = $xwiki.celementsweb.getAttachmentListSorted($doc, 'AttachmentDescendingChangeDateComparator'))
+#if($attachments.size() > 0)
 #foreach ($attach in $attachments)
 #if ($attach.isImage())
 $services.celementsphoto.addImage($jsonBuilder, $attach)
 #end ## if isImage
 #end ## foreach
+#elseif("$!services.pageType.getPageTypeRef($doc.documentReference).configName" == 'ImageGallery')
+  #set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
+  #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
+  #set($gallerySlidesDocRef = $services.model.createDocumentReference('', "$!{gallerySpace}", ''))
+  #set($slidesMenu = $xwiki.celementsweb.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
+  #foreach($slideTreeNode in $slidesMenu)
+    #set($slideContent = $services.celementsweb.renderCelementsDocument($slideTreeNode.documentReference).replaceAll('[\n\r]',''))
+    #set($imageTagInSlide = $slideContent.replaceAll('.*<img [^>]*src="([^"]*)".*', '$1'))
+    #if($imageTagInSlide.indexOf('?') > 0)
+      #set($imageInSlide = $imageTagInSlide.substring(0, $imageTagInSlide.indexOf('?')))
+    #end
+    #set($imageSplit = $imageInSlide.splict('/'))
+    #set($imageDocRef = $services.model.createDocumentReference('', $imageSplit.get(1), $imageSplit.get(2)))
+    #set($imageRef = $services.createAttachmentReference($imageDocRef, $imageSplit.get(3)))
+    #set($imgAttach = $services.celementsphoto.getImageAttachment())
+    #if("$!imgAttach" != '')
+$services.celementsphoto.addImage($jsonBuilder, $imgAttach)
+    #end
+  #end
+#end
 $jsonBuilder.closeArray()
 $jsonBuilder.closeDictionary()
 $jsonBuilder.getJSON()
