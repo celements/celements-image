@@ -27,6 +27,7 @@ CiG.prototype = {
   },
 
   getDocRef : function() {
+    var _me = this;
     return _me._collDocRef;
   },
 
