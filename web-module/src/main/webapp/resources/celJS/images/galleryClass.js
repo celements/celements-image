@@ -26,6 +26,10 @@ CiG.prototype = {
     _me._loadData(callbackFN);
   },
 
+  getDocRef : function() {
+    return _me._collDocRef;
+  },
+
   _getGalleryURL : function() {
     var _me = this;
     var colDocRefSplit = _me._collDocRef.split('.');
