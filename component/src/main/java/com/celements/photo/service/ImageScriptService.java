@@ -23,6 +23,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component("celementsphoto")
@@ -65,6 +66,21 @@ public class ImageScriptService implements ScriptService {
 
   public void addImage(Builder jsonBuilder, Attachment imgAttachment) {
     addImage(jsonBuilder, imgAttachment, false);
+  }
+
+  public Attachment getImageAttachment(AttachmentReference imageRef) {
+    Attachment imageAttachment = null;
+    try {
+      XWikiDocument imageDoc = getContext().getWiki().getDocument(
+          imageRef.getDocumentReference(), getContext());
+      XWikiAttachment imageAtt = imageDoc.getAttachment(imageRef.getName());
+      imageAttachment = new Attachment(imageDoc.newDocument(getContext()), imageAtt,
+          getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get image for attachment reference [" + imageRef + "]",
+          exp);
+    }
+    return imageAttachment;
   }
 
   public void addImage(Builder jsonBuilder, Attachment imgAttachment,
