@@ -18,7 +18,7 @@
 $celementsweb.addExtJSfileOnce(':celJS/prototype.js')
 $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 <form id="galleryEdit" method="post" action="$doc.getURL('save')" target="_parent">
-  <input type="hidden" name="template" value="$!doc.getTemplate()" />
+  <input type="hidden" name="template" value="$!request.template" />
  <input type="hidden" class="celEditorRedirect" name="xredirect" value="$xredirect" />
   <input type="hidden" name="language" value="$!tdoc.language" />
 <input type="hidden" name="submitted" value="1" />
