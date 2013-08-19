@@ -59,9 +59,11 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
   <div class="celements2_box_subtitle">$adminMsg.get('cel_gallery_reordering_title')</div>
 ## add new slide
 #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
-#set($l = $doc.getURL('view', 'xpage=overlay&conf=AddPage'))
-#set($l = "${l}&space=${gallerySpace}")
-#set($l = "${l}&menu_position=&language=${default_language}&redirmode=newpageedit")
+#set($newSlideDocRef = $celementsweb.getNextTitledPageDocRef(${gallerySpace}, $adminMsg.get('gallery_editor_newSlideTitle')))
+#set($l = $xwiki.getURL($services.model.serialize($newSlideDocRef,'local'), 'inline', "template=ImageGalleryTemplates.NewImageGallerySlide&language=${default_language}"))
+## #set($l = $doc.getURL('view', 'xpage=overlay&conf=AddPage'))
+## #set($l = "${l}&space=${gallerySpace}")
+## #set($l = "${l}&menu_position=&language=${default_language}&redirmode=newpageedit")
 #set($cmenu_pageLink = "${l}&xredirect=$escapetool.url($doc.getURL('view'))")
 <p style="float:right;"><a href="${cmenu_pageLink}" target="_blank">
 $adminMsg.get('gallery_editor_addNewSlide')</a></p>
