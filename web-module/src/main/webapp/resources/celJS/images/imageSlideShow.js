@@ -184,7 +184,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           startSlideNum = images.size() - 1;
         }
         _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
-        _me._currentHtmlElem.removeAttribute('with');
+        _me._currentHtmlElem.removeAttribute('width');
         _me._currentHtmlElem.removeAttribute('height');
         _me._currentHtmlElem.setStyle({
           'visibility' : '',
