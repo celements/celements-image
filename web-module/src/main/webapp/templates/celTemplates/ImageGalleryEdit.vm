@@ -60,7 +60,12 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 ## add new slide
 #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
 #set($newSlideDocRef = $celementsweb.getNextTitledPageDocRef(${gallerySpace}, $adminMsg.get('gallery_editor_newSlideTitle')))
-#set($l = $xwiki.getURL($services.model.serialize($newSlideDocRef,'local'), 'inline', "template=ImageGalleryTemplates.NewImageGallerySlide&language=${default_language}"))
+#if($xwiki.exists($services.model.resolveDocument($slideTemplate)))
+#set($slideTemplate = 'ImageGalleryTemplates.NewImageGallerySlide')
+#else
+#set($slideTemplate = 'celements2web:ImageGalleryTemplates.NewImageGallerySlide')
+#end
+#set($l = $xwiki.getURL($services.model.serialize($newSlideDocRef,'local'), 'inline', "template=${slideTemplate}&language=${default_language}"))
 ## #set($l = $doc.getURL('view', 'xpage=overlay&conf=AddPage'))
 ## #set($l = "${l}&space=${gallerySpace}")
 ## #set($l = "${l}&menu_position=&language=${default_language}&redirmode=newpageedit")
