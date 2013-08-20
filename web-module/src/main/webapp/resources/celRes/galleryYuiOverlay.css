@@ -66,8 +66,8 @@ body div.mask.cel-YuiOverlay {
   height: 100%;
   width: 40px;
   z-index: 9;
-  background-repeat: no-repeat no-repeat;
-  background-position: center center;
+  background-repeat: no-repeat; /** do not duplicate no-repeat IE8 does NOT like it **/
+  background-position: center center; /** DO duplicate center (x/y) FF needs it **/
 }
 .celPresSlideShow_next:Hover,
 .celPresSlideShow_prev:Hover {
