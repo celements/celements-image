@@ -82,3 +82,6 @@ body div.mask.cel-YuiOverlay {
   left: 0px;
   background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayLeftArrowWhite.png');
 }
+.celimage_overlay {
+  cursor: pointer;
+}
