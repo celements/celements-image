@@ -204,7 +204,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       getStartSlideNum : function() {
         var _me = this;
         if (!_me._startSlideNum) {
-          setStartSlideNum(_me._getStartSlideNumFromId() || 0);
+          _me.setStartSlideNum(_me._getStartSlideNumFromId() || 0);
         }
         return _me._startSlideNum;
       },
