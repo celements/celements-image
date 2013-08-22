@@ -67,7 +67,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (!_me._isOverlayRegistered) {
           _me._isOverlayRegistered = true;
           _me._celSlideShowObj = getCelSlideShowObj();
-          _me._celSlideShowObj.setOverwritePageLayout('SimpleLayout');
+          _me._getGallery(function(galleryObj) {
+            _me.getCelSlideShowObj(galleryObj.getLayoutName());
+          });
           var bodyElem = $$('body')[0];
           bodyElem.observe('cel_slideShow:shouldRegister',
               _me._checkIsImageSlideShowOverlay.bind(_me));
@@ -91,12 +93,15 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         }
       },
 
-      _getCelSlideShowObj : function() {
+      _getCelSlideShowObj : function(overwriteLayout) {
         var _me = this;
         if (!_me._celSlideShowObj) {
           _me._celSlideShowObj = new CELEMENTS.presentation.SlideShow(
               _me._currentHtmlElem.id);
-          _me._celSlideShowObj.setOverwritePageLayout('SimpleLayout');
+          overwriteLayout = overwriteLayout || 'SimpleLayout';
+          _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
+        } else if (overwriteLayout) {
+          _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
         }
         return _me._celSlideShowObj;
       },
