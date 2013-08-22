@@ -169,7 +169,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           'link' : htmlElem
         });
         _me._getGallery(function(galleryObj) {
-          _me.getCelSlideShowObj(galleryObj.getLayoutName());
+          _me._getCelSlideShowObj(galleryObj.getLayoutName());
           openDialog.intermediatOpenHandler();
         });
       },
