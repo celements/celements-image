@@ -78,6 +78,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         htmlElem.observe('cel_ImageSlideShow:startSlideShow', _me._openInOverlayBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
+        $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
       },
 
       _getGallery : function(callbackFN) {
@@ -152,7 +153,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var openDialog = CELEMENTS.presentation.getOverlayObj({
           'close' : hasCloseButton,
           'slideShowElem' : htmlElem,
-          'link' : htmlElem
+          'link' : htmlElem,
+          'startAt' : event.memo
         });
         openDialog.intermediatOpenHandler();
       },
