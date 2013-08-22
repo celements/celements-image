@@ -49,11 +49,14 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _isOverlayRegistered : false,
       _currentHtmlElem : undefined,
       _gallery : undefined,
+      _startSlideNum : undefined,
+      _startAtSlideName : undefined,
 
       _init : function(htmlElem) {
         var _me = this;
         _me._currentHtmlElem = $(htmlElem) || null;
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
+        _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
@@ -67,20 +70,23 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (!_me._isOverlayRegistered) {
           _me._isOverlayRegistered = true;
           _me._celSlideShowObj = getCelSlideShowObj();
-          _me._getGallery(function(galleryObj) {
-            _me.getCelSlideShowObj(galleryObj.getLayoutName());
-          });
           var bodyElem = $$('body')[0];
           bodyElem.observe('cel_slideShow:shouldRegister',
               _me._checkIsImageSlideShowOverlay.bind(_me));
           bodyElem.observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlay.bind(_me));
         }
-        htmlElem.observe('click', _me._openInOverlayBind);
+        htmlElem.observe('click', _me._openInOverlayClickHandlerBind);
         htmlElem.observe('cel_ImageSlideShow:startSlideShow', _me._openInOverlayBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
         $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
+      },
+
+      _openInOverlayClickHandler : function(event) {
+        var _me = this;
+        event.stop();
+        _me.openInOverlay(event);
       },
 
       _getGallery : function(callbackFN) {
@@ -132,7 +138,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           _me._getCelSlideShowObj().getHtmlContainer().observe(
               'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
           var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
-          _me._getCelSlideShowObj().loadMainSlides(gallerySpace);
+          var startAt = _me._startAtSlideName || _me.getStartSlideNum();
+          _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
           event.stop();
         }
       },
@@ -154,14 +161,17 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         var htmlElem = event.element();
         _me._currentHtmlElem = htmlElem;
+        _me._startAtSlideName = event.memo;
         var hasCloseButton = htmlElem.hasClassName('celimage_overlay_addCloseButton');
         var openDialog = CELEMENTS.presentation.getOverlayObj({
           'close' : hasCloseButton,
           'slideShowElem' : htmlElem,
-          'link' : htmlElem,
-          'startAt' : event.memo
+          'link' : htmlElem
         });
-        openDialog.intermediatOpenHandler();
+        _me._getGallery(function(galleryObj) {
+          _me.getCelSlideShowObj(galleryObj.getLayoutName());
+          openDialog.intermediatOpenHandler();
+        });
       },
 
       _getPart : function(elemId, num, defaultvalue) {
@@ -181,10 +191,28 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._getGallery(_me._replaceStartImage.bind(_me));
       },
 
+      _getStartSlideNumFromId : function() {
+        var _me = this;
+        return parseInt(_me._getPart(_me._currentHtmlElem.id, 6, 1)) - 1;
+      },
+
+      setStartSlideNum : function(newStartSlideNum) {
+        var _me = this;
+        _me._startSlideNum = newStartSlideNum;
+      },
+
+      getStartSlideNum : function() {
+        var _me = this;
+        if (!_me._startSlideNum) {
+          setStartSlideNum(_me._getStartSlideNumFromId() || 0);
+        }
+        return _me._startSlideNum;
+      },
+
       _replaceStartImage : function(galleryObj) {
         var _me = this;
         var images = galleryObj.getImages();
-        var startSlideNum = parseInt(_me._getPart(_me._currentHtmlElem.id, 6, 1)) - 1;
+        var startSlideNum = _me.getStartSlideNum();
         if (startSlideNum < 0) {
           startSlideNum = 0;
         } else if (startSlideNum >= images.size()) {
