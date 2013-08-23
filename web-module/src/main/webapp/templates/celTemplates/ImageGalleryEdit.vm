@@ -40,14 +40,14 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
   $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
 <div class="editblock editObjField_XWiki.PhotoAlbumClass_galleryLayout">
 <dl>
-<dt class="label"><label for="XWiki.PhotoAlbumClass_0_galleryLayout">$adminMsg.get('gallery_editor_galleryLayout')</label></dt>
+<dt class="label"><label for="XWiki.PhotoAlbumClass_$!{albumobj.getNumber()}_galleryLayout">$adminMsg.get('gallery_editor_galleryLayout')</label></dt>
 <dd>
 #set($cel_pageLayouts = $celementsweb.getActivePageLayouts())
 #set($cel_currentGalleryLayout = "$!albumobj.getProperty('galleryLayout').getValue()")
 #if("$!cel_currentGalleryLayout" == '')
   #set($cel_currentGalleryLayout = 'SimpleLayout')
 #end
-<select id="XWiki.PhotoAlbumClass_${cel_pageTypeObj.number}_galleryLayout" size="1" name="XWiki.PhotoAlbumClass_${cel_pageTypeObj.number}_galleryLayout">
+<select id="XWiki.PhotoAlbumClass_${albumobj.number}_galleryLayout" size="1" name="XWiki.PhotoAlbumClass_${albumobj.number}_galleryLayout">
     #if(!$cel_pageLayouts.containsKey('SimpleLayout'))
     <option #if("$!cel_currentGalleryLayout" == 'SimpleLayout') selected="selected" #end value="SimpleLayout" label="Simple Layout">Simple Layout</option>
     #end
