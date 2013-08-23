@@ -44,9 +44,12 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 <dd>
 #set($cel_pageLayouts = $celementsweb.getActivePageLayouts())
 #set($cel_currentGalleryLayout = "$!albumobj.getProperty('galleryLayout').getValue()")
+#if("$!cel_currentGalleryLayout" == '')
+  #set($cel_currentGalleryLayout = 'SimpleLayout')
+#end
 <select id="XWiki.PhotoAlbumClass_${cel_pageTypeObj.number}_galleryLayout" size="1" name="XWiki.PhotoAlbumClass_${cel_pageTypeObj.number}_galleryLayout">
     #if(!$cel_pageLayouts.containsKey('SimpleLayout'))
-    <option #if("$!cel_currentGalleryLayout" == '') selected="selected" #end value="SimpleLayout" label="Simple Layout">Simple Layout</option>
+    <option #if("$!cel_currentGalleryLayout" == 'SimpleLayout') selected="selected" #end value="SimpleLayout" label="Simple Layout">Simple Layout</option>
     #end
 #foreach($cel_pageLayoutKey in $cel_pageLayouts.keySet())
     <option #if("$!cel_currentGalleryLayout" == "$!cel_pageLayoutKey") selected="selected" #end value="$cel_pageLayoutKey" label="$cel_pageLayouts.get($cel_pageLayoutKey)">$cel_pageLayouts.get($cel_pageLayoutKey)</option>
