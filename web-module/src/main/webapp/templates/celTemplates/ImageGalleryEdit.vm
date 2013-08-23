@@ -38,7 +38,23 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 #set($cel_editobj_nb = $albumobj.getNumber())
 #set($cel_editobj_properties = "description,thumbWidth,height,height2,photoWidth")
   $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
+<div class="editblock editObjField_XWiki.PhotoAlbumClass_galleryLayout">
+<dl>
+<dt class="label"><label for="XWiki.PhotoAlbumClass_0_galleryLayout">$adminMsg.get('gallery_editor_galleryLayout')</label></dt>
+<dd>
+#set($cel_pageLayouts = $celementsweb.getActivePageLayouts())
+#set($cel_currentGalleryLayout = "$!albumobj.getProperty('galleryLayout').getValue()")
+<select id="XWiki.PhotoAlbumClass_${cel_pageTypeObj.number}_galleryLayout" size="1" name="XWiki.PhotoAlbumClass_${cel_pageTypeObj.number}_galleryLayout">
+    <option #if("$!cel_currentGalleryLayout" == '') selected="selected" #end value="SimpleLayout" label="Simple Layout">Simple Layout</option>
+#foreach($cel_pageLayoutKey in $cel_pageLayouts.keySet())
+    <option #if("$!cel_currentGalleryLayout" == "$!cel_pageLayoutKey") selected="selected" #end value="$cel_pageLayoutKey" label="$cel_pageLayouts.get($cel_pageLayoutKey)">$cel_pageLayouts.get($cel_pageLayoutKey)</option>
+#end
+</select>
+  </dd>
+</dl>
+<div class="editblockclear"><!-- IE6 --></div>
 </div>
+</div> ## gallery_gallery_properties
 #set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
 #if($isSuperAdmin)
 <div class="navigationFieldsEditPart" style="clear:both;">
