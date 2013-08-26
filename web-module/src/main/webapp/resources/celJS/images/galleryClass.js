@@ -203,7 +203,7 @@ CiI.prototype = {
     if (_me.getThumbDimension()) {
       return _me._getDimURL(_me.getThumbDimension());
     } else {
-      return _me.getSrc();
+      return _me._getSrcWithVersion();
     }
   },
 
@@ -212,7 +212,7 @@ CiI.prototype = {
     if (maxWidth || maxHeight) {
       return _me._getDimURL({ 'height' : maxHeight , 'width' : maxWidth });
     } else {
-      return _me.getSrc();
+      return _me._getSrcWithVersion();
     }
   },
 
@@ -220,7 +220,12 @@ CiI.prototype = {
     var _me = this;
     var height = dimObj.height || '';
     var width = dimObj.width || '';
-    return (_me.getSrc() + "?celwidth=" + width + "&celheight=" + height);
+    return (_me._getSrcWithVersion() + "&celwidth=" + width + "&celheight=" + height);
+  },
+
+  _getSrcWithVersion : function() {
+    var _me = this;
+    return _me._imageData.src + '?vers=' + _me.getVersion();
   },
 
   getSrc : function() {
