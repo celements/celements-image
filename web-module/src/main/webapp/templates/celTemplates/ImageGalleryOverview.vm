@@ -32,6 +32,7 @@
 #if("$!imgGalcount" == '')
   #set($imgGalcount = 0)
 #end
+<!-- $doc ; $albumobj ; $albumobj.getProperty('photoWidth').getValue() ; $albumobj.getProperty('height2').getValue() -->
 #set($imgGalcount = $imgGalcount + 1)
 ###set($thumbWidth = "$!albumobj.getProperty('thumbWidth').getValue()")
 ###set($thumbHeight = "$!albumobj.getProperty('height').getValue()")
