@@ -1,6 +1,6 @@
 #set($title = "$!gallerydoc.getTitle()")
 #set($galleryFN = $services.model.serialize($gallerydoc.documentReference, 'local'))
-#set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
+#set($albumobj = $!gallerydoc.getObject("XWiki.PhotoAlbumClass"))
 #if("$!albumobj.getProperty('hasOverview').getValue()" != "0")
   #set($galleryLink = "$!xwiki.getURL($galleryFN, 'view')")
 #else
