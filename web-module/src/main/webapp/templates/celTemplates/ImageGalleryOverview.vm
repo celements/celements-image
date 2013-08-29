@@ -59,7 +59,11 @@
      -moz-transform-origin: 0 0;
   *#
       <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0;">
-        $firstSlideContent
+        <div class="slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
+          <div class="slideWrapper">
+          $firstSlideContent
+          </div>
+        </div>
       </div>
   </div>
 #else

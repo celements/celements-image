@@ -9,6 +9,7 @@ $celementsweb.addExtJSfileOnce(':celJS/celpresentation/CelementsSlideShow.js', '
 $celementsweb.addExtJSfileOnce(':celJS/images/imageSlideShow.js', 'file')
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/yui/container/assets/skins/sam/container.css', 'file')" type="text/css" media="screen" />
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/yui/button/assets/skins/sam/button.css', 'file')" type="text/css" media="screen" />
+<link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/Gallery.css', 'file')" type="text/css" media="screen" />
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/galleryYuiOverlay.css', 'file')" type="text/css" media="screen" />
 #if("$!request.deleted" == '1')
 $xwiki.celementsweb.flushCache()

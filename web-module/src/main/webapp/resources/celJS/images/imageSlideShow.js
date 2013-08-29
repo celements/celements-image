@@ -60,9 +60,36 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
-        if(_me._currentHtmlElem) {
-         _me._fixStartImage(); 
+        if (_me._currentHtmlElem) {
+          if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
+            _me._fixStartImage(); 
+          } else if (_me._currentHtmlElem.down('.slideWrapper')) {
+            _me._centerStartSlide();
+          }
         }
+      },
+
+      _centerStartSlide : function() {
+        var _me = this;
+        var slideWrapper = _me._currentHtmlElem.down('.slideWrapper');
+        slideWrapper.setStyle({
+          'position' : 'absolute',
+          'width' : 'auto'
+          });
+        var slideWidth = slideWrapper.getWidth();
+        var slideHeight = slideWrapper.getHeight();
+        var parentDiv = slideWrapper.up('.slideRoot') || slideWrapper;
+        var parentHeight = parentDiv.getHeight();
+        var topPos = (parentHeight - slideHeight) / 2;
+        slideWrapper.setStyle({
+          'position' : 'relative',
+          'margin' : '0',
+          'margin-left' : 'auto',
+          'margin-right' : 'auto',
+          'width' : slideWidth + 'px',
+          'height' : slideHeight + 'px',
+          'top' : topPos + 'px'
+          });
       },
 
       registerOpenInOverlay : function(htmlElem) {
