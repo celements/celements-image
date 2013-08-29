@@ -3,7 +3,6 @@ package com.celements.photo.unpack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -49,8 +48,8 @@ public class UnpackComponent implements IUnpackComponentRole {
       if(isZipFile(zipSrcFile)){
         ByteArrayOutputStream newAttOutStream = null;
         try {
-          newAttOutStream = (new Unzip()).getFile(attName, zipSrcFile.getContentInputStream(
-            getContext());
+          newAttOutStream = (new Unzip()).getFile(attName, 
+              zipSrcFile.getContentInputStream(getContext()));
           cleanName = attName.replace(System.getProperty("file.separator"), ".");
           cleanName = getContext().getWiki().clearName(cleanName, false, true, 
               getContext());
