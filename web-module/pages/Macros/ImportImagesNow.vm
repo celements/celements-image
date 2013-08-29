@@ -10,6 +10,10 @@
     $services.celmetatags.extractMetadataToDocument($destDocRef, $effectiveName, $destDocRef)
     #if("$!request.gallery" != '')
       TODO Bilder $request.gallery hinzufuegen
+      
+      
+      TODO Preimport: custom metatags allen
+      TODO Preimport: am richtigen ort nach ueberschreiben etc. suchen
     #end
   #end
 #end
