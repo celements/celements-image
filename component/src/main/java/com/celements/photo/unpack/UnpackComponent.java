@@ -64,6 +64,9 @@ public class UnpackComponent implements IUnpackComponentRole {
           LOGGER.error("Exception while unpacking zip", ioe);
         } catch (XWikiException xwe) {
           LOGGER.error("Exception while unpacking zip", xwe);
+        } catch (NullPointerException npe) {
+          LOGGER.error("ByteArrayOutputStream when exception" + newAttOutStream);
+          LOGGER.error("NPE when unpacking zip", npe);
         } finally {
           if(newAttOutStream != null) {
             try {
