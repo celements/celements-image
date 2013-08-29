@@ -159,7 +159,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       openInOverlay : function(event) {
         var _me = this;
-        var htmlElem = event.element();
+        var htmlElem = event.findElement('.celimage_overlay') || event.element();
         _me._currentHtmlElem = htmlElem;
         _me._startAtSlideName = event.memo;
         _me._startSlideNum = undefined;
