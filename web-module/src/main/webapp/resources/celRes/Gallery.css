@@ -59,3 +59,13 @@
   border: 0px solid black;
   background-color: black;
 }
+
+.presentationList ul .celimage_slideshow .slideRoot p,
+.presentationList ul .celimage_slideshow .slideRoot h1,
+.presentationList ul .celimage_slideshow .slideRoot h2,
+.presentationList ul .celimage_slideshow .slideRoot h3,
+.presentationList ul .celimage_slideshow .slideRoot h4,
+.presentationList ul .celimage_slideshow .slideRoot h5,
+.presentationList ul .celimage_slideshow .slideRoot h6 {
+  color: #EDEDED;
+}
