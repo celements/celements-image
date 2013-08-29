@@ -148,6 +148,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
     getComputeImgCmd().flushCache();
   }
   
+  @Override
   public XWikiAttachment downloadAttachment(XWikiAttachment attachment, 
       XWikiContext context) {
 
