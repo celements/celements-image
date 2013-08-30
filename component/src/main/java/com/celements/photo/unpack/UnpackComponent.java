@@ -48,6 +48,8 @@ public class UnpackComponent implements IUnpackComponentRole {
       if(isZipFile(zipSrcFile)){
         ByteArrayOutputStream newAttOutStream = null;
         try {
+          //TODO remove
+          LOGGER.error(attName + " " + zipSrcFile + " " + ((zipSrcFile != null)?zipSrcFile.getFilesize():""));
           newAttOutStream = (new Unzip()).getFile(attName, 
               zipSrcFile.getContentInputStream(getContext()));
           cleanName = attName.replace(System.getProperty("file.separator"), ".");
