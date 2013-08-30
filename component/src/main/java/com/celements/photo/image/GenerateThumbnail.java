@@ -320,6 +320,7 @@ public class GenerateThumbnail {
             lowerBoundPositioning, tmpI.getHeight(null), imgSize.getSize().height), null);
       }
     } else if(defaultBg != null) {
+//TODO defaultBg does not get used inside? -> version conflict / bad merge?
       Image tmpI = img;
       int underWidth = img.getWidth() - imgSize.getSize().width;
       int underHeight = img.getHeight() - imgSize.getSize().height;
