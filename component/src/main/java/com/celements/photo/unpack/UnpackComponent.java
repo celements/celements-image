@@ -48,8 +48,6 @@ public class UnpackComponent implements IUnpackComponentRole {
       if(isZipFile(zipSrcFile)){
         ByteArrayOutputStream newAttOutStream = null;
         try {
-          //TODO remove
-          LOGGER.error("filecontentstream: " + zipSrcFile.getContentInputStream(getContext()));
           newAttOutStream = (new Unzip()).getFile(attName, 
               zipSrcFile.getContentInputStream(getContext()));
           cleanName = attName.replace(System.getProperty("file.separator"), ".");
@@ -65,10 +63,6 @@ public class UnpackComponent implements IUnpackComponentRole {
           LOGGER.error("Exception while unpacking zip", ioe);
         } catch (XWikiException xwe) {
           LOGGER.error("Exception while unpacking zip", xwe);
-        } catch (NullPointerException npe) {
-//TODO remove when problem fixed
-          LOGGER.error("ByteArrayOutputStream when exception" + newAttOutStream);
-          LOGGER.error("NPE when unpacking zip", npe);
         } finally {
           if(newAttOutStream != null) {
             try {

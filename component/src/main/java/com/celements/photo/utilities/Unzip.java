@@ -64,12 +64,8 @@ public class Unzip {
   private ByteArrayOutputStream findAndExtractFile(String filename, ZipInputStream zipIn
       ) throws IOException {
     ByteArrayOutputStream out = null;
-//TODO remove
-LOGGER.error("input stream: " + zipIn);
     for(ZipEntry entry = zipIn.getNextEntry(); zipIn.available()>0; entry = 
         zipIn.getNextEntry()){
-//TODO remove
-LOGGER.error("looking for: " + filename + " found: " + entry.getName());
       if(!entry.isDirectory() && entry.getName().equals(filename)){
         // read the data and write it to the OutputStream
         int count;
