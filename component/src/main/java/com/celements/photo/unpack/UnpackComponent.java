@@ -33,7 +33,7 @@ public class UnpackComponent implements IUnpackComponentRole {
       XWikiDocument zipSourceDoc = getContext().getWiki().getDocument(zipSrcDocRef, 
           getContext());
       XWikiAttachment zipAtt = zipSourceDoc.getAttachment(attachmentName);
-      unzipFileToAttachment(zipAtt, attachmentName, destinationDoc);
+      unzipFileToAttachment(zipAtt, unzipFileName, destinationDoc);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception getting zip source document", xwe);
     }
