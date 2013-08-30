@@ -49,7 +49,7 @@ public class UnpackComponent implements IUnpackComponentRole {
         ByteArrayOutputStream newAttOutStream = null;
         try {
           //TODO remove
-          LOGGER.error(attName + " " + zipSrcFile + " " + ((zipSrcFile != null)?zipSrcFile.getFilesize():""));
+          LOGGER.error("filecontentstream: " + zipSrcFile.getContentInputStream(getContext()));
           newAttOutStream = (new Unzip()).getFile(attName, 
               zipSrcFile.getContentInputStream(getContext()));
           cleanName = attName.replace(System.getProperty("file.separator"), ".");

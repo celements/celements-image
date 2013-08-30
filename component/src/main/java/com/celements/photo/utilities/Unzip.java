@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiException;
 public class Unzip {
   private static final int BUFFER = 1024;
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(Unzip.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(Unzip.class);
   
   public Unzip(){}
   
@@ -64,9 +64,12 @@ public class Unzip {
   private ByteArrayOutputStream findAndExtractFile(String filename, ZipInputStream zipIn
       ) throws IOException {
     ByteArrayOutputStream out = null;
-    
+//TODO remove
+LOGGER.error("input stream: " + zipIn);
     for(ZipEntry entry = zipIn.getNextEntry(); zipIn.available()>0; entry = 
         zipIn.getNextEntry()){
+//TODO remove
+LOGGER.error("looking for: " + filename + " found: " + entry.getName());
       if(!entry.isDirectory() && entry.getName().equals(filename)){
         // read the data and write it to the OutputStream
         int count;
@@ -109,7 +112,7 @@ public class Unzip {
         }
       }
     } catch (IOException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     
     return contentList;
