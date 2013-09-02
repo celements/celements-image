@@ -309,6 +309,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       },
 
       _isOrientationLandscape : function() {
+        var _me = this;
         var innerWidth = window.innerWidth || document.documentElement.clientWidth;
         var innerHeight = window.innerHeight || document.documentElement.clientHeight;
         //window.orientation works only correct on load, but has whimsical behavior when 
@@ -317,6 +318,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       },
 
       _getInnerWidth : function() {
+        var _me = this;
         var width = window.innerWidth || document.documentElement.clientWidth;
         if(isMobile.any()) {
           if(isMobile.iOS() && _me._isOrientationLandscape()) {
@@ -329,6 +331,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       },
 
       _getInnerHeight : function() {
+        var _me = this;
         var height = window.innerHeight || document.documentElement.clientHeight;
         if(isMobile.any()) {
           if(isMobile.iOS() && _me._isOrientationLandscape()) {
