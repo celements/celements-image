@@ -331,7 +331,6 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
                 'cel_imageSlideShow:resizeDialogContent', eventMemo);
             if (!resizeEvent.stopped) {
               $('yuiOverlayContainer').setStyle({
-                'height' : newHeight + 'px',
                 'zoom' : zoomFactor
               });
             }
