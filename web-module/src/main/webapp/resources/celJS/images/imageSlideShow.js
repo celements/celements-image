@@ -391,15 +391,15 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       },
 
       _getInnerHeight : function() {
-        var _me = this;
+//        var _me = this;
         var height = window.innerHeight || document.documentElement.clientHeight;
-        if(isMobile.any()) {
-          if(isMobile.iOS() && _me._isOrientationLandscape()) {
-            height = screen.width;
-          } else {
-            height = screen.height;
-          }
-        }
+//        if(isMobile.any()) {
+//          if(isMobile.iOS() && _me._isOrientationLandscape()) {
+//            height = screen.width;
+//          } else {
+//            height = screen.height;
+//          }
+//        }
         return height;
       }
 
