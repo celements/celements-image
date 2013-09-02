@@ -5,7 +5,42 @@
 if(typeof CELEMENTS=="undefined"){var CELEMENTS={};};
 if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
-(function() {
+(function(window, undefined) {
+
+  var isMobile = {
+      Android: function() {
+        return navigator.userAgent.match(/Android/i);
+      },
+      BlackBerry: function() {
+        return navigator.userAgent.match(/BlackBerry/i);
+      },
+      iOS: function() {
+        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+      },
+      iPhone: function() {
+        return navigator.userAgent.match(/iPhone/i);
+      },
+      iPod: function() {
+        return navigator.userAgent.match(/iPod/i);
+      },
+      iPad: function() {
+        return navigator.userAgent.match(/iPad/i);
+      },
+      Opera: function() {
+        return navigator.userAgent.match(/Opera Mini/i);
+      },
+      Windows: function() {
+        return navigator.userAgent.match(/IEMobile/i);
+      },
+      Simulator: function() {
+        // http://iphone4simulator.com/ maybe
+        return (window.top != window);
+      },
+      any: function() {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() 
+            || isMobile.Opera() || isMobile.Windows());
+      }
+    };
 
   var CISS_OverlaySlideShowObj = undefined;
 
@@ -51,6 +86,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _gallery : undefined,
       _startSlideNum : undefined,
       _startAtSlideName : undefined,
+      _resizeOverlayBind : undefined,
+      _autoresize : true,
 
       _init : function(htmlElem) {
         var _me = this;
@@ -60,6 +97,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
+        _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
         if (_me._currentHtmlElem) {
           if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
             _me._fixStartImage(); 
@@ -102,6 +140,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
               _me._checkIsImageSlideShowOverlay.bind(_me));
           bodyElem.observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlay.bind(_me));
+          Event.observe(window, "resize", _me._resizeOverlayBind);
+          Event.observe(window, "orientationchange", _me._resizeOverlayBind);
         }
         htmlElem.observe('click', _me._openInOverlayClickHandlerBind);
         htmlElem.observe('cel_ImageSlideShow:startSlideShow', _me._openInOverlayBind);
@@ -194,7 +234,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var openDialog = CELEMENTS.presentation.getOverlayObj({
           'close' : hasCloseButton,
           'slideShowElem' : htmlElem,
-          'link' : htmlElem
+          'link' : htmlElem,
+          monitorresize : !_me._autoresize
         });
         _me._getGallery(function(galleryObj) {
           _me._getCelSlideShowObj(galleryObj.getLayoutName());
@@ -254,9 +295,45 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           'width' : '',
           'height' : ''
         });
+      },
+
+      _resizeOverlay : function() {
+        var _me = this;
+        if (_me._autoresize) {
+          var openDialog = CELEMENTS.presentation.getOverlayObj();
+          alert('innerHeight: ', _me._getInnerHeight());
+          alert('innerHeight: ', _me._getInnerWidth());
+//          openDialog.cfg.setProperty('width', newOverlayPageWidthScroll + 'px');
+//          openDialog.center();
+        }
+      },
+
+      _getInnerWidth : function() {
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if(isMobile.any()) {
+          if(isMobile.iOS() && isOrientationLandscape()) {
+            width = screen.height
+          } else {
+            width = screen.width;
+          }
+        }
+        return width;
+      },
+
+      _getInnerHeight : function() {
+        var height = window.innerHeight || document.documentElement.clientHeight;
+        if(isMobile.any()) {
+          if(isMobile.iOS() && isOrientationLandscape()) {
+            height = screen.width
+          } else {
+            height = screen.height;
+          }
+        }
+//        console.log('getInnerHeight: ', window.innerHeight, screen.height, height);
+        return height;
       }
 
   };
 })();
 
-})();
+})(window);
