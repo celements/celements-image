@@ -331,7 +331,11 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
                 'cel_imageSlideShow:resizeDialogContent', eventMemo);
             if (!resizeEvent.stopped) {
               $('yuiOverlayContainer').setStyle({
-                'zoom' : zoomFactor
+                'zoom' : zoomFactor,
+                'transform' : 'scale(' + zoomFactor + ')',
+                'transformOrigin' : '0 0 0',
+                'height' : oldHeight + 'px',  // important for FF
+                'width' : oldWidth + 'px' // important for FF
               });
             }
           } else {
