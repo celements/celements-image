@@ -308,11 +308,19 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         }
       },
 
+      _isOrientationLandscape : function() {
+        var innerWidth = window.innerWidth || document.documentElement.clientWidth;
+        var innerHeight = window.innerHeight || document.documentElement.clientHeight;
+        //window.orientation works only correct on load, but has whimsical behavior when 
+        //  rotating 
+        return innerWidth > innerHeight;
+      },
+
       _getInnerWidth : function() {
         var width = window.innerWidth || document.documentElement.clientWidth;
         if(isMobile.any()) {
-          if(isMobile.iOS() && isOrientationLandscape()) {
-            width = screen.height
+          if(isMobile.iOS() && _me._isOrientationLandscape()) {
+            width = screen.height;
           } else {
             width = screen.width;
           }
@@ -323,8 +331,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _getInnerHeight : function() {
         var height = window.innerHeight || document.documentElement.clientHeight;
         if(isMobile.any()) {
-          if(isMobile.iOS() && isOrientationLandscape()) {
-            height = screen.width
+          if(isMobile.iOS() && _me._isOrientationLandscape()) {
+            height = screen.width;
           } else {
             height = screen.height;
           }
