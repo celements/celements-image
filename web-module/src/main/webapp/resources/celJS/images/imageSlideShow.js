@@ -88,6 +88,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
       _autoresize : true,
+      _debug : false,
 
       _init : function(htmlElem) {
         var _me = this;
@@ -237,7 +238,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           'close' : hasCloseButton,
           'slideShowElem' : htmlElem,
           'link' : htmlElem,
-          monitorresize : !_me._autoresize
+          fixedcenter: !_me._autoresize
         });
         _me._getGallery(function(galleryObj) {
           _me._getCelSlideShowObj(galleryObj.getLayoutName());
@@ -303,21 +304,44 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         if (_me._autoresize) {
           var openDialog = CELEMENTS.presentation.getOverlayObj();
-          alert('innerHeight: ' + _me._getInnerHeight());
-          alert('innerWidth: ' + _me._getInnerWidth());
-          console.log('current width: ', openDialog.getWidth());
-          var oldWidth = parseInt(openDialog.getWidth());
-          var oldHeight = parseInt(openDialog.getHeight());
           var zoomFactor = _me._computeZoomFactor();
-          if (zoomFactor < 1) {
+          if (zoomFactor <= 1) {
+            var oldWidth = parseInt(openDialog.getWidth());
+            var oldHeight = parseInt(openDialog.getHeight());
             newHeight = oldHeight * zoomFactor;
             newWidth = oldWidth * zoomFactor;
-            console.log('final resize factor: ', zoomFactor);
+            var eventMemo = {
+                'fullWidth' : oldWidth,
+                'fullHeight' : oldHeight,
+                'zoomFactor' : zoomFactor,
+                'newWidth' : newWidth,
+                'newHeight' : newHeight
+            };
+            if (_me._debug && (typeof console != 'undefined')
+                && (typeof console.log != 'undefined')) {
+              console.log('final resize factor: ', eventMemo);
+            }
+            $(document.body).fire('cel_imageSlideShow:beforeResizeDialog_General',
+                eventMemo);
+            openDialog._overlayDialog.cfg.setProperty('width', newWidth + 'px');
+            openDialog._overlayDialog.cfg.setProperty('height', newHeight + 'px');
+            $(document.body).fire('cel_imageSlideShow:afterResizeDialog_General',
+                eventMemo);
+            var resizeEvent = $('yuiOverlayContainer').fire(
+                'cel_imageSlideShow:resizeDialogContent', eventMemo);
+            if (!resizeEvent.stopped) {
+              $('yuiOverlayContainer').setStyle({
+                'height' : newHeight + 'px',
+                'zoom' : zoomFactor
+              });
+            }
           } else {
-            console.log('no resize needed.', zoomFactor);
+            if (_me._debug && (typeof console != 'undefined')
+                && (typeof console.log != 'undefined')) {
+              console.log('no resize needed.', zoomFactor);
+            }
           }
-//          openDialog.cfg.setProperty('width', newOverlayPageWidthScroll + 'px');
-//          openDialog.center();
+          openDialog._overlayDialog.center();
         }
       },
 
@@ -327,30 +351,26 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var oldWidth = parseInt(openDialog.getWidth());
         var newWidth = oldWidth;
         if (oldWidth > _me._getInnerWidth()) {
-          newWidth = _me._getInnerWidth();
-          console.log("resize width needed!", newWidth, newWidth);
+          newWidth = _me._getInnerWidth() - 20; // take care of close button
         }
         var zoomWidthFactor = newWidth / oldWidth;
         var oldHeight = parseInt(openDialog.getHeight());
         var newHeight = oldHeight;
         if (oldHeight > _me._getInnerHeight()) {
-          newHeight = _me._getInnerHeight();
-          console.log("resize height needed!", oldHeight, newHeight);
+          newHeight = _me._getInnerHeight() - 20; // take care of close button
         }
         var zoomHeightFactor = newHeight / oldHeight;
         var zoomFactor;
         if (zoomHeightFactor < zoomWidthFactor) {
-          console.log('resize by height: ', zoomHeightFactor, zoomWidthFactor);
           zoomFactor = zoomHeightFactor;
         } else {
-          console.log('resize by width: ', zoomHeightFactor, zoomWidthFactor);
           zoomFactor = zoomWidthFactor;
         }
         return zoomFactor;
       },
 
       _isOrientationLandscape : function() {
-        var _me = this;
+//        var _me = this;
         var innerWidth = window.innerWidth || document.documentElement.clientWidth;
         var innerHeight = window.innerHeight || document.documentElement.clientHeight;
         //window.orientation works only correct on load, but has whimsical behavior when 
@@ -381,7 +401,6 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
             height = screen.height;
           }
         }
-//        console.log('getInnerHeight: ', window.innerHeight, screen.height, height);
         return height;
       }
 
