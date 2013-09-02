@@ -323,6 +323,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       _computeZoomFactor : function() {
         var _me = this;
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
         var oldWidth = parseInt(openDialog.getWidth());
         var newWidth = oldWidth;
         if (oldWidth > _me._getInnerWidth()) {
