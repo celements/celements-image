@@ -301,8 +301,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         if (_me._autoresize) {
           var openDialog = CELEMENTS.presentation.getOverlayObj();
-          alert('innerHeight: ', _me._getInnerHeight());
-          alert('innerHeight: ', _me._getInnerWidth());
+          alert('innerHeight: ' + _me._getInnerHeight());
+          alert('innerHeight: ' + _me._getInnerWidth());
 //          openDialog.cfg.setProperty('width', newOverlayPageWidthScroll + 'px');
 //          openDialog.center();
         }
