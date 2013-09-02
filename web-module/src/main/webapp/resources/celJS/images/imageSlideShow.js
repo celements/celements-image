@@ -306,15 +306,46 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           alert('innerHeight: ' + _me._getInnerHeight());
           alert('innerWidth: ' + _me._getInnerWidth());
           console.log('current width: ', openDialog.getWidth());
-          if (parseInt(openDialog.getWidth()) > _me._getInnerWidth()) {
-            console.log("resize width needed!", parseInt(openDialog.getWidth()), _me._getInnerWidth());
-          }
-          if (parseInt(openDialog.getHeight()) > _me._getInnerHeight()) {
-            console.log("resize height needed!", parseInt(openDialog.getHeight()), _me._getInnerHeight());
+          var oldWidth = parseInt(openDialog.getWidth());
+          var oldHeight = parseInt(openDialog.getHeight());
+          var zoomFactor = _computeZoomFactor;
+          if (zoomFactor < 1) {
+            newHeight = oldHeight * zoomFactor;
+            newWidth = oldWidth * zoomFactor;
+            console.log('final resize factor: ', zoomFactor);
+          } else {
+            console.log('no resize needed.', zoomFactor);
           }
 //          openDialog.cfg.setProperty('width', newOverlayPageWidthScroll + 'px');
 //          openDialog.center();
         }
+      },
+
+      _computeZoomFactor : function() {
+        var _me = this;
+        var oldWidth = parseInt(openDialog.getWidth());
+        var newWidth = oldWidth;
+        if (oldWidth > _me._getInnerWidth()) {
+          newWidth = _me._getInnerWidth();
+          console.log("resize width needed!", newWidth, newWidth);
+        }
+        var zoomWidthFactor = newWidth / oldWidth;
+        var oldHeight = parseInt(openDialog.getHeight());
+        var newHeight = oldHeight;
+        if (oldHeight > _me._getInnerHeight()) {
+          newHeight = _me._getInnerHeight();
+          console.log("resize height needed!", oldHeight, newHeight);
+        }
+        var zoomHeightFactor = newHeight / oldHeight;
+        var zoomFactor;
+        if (zoomHeightFactor < zoomWidthFactor) {
+          console.log('resize by height: ', zoomHeightFactor, zoomWidthFactor);
+          zoomFactor = zoomHeightFactor;
+        } else {
+          console.log('resize by width: ', zoomHeightFactor, zoomWidthFactor);
+          zoomFactor = zoomWidthFactor;
+        }
+        return zoomFactor;
       },
 
       _isOrientationLandscape : function() {
