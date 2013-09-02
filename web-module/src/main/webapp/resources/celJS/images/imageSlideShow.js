@@ -147,6 +147,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         htmlElem.observe('cel_ImageSlideShow:startSlideShow', _me._openInOverlayBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
+        $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
+            _me._resizeOverlayBind);
         $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
       },
 
@@ -303,6 +305,13 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           var openDialog = CELEMENTS.presentation.getOverlayObj();
           alert('innerHeight: ' + _me._getInnerHeight());
           alert('innerWidth: ' + _me._getInnerWidth());
+          console.log('current width: ', openDialog.getWidth());
+          if (parseInt(openDialog.getWidth()) > _me._getInnerWidth()) {
+            console.log("resize width needed!", parseInt(openDialog.getWidth()), _me._getInnerWidth());
+          }
+          if (parseInt(openDialog.getHeight()) > _me._getInnerHeight()) {
+            console.log("resize height needed!", parseInt(openDialog.getHeight()), _me._getInnerHeight());
+          }
 //          openDialog.cfg.setProperty('width', newOverlayPageWidthScroll + 'px');
 //          openDialog.center();
         }
