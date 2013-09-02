@@ -308,7 +308,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           console.log('current width: ', openDialog.getWidth());
           var oldWidth = parseInt(openDialog.getWidth());
           var oldHeight = parseInt(openDialog.getHeight());
-          var zoomFactor = _computeZoomFactor;
+          var zoomFactor = _me._computeZoomFactor();
           if (zoomFactor < 1) {
             newHeight = oldHeight * zoomFactor;
             newWidth = oldWidth * zoomFactor;
