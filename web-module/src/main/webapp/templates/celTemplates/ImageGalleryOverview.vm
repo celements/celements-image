@@ -56,9 +56,9 @@
       zoom: 2; /* all browsers */
      -moz-transform: scale(2);  /* Firefox */
      position: absolute;
-     -moz-transform-origin: 0 0;
+     -moz-transform-origin: 0 0 0;
   *#
-      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0;">
+      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
         <div class="slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
           <div class="slideWrapper">
           $firstSlideContent
