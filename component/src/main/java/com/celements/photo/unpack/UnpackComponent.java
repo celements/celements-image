@@ -3,7 +3,6 @@ package com.celements.photo.unpack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -34,7 +33,7 @@ public class UnpackComponent implements IUnpackComponentRole {
       XWikiDocument zipSourceDoc = getContext().getWiki().getDocument(zipSrcDocRef, 
           getContext());
       XWikiAttachment zipAtt = zipSourceDoc.getAttachment(attachmentName);
-      unzipFileToAttachment(zipAtt, attachmentName, destinationDoc);
+      unzipFileToAttachment(zipAtt, unzipFileName, destinationDoc);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception getting zip source document", xwe);
     }
@@ -49,8 +48,8 @@ public class UnpackComponent implements IUnpackComponentRole {
       if(isZipFile(zipSrcFile)){
         ByteArrayOutputStream newAttOutStream = null;
         try {
-          newAttOutStream = (new Unzip()).getFile(IOUtils.toByteArray(
-              zipSrcFile.getContentInputStream(getContext())), attName);
+          newAttOutStream = (new Unzip()).getFile(attName, 
+              zipSrcFile.getContentInputStream(getContext()));
           cleanName = attName.replace(System.getProperty("file.separator"), ".");
           cleanName = getContext().getWiki().clearName(cleanName, false, true, 
               getContext());
@@ -64,9 +63,6 @@ public class UnpackComponent implements IUnpackComponentRole {
           LOGGER.error("Exception while unpacking zip", ioe);
         } catch (XWikiException xwe) {
           LOGGER.error("Exception while unpacking zip", xwe);
-        } catch (NullPointerException npe) {
-          LOGGER.error("ByteArrayOutputStream when exception" + newAttOutStream);
-          LOGGER.error("NPE when unpacking zip", npe);
         } finally {
           if(newAttOutStream != null) {
             try {
