@@ -123,8 +123,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         slideWrapper.setStyle({
           'position' : 'relative',
           'margin' : '0',
-          'margin-left' : 'auto',
-          'margin-right' : 'auto',
+          'marginLeft' : 'auto',
+          'marginRight' : 'auto',
           'width' : slideWidth + 'px',
           'height' : slideHeight + 'px',
           'top' : topPos + 'px'
