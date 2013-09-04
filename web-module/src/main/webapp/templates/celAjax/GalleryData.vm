@@ -59,7 +59,7 @@ $services.celementsphoto.addImage($jsonBuilder, $attach)
   #end
   #set($endNumImages = $getNumImages + $offsetNumImages)
   #foreach($slideTreeNode in $slidesMenu)
-    #if(($velocityCount <= $onlyFirstNumImages) && ($velocityCount >= $offsetNumImages) && ($velocityCount > $endNumImages))
+    #if(($velocityCount <= $onlyFirstNumImages) && ($velocityCount >= $offsetNumImages) && ($velocityCount < $endNumImages))
       #set($slideContent = $services.celementsweb.renderCelementsDocument($slideTreeNode.documentReference).replaceAll('[\n\r]',''))
       #set($imageTagInSlide = $slideContent.replaceAll('.*<img [^>]*src="([^"]*)".*', '$1'))
       #if($imageTagInSlide.indexOf('?') > 0)
