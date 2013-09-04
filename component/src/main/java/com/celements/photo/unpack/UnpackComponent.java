@@ -20,9 +20,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
 public class UnpackComponent implements IUnpackComponentRole {
-  
   @Requirement
   Execution execution;
+  
+  XWikiContext inject_context = null;
+  Unzip inject_unzip = null;
+  AddAttachmentToDoc inject_addAttachmentToDoc = null;
   
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       UnpackComponent.class);
@@ -48,14 +51,14 @@ public class UnpackComponent implements IUnpackComponentRole {
       if(isZipFile(zipSrcFile)){
         ByteArrayOutputStream newAttOutStream = null;
         try {
-          newAttOutStream = (new Unzip()).getFile(attName, 
+          newAttOutStream = getUnzip().getFile(attName, 
               zipSrcFile.getContentInputStream(getContext()));
           cleanName = attName.replace(System.getProperty("file.separator"), ".");
           cleanName = getContext().getWiki().clearName(cleanName, false, true, 
               getContext());
           XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
               getContext());
-          XWikiAttachment att = (new AddAttachmentToDoc()).addAtachment(destDoc, 
+          XWikiAttachment att = getAddAttachmentToDoc().addAtachment(destDoc, 
               newAttOutStream.toByteArray(), cleanName, getContext());
           LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
               ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
@@ -81,6 +84,20 @@ public class UnpackComponent implements IUnpackComponentRole {
     return cleanName;
   }
   
+  private AddAttachmentToDoc getAddAttachmentToDoc() {
+    if(inject_addAttachmentToDoc != null) {
+      return inject_addAttachmentToDoc;
+    }
+    return new AddAttachmentToDoc();
+  }
+
+  private Unzip getUnzip() {
+    if(inject_unzip != null) {
+      return inject_unzip;
+    }
+    return new Unzip();
+  }
+
   boolean isZipFile(XWikiAttachment file) {
     return (file != null) && (file.getMimeType(getContext()).equalsIgnoreCase(
         ImageLibStrings.MIME_ZIP) || file.getMimeType(getContext()).equalsIgnoreCase(
@@ -98,6 +115,9 @@ public class UnpackComponent implements IUnpackComponentRole {
   }
   
   private XWikiContext getContext() {
+    if(inject_context != null) {
+      return inject_context;
+    }
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 }
