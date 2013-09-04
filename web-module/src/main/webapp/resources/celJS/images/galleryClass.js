@@ -7,9 +7,9 @@ if(typeof CELEMENTS.images=="undefined"){CELEMENTS.images={};};
 
 (function() {
 
-CELEMENTS.images.Gallery = function(galleryDocRef, callbackFN) {
+CELEMENTS.images.Gallery = function(galleryDocRef, callbackFN, onlyFirstNumImages) {
   // constructor
-  this._init(galleryDocRef, callbackFN);
+  this._init(galleryDocRef, callbackFN, onlyFirstNumImages);
 };
 
 var CiG = CELEMENTS.images.Gallery;
