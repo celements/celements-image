@@ -40,20 +40,26 @@ $services.celementsphoto.addImage($jsonBuilder, $attach)
   #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
   #set($gallerySlidesDocRef = $services.model.createDocumentReference('', "$!{gallerySpace}", ''))
   #set($slidesMenu = $xwiki.celementsweb.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
+  #set($onlyFirstNumImages = $numbertool.toNumber("$!request.onlyFirstNumImages"))
+  #if("$!onlyFirstNumImages" == '')
+    #set($onlyFirstNumImages = $slidesMenu.size())
+  #end
   #foreach($slideTreeNode in $slidesMenu)
-    #set($slideContent = $services.celementsweb.renderCelementsDocument($slideTreeNode.documentReference).replaceAll('[\n\r]',''))
-    #set($imageTagInSlide = $slideContent.replaceAll('.*<img [^>]*src="([^"]*)".*', '$1'))
-    #if($imageTagInSlide.indexOf('?') > 0)
-      #set($imageInSlide = $imageTagInSlide.substring(0, $imageTagInSlide.indexOf('?')))
-    #end
-    #set($imageSplit = $imageInSlide.split('/'))
-    #if($imageSplit.size() > 4)
-      #set($imageDocRef = $services.model.createDocumentReference('', $imageSplit.get(2), $imageSplit.get(3)))
-      #set($imageRef = $services.model.createAttachmentReference($imageDocRef, $imageSplit.get(4)))
-      #set($imgAttach = $services.celementsphoto.getImageAttachment($imageRef))
-    #end
-    #if("$!imgAttach" != '')
-$services.celementsphoto.addImage($jsonBuilder, $imgAttach)
+    #if($velocityCount < $onlyFirstNumImages)
+      #set($slideContent = $services.celementsweb.renderCelementsDocument($slideTreeNode.documentReference).replaceAll('[\n\r]',''))
+      #set($imageTagInSlide = $slideContent.replaceAll('.*<img [^>]*src="([^"]*)".*', '$1'))
+      #if($imageTagInSlide.indexOf('?') > 0)
+        #set($imageInSlide = $imageTagInSlide.substring(0, $imageTagInSlide.indexOf('?')))
+      #end
+      #set($imageSplit = $imageInSlide.split('/'))
+      #if($imageSplit.size() > 4)
+        #set($imageDocRef = $services.model.createDocumentReference('', $imageSplit.get(2), $imageSplit.get(3)))
+        #set($imageRef = $services.model.createAttachmentReference($imageDocRef, $imageSplit.get(4)))
+        #set($imgAttach = $services.celementsphoto.getImageAttachment($imageRef))
+      #end
+      #if("$!imgAttach" != '')
+  $services.celementsphoto.addImage($jsonBuilder, $imgAttach)
+      #end
     #end
   #end
 #end

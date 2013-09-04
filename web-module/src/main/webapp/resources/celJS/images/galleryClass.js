@@ -20,10 +20,10 @@ CiG.prototype = {
     _imagesArray : undefined,
     _imagesHash : undefined,
 
-  _init : function(collDocRef, callbackFN) {
+  _init : function(collDocRef, callbackFN, onlyFirstNumImages) {
     var _me = this;
     _me._collDocRef = collDocRef;
-    _me._loadData(callbackFN);
+    _me._loadData(callbackFN, onlyFirstNumImages);
   },
 
   getDocRef : function() {
@@ -42,14 +42,18 @@ CiG.prototype = {
       + colDocRefSplit[0] + '/' + colDocRefSplit[1];
   },
 
-  _loadData : function(callbackFN) {
+  _loadData : function(callbackFN, onlyFirstNumImages) {
     var _me = this;
-    new Ajax.Request(_me._getGalleryURL(), {
-      method : "POST",
-      parameters: {
+    var params = {
         'xpage' : 'celements_ajax',
         'ajax_mode' : 'GalleryData'
-      },
+      };
+    if(onlyFirstNumImages) {
+      params['onlyFirstNumImages'] = onlyFirstNumImages;
+    }
+    new Ajax.Request(_me._getGalleryURL(), {
+      method : "POST",
+      parameters: params,
       onSuccess : function(transport) {
         if (transport.responseText.isJSON()) {
           var responseObject = transport.responseText.evalJSON();

@@ -159,11 +159,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me.openInOverlay(event);
       },
 
-      _getGallery : function(callbackFN) {
+      _getGallery : function(callbackFN, onlyFirstNumImages) {
         var _me = this;
         var galleryFN = _me._getPart(_me._currentHtmlElem.id, 1, '');
         if (!_me._gallery && (galleryFN != '')) {
-          _me._gallery = new CELEMENTS.images.Gallery(galleryFN, callbackFN);
+          _me._gallery = new CELEMENTS.images.Gallery(galleryFN, callbackFN,
+              onlyFirstNumImages);
         } else {
           callbackFN(_me._gallery);
         }
@@ -260,7 +261,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._currentHtmlElem.setStyle({
           'visibility' : 'hidden'
         });
-        _me._getGallery(_me._replaceStartImage.bind(_me));
+        _me._getGallery(_me._replaceStartImage.bind(_me), _me.getStartSlideNum() + 1);
       },
 
       _getStartSlideNumFromId : function() {
