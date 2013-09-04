@@ -5,7 +5,42 @@
 if(typeof CELEMENTS=="undefined"){var CELEMENTS={};};
 if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
-(function() {
+(function(window, undefined) {
+
+  var isMobile = {
+      Android: function() {
+        return navigator.userAgent.match(/Android/i);
+      },
+      BlackBerry: function() {
+        return navigator.userAgent.match(/BlackBerry/i);
+      },
+      iOS: function() {
+        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+      },
+      iPhone: function() {
+        return navigator.userAgent.match(/iPhone/i);
+      },
+      iPod: function() {
+        return navigator.userAgent.match(/iPod/i);
+      },
+      iPad: function() {
+        return navigator.userAgent.match(/iPad/i);
+      },
+      Opera: function() {
+        return navigator.userAgent.match(/Opera Mini/i);
+      },
+      Windows: function() {
+        return navigator.userAgent.match(/IEMobile/i);
+      },
+      Simulator: function() {
+        // http://iphone4simulator.com/ maybe
+        return (window.top != window);
+      },
+      any: function() {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() 
+            || isMobile.Opera() || isMobile.Windows());
+      }
+    };
 
   var CISS_OverlaySlideShowObj = undefined;
 
@@ -51,6 +86,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _gallery : undefined,
       _startSlideNum : undefined,
       _startAtSlideName : undefined,
+      _resizeOverlayBind : undefined,
+      _autoresize : true,
+      _debug : false,
 
       _init : function(htmlElem) {
         var _me = this;
@@ -60,6 +98,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
+        _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
         if (_me._currentHtmlElem) {
           if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
             _me._fixStartImage(); 
@@ -84,8 +123,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         slideWrapper.setStyle({
           'position' : 'relative',
           'margin' : '0',
-          'margin-left' : 'auto',
-          'margin-right' : 'auto',
+          'marginLeft' : 'auto',
+          'marginRight' : 'auto',
           'width' : slideWidth + 'px',
           'height' : slideHeight + 'px',
           'top' : topPos + 'px'
@@ -102,11 +141,15 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
               _me._checkIsImageSlideShowOverlay.bind(_me));
           bodyElem.observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlay.bind(_me));
+          Event.observe(window, "resize", _me._resizeOverlayBind);
+          Event.observe(window, "orientationchange", _me._resizeOverlayBind);
         }
         htmlElem.observe('click', _me._openInOverlayClickHandlerBind);
         htmlElem.observe('cel_ImageSlideShow:startSlideShow', _me._openInOverlayBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
+        $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
+            _me._resizeOverlayBind);
         $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
       },
 
@@ -194,7 +237,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var openDialog = CELEMENTS.presentation.getOverlayObj({
           'close' : hasCloseButton,
           'slideShowElem' : htmlElem,
-          'link' : htmlElem
+          'link' : htmlElem,
+          fixedcenter: !_me._autoresize
         });
         _me._getGallery(function(galleryObj) {
           _me._getCelSlideShowObj(galleryObj.getLayoutName());
@@ -254,9 +298,116 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           'width' : '',
           'height' : ''
         });
+      },
+
+      _resizeOverlay : function() {
+        var _me = this;
+        if (_me._autoresize) {
+          var openDialog = CELEMENTS.presentation.getOverlayObj();
+          var zoomFactor = _me._computeZoomFactor();
+          if (zoomFactor <= 1) {
+            var oldWidth = parseInt(openDialog.getWidth());
+            var oldHeight = parseInt(openDialog.getHeight());
+            newHeight = oldHeight * zoomFactor;
+            newWidth = oldWidth * zoomFactor;
+            var eventMemo = {
+                'fullWidth' : oldWidth,
+                'fullHeight' : oldHeight,
+                'zoomFactor' : zoomFactor,
+                'newWidth' : newWidth,
+                'newHeight' : newHeight
+            };
+            if (_me._debug && (typeof console != 'undefined')
+                && (typeof console.log != 'undefined')) {
+              console.log('final resize factor: ', eventMemo);
+            }
+            $(document.body).fire('cel_imageSlideShow:beforeResizeDialog_General',
+                eventMemo);
+            openDialog._overlayDialog.cfg.setProperty('width', newWidth + 'px');
+            openDialog._overlayDialog.cfg.setProperty('height', newHeight + 'px');
+            $(document.body).fire('cel_imageSlideShow:afterResizeDialog_General',
+                eventMemo);
+            var resizeEvent = $('yuiOverlayContainer').fire(
+                'cel_imageSlideShow:resizeDialogContent', eventMemo);
+            if (!resizeEvent.stopped) {
+              $('yuiOverlayContainer').setStyle({
+                'zoom' : zoomFactor,
+                'transform' : 'scale(' + zoomFactor + ')',
+                'transformOrigin' : '0 0 0',
+                'height' : oldHeight + 'px',  // important for FF
+                'width' : oldWidth + 'px' // important for FF
+              });
+            }
+          } else {
+            if (_me._debug && (typeof console != 'undefined')
+                && (typeof console.log != 'undefined')) {
+              console.log('no resize needed.', zoomFactor);
+            }
+          }
+          openDialog._overlayDialog.center();
+        }
+      },
+
+      _computeZoomFactor : function() {
+        var _me = this;
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
+        var oldWidth = parseInt(openDialog.getWidth());
+        var newWidth = oldWidth;
+        if (oldWidth > _me._getInnerWidth()) {
+          newWidth = _me._getInnerWidth() - 20; // take care of close button
+        }
+        var zoomWidthFactor = newWidth / oldWidth;
+        var oldHeight = parseInt(openDialog.getHeight());
+        var newHeight = oldHeight;
+        if (oldHeight > _me._getInnerHeight()) {
+          newHeight = _me._getInnerHeight() - 20; // take care of close button
+        }
+        var zoomHeightFactor = newHeight / oldHeight;
+        var zoomFactor;
+        if (zoomHeightFactor < zoomWidthFactor) {
+          zoomFactor = zoomHeightFactor;
+        } else {
+          zoomFactor = zoomWidthFactor;
+        }
+        return zoomFactor;
+      },
+
+      _isOrientationLandscape : function() {
+//        var _me = this;
+        var innerWidth = window.innerWidth || document.documentElement.clientWidth;
+        var innerHeight = window.innerHeight || document.documentElement.clientHeight;
+        //window.orientation works only correct on load, but has whimsical behavior when 
+        //  rotating 
+        return innerWidth > innerHeight;
+      },
+
+      _getInnerWidth : function() {
+        var _me = this;
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if(isMobile.any()) {
+          if(isMobile.iOS() && _me._isOrientationLandscape()) {
+            width = screen.height;
+          } else {
+            width = screen.width;
+          }
+        }
+        return width;
+      },
+
+      _getInnerHeight : function() {
+//        var _me = this;
+        var height = window.innerHeight || document.documentElement.clientHeight;
+//        if(isMobile.any()) {
+//          if(isMobile.iOS() && _me._isOrientationLandscape()) {
+//            height = screen.width;
+//          } else {
+//            height = screen.height;
+//          }
+//        }
+        return height;
       }
 
   };
 })();
 
-})();
+})(window);

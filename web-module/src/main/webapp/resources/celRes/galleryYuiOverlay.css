@@ -45,7 +45,12 @@ body div.mask.cel-YuiOverlay {
 .cel-YuiOverlay .yui-panel .hd,
 .cel-YuiOverlay .yui-panel .bd,
 .cel-YuiOverlay .yui-panel .ft {
-  margin: 0px;
+  margin: 0;
+  padding: 0;
+}
+.cel-YuiOverlay .yui-panel .hd,
+.cel-YuiOverlay .yui-panel .ft {
+  display:none;
 }
 .cel-YuiOverlay .yui-panel-container {
   padding: 0px;
