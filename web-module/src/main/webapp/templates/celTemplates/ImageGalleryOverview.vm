@@ -20,11 +20,13 @@
   #set($slidesMenu = $xwiki.celementsweb.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
   #if($slidesMenu.size() > 0)
     #set($slideContent = $services.celementsweb.renderCelementsDocument($slidesMenu.get(0).documentReference))
+#*
     #set($slideContentOneLine = $slideContent.replaceAll('[\n\r]',''))
-    #set($imageTagInSlide = $slideContent.replaceAll('.*<img [^>]*src="([^"]*)".*', '$1'))
+    #set($imageTagInSlide = $slideContentOneLine.replaceAll('.*<img [^>]*src="([^"]*)".*', '$1'))
     #if($imageTagInSlide.indexOf('?') > 0)
       #set($imageInSlide = $imageTagInSlide.substring(0, $imageTagInSlide.indexOf('?')))
     #end
+*#
 ##    #set($firstImageLink = $imageInSlide)
     #set($firstSlideContent = $slideContent)
   #end
