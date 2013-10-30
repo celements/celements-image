@@ -70,7 +70,6 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 // Celements image Slideshow
 //////////////////////////////////////////////////////////////////////////////
 CELEMENTS.image.SlideShow = function(htmlElem) {
-  containerId = htmlElem;
   // constructor
   this._init(htmlElem);
 };
