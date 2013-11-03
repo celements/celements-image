@@ -3,6 +3,7 @@ package com.celements.photo.service;
 
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +19,7 @@ import com.celements.photo.image.ICropImage;
 import com.celements.photo.unpack.IUnpackComponentRole;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -53,15 +55,18 @@ public class ImageScriptService implements ScriptService {
   @Requirement
   IUnpackComponentRole unpack;
 
-  private CelementsWebScriptService getCelWebService() {
-    return (CelementsWebScriptService) celementsService;
-  }
+  @Requirement
+  IWebUtilsService webUtilsService;
 
   @Requirement
   Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  private CelementsWebScriptService getCelWebService() {
+    return (CelementsWebScriptService) celementsService;
   }
 
   public void addImage(Builder jsonBuilder, Attachment imgAttachment) {
@@ -184,4 +189,26 @@ public class ImageScriptService implements ScriptService {
       return unzipFileName;
     }
   }
+
+  public boolean addSlideFromTemplate(DocumentReference galleryDocRef,
+      String slideBaseName, String attFullName) {
+    if (imageService.checkAddSlideRights(galleryDocRef)) {
+      return imageService.addSlideFromTemplate(galleryDocRef, slideBaseName, attFullName);
+    }
+    return false;
+  }
+
+  public boolean addSlidesFromTemplate(DocumentReference galleryDocRef,
+      String slideBaseName, List<String> attFullNameList) {
+    if (imageService.checkAddSlideRights(galleryDocRef)) {
+      boolean successfullAdded = true;
+      for (String attFullName : attFullNameList) {
+        successfullAdded &= imageService.addSlideFromTemplate(galleryDocRef,
+            slideBaseName, attFullName);
+      }
+      return successfullAdded;
+    }
+    return false;
+  }
+
 }
