@@ -7,7 +7,6 @@ $jsonBuilder.openProperty('successful')
 $jsonBuilder.addBoolean(true)
 $jsonBuilder.addStringProperty('errMsg', "")
 #else
-$jsonBuilder.openProperty('successful')
 $jsonBuilder.addBoolean(false)
 $jsonBuilder.addStringProperty('errMsg', "creating slides failed.")
 #end
