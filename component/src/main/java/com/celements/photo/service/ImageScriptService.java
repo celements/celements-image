@@ -199,7 +199,7 @@ public class ImageScriptService implements ScriptService {
   }
 
   public boolean addSlidesFromTemplate(DocumentReference galleryDocRef,
-      String slideBaseName, List<?> attFullNameList) {
+      String slideBaseName, List<String> attFullNameList) {
     if (imageService.checkAddSlideRights(galleryDocRef)) {
       boolean successfullAdded = true;
       for (Object attFullName : attFullNameList) {
