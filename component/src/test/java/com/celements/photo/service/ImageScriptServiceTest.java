@@ -39,13 +39,12 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_ImageScriptService() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
     imageScriptService = (ImageScriptService)Utils.getComponent(ScriptService.class,
         "celementsphoto");
-    urlFactoryMock = createMock(XWikiURLFactory.class);
+    urlFactoryMock = createMockAndAddToDefault(XWikiURLFactory.class);
     context.setURLFactory(urlFactoryMock);
-    imageServiceMock = createMock(IImageService.class);
+    imageServiceMock = createMockAndAddToDefault(IImageService.class);
     imageScriptService.imageService = imageServiceMock;
   }
 
@@ -53,88 +52,87 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void testAddImage_dictionary() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must be a dictionary. JSON: " + imgJSON, imgJSON.startsWith("{"));
     assertTrue("must be a dictionary. JSON: " + imgJSON, imgJSON.endsWith("}"));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
   public void testAddImage_src() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain src property. JSON: " + imgJSON, imgJSON.contains(
         "\"src\" : \"" + _IMG_URL_STR + "\""));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
   public void testAddImage_filename() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
-    imageScriptService.addImage(jsonBuilder, imgAttachment);
+    replayDefault(imgAttachment);    imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain filename property. JSON: " + imgJSON, imgJSON.contains(
         "\"filename\" : \"" + _IMG_FILENAME + "\""));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
   public void testAddImage_attversion() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain attversion property. JSON: " + imgJSON, imgJSON.contains(
         "\"attversion\" : \"" + _IMG_ATTVERSION + "\""));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
   public void testAddImage_lastChangedBy() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain lastChangedBy property. JSON: " + imgJSON, imgJSON.contains(
         "\"lastChangedBy\" : \"" + _ATT_AUTHOR_NAME + "\""));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
   public void testAddImage_no_Dimension() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertFalse("must NOT contain maxHeight property. JSON: " + imgJSON, imgJSON.contains(
         "\"maxHeight\" : 200"));
     assertFalse("must NOT contain maxWidth property. JSON: " + imgJSON, imgJSON.contains(
         "\"maxWidth\" : 100"));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
   public void testAddImage_Dimension() throws Exception {
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment, true);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain maxHeight property. JSON: " + imgJSON, imgJSON.contains(
         "\"maxHeight\" : 200"));
     assertTrue("must contain maxWidth property. JSON: " + imgJSON, imgJSON.contains(
         "\"maxWidth\" : 100"));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
@@ -142,12 +140,12 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain fileSize property. JSON: " + imgJSON, imgJSON.contains(
         "\"fileSize\" : \"2,0 MB\""));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   @Test
@@ -155,12 +153,12 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     Builder jsonBuilder = new Builder();
     Attachment imgAttachment = createTestAttachment();
-    replayAll(imgAttachment);
+    replayDefault(imgAttachment);
     imageScriptService.addImage(jsonBuilder, imgAttachment);
     String imgJSON = jsonBuilder.getJSON();
     assertTrue("must contain mime type property. JSON: " + imgJSON, imgJSON.contains(
         "\"mimeType\" : \"image/jpeg\""));
-    verifyAll(imgAttachment);
+    verifyDefault(imgAttachment);
   }
 
   //*****************************************************************
@@ -192,16 +190,6 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(imgAttachment.getFilesize()).andReturn(2 * 1000 * 1000).anyTimes();
     expect(imgAttachment.getMimeType()).andReturn("image/jpeg").anyTimes();
     return imgAttachment;
-  }
-
-  private void replayAll(Object ... mocks) {
-    replay(xwiki, urlFactoryMock, imageServiceMock);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object ... mocks) {
-    verify(xwiki, urlFactoryMock, imageServiceMock);
-    verify(mocks);
   }
 
 }
