@@ -1,0 +1,20 @@
+#set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
+$jsonBuilder.openDictionary()
+#set($isNewImageGallery = ("$!services.pageType.getPageTypeRef($doc.documentReference).configName" == 'ImageGallery'))
+#if($isNewImageGallery)
+$jsonBuilder.openProperty('successful')
+#if($services.celementsphoto.addSlidesFromTemplate($doc.documentReference, $adminMsg.get('gallery_editor_newSlideTitle'), $request.getParameterValues('imageFN')))
+$jsonBuilder.addBoolean(true)
+$jsonBuilder.addStringProperty('errMsg', "")
+#else
+$jsonBuilder.openProperty('successful')
+$jsonBuilder.addBoolean(false)
+$jsonBuilder.addStringProperty('errMsg', "creating slides failed.")
+#end
+#else
+$jsonBuilder.openProperty('successful')
+$jsonBuilder.addBoolean(false)
+$jsonBuilder.addStringProperty('errMsg', "current doc is no image gallery doc")
+#end
+$jsonBuilder.closeDictionary()
+$jsonBuilder.getJSON()
