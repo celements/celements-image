@@ -110,7 +110,7 @@ public class ImageService implements IImageService {
   public int getPhotoAlbumMaxHeight(DocumentReference galleryDocRef
       ) throws NoGalleryDocumentException {
     try {
-      return getPhotoAlbumNavObject(galleryDocRef).getIntValue("height2");
+      return getPhotoAlbumObject(galleryDocRef).getIntValue("height2");
     } catch (XWikiException exp) {
       LOGGER.error("Failed to getPhotoAlbumSpaceRef.", exp);
     }
@@ -120,7 +120,7 @@ public class ImageService implements IImageService {
   public int getPhotoAlbumMaxWidth(DocumentReference galleryDocRef
       ) throws NoGalleryDocumentException {
     try {
-      return getPhotoAlbumNavObject(galleryDocRef).getIntValue("photoWidth");
+      return getPhotoAlbumObject(galleryDocRef).getIntValue("photoWidth");
     } catch (XWikiException exp) {
       LOGGER.error("Failed to getPhotoAlbumSpaceRef.", exp);
     }

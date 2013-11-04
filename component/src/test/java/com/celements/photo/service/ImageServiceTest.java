@@ -11,6 +11,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.NavigationClasses;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -214,12 +215,16 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     photoAlbumNavObj.setXClassReference(new NavigationClasses(
         ).getNavigationConfigClassRef(context.getDatabase()));
     String gallerySpaceName = "gallerySpace";
+    photoAlbumNavObj.setStringValue("menu_space", gallerySpaceName);
+    galleryDoc.addXObject(photoAlbumNavObj);
+    BaseObject photoAlbumObj = new BaseObject();
+    photoAlbumObj.setXClassReference(new OldCoreClasses().getPhotoAlbumClassRef(
+        context.getDatabase()));
     int maxWidth = 800;
     int maxHeight = 800;
-    photoAlbumNavObj.setStringValue("menu_space", gallerySpaceName);
-    photoAlbumNavObj.setIntValue("height2", maxHeight);
-    photoAlbumNavObj.setIntValue("photoWidth", maxWidth);
-    galleryDoc.addXObject(photoAlbumNavObj);
+    photoAlbumObj.setIntValue("height2", maxHeight);
+    photoAlbumObj.setIntValue("photoWidth", maxWidth);
+    galleryDoc.addXObject(photoAlbumObj);
     expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc
         ).atLeastOnce();
     DocumentReference slideDocRef = new DocumentReference(context.getDatabase(),
