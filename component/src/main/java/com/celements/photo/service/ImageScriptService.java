@@ -3,6 +3,7 @@ package com.celements.photo.service;
 
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -211,6 +212,12 @@ public class ImageScriptService implements ScriptService {
       return successfullAdded;
     }
     return false;
+  }
+
+  public boolean addSlidesFromTemplate(DocumentReference galleryDocRef,
+      String slideBaseName, String[] attFullNameList) {
+    return addSlidesFromTemplate(galleryDocRef, slideBaseName, Arrays.asList(
+        attFullNameList));
   }
 
 }
