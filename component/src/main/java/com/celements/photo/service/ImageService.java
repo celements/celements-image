@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -248,12 +249,23 @@ public class ImageService implements IImageService {
       String slideBaseName, String attFullName) {
     try {
       DocumentReference slideTemplateRef = getImageSlideTemplateRef();
+      String gallerySpaceName = getPhotoAlbumSpaceRef(galleryDocRef).getName();
       DocumentReference newSlideDocRef = getNextFreeDocNameCmd().getNextTitledPageDocRef(
-          getPhotoAlbumSpaceRef(galleryDocRef).getName(), slideBaseName, getContext());
+          gallerySpaceName, slideBaseName, getContext());
       if (getContext().getWiki().copyDocument(slideTemplateRef, newSlideDocRef, true,
           getContext())) {
         XWikiDocument newSlideDoc = getContext().getWiki().getDocument(newSlideDocRef,
             getContext());
+        newSlideDoc.setDefaultLanguage(webUtilsService.getDefaultLanguage(
+            gallerySpaceName));
+        Date creationDate = new Date();
+        newSlideDoc.setLanguage("");
+        newSlideDoc.setCreationDate(creationDate);
+        newSlideDoc.setContentUpdateDate(creationDate);
+        newSlideDoc.setDate(creationDate);
+        newSlideDoc.setCreator(getContext().getUser());
+        newSlideDoc.setAuthor(getContext().getUser());
+        newSlideDoc.setTranslation(0);
         String imgURL = getAttURLCmd().getAttachmentURL(attFullName, getContext());
         String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef)
             + "&celheight=" + getPhotoAlbumMaxHeight(galleryDocRef);

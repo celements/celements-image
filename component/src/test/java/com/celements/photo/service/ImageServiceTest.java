@@ -248,6 +248,8 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true),
         same(context));
     expectLastCall().once();
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""),
+        same(context))).andReturn("de").anyTimes();
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
