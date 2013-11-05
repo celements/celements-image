@@ -1,8 +1,11 @@
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/galleryEdit.css', 'file')" type="text/css" media="screen" />
 #if("$!request.get('xredirect')" != '')
-#set($xredirect = $!request.getParameter('xredirect'))
+#set($xredirect = "$!request.xredirect")
 #else
 #set($xredirect = "$doc.getURL('view')")
+#end
+#if("$!xredirect" == '')
+  #set($xredirect = '/')
 #end
 #set($redirectStr = "xredirect=$xredirect")
 #set($filled = $request.get("submitted") == "1")
@@ -43,9 +46,9 @@
  $album_obj.set('theme',$!request.get('XWiki.PhotoAlbumClass_0_theme'))
  $doc.save()
  ## redirect to edit album
- $context.getResponse().sendRedirect($doc.getURL("view"))
+ $context.getResponse().sendRedirect($xredirect)
 #end
-<div class="celements2_box editGallery_box c3_scrollable">
+<div class="celements2_box c3_scrollable">
   #set($title = $!doc.getTitle())
 <div class="celements2_box_title">$adminMsg.get('gallery_edit_gallery') #if("$!doc.getTitle()" != '')${doc.getTitle()}#else${doc.getName()}#end</div>
 <div class="celements2_box_subtitle">$adminMsg.get('gallery_pictures')</div>

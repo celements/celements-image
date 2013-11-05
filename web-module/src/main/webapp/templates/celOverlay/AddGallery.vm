@@ -1,0 +1,8 @@
+#set($cel_loadAdminMenuBar = false)
+#set($showOverlayLanguageBar = false)
+#set($showCloseOverlayButton = true)
+#if($xwiki.getSpacePreferenceAsInt('celNewImageGallery', 0) == 1)
+#set($celementsLoadInOverlay = "celTemplates/AddImageGallery.vm")
+#else
+#set($celementsLoadInOverlay = "celTemplates/AddGallery.vm")
+#end

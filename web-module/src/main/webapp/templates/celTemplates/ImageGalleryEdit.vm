@@ -1,0 +1,150 @@
+<link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/galleryEdit.css', 'file')" type="text/css" media="screen" />
+#if("$!request.get('xredirect')" != '')
+#set($xredirect = "$!request.getParameter('xredirect')")
+#else
+#set($xredirect = "$doc.getURL('view')")
+#end
+#if("$!xredirect" == '')
+  #set($xredirect = '/')
+#end
+##
+#set($galleryDoc = $doc)
+#parse('celMacros/checkImageGalleryObjects.vm')
+##
+<div class="celements2_box c3_scrollable">
+<div id="imageGalleryEditor">
+  #set($title = $!doc.getTitle())
+<div class="celements2_box_title">$adminMsg.get('gallery_edit_gallery') #if("$!doc.getTitle()" != '')${doc.getTitle()}#else${doc.getName()}#end</div>
+$celementsweb.addExtJSfileOnce(':celJS/prototype.js')
+$celementsweb.addExtJSfileOnce(':celJS/validation.js')
+<form id="galleryEdit" method="post" action="$doc.getURL('save')" target="_parent">
+  <input type="hidden" name="template" value="$!request.template" />
+ <input type="hidden" class="celEditorRedirect" name="xredirect" value="$xredirect" />
+  <input type="hidden" name="language" value="$!tdoc.language" />
+<input type="hidden" name="submitted" value="1" />
+<div class="galleryFieldsEditPart">
+<div id="con_titleEdit" class="editblock">$adminMsg.get('gallery_album_title')
+    <input id="pagetitle" name="title" class="fullwidth" value="$!xwiki.getFormEncoded($!tdoc.getTitle())" type="text">
+</div>
+<div class="celements2_box_subtitle">$adminMsg.get('gallery_gallery_properties')</div>
+#set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
+#set($cel_editobj_dict_prefix = 'gallery_editor_')
+#set($cel_editobj_externalForm = true)
+#set($cel_embedded_editobj = true)
+#set($cel_editobj_title = $adminMsg.get('gallery_gallery_properties'))
+#set($cel_editobj_hasObjAddLink = false)
+#set($cel_editobj_hasObjRemoveLink = false)
+#set($cel_editobj_classname = "XWiki.PhotoAlbumClass")
+#set($cel_editobj_nb = $albumobj.getNumber())
+#set($cel_editobj_properties = "description,thumbWidth,height,height2,photoWidth")
+  $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
+<div class="editblock editObjField_XWiki.PhotoAlbumClass_galleryLayout">
+<dl>
+<dt class="label"><label for="XWiki.PhotoAlbumClass_$!{albumobj.getNumber()}_galleryLayout">$adminMsg.get('gallery_editor_galleryLayout')</label></dt>
+<dd>
+#set($cel_pageLayouts = $celementsweb.getActivePageLayouts())
+#set($cel_currentGalleryLayout = "$!albumobj.getProperty('galleryLayout').getValue()")
+#if("$!cel_currentGalleryLayout" == '')
+  #set($cel_currentGalleryLayout = 'SimpleLayout')
+#end
+<select id="XWiki.PhotoAlbumClass_${albumobj.number}_galleryLayout" size="1" name="XWiki.PhotoAlbumClass_${albumobj.number}_galleryLayout">
+    #if(!$cel_pageLayouts.containsKey('SimpleLayout'))
+    <option #if("$!cel_currentGalleryLayout" == 'SimpleLayout') selected="selected" #end value="SimpleLayout" label="Simple Layout">Simple Layout</option>
+    #end
+#foreach($cel_pageLayoutKey in $cel_pageLayouts.keySet())
+    <option #if("$!cel_currentGalleryLayout" == "$!cel_pageLayoutKey") selected="selected" #end value="$cel_pageLayoutKey" label="$cel_pageLayouts.get($cel_pageLayoutKey)">$cel_pageLayouts.get($cel_pageLayoutKey)</option>
+#end
+</select>
+  </dd>
+</dl>
+<div class="editblockclear"><!-- IE6 --></div>
+</div>
+</div> ## gallery_gallery_properties
+#set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
+#if($isSuperAdmin)
+<div class="navigationFieldsEditPart" style="clear:both;">
+<div class="celements2_box_subtitle">$adminMsg.get('cel_gallery_presentation_space')</div>
+  #set($cel_embedded_editobj = true)
+  #set($cel_editobj_classname = "Celements2.NavigationConfigClass")
+  #set($cel_editobj_nb = $navObj.getNumber())
+  #set($cel_editobj_hasObjRemoveLink = false)
+  #set($cel_editobj_externalForm = true)
+  #set($cel_editobj_properties = "menu_space")
+  #if(!$isAdmin)
+    #set($cel_editobj_readonly_properties = 'menu_space')
+  #end
+  $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
+</div>
+#end
+<div class="reorderingEditPart" style="clear:both;">
+  <div class="celements2_box_subtitle">$adminMsg.get('cel_gallery_reordering_title')</div>
+## add new slide
+#set($gallerySpace = $navObj.getProperty('menu_space').getValue())
+#set($newSlideDocRef = $celementsweb.getNextTitledPageDocRef(${gallerySpace}, $adminMsg.get('gallery_editor_newSlideTitle')))
+#set($slideTemplate = 'ImageGalleryTemplates.NewImageGallerySlide')
+#if(!$xwiki.exists($services.model.resolveDocument($slideTemplate)))
+#set($slideTemplate = 'celements2web:ImageGalleryTemplates.NewImageGallerySlide')
+#end
+#set($l = $xwiki.getURL($services.model.serialize($newSlideDocRef,'local'), 'inline', "template=${slideTemplate}&language=${default_language}"))
+## #set($l = $doc.getURL('view', 'xpage=overlay&conf=AddPage'))
+## #set($l = "${l}&space=${gallerySpace}")
+## #set($l = "${l}&menu_position=&language=${default_language}&redirmode=newpageedit")
+#set($cmenu_pageLink = "${l}&xredirect=$escapetool.url($doc.getURL('view'))")
+<p style="float:right;"><a href="${cmenu_pageLink}" target="_blank">
+$adminMsg.get('gallery_editor_addNewSlide')</a></p>
+    <p>$adminMsg.get('cel_presentation_reordering_hint')</p>
+    <button class="cel_naveditor_button_cancel">$adminMsg.get('cel_cancel')</button>
+    <button class="cel_naveditor_button_saveAndContinue">$adminMsg.get('cel_save')</button>
+  </div>
+  <div id="cel_presentation_editor_reorder_tree" class="presentation_order_edit">
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/yahoo/yahoo-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/event/event-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/yahoo-dom-event/yahoo-dom-event.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/dom/dom-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/element/element-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/connection/connection-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/json/json-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/dragdrop/dragdrop-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/element/element-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/button/button-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/container/container-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/utilities/utilities.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/yui/animation/animation-min.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/navigation/reorderMenuItems.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/celpresentation/reorder.js</span>
+$celementsweb.addExtJSfileOnce(':celJS/yui/yahoo/yahoo-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/event/event-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/yahoo-dom-event/yahoo-dom-event.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/dom/dom-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/element/element-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/connection/connection-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/json/json-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/dragdrop/dragdrop-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/element/element-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/button/button-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/container/container-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/utilities/utilities.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/yui/animation/animation-min.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/navigation/reorderMenuItems.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/celpresentation/reorder.js', 'file')
+#set($structNav = $celementsweb.createNavigation())
+$structNav.setMenuPart("")
+##$structNav.setShowAll(true)
+$structNav.setShowInactiveToLevel(1)
+$structNav.setHasLink(false)
+$structNav.setPresentationType('sitemap')
+$structNav.setMenuSpace($navObj.getProperty('menu_space').getValue())
+$structNav.addUlCSSClass("cel_presentation_reorder")
+$structNav.setCMcssClass("cel_cm_presentationeditor_nodes")
+$structNav.includeNavigation()
+  </div>
+</form>
+<script type="text/javascript">
+ var valid = new Validation('edit', {immediate : true});
+ ## if not complete or valid run the js validation
+ #if($filled && (!$complete || !$valid))
+ var result = valid.validate();
+ #end
+</script>
+</div>
+</div>

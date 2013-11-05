@@ -24,6 +24,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -37,7 +38,7 @@ import com.xpn.xwiki.XWikiException;
 public class Unzip {
   private static final int BUFFER = 1024;
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(Unzip.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(Unzip.class);
   
   public Unzip(){}
   
@@ -50,14 +51,21 @@ public class Unzip {
    * @throws XWikiException
    * @throws IOException
    */
-  public ByteArrayOutputStream getFile(byte[] zipFile, String filename) throws XWikiException, IOException{
+  public ByteArrayOutputStream getFile(byte[] zipFile, String filename
+      ) throws XWikiException, IOException{
+    return findAndExtractFile(filename, getZipInputStream(zipFile));
+  }
+
+  public ByteArrayOutputStream getFile(String filename, InputStream zipFile
+      ) throws XWikiException, IOException{
     return findAndExtractFile(filename, getZipInputStream(zipFile));
   }
   
-  private ByteArrayOutputStream findAndExtractFile(String filename, ZipInputStream zipIn) throws IOException {
+  private ByteArrayOutputStream findAndExtractFile(String filename, ZipInputStream zipIn
+      ) throws IOException {
     ByteArrayOutputStream out = null;
-    
-    for(ZipEntry entry = zipIn.getNextEntry(); zipIn.available()>0; entry = zipIn.getNextEntry()){
+    for(ZipEntry entry = zipIn.getNextEntry(); zipIn.available()>0; entry = 
+        zipIn.getNextEntry()){
       if(!entry.isDirectory() && entry.getName().equals(filename)){
         // read the data and write it to the OutputStream
         int count;
@@ -80,7 +88,8 @@ public class Unzip {
    * Get a List of names of all files contained in the zip file.
    * 
    * @param zipFile byte array of the zip file.
-   * @return List of all filenames (and directory names - ending with a file seperator) contained in the zip file.
+   * @return List of all filenames (and directory names - ending with a file seperator) 
+   *              contained in the zip file.
    */
   public List<String> getZipContentList(byte[] zipFile){
     String fileSep = System.getProperty("file.separator");
@@ -99,7 +108,7 @@ public class Unzip {
         }
       }
     } catch (IOException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     
     return contentList;
@@ -113,6 +122,10 @@ public class Unzip {
    */
   private ZipInputStream getZipInputStream(byte[] srcFile) {
     ByteArrayInputStream in = new ByteArrayInputStream(srcFile);
+    return new ZipInputStream(new BufferedInputStream(in));
+  }
+
+  private ZipInputStream getZipInputStream(InputStream in) {
     return new ZipInputStream(new BufferedInputStream(in));
   }
 }

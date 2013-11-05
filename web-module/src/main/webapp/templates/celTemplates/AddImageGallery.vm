@@ -1,0 +1,135 @@
+#if("$!request.xredirect" != '')
+#set($xredirect = "$!request.xredirect")
+#else
+#set($xredirect = "$doc.getURL('view')")
+#end
+#set($gallerySpace = "$!request.get('space')")
+#if("$!gallerySpace" == '')
+  #set($gallerySpace = $doc.space)
+#end
+#set($newGalleryLinkName = "$!request.get('galleryLinkName')")
+#if("$!newGalleryLinkName" == '')
+ #if("$!adminMsg.get('cel_image_gallery_titled_name')" != 'cel_image_gallery_titled_name')
+  #set($titledGalleryName = $adminMsg.get('cel_image_gallery_titled_name'))
+ #else
+  #set($titledGalleryName = "Gallery")
+ #end
+ #set($newGalleryLinkFN = $xwiki.celementsweb.getNextTitledPageFullName("$!gallerySpace", "$!titledGalleryName"))
+ #set($newGalleryLinkName = $services.model.resolveDocument($newGalleryLinkFN).getName())
+#end
+#set($filled = $request.get("submitted") == "1")
+#set($complete = true)
+#set($valid = true)
+#if($filled && $complete && $valid)
+  #set($newGalleryDocRef = $services.model.createDocumentReference('', "$!{gallerySpace}", "$!{newGalleryLinkName}"))
+  #set($new_doc = $services.celementsweb.createDocument($newGalleryDocRef, 'ImageGallery'))
+  ## set album title
+  $new_doc.setTitle($!request.get("title"))
+  ## should we add menu item?
+  #if("$!request.get('addMenuItem')" == 'true')
+    ## add menu item
+    #set($menu_item_obj = $new_doc.getObject("Celements2.MenuItem", true))
+    ## determine position
+    #set($menu = $xwiki.celementsweb.getSubNodesForParentRef($newGalleryDocRef.lastSpaceReference))
+    #if($menu.size() > 0)
+      #set($lastitemNum = $menu.size() - 1)
+      #set($next_menu_item_nr = $menu.get($lastitemNum).getPosition() + 1)
+    #else
+      #set($next_menu_item_nr = 0)
+    #end
+    #set($position = $next_menu_item_nr)
+    $menu_item_obj.set("menu_position", $!position)
+    $new_doc.save()
+    $xwiki.celementsweb.flushCache()
+  #end
+  #set($galleryDoc = $new_doc)
+  #parse('celMacros/checkImageGalleryObjects.vm')
+  ## redirect to edit album
+  $context.getResponse().sendRedirect($new_doc.getURL("edit", "xredirect=$!xredirect"))
+#else
+$celementsweb.addExtJSfileOnce(':celJS/prototype.js')
+$celementsweb.addExtJSfileOnce(':celJS/validation.js')
+#set($templateDocFN = "$!request.get('galleryTemplate')")
+#set($templateObj = '')
+#if("$!templateDocFN" != '')
+  #set($templateDoc = $xwiki.getDocument($services.model.resolveDocument($templateDocFN)))
+  #set($templateObj = $templateDoc.getObject('XWiki.PhotoAlbumClass'))
+#end
+<div class="celements2_box">
+<div class="celements2_box_title">$adminMsg.get("gallery_album_create")</div>
+<form id="create" name="create" method="post" action="">
+<input type="hidden" name="submitted" value="1" />
+<input type="hidden" name="xredirect" value="$!xredirect" />
+<input type="hidden" name="addMenuItem" value="$!request.get('addMenuItem')" />
+<table cellspacing="0" cellpadding="0" border="0" class="celements2_table">
+<tr>
+  <td class="celements2_text">$adminMsg.get("cel_tm_document_name")</td>
+  <td><input name="galleryLinkName" type="text" value="$!newGalleryLinkName" class="celements2_input validate-docname" /></td>
+</tr>
+<tr>
+  <td class="celements2_text">$adminMsg.get("gallery_album_title")</td>
+  <td><input name="title" type="text" value="$!request.get('title')" class="celements2_input" /></td>
+</tr>
+<tr>
+  <td class="celements2_text">$adminMsg.get("gallery_album_description")</td>
+  <td><textarea name="description" class="celements2_input" >$!request.get('description')</textarea></td>
+</tr>
+<tr>
+  <td class="celements2_text">$adminMsg.get("gallery_thumbnail_width")</td>
+  #if("$!request.get('thumbWidth')" != '')
+   #set($thumbWidth = $!request.get('thumbWidth'))
+  #elseif("$!templateObj.getProperty('thumbWidth').getValue()" != '')
+   #set($thumbWidth = "$!templateObj.getProperty('thumbWidth').getValue()")
+  #else
+   #set($thumbWidth = 170)
+  #end
+  <td><input name="thumbWidth" type="text" value="$!thumbWidth" class="celements2_input validate-number" /></td>
+</tr>
+<tr> <td class="celements2_text">$adminMsg.get("gallery_thumbnail_height")</td>
+ #if("$!request.get('height')" != '')
+  #set($height = $!request.get('height'))
+ #elseif("$!templateObj.getProperty('height').getValue()" != '')
+  #set($height = "$!templateObj.getProperty('height').getValue()")
+ #else
+  #set($height = 119)
+ #end
+ <td><input name="height" type="text" value="$!height" class="celements2_input validate-number" /></td>
+</tr>
+<tr>
+ <td class="celements2_text">$adminMsg.get("gallery_picture_height")</td>
+ #if("$!request.get('height2')" != '')
+  #set($height2 = $!request.get('height2'))
+ #elseif("$!templateObj.getProperty('height2').getValue()" != '')
+  #set($height2 = "$!templateObj.getProperty('height2').getValue()")
+ #else
+  #set($height2 = 500)
+ #end
+ <td><input name="height2" type="text" value="$!height2" class="celements2_input validate-number" /></td>
+</tr>
+<tr>
+ <td class="celements2_text">$adminMsg.get("gallery_picture_width")</td>
+ #if("$!request.get('photoWidth')" != '')
+  #set($photoWidth = $!request.get('photoWidth'))
+ #elseif("$!templateObj.getProperty('photoWidth').getValue()" != '')
+  #set($photoWidth = "$!templateObj.getProperty('photoWidth').getValue()")
+ #else
+  #set($photoWidth = 500)
+ #end
+ <td><input name="photoWidth" type="text" value="$!photoWidth" class="celements2_input validate-number" /></td>
+</tr>
+</table>
+<input type="submit" value="$adminMsg.get('gallery_album_create')" />
+</form>
+<script type="text/javascript">
+## remove as soon as new validation.js of 2.30.0 is installed
+Validation.add('validate-docname', '$adminMsg.get('cel_tm_validate_warning')', function (v) {
+    return !Validation.get('IsEmpty').test(v) &&  !/\W/.test(v.replace(/-/g, ''))
+});
+ var valid = new Validation('create', {immediate : true});
+ ## if not complete or valid run the js validation
+ #if($filled && (!$complete || !$valid))
+ var result = valid.validate();
+ #end
+</script>
+</div>
+#end

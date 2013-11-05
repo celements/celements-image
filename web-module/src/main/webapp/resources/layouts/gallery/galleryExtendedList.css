@@ -136,8 +136,8 @@ body .highslide-container .highslide-wrapper {
   position: absolute;
   width: 40px !important;
   z-index: 9;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-repeat: no-repeat; /** do not duplicate no-repeat IE8 does NOT like it **/
+  background-position: center center; /** DO duplicate center (x/y) FF neads it **/
   top: 0px;
 }
 

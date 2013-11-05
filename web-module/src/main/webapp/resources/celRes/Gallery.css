@@ -1,0 +1,78 @@
+/* Gallery */
+
+.presentationList ul {
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+}
+
+.presentationList ul .cel_cm_gallery {
+	position: relative;
+	float: left;
+	width: 100px;
+	height: 100px;
+	overflow: hidden;
+	margin: 0px 5px 5px 0px;
+}
+
+.presentationList ul .cel_cm_gallery .text {
+	position: absolute;
+	display: block;
+	top: 40px;
+	left: 0px;
+	height: 20px;
+	width: 100px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.presentationList ul .cel_cm_gallery .background {
+	display: block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100px;
+	height: 100px;
+	background: #ddd;
+	opacity: 0.9;
+	filter: alpha(opacity=90);
+}
+.presentationList ul .cel_cm_gallery:hover .text,
+.presentationList ul .cel_cm_gallery:hover .background {
+	display: none;
+}
+
+.presentationList ul .cel_cm_gallery .slideshowButton {
+	visibility: hidden;
+}
+.presentationList ul .cel_cm_gallery:hover .slideshowButton {
+	visibility: visible;
+}
+
+.presentationList ul .cel_cm_gallery .celanim_slideShow_navLeft,
+.presentationList ul .cel_cm_gallery .celanim_slideShow_navRight {
+	display: none;
+}
+
+.presentationList ul .celimage_slideshow .slideRoot {
+  color: #EDEDED;
+  border: 0px solid black;
+  background-color: black;
+}
+
+#sitecontainer .presentationList ul .celimage_slideshow .slideRoot p,
+#sitecontainer .presentationList ul .celimage_slideshow .slideRoot h1,
+#sitecontainer .presentationList ul .celimage_slideshow .slideRoot h2,
+#sitecontainer .presentationList ul .celimage_slideshow .slideRoot h3,
+#sitecontainer .presentationList ul .celimage_slideshow .slideRoot h4,
+#sitecontainer .presentationList ul .celimage_slideshow .slideRoot h5,
+#sitecontainer .presentationList ul .celimage_slideshow .slideRoot h6,
+.presentationList ul .celimage_slideshow .slideRoot p,
+.presentationList ul .celimage_slideshow .slideRoot h1,
+.presentationList ul .celimage_slideshow .slideRoot h2,
+.presentationList ul .celimage_slideshow .slideRoot h3,
+.presentationList ul .celimage_slideshow .slideRoot h4,
+.presentationList ul .celimage_slideshow .slideRoot h5,
+.presentationList ul .celimage_slideshow .slideRoot h6 {
+  color: #EDEDED;
+}

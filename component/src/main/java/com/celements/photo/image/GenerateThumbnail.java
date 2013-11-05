@@ -444,7 +444,7 @@ public class GenerateThumbnail {
     
     // rotate around image center
     double angle = (Math.sin(height/(double)width));
-      g2d.rotate(-angle, width / 2.0, height / 2.0);
+    g2d.rotate(-angle, width / 2.0, height / 2.0);
 
     g2d.drawString(
         watermark, 

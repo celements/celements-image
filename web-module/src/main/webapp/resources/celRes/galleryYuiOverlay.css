@@ -1,0 +1,92 @@
+/** yui overlay **/
+body div.mask.cel-YuiOverlay {
+  background-color: black;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0.85;
+  filter: alpha(opacity = 85);
+  display: none;
+  top: 0px;
+  left: 0px;
+  z-index: 99;
+}
+
+.cel-YuiOverlay .yui-panel .hd {
+  height: 0px;
+}
+.cel-YuiOverlay .yui-panel,
+.cel-YuiOverlay .yui-panel .hd, 
+.cel-YuiOverlay .yui-panel .bd, 
+.cel-YuiOverlay .yui-panel .ft {
+  background: black;
+  color: #EDEDED;
+  border: 0px solid black;
+}
+.cel-YuiOverlay .container-close {
+  position: absolute;
+  z-index: 10;
+  top: -15px;
+  right: -15px;
+  width: 30px;
+  height: 30px;
+  background-image:url('/file/resources/celRes/close.png');
+  background-repeat: no-repeat;
+  background-position: top right;
+  cursor: pointer;
+}
+.cel-YuiOverlay .container-close:hover {
+  background-image:url('/file/resources/celRes/close-hover.png');
+}
+.cel-YuiOverlay .container-close:focus {
+  border: 0px solid black;
+  outline: none;
+}
+.cel-YuiOverlay .yui-panel .hd,
+.cel-YuiOverlay .yui-panel .bd,
+.cel-YuiOverlay .yui-panel .ft {
+  margin: 0;
+  padding: 0;
+}
+.cel-YuiOverlay .yui-panel .hd,
+.cel-YuiOverlay .yui-panel .ft {
+  display:none;
+}
+.cel-YuiOverlay .yui-panel-container {
+  padding: 0px;
+}
+.cel-YuiOverlay .yui-panel-container.shadow .underlay {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  display: none;
+}
+
+/** navigation default configuration **/
+.celPresSlideShow_next,
+.celPresSlideShow_prev {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 40px;
+  z-index: 9;
+  background-repeat: no-repeat; /** do not duplicate no-repeat IE8 does NOT like it **/
+  background-position: center center; /** DO duplicate center (x/y) FF needs it **/
+}
+.celPresSlideShow_next:Hover,
+.celPresSlideShow_prev:Hover {
+  opacity: 1;
+  cursor: pointer;
+}
+.celPresSlideShow_next {
+  right: 0px;
+  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayRightArrowWhite.png');
+}
+.celPresSlideShow_prev {
+  left: 0px;
+  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayLeftArrowWhite.png');
+}
+.celimage_overlay {
+  cursor: pointer;
+}
