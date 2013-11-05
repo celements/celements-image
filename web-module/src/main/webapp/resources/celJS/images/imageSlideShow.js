@@ -70,7 +70,6 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 // Celements image Slideshow
 //////////////////////////////////////////////////////////////////////////////
 CELEMENTS.image.SlideShow = function(htmlElem) {
-  containerId = htmlElem;
   // constructor
   this._init(htmlElem);
 };
@@ -87,11 +86,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startSlideNum : undefined,
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
-      _autoresize : true,
+      _autoresize : false,
       _debug : false,
 
       _init : function(htmlElem) {
         var _me = this;
+        _me._autoresize = isMobile.iOS() || isMobile.Android();
         _me._currentHtmlElem = $(htmlElem) || null;
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
