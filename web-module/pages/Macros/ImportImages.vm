@@ -29,7 +29,10 @@
   <input type="hidden" name="gallery" value="$!request.get('gallery')" />
   <input type="hidden" name="attDoc" value="$!request.get('attDoc')" />
   <input type="hidden" name="filename" value="$!request.get('filename')" />
-  <input type="hidden" name="imgDestSpace" value="$!request.get('imgDestSpace')" />
+  #set($fbDoc = "$!xwiki.getWebPreference('cel_centralfilebase')") <!-- centraldoc: $fbDoc -->
+  #set($fbDot = $fbDoc.indexOf('.'))
+  #set($fbDocSpace = "$!fbDoc.substring(0, $fbDot)") <!-- space: $fbDocSpace -->
+  <input type="hidden" name="imgDestSpace" value="$fbDocSpace" />
   
   <span id="c3_import_button_div" class="c3_import_scrollabe_ignore"><input type="submit" id="c3_import_button" value="$adminMsg.get('cel_photo_import_selected_now')" /></span>
   <div class="c3_import_row">
