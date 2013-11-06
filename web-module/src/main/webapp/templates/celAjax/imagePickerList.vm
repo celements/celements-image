@@ -17,7 +17,12 @@ $response.setStatus(200)
 #elseif("$request.orderby" == 'ChangeDateDesc')
   #set($comparator = 'AttachmentDescendingChangeDateComparator')
 #end
+##TODO make getAttachmentListSorted for whole space
+#if("$!request.spaceImgs" != '')
+#set($attachments = $xwiki.celementsweb.getAttachmentListSortedSpace("$!request.spaceImgs", $comparator, true, $start, $nb))
+#else
 #set($attachments = $xwiki.celementsweb.getAttachmentListSorted($doc, $comparator, true, $start, $nb))
+#end
 #set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
 $jsonBuilder.openArray()
 #foreach ($attach in $attachments)
