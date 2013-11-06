@@ -24,7 +24,8 @@
       
       TODO Preimport: custom metatags adden
       TODO Preimport: am richtigen ort nach ueberschreiben etc. suchen
-      TODO Add Tag to show under images in file base
+      TODO Add Tag to show under images in file base. use:
+      #set($initFilters = "$!importObj.getProperty('filebaseTagDocName').getValue()") <!-- filter: $initFilters -->
     #end
   #end
 #end
