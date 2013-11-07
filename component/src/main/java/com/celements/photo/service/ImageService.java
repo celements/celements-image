@@ -36,6 +36,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 public class ImageService implements IImageService {
@@ -271,7 +272,20 @@ public class ImageService implements IImageService {
         String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef)
             + "&celheight=" + getPhotoAlbumMaxHeight(galleryDocRef);
         String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0)?"?":"&") + resizeParam;
-        newSlideDoc.setContent("<img src=\"" + fullImgURL + "\"/>");
+        String slideContent = "<img src=\"" + fullImgURL + "\"/>";
+        DocumentReference attDocRef = getWebUtilsService().resolveDocumentReference(
+            attFullName.replaceAll("^(.*);.*$", "$1"));
+        XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext());
+        String tags = "";
+        for(BaseObject tag : attDoc.getXObjects(getWebUtilsService(
+            ).resolveDocumentReference("Classes.PhotoMetainfoClass"))) {
+          tags += "<li>" + tag.getStringValue("name") + " : " 
+              + tag.getStringValue("description") + " </li>";
+        }
+        if(tags.length() > 0) {
+          slideContent += "<ul class=\"metatags\">" + tags + "</ul>";
+        }
+        newSlideDoc.setContent(slideContent);
         getContext().getWiki().saveDocument(newSlideDoc, "add default image slide"
             + " content", true, getContext());
         return true;
@@ -285,6 +299,10 @@ public class ImageService implements IImageService {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
     }
     return false;
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   public DocumentReference getImageSlideTemplateRef() {
