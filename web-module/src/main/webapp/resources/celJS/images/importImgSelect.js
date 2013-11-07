@@ -173,22 +173,22 @@ var selectImgEle = function(selectElement) {
   }
   var nrActive = $$('.bild.selected').length;
   if(nrActive == 1) {
-    $$('.highResButton, .downloadButton, .motiveSubmit').each(function(button) {
-      button.removeClassName('dark');
-      button.addClassName('dark');
-    });
+//    $$('.highResButton, .downloadButton, .motiveSubmit').each(function(button) {
+//      button.removeClassName('dark');
+//      button.addClassName('dark');
+//    });
     var gal = getGalObjForImgId($$('.bild.selected')[0].id);
     var img = gal.getImageForId($$('.bild.selected')[0].id);
     setImgName(img.getFilename(), true);
     setImgInfo(gal.getDesc(), true);
   } else if(nrActive > 1) {
-    $$('.highResButton, .downloadButton').each(function(button) {
-      button.removeClassName('dark');
-      button.addClassName('dark');
-    });
-    $$('.motiveSubmit').each(function(button) {
-      button.removeClassName('dark');
-    });
+//    $$('.highResButton, .downloadButton').each(function(button) {
+//      button.removeClassName('dark');
+//      button.addClassName('dark');
+//    });
+//    $$('.motiveSubmit').each(function(button) {
+//      button.removeClassName('dark');
+//    });
     setImgName('-', true);
     var multiInfo = ''
     if($('galleryMultiSelectMessage')) {
@@ -198,9 +198,9 @@ var selectImgEle = function(selectElement) {
     }
     setImgInfo(multiInfo, true);
   } else {
-    $$('.highResButton, .downloadButton, .motiveSubmit').each(function(button) {
-      button.removeClassName('dark');
-    });
+//    $$('.highResButton, .downloadButton, .motiveSubmit').each(function(button) {
+//      button.removeClassName('dark');
+//    });
     setImgName('', true);
     setImgInfo('', true);
   }
