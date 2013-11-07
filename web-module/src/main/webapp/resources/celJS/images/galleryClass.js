@@ -7,9 +7,9 @@ if(typeof CELEMENTS.images=="undefined"){CELEMENTS.images={};};
 
 (function() {
 
-CELEMENTS.images.Gallery = function(galleryDocRef, callbackFN, onlyFirstNumImages) {
+CELEMENTS.images.Gallery = function(galleryDocRef, callbackFN, onlyFirstNumImages, spaceImgs) {
   // constructor
-  this._init(galleryDocRef, callbackFN, onlyFirstNumImages);
+  this._init(galleryDocRef, callbackFN, onlyFirstNumImages, spaceImgs);
 };
 
 var CiG = CELEMENTS.images.Gallery;
@@ -20,10 +20,10 @@ CiG.prototype = {
     _imagesArray : undefined,
     _imagesHash : undefined,
 
-  _init : function(collDocRef, callbackFN, onlyFirstNumImages) {
+  _init : function(collDocRef, callbackFN, onlyFirstNumImages, spaceImgs) {
     var _me = this;
     _me._collDocRef = collDocRef;
-    _me._loadData(callbackFN, onlyFirstNumImages);
+    _me._loadData(callbackFN, onlyFirstNumImages, spaceImgs);
   },
 
   getDocRef : function() {
@@ -33,16 +33,21 @@ CiG.prototype = {
 
   _getGalleryURL : function() {
     var _me = this;
-    var colDocRefSplit = _me._collDocRef.split('.');
     var port = '';
     if (window.location.port != '80') {
       port = window.location.port;
     }
-    return window.location.protocol + '//' + window.location.host + '/'
-      + colDocRefSplit[0] + '/' + colDocRefSplit[1];
+    if(spaceImgs) {
+      var colDocRefSplit = _me._collDocRef.split('.');
+      return window.location.protocol + '//' + window.location.host + '/'
+        + colDocRefSplit[0] + '/' + colDocRefSplit[1];
+    } else {
+      return window.location.protocol + '//' + window.location.host + '/'
+        + _me._collDocRef + '/WebHome';
+    }
   },
 
-  _loadData : function(callbackFN, onlyFirstNumImages) {
+  _loadData : function(callbackFN, onlyFirstNumImages, spaceImgs) {
     var _me = this;
     var params = {
         'xpage' : 'celements_ajax',
@@ -50,6 +55,9 @@ CiG.prototype = {
       };
     if(onlyFirstNumImages) {
       params['onlyFirstNumImages'] = onlyFirstNumImages;
+    }
+    if(spaceImgs) {
+      params['spaceImgs'] = _me._collDocRef;
     }
     new Ajax.Request(_me._getGalleryURL(), {
       method : "POST",
