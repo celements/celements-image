@@ -273,14 +273,20 @@ public class ImageService implements IImageService {
             + "&celheight=" + getPhotoAlbumMaxHeight(galleryDocRef);
         String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0)?"?":"&") + resizeParam;
         String slideContent = "<img src=\"" + fullImgURL + "\"/>";
-        DocumentReference attDocRef = getWebUtilsService().resolveDocumentReference(
+        DocumentReference attDocRef = webUtilsService.resolveDocumentReference(
             attFullName.replaceAll("^(.*);.*$", "$1"));
         XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext());
         String tags = "";
-        for(BaseObject tag : attDoc.getXObjects(getWebUtilsService(
-            ).resolveDocumentReference("Classes.PhotoMetainfoClass"))) {
-          tags += "<li>" + tag.getStringValue("name") + " : " 
-              + tag.getStringValue("description") + " </li>";
+        DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
+            "Classes.PhotoMetainfoClass");
+        List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
+        if(metaObjs != null) {
+          for(BaseObject tag : metaObjs) {
+            if(tag != null) {
+              tags += "<li>" + tag.getStringValue("name") + " : " 
+                  + tag.getStringValue("description") + " </li>";
+            }
+          }
         }
         if(tags.length() > 0) {
           slideContent += "<ul class=\"metatags\">" + tags + "</ul>";
@@ -299,10 +305,6 @@ public class ImageService implements IImageService {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
     }
     return false;
-  }
-
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
   }
 
   public DocumentReference getImageSlideTemplateRef() {

@@ -13,6 +13,7 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.NavigationClasses;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -243,14 +244,28 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn(true).once();
     String attFullName = "ContentAttachment.FileBaseDoc;myImg.png";
     String imgAttURL = "/file/ContentAttachment/FileBaseDoc/myImg.png";
-    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), same(context))).andReturn(
-        imgAttURL).once();
+    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
+        ).andReturn(imgAttURL).once();
+    imageService.webUtilsService = createMock(IWebUtilsService.class);
+    DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(), 
+        "ContentAttachment", "FileBaseDoc");
+    expect(imageService.webUtilsService.resolveDocumentReference(
+        eq("ContentAttachment.FileBaseDoc"))).andReturn(attDocRef).once();
+    XWikiDocument attDoc = new XWikiDocument(new DocumentReference("a", "b", "c"));
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
+    expect(imageService.webUtilsService.resolveDocumentReference(
+        eq("Classes.PhotoMetainfoClass"))).andReturn(attDocRef).once();
     xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true),
         same(context));
     expectLastCall().once();
+    expect(imageService.webUtilsService.getWikiRef((DocumentReference)anyObject())
+        ).andReturn(attDocRef.getWikiReference()).anyTimes();
+    expect(imageService.webUtilsService.getDefaultLanguage((String)anyObject())
+        ).andReturn("de").anyTimes();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""),
         same(context))).andReturn("de").anyTimes();
     replayDefault();
+    replay(imageService.webUtilsService);
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
     assertTrue("expecting img tag in content", slideDoc.getContent().matches(
@@ -261,6 +276,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         + "] with resizing to max dimensions from gallery doc but got ["
         + slideDoc.getContent() + "].", slideDoc.getContent().contains(expectedImgURL));
     verifyDefault();
+    verify(imageService.webUtilsService);
   }
 
 }
