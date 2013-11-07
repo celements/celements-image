@@ -31,7 +31,7 @@ CiG.prototype = {
     return _me._collDocRef;
   },
 
-  _getGalleryURL : function() {
+  _getGalleryURL : function(spaceImgs) {
     var _me = this;
     var port = '';
     if (window.location.port != '80') {
@@ -59,7 +59,7 @@ CiG.prototype = {
     if(spaceImgs) {
       params['spaceImgs'] = _me._collDocRef;
     }
-    new Ajax.Request(_me._getGalleryURL(), {
+    new Ajax.Request(_me._getGalleryURL(spaceImgs), {
       method : "POST",
       parameters: params,
       onSuccess : function(transport) {
