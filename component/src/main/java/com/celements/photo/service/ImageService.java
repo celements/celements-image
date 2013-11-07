@@ -266,10 +266,12 @@ public class ImageService implements IImageService {
         newSlideDoc.setCreator(getContext().getUser());
         newSlideDoc.setAuthor(getContext().getUser());
         newSlideDoc.setTranslation(0);
-        String imgURL = getAttURLCmd().getAttachmentURL(attFullName, getContext());
+        String imgURL = getAttURLCmd().getAttachmentURL(attFullName, "download",
+            getContext());
         String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef)
             + "&celheight=" + getPhotoAlbumMaxHeight(galleryDocRef);
-        newSlideDoc.setContent("<img src=\"" + imgURL + "?" + resizeParam + "\"/>");
+        String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0)?"?":"&") + resizeParam;
+        newSlideDoc.setContent("<img src=\"" + fullImgURL + "\"/>");
         getContext().getWiki().saveDocument(newSlideDoc, "add default image slide"
             + " content", true, getContext());
         return true;
