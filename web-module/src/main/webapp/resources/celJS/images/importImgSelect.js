@@ -398,10 +398,12 @@ var pickMotive = function(event) {
       var imageDocFN = image.getURL().replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2');
       imageFNs.push(imageDocFN + ';' + image.getFilename());
     });
+    var slideContent = $('slideContent').value.strip();
     if(imageFNs.length > 0) {
       var params = {
           'xpage' : 'celements_ajax',
           'ajax_mode' : 'generateImageSlides',
+          'slideContent' : slideContent,
           'imageFN' : imageFNs
       };
       new Ajax.Request(url, {
