@@ -33,5 +33,6 @@
   #foreach($key in $metaTagMap.keySet())
     #set($slideContent = $slideContent.replaceAll("\{metatag:${key}\}", "$!metaTagMap.get($key)"))
   #end
+  #set($slideContent = $slideContent.replaceAll("\{metatag:.*?\}", '')) ## empty non existent tags
   $slideContent
 #end
