@@ -1,0 +1,26 @@
+## Provided values:
+## $imageURL - the resized download URL to the image
+## $attFullName - attachment full name (Space.Name;Attachment)
+## $metaTagMap - Map containing all metatags extracted from the image
+#set($imgAltTag = "$attFullName.replaceAll('^.*;(.*)\..*?$', '$1')")
+#if($metaTagMap.contains('Headline'))
+  #set($imgAltTag = "$!metaTagMap.get('Headline')")
+#end
+<img src="$fullImgURL" alt="$imgAltTag"/>
+#if($metaTagMap.contains('Headline'))
+  <h1 class="imageHeadline">$!metaTagMap.get('Headline')</h1>
+#end
+#if($metaTagMap.contains('Object Name')) ## Title
+  <p class="imageTitle">$!metaTagMap.get('Object Name')</p>
+#end
+<p class="imageEvent">
+#if($metaTagMap.contains('Fixture Identifier')) ## Event
+  <span class="imageFixtureIdentifier">$!metaTagMap.get('Fixture Identifier')</span>
+#end
+#if($metaTagMap.contains('Date/Time'))
+  <span class="imageDateTime">$!metaTagMap.get('Date/Time')</span>
+#end
+</p>
+#if($metaTagMap.contains('Caption/Abstract'))
+  <p class="imageDescription">$!metaTagMap.get('Caption/Abstract')</p>
+#end
