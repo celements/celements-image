@@ -3,24 +3,27 @@
 ## $attFullName - attachment full name (Space.Name;Attachment)
 ## $metaTagMap - Map containing all metatags extracted from the image
 #set($imgAltTag = "$attFullName.replaceAll('^.*;(.*)\..*?$', '$1')")
-#if($metaTagMap.contains('Headline'))
+#if($metaTagMap.containsKey('Headline'))
   #set($imgAltTag = "$!metaTagMap.get('Headline')")
 #end
-<img src="$fullImgURL" alt="$imgAltTag"/>
-#if($metaTagMap.contains('Headline'))
+<img src="$imageURL" alt="$imgAltTag"/>
+#if($metaTagMap.containsKey('Headline'))
   <h1 class="imageHeadline">$!metaTagMap.get('Headline')</h1>
 #end
-#if($metaTagMap.contains('Object Name')) ## Title
+#if($metaTagMap.containsKey('Object Name')) ## Title
   <p class="imageTitle">$!metaTagMap.get('Object Name')</p>
 #end
-<p class="imageEvent">
-#if($metaTagMap.contains('Fixture Identifier')) ## Event
-  <span class="imageFixtureIdentifier">$!metaTagMap.get('Fixture Identifier')</span>
+#if($metaTagMap.containsKey('Fixture Identifier') || $metaTagMap.containsKey('Date/Time'))
+  <p class="imageEvent">
+    #if($metaTagMap.containsKey('Fixture Identifier')) ## Event
+      <span class="imageFixtureIdentifier">$!metaTagMap.get('Fixture Identifier')</span>
+    #end
+    #if($metaTagMap.containsKey('Date/Time'))
+      #set($evDate = $datetool.toDate('yyyy:MM:dd HH:mm:ss', "$!metaTagMap.get('Date/Time')"))
+      <span class="imageDateTime">$!datetool.format('dd.MM.yyyy HH:mm:ss')</span>
+    #end
+  </p>
 #end
-#if($metaTagMap.contains('Date/Time'))
-  <span class="imageDateTime">$!metaTagMap.get('Date/Time')</span>
-#end
-</p>
-#if($metaTagMap.contains('Caption/Abstract'))
+#if($metaTagMap.containsKey('Caption/Abstract'))
   <p class="imageDescription">$!metaTagMap.get('Caption/Abstract')</p>
 #end
