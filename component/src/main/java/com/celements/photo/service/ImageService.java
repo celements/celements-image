@@ -297,7 +297,7 @@ public class ImageService implements IImageService {
         DocumentReference slideContentRef = new DocumentReference(getContext(
             ).getDatabase(), "Macros", "ImageSlideImportContent");
         String slideContent = webUtilsService.renderInheritableDocument(slideContentRef, 
-            getContext().getLanguage());
+            getContext().getLanguage(), webUtilsService.getDefaultLanguage());
         newSlideDoc.setContent(slideContent);
         getContext().getWiki().saveDocument(newSlideDoc, "add default image slide"
             + " content", true, getContext());

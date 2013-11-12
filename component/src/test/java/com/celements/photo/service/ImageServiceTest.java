@@ -3,6 +3,9 @@ package com.celements.photo.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Map;
+
+import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -202,6 +205,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testAddSlideFromTemplate() throws Exception {
     String editorUser = "XWiki.myEditor";
@@ -243,40 +247,45 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.copyDocument(eq(localTemplateRef), eq(slideDocRef), eq(true),
         same(context))).andReturn(true).once();
     String attFullName = "ContentAttachment.FileBaseDoc;myImg.png";
-    String imgAttURL = "/file/ContentAttachment/FileBaseDoc/myImg.png";
+    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/myImg.png";
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
         ).andReturn(imgAttURL).once();
     imageService.webUtilsService = createMock(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(), 
         "ContentAttachment", "FileBaseDoc");
-    expect(imageService.webUtilsService.resolveDocumentReference(
+    IWebUtilsService webUtils = imageService.webUtilsService;
+    expect(webUtils.resolveDocumentReference(
         eq("ContentAttachment.FileBaseDoc"))).andReturn(attDocRef).once();
     XWikiDocument attDoc = new XWikiDocument(new DocumentReference("a", "b", "c"));
     expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
-    expect(imageService.webUtilsService.resolveDocumentReference(
+    expect(webUtils.resolveDocumentReference(
         eq("Classes.PhotoMetainfoClass"))).andReturn(attDocRef).once();
     xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true),
         same(context));
     expectLastCall().once();
-    expect(imageService.webUtilsService.getWikiRef((DocumentReference)anyObject())
+    expect(webUtils.getWikiRef((DocumentReference)anyObject())
         ).andReturn(attDocRef.getWikiReference()).anyTimes();
-    expect(imageService.webUtilsService.getDefaultLanguage((String)anyObject())
-        ).andReturn("de").anyTimes();
+    expect(webUtils.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(webUtils.getDefaultLanguage((String)anyObject())).andReturn("de").anyTimes();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""),
         same(context))).andReturn("de").anyTimes();
+    VelocityContext vcontext = new VelocityContext();
+    context.put("vcontext", vcontext);
+    DocumentReference imgImportContentRef = new DocumentReference(context.getDatabase(),
+        "Macros", "ImageSlideImportContent");
+    expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), 
+        eq(context.getLanguage()), eq("de"))).andReturn("content").once();
     replayDefault();
-    replay(imageService.webUtilsService);
+    replay(webUtils);
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
-    assertTrue("expecting img tag in content", slideDoc.getContent().matches(
-        "<img [^>]*/>"));
-    String expectedImgURL = " src=\"" + imgAttURL + "?celwidth=" + maxWidth
-        + "&celheight=" + maxHeight + "\"";
-    assertTrue("expecting img src [" + expectedImgURL
-        + "] with resizing to max dimensions from gallery doc but got ["
-        + slideDoc.getContent() + "].", slideDoc.getContent().contains(expectedImgURL));
+    String expectedImgURL = imgAttURL + "?celwidth=" + maxWidth + "&celheight=" 
+        + maxHeight;
     verifyDefault();
-    verify(imageService.webUtilsService);
+    verify(webUtils);
+    assertEquals(expectedImgURL, vcontext.get("imageURL"));
+    assertEquals(attFullName, vcontext.get("attFullName"));
+    assertEquals(0, ((Map<String, String>)vcontext.get("metaTagMap")).size());
   }
 
 }
