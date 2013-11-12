@@ -272,7 +272,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     VelocityContext vcontext = new VelocityContext();
     context.put("vcontext", vcontext);
     DocumentReference imgImportContentRef = new DocumentReference(context.getDatabase(),
-        "Macros", "ImageSlideImportContent");
+        "Templates", "ImageSlideImportContent");
     expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), 
         eq(context.getLanguage()), eq("de"))).andReturn("content").once();
     replayDefault();

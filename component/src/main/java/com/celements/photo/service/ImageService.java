@@ -295,7 +295,7 @@ public class ImageService implements IImageService {
         }
         vcontext.put("metaTagMap", metaTagMap);
         DocumentReference slideContentRef = new DocumentReference(getContext(
-            ).getDatabase(), "Macros", "ImageSlideImportContent");
+            ).getDatabase(), "Templates", "ImageSlideImportContent");
         String slideContent = webUtilsService.renderInheritableDocument(slideContentRef, 
             getContext().getLanguage(), webUtilsService.getDefaultLanguage());
         newSlideDoc.setContent(slideContent);
