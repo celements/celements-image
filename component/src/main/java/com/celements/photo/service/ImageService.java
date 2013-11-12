@@ -5,12 +5,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -36,7 +39,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 @Component
 public class ImageService implements IImageService {
@@ -272,25 +274,30 @@ public class ImageService implements IImageService {
         String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef)
             + "&celheight=" + getPhotoAlbumMaxHeight(galleryDocRef);
         String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0)?"?":"&") + resizeParam;
-        String slideContent = "<img src=\"" + fullImgURL + "\"/>";
+        VelocityContext vcontext = (VelocityContext)getContext().get("vcontext");
+        vcontext.put("imageURL", fullImgURL);
+        vcontext.put("attFullName", attFullName);
+        Map<String, String> metaTagMap = new HashMap<String, String>();
         DocumentReference attDocRef = webUtilsService.resolveDocumentReference(
             attFullName.replaceAll("^(.*);.*$", "$1"));
-        XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext());
-        String tags = "";
+        XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext()
+            );
         DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
             "Classes.PhotoMetainfoClass");
         List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
         if(metaObjs != null) {
           for(BaseObject tag : metaObjs) {
             if(tag != null) {
-              tags += "<li>" + tag.getStringValue("name") + " : " 
-                  + tag.getStringValue("description") + " </li>";
+              metaTagMap.put(tag.getStringValue("name"), tag.getStringValue("description")
+                  );
             }
           }
         }
-        if(tags.length() > 0) {
-          slideContent += "<ul class=\"metatags\">" + tags + "</ul>";
-        }
+        vcontext.put("metaTagMap", metaTagMap);
+        DocumentReference slideContentRef = new DocumentReference(getContext(
+            ).getDatabase(), "Macros", "ImageSlideImportContent");
+        String slideContent = webUtilsService.renderInheritableDocument(slideContentRef, 
+            getContext().getLanguage());
         newSlideDoc.setContent(slideContent);
         getContext().getWiki().saveDocument(newSlideDoc, "add default image slide"
             + " content", true, getContext());
