@@ -1,7 +1,3 @@
-#set($destSpace = "Images")
-#if("$!request.imgDestSpace" != '')
-  #set($destSpace = "$!request.imgDestSpace")
-#end
 <div class="c3_import_title c3_title_imported">$adminMsg.get('cel_import_photo_imported')</div><!-- /c3_import_title -->
 <div class="c3_import_preimport_result c3_import_tabbox" id="c3_import_preimport_result">
 <ul>
@@ -9,23 +5,11 @@
   #if(("$!param.indexOf('filename_')" == '0') && ("$!request.get($param)" != ''))
     <li>$request.get($param)</li>
     #set($attDocRef = $services.model.resolveDocument("$request.attDoc"))
-    #set($destDocRef = $celementsweb.getNextTitledPageDocRef($destSpace, "Img")))
+    #set($destDocRef = $celementsweb.getNextTitledPageDocRef("Images", "Img")))
     #set($effectiveName = $services.celementsphoto.unzipFileToAttachment($attDocRef, "$!request.filename", "$!request.get($param)", $destDocRef))
     $services.celmetatags.extractMetadataToDocument($destDocRef, $effectiveName, $destDocRef)
     #if("$!request.gallery" != '')
-      TODO For direct import add images to $request.gallery
-      
-      how ajax does it:
-      /Gallery/Gallery7?xpage=celements_ajax&ajax_mode=generateImageSlides&imageFN=Content_attachments.FileBaseDoc;photo.jpg&imageFN=Content_attachments.FileBaseDoc;fro07008.png
-      Kurz zum Ajax call:
-      - $doc muss GalleryDoc sein
-      - Ajax-Script Name: generateImageSlides
-      - für jede ImageFN ein imageFN Parameter mit dem Wert zur URL hinzufügen
-      
-      TODO Preimport: custom metatags adden
-      TODO Preimport: am richtigen ort nach ueberschreiben etc. suchen
-      TODO Add Tag to show under images in file base. use:
-      #set($initFilters = "$!importObj.getProperty('filebaseTagDocName').getValue()") <!-- filter: $initFilters -->
+      TODO Bilder $request.gallery hinzufuegen
     #end
   #end
 #end

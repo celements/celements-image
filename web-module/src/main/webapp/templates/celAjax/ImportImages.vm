@@ -19,7 +19,7 @@
   <span id="check_none">$adminMsg.get('cel_photo_none')</span>
 </span>
 <input type="hidden" id="c3_not_yet_imported_msg" value="$adminMsg.get('cel_import_photo_unimported_preimport')" />
-<input type="hidden" id="c3_import_url" value="$xwiki.getURL('Macros.ImportImagesNow').replaceFirst('/xwiki/bin/view/','/')" />
+<input type="hidden" id="c3_import_url" value="$!{doc.getURL()}?xpage=celements_ajax&ajax_mode=ImportImagesNow" />
 <input type="hidden" id="c3_title_importing" value="$adminMsg.get('cel_import_photo_importing')" />
 <input type="hidden" id="c3_nothing_to_import_msg" value="$adminMsg.get('cel_import_alert_images_empty')" />
 <input type="hidden" id="c3_overwrite_on_import_msg" value="$adminMsg.get('cel_import_alert_images_overwrite')" />
