@@ -1,0 +1,53 @@
+$celementsweb.addExtJSfileOnce(':celJS/images/galleryClass.js')
+$celementsweb.addExtJSfileOnce(':celJS/images/importImgSelect.js')
+$celementsweb.includeCSSPage(':celRes/importIntoGallery.css')
+<form action="" method="post">
+<div style="border: 1px dotted grey">
+  <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
+#foreach($gal in $services.query.xwql("from doc.object(XWiki.PhotoAlbumClass) as obj").execute())
+  #set($defaultChecked = '')
+  #if("$!gal" == "$!doc.getFullName()")
+    #set($defaultChecked = 'checked="checked"')
+  #end
+  <input type="radio" class="galleries" name="galleries" value="$xwiki.getURL($gal)" $defaultChecked />
+  $gal<br />
+#end
+</div>
+<div style="border: 1px dotted grey">
+  Slideaufbau
+  <table>
+    <thead>
+      <tr>
+        <th>Standard</th>
+        <th>Angepasst</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Bild</td>
+        <td>Bild</td>
+      </tr>
+      <tr>
+        <td>
+          &Uuml;berschrift<br />
+          Titel<br />
+          Anlass & Datum / Zeit<br />
+          Beschreibung
+        </td>
+        <td><textarea id="slideContent" style="width: 325px; height: 100px;" name="slideContent"><h1 class="imageHeadline">{metatag:Headline}</h1>
+<p class="imageTitle">{metatag:Object Name}</p></textarea></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="text relative imagePicker">
+    <div class="height29"><p class="size13 mtop5">Bild Info: <span class="infoName"></span></p></div>
+    <input class="absolute right25 top2 motiveSubmit" type="submit" value="Auswahl Importieren">
+    <input type="hidden" name="xpage" value="celements_ajax" />
+    <input type="hidden" name="ajax_mode" value="generateImageSlides" />
+    <input type="hidden" class="motive imageFN" name="imageFN" value="Content_attachments.FileBaseDoc;photo.jpg" />
+    <br>
+</div>
+<div class="bilder"></div>
+<input class="motiveSubmit" style="margin-left:296px; margin-bottom:5px" type="submit" value="Auswahl Importieren">
+</form>

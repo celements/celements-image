@@ -1,0 +1,12 @@
+.bild {
+  display: inline-block;
+  width: 75px;
+  height: 75px;
+  margin: 3px;
+  background: no-repeat;
+}
+
+.bild.selected {
+  border: 1px solid red;
+  margin: 2px;
+}
