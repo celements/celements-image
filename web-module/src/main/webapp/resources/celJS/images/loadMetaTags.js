@@ -17,7 +17,7 @@
           parameters: {
             'xpage' : 'celements_ajax',
             'ajax_mode' : 'getMetaTagsForImage',
-            'imageDoc' : image.src.replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2');
+            'imageDoc' : image.src.replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2')
           },
           onComplete: function(transport) {
         	  
