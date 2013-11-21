@@ -1,7 +1,8 @@
-(function(window, undefined) {
   var loadedMetaTags = new Object();
-  
-  document.body.observe('celimage:imageSelectionChanged', displayMetaSelection);
+
+  Event.observe(window, 'load', function() {
+    $(document.body).observe('celimage:imageSelectionChanged', displayMetaSelection);
+  });
   
   var loadMeta = function(imageId) {
     if(!loadedMetaTags[imageId]) {
@@ -46,4 +47,3 @@
       tagContainer.up().show();
     }
   };
-})(window);
