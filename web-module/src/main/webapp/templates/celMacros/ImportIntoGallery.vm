@@ -24,31 +24,14 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   Bilder zur Galerie $gName hinzuf&uuml;gen
 #end
 <div style="border: 1px dotted grey">
-  Slideaufbau
-  <table>
-    <thead>
-      <tr>
-        <th>Standard</th>
-        <th>Angepasst</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Bild</td>
-        <td>Bild</td>
-      </tr>
-      <tr>
-        <td>
-          &Uuml;berschrift<br />
-          Titel<br />
-          Anlass & Datum / Zeit<br />
-          Beschreibung
-        </td>
-        <td><textarea id="slideContent" style="width: 325px; height: 100px;" name="slideContent"><h1 class="imageHeadline">{metatag:Headline}</h1>
-<p class="imageTitle">{metatag:Object Name}</p></textarea></td>
-      </tr>
-    </tbody>
-  </table>
+  Slideaufbau<br />
+  Leer lassen f&uuml;r Standardinhalt (&Uuml;berschrift, Titel, Anlass, Datum / Zeit und Beschreibung).
+  <div style="display:none;">
+    Verf&uuml;gbare MetaTags:
+    <p id="metaTags"></p>
+  </div>
+  <textarea id="slideContent" style="width: 550px; height: 100px;" name="slideContent"><h1 class="imageHeadline">{metatag:Headline}</h1>
+<p class="imageTitle">{metatag:Object Name}</p></textarea>
 </div>
 <div class="text relative imagePicker">
     <div class="height29"><p class="size13 mtop5">Bild Info: <span class="infoName"></span></p></div>
