@@ -39,6 +39,11 @@
     selected.each(function(imgDiv) {
       loadMeta(imgDiv.id);
     });
-    console.log('meta tags:', loadedMetaTags);
+    var tagContainer = $('metaTags');
+    if(tagContainer) {
+      console.log('meta tags:', loadedMetaTags);
+      
+      tagContainer.up().show();
+    }
   };
 })(window);
