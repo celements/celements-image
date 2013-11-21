@@ -1,10 +1,10 @@
 (function(window, undefined) {
-  var loadedMetaTags = new Hash();
+  var loadedMetaTags = new Object();
   
   document.body.observe('celimage:imageSelectionChanged', displayMetaSelection);
   
   var loadMeta = function(imageId) {
-    if(!loadedMetaTags.imageId) {
+    if(!loadedMetaTags[imageId]) {
       var galleryId = imageId.replace(/^.*:(.*?):.*$/g, '$1');
       var image = null;
       loadedGalleries.get(galleryId).getImages().each(function(galImg) {
@@ -20,10 +20,13 @@
             'imageDoc' : image.src.replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2')
           },
           onComplete: function(transport) {
-        	  
-        	  
-        	  
-        	  displayMetaSelection();
+            if (transport.responseText.isJSON()) {
+              loadedMetaTags[imageId] = transport.responseText.evalJSON();
+            } else if ((typeof console != 'undefined')
+                && (typeof console.warn != 'undefined')) {
+              console.warn('getMetaTagsForImage: noJSON!!! ', transport.responseText);
+            }
+            displayMetaSelection();
           }
       });
     } else {
@@ -36,6 +39,6 @@
     selected.each(function(imgDiv) {
       loadMeta(imgDiv.id);
     });
-    alert('display');
+    console.log('meta tags:', loadedMetaTags);
   };
 })(window);
