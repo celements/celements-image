@@ -204,7 +204,7 @@ var selectImgEle = function(selectElement) {
     setImgName('', true);
     setImgInfo('', true);
   }
-  document.body.fire('celimage:imageSelectionChanged');
+  $(document.body).fire('celimage:imageSelectionChanged');
 };
 
 var setImgName = function(imgName, setDefault) {
