@@ -27,7 +27,7 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   <h1>Bilder zur Galerie "$gName" hinzuf&uuml;gen</h1>
 #end
 <div style="border: 1px dotted grey">
-  Slideaufbau<br />
+  <h2>Slideaufbau<h2>
   Leer lassen f&uuml;r Standardinhalt (&Uuml;berschrift, Titel, Anlass, Datum / Zeit und Beschreibung).
   <div style="display:none;">
     Verf&uuml;gbare MetaTags:
