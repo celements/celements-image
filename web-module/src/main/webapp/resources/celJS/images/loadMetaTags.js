@@ -52,28 +52,24 @@
             allTagArray.push(tagKey);
             allTagContent[tagKey] = { 
                 nr: 1, 
-                values: [tags[tagKey]] 
+                values: [tags[tagKey]]
             };
           } else {
             allTagContent[tagKey] = { 
                 nr: (allTagContent[tagKey].nr + 1), 
-                values: allTagContent[tagKey].values.push(tags[tagKey])] 
+                values: allTagContent[tagKey].values.push(tags[tagKey])
             };
           }
         }
       }
       allTagArray.sort();
-    	  console.log(allTagArray, allTagContent);
-    	  
-    	  
-    	  
-    	  
-    	  
-//    	  <p id="metaTags"><span class="tag" title="knulf">bli</span><span class="ocurrences">(1)</span></p>
-    	  
-    	  
-    	  
-      }
+      $(allTagArray).each(function(tag) {
+        var tagContent = allTagContent[tag];
+        var tagDom = new Element('div', { 'class' : 'tagOcurrences' });
+        tagDom.insert(new Element('span', { 'class' : 'tag', 'title' : tagContent.values }).insert(tag));
+        tagDom.insert(new Element('span', { 'class' : 'ocurrences' }).insert('(' + tagContent.nr + ')'));
+        tagContainer.insert(tagDom);
+      });
       tagContainer.up().show();
     }
   };
