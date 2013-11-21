@@ -1,0 +1,10 @@
+#set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
+$jsonBuilder.openDictionary()
+#set($imgDocRef = $services.model.resolveDocument("$!request.imageDoc"))
+#if($xwiki.exists($imgDocRef))
+#foreach($obj in $xwiki.getDocument($imgDocRef).getObjects('Classes.PhotoMetainfoClass'))
+$jsonBuilder.addStringProperty("$!obj.getProperty('name').getValue()", "$!obj.getProperty('description').getValue()")
+#end
+#end
+$jsonBuilder.closeDictionary()
+$jsonBuilder.getJSON()
