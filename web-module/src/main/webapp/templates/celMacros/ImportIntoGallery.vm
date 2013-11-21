@@ -3,17 +3,26 @@ $celementsweb.addExtJSfileOnce(':celJS/images/importImgSelect.js')
 $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/importIntoGallery.css', 'file')" type="text/css" media="all" /> 
 <form action="" method="post">
-<div style="border: 1px dotted grey">
-  <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
-#foreach($gal in $services.query.xwql("from doc.object(XWiki.PhotoAlbumClass) as obj").execute())
-  #set($defaultChecked = '')
-  #if("$!gal" == "$!doc.getFullName()")
-    #set($defaultChecked = 'checked="checked"')
+#if("$!doc.getObject('XWiki.PhotoAlbumClass')" == '')
+  <div style="border: 1px dotted grey; padding-bottom: 20px;">
+    <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
+    #foreach($gal in $services.query.xwql("from doc.object(XWiki.PhotoAlbumClass) as obj").execute())
+      #set($defaultChecked = '')
+      #if("$!gal" == "$!doc.getFullName()")
+        #set($defaultChecked = 'checked="checked"')
+      #end
+      <input type="radio" class="galleries" name="galleries" value="$xwiki.getURL($gal)" $defaultChecked />
+      $gal<br />
+    #end
+  </div>
+#else
+  #set($gObj = $doc.getObject('XWiki.PhotoAlbumClass'))
+  #set($gName = "$!gObj.getProperty('title').getValue()")
+  #if("$!gName" == '')
+    #set($gName = "$!doc.getName()")
   #end
-  <input type="radio" class="galleries" name="galleries" value="$xwiki.getURL($gal)" $defaultChecked />
-  $gal<br />
+  Bilder zur Galerie $gName hinzuf&uuml;gen
 #end
-</div>
 <div style="border: 1px dotted grey">
   Slideaufbau
   <table>
