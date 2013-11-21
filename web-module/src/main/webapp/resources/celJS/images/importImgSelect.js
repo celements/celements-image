@@ -24,7 +24,7 @@ var observeImgs = function(event) {
   $$('.motiveSubmit').each(function(ele) {
     ele.observe('click', pickMotive);
   });
-  $(document.body).observe('adtool:finishLoadingAllGalleries', function(event) {
+  $(document.body).observe('celimage:finishLoadingAllGalleries', function(event) {
     showHideGallery();
   });
   var aGal = undefined;
@@ -35,7 +35,7 @@ var observeImgs = function(event) {
   var loadingCallbackFN = function(theGallery) {
     finishedLoadingGalleries.push(theGallery._collDocRef);
     if (finishedLoadingGalleries.size() >= allActiveGalleries.size()) {
-      $(document.body).fire('adtool:finishLoadingAllGalleries');
+      $(document.body).fire('celimage:finishLoadingAllGalleries');
     }
   };
     
@@ -204,6 +204,7 @@ var selectImgEle = function(selectElement) {
     setImgName('', true);
     setImgInfo('', true);
   }
+  document.body.fire('celimage:imageSelectionChanged');
 };
 
 var setImgName = function(imgName, setDefault) {
