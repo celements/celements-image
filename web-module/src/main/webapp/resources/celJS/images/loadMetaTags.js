@@ -66,7 +66,7 @@
       $(allTagArray).each(function(tag) {
         var tagContent = allTagContent[tag];
         var tagDom = new Element('div', { 'class' : 'tagOcurrences' });
-        tagDom.insert(new Element('span', { 'class' : 'tag', 'title' : tagContent.values }).insert(tag));
+        tagDom.insert(new Element('span', { 'class' : 'tag', 'title' : JSON.stringify(tagContent.values) }).insert(tag));
         tagDom.insert(new Element('span', { 'class' : 'ocurrences' }).insert('(' + tagContent.nr + ')'));
         tagContainer.insert(tagDom);
       });
