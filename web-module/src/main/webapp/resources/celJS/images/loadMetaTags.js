@@ -38,7 +38,7 @@
   };
   
   var loadMetaTags = function() {
-    if(lading == 0) {
+    if(loading == 0) {
       var selected = $$('.bild.selected');
       selected.each(function(imgDiv) {
         loadMeta(imgDiv.id);
