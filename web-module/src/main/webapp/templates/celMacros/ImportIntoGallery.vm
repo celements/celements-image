@@ -3,9 +3,9 @@ $celementsweb.addExtJSfileOnce(':celJS/images/importImgSelect.js')
 $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/importIntoGallery.css', 'file')" type="text/css" media="all" /> 
 <form action="" method="post">
+  <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
 #if("$!doc.getObject('XWiki.PhotoAlbumClass')" == '')
   <div style="border: 1px dotted grey; padding-bottom: 20px;">
-    <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
     #foreach($gal in $services.query.xwql("from doc.object(XWiki.PhotoAlbumClass) as obj").execute())
       #set($defaultChecked = '')
       #if("$!gal" == "$!doc.getFullName()")
@@ -25,6 +25,7 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
     #set($gName = "$!doc.getName()")
   #end
   <h1>Bilder zur Galerie "$gName" hinzuf&uuml;gen</h1>
+  <input type="hidden" class="galleries" name="galleries" value="$doc.getURL()" />
 #end
 <div style="border: 1px dotted grey">
   <h2>Slideaufbau</h2>
