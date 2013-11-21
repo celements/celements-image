@@ -19,6 +19,9 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   #set($gObj = $doc.getObject('XWiki.PhotoAlbumClass'))
   #set($gName = "$!gObj.getProperty('title').getValue()")
   #if("$!gName" == '')
+    #set($gName = "$!doc.getTitle()")
+  #end
+  #if("$!gName" == '')
     #set($gName = "$!doc.getName()")
   #end
   Bilder zur Galerie $gName hinzuf&uuml;gen
