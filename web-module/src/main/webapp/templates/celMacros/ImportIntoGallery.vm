@@ -24,7 +24,7 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   #if("$!gName" == '')
     #set($gName = "$!doc.getName()")
   #end
-  Bilder zur Galerie $gName hinzuf&uuml;gen
+  <h1>Bilder zur Galerie "$gName" hinzuf&uuml;gen</h1>
 #end
 <div style="border: 1px dotted grey">
   Slideaufbau<br />
