@@ -16,7 +16,6 @@
           image = galImg;
         }
       });
-console.log('start ajax for', imageId);
       new Ajax.Request(getCelHost(), {
           method: 'post',
           parameters: {
@@ -25,7 +24,6 @@ console.log('start ajax for', imageId);
             'imageDoc' : image.getSrc().replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2')
           },
           onComplete: function(transport) {
-console.log('ajax done for', imageId);
             loading--;
             if (transport.responseText.isJSON()) {
               loadedMetaTags[imageId] = transport.responseText.evalJSON();
@@ -40,12 +38,10 @@ console.log('ajax done for', imageId);
   };
   
   var loadMetaTags = function() {
-console.log('start loading', loading);
     var selected = $$('.bild.selected');
     selected.each(function(imgDiv) {
       loadMeta(imgDiv.id);
     });
-console.log('end loading', loading);
     if(loading == 0) {
       displayMetaSelection();
     }
