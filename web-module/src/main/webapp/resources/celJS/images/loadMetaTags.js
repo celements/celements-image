@@ -77,9 +77,13 @@ console.log('end loading', loading);
         $(allTagArray).each(function(tag) {
           var tagContent = allTagContent[tag];
           var tagDom = new Element('div', { 'class' : 'tagOcurrences' });
-          tagDom.insert(new Element('span', { 'class' : 'tag', 'title' : JSON.stringify(tagContent.values) }).insert(tag));
+          var tagSpan = new Element('span', { 'class' : 'tag', 'title' : JSON.stringify(tagContent.values) }).insert(tag);
+          tagDom.insert(tagSpan);
           tagDom.insert(new Element('span', { 'class' : 'ocurrences' }).insert('(' + tagContent.nr + ')'));
           tagContainer.insert(tagDom);
+          tagSpan.observe('click', function(event) {
+            window.prompt ("Copy to clipboard: Ctrl+C, Enter", event.element().innerText);
+          });
         });
         tagContainer.up().show();
       }
