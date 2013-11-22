@@ -438,6 +438,7 @@ var resetSelection = function(event) {
   });
   setImgName('', true);
   setImgInfo('', true);
+  $(document.body).fire('celimage:imageSelectionChanged');
   event.stop()
 }
 
