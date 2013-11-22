@@ -78,7 +78,7 @@
           tagDom.insert(new Element('span', { 'class' : 'ocurrences' }).insert('(' + tagContent.nr + ')'));
           tagContainer.insert(tagDom);
           tagSpan.observe('click', function(event) {
-            window.prompt ("Copy to clipboard: Ctrl+C, Enter", event.element().innerText);
+            window.prompt ("Copy to clipboard: Ctrl+C, Enter", '{metatag:' + event.element().innerText + '}');
           });
         });
         tagContainer.up().show();
