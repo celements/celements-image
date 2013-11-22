@@ -1,7 +1,8 @@
 $celementsweb.addExtJSfileOnce(':celJS/images/galleryClass.js')
 $celementsweb.addExtJSfileOnce(':celJS/images/importImgSelect.js')
 $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
-<link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/importIntoGallery.css', 'file')" type="text/css" media="all" /> 
+<link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/importIntoGallery.css', 'file')" type="text/css" media="all" />
+#if($xwiki.hasAccessLevel('edit'))
 <form action="" method="post">
   <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
 #if("$!doc.getObject('XWiki.PhotoAlbumClass')" == '')
@@ -11,8 +12,10 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
       #if("$!gal" == "$!doc.getFullName()")
         #set($defaultChecked = 'checked="checked"')
       #end
-      <input type="radio" class="galleries" name="galleries" value="$xwiki.getURL($gal)" $defaultChecked />
-      $gal<br />
+      #if($xwiki.hasAccessLevel('edit', "$!gal"))
+        <input type="radio" class="galleries" name="galleries" value="$xwiki.getURL($gal)" $defaultChecked />
+        $gal<br />
+      #end
     #end
   </div>
 #else
@@ -27,16 +30,6 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   <h1>Bilder zur Galerie "$gName" hinzuf&uuml;gen</h1>
   <input type="hidden" class="galleries" name="galleries" value="$doc.getURL()" />
 #end
-<div style="border: 1px dotted grey">
-  <h2>Slideaufbau</h2>
-  Leer lassen f&uuml;r Standardinhalt (&Uuml;berschrift, Titel, Anlass, Datum / Zeit und Beschreibung).
-  <div style="display:none;">
-    Verf&uuml;gbare MetaTags:
-    <p id="metaTags"></p>
-  </div>
-  <textarea id="slideContent" style="width: 550px; height: 100px;" name="slideContent"><h1 class="imageHeadline">{metatag:Headline}</h1>
-<p class="imageTitle">{metatag:Object Name}</p></textarea>
-</div>
 <div class="text relative imagePicker">
     <div class="height29"><p class="size13 mtop5">Bild Info: <span class="infoName"></span></p></div>
     <input class="absolute right25 top2 motiveSubmit" type="submit" value="Auswahl Importieren">
@@ -47,4 +40,17 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
 </div>
 <div class="bilder"></div>
 <input class="motiveSubmit" style="margin-left:296px; margin-bottom:5px" type="submit" value="Auswahl Importieren">
+<div style="border: 1px dotted grey">
+  <h2>Slideaufbau</h2>
+  Leer lassen f&uuml;r Standardinhalt (&Uuml;berschrift, Titel, Anlass, Datum / Zeit und Beschreibung).
+  <textarea id="slideContent" style="width: 550px; height: 100px;" name="slideContent"><h1 class="imageHeadline">{metatag:Headline}</h1>
+<p class="imageTitle">{metatag:Object Name}</p></textarea>
+  <div style="display:none;">
+    Verf&uuml;gbare MetaTags:
+    <p id="metaTags"></p>
+  </div>
+</div>
 </form>
+#else
+  Insufficient rights!
+#end
