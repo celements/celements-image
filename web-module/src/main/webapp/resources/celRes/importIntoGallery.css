@@ -10,3 +10,12 @@
   border: 1px solid red;
   margin: 2px;
 }
+
+.tagOcurrences {
+  display: inline-block;
+}
+
+.tag {
+  cursor: pointer;
+  padding-right: 8px;
+}
