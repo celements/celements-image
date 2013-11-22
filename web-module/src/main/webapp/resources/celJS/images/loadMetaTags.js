@@ -58,8 +58,8 @@ console.log('end loading', loading);
         tagContainer.update();
         var allTagArray = new Array();
         var allTagContent = new Object();
-        for(key in loadedMetaTags) {
-          var tags = loadedMetaTags[key];
+        $$('.bild.selected').each(function(img) {
+          var tags = loadedMetaTags[img.id];
           for(tagKey in tags) {
             if(allTagArray.indexOf(tagKey) < 0) {
               allTagArray.push(tagKey);
@@ -68,13 +68,11 @@ console.log('end loading', loading);
                   values: [tags[tagKey]]
               };
             } else {
-              allTagContent[tagKey] = { 
-                  nr: (allTagContent[tagKey].nr + 1), 
-                  values: allTagContent[tagKey].values.push(tags[tagKey])
-              };
+              allTagContent[tagKey].nr = 1 + allTagContent[tagKey].nr;
+              allTagContent[tagKey].values.push(tags[tagKey]);
             }
           }
-        }
+        });
         allTagArray.sort();
         $(allTagArray).each(function(tag) {
           var tagContent = allTagContent[tag];
