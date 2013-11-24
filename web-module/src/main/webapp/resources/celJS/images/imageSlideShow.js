@@ -86,6 +86,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startSlideNum : undefined,
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
+      _imgLoadedReCenterStartSlideBind : undefined,
       _autoresize : false,
       _debug : false,
 
@@ -99,7 +100,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
         _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
-        _me._imgLoadedReCenterStartSlideBind = _me.imgLoadedReCenterStartSlide.bind(_me);
+        _me._imgLoadedReCenterStartSlideBind = _me._imgLoadedReCenterStartSlide.bind(_me);
         if (_me._currentHtmlElem) {
           if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
             _me._fixStartImage(); 
@@ -112,8 +113,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         }
       },
 
-      imgLoadedReCenterStartSlide : function(imgElem, event) {
-        console.log('img loaded: ', imgElem.src);
+      _imgLoadedReCenterStartSlide : function(imgElem, event) {
+        var _me = this;
         imgElem.stopObserving('load', _me._imgLoadedReCenterStartSlideBind);
         _me._centerStartSlide();
       },
@@ -123,8 +124,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var slideWrapper = _me._currentHtmlElem.down('.slideWrapper');
         slideWrapper.setStyle({
           'position' : 'absolute',
-          'width' : 'auto'
-          });
+          'width' : 'auto',
+          'height' : 'auto',
+          'top' : 0,
+          'marginLeft' : 0,
+          'marginRight' : 0
+        });
         var slideWidth = slideWrapper.getWidth();
         var slideHeight = slideWrapper.getHeight();
         var parentDiv = slideWrapper.up('.slideRoot') || slideWrapper;
@@ -138,7 +143,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           'width' : slideWidth + 'px',
           'height' : slideHeight + 'px',
           'top' : topPos + 'px'
-          });
+        });
       },
 
       registerOpenInOverlay : function(htmlElem) {
