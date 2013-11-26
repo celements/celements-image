@@ -385,8 +385,9 @@ var getImgObjForId = function(id) {
 var pickMotive = function(event) {
   var url = null;
   $$('.galleries').each(function(ele) {
-    if(ele.checked) {
+    if(ele.checked || (ele.type == 'hidden')) {
       url = ele.value;
+      throw $break;
     }
   });
   if(url) {
