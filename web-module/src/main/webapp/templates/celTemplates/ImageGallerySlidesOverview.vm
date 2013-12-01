@@ -1,4 +1,4 @@
-#set($title = "$!slidedoc.getTitle()")
+## #set($title = "$!slidedoc.getTitle()")
 #set($slideFN = $services.model.serialize($slidedoc.documentReference, 'local'))
 #set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
 #if("$!albumobj.getProperty('hasOverview').getValue()" != "0")
@@ -44,6 +44,8 @@
         </div>
       </div>
   </div>
+#*
   <span class="background"></span>
   <span class="text">$!title</span>
+*#
 </span>
