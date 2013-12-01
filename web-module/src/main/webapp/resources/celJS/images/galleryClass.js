@@ -37,7 +37,7 @@ CiG.prototype = {
     if (window.location.port != '80') {
       port = window.location.port;
     }
-    if(spaceImgs) {
+    if (!spaceImgs) {
       var colDocRefSplit = _me._collDocRef.split('.');
       return window.location.protocol + '//' + window.location.host + '/'
         + colDocRefSplit[0] + '/' + colDocRefSplit[1];
