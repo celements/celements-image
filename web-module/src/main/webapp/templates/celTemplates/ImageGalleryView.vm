@@ -9,7 +9,7 @@ $xwiki.celementsweb.flushCache()
 #set($overwritePresCmCssClass = '')
 #set($overwriteNavCMcssClass = 'cel_cm_gallery_view')
 #set($emptyDictKeySuffix = '_gallery_overview')
-#set($overwriteNavPresentationType = 'galleryView')
+#set($overwriteNavPresentationType = 'gallerySlidesOverview')
 #if("$!galleryPresentationCount" == '')
 #set($galleryPresentationCount = 0)
 #end
