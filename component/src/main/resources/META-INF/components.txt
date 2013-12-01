@@ -6,3 +6,4 @@ com.celements.photo.service.BarcodeScriptService
 com.celements.photo.presentation.GalleryOverviewPresentationType
 com.celements.photo.unpack.UnpackComponent
 com.celements.photo.metadata.MetadataDocument
+com.celements.photo.presentation.GalleryPresentationType
