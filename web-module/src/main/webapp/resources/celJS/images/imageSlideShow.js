@@ -104,8 +104,6 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         _me._autoresize = isMobile.iOS() || isMobile.Android();
         _me._currentHtmlElem = $(htmlElem) || null;
-        _me._hasRandomStart = _me._currentHtmlElem.hasClassName(
-            'celimage_slideshowRandomStart');
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
         _me._imageSlideShowLoadFirstContentBind =
@@ -114,6 +112,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
         _me._imgLoadedReCenterStartSlideBind = _me._imgLoadedReCenterStartSlide.bind(_me);
         if (_me._currentHtmlElem) {
+          _me._hasRandomStart = _me._currentHtmlElem.hasClassName(
+              'celimage_slideshowRandomStart');
           if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
             _me._fixStartImage(); 
           } else if (_me._currentHtmlElem.down('.slideWrapper')) {
