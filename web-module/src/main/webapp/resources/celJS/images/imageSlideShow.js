@@ -95,6 +95,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
       _imgLoadedReCenterStartSlideBind : undefined,
+      _wrapperHtmlElem : undefined,
+      _hasRandomStart : false,
       _autoresize : false,
       _debug : false,
 
@@ -102,6 +104,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         _me._autoresize = isMobile.iOS() || isMobile.Android();
         _me._currentHtmlElem = $(htmlElem) || null;
+        _me._hasRandomStart = _me._currentHtmlElem.hasClassName(
+            'celimage_slideshowRandomStart');
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
         _me._imageSlideShowLoadFirstContentBind =
@@ -211,7 +215,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (_me._isOverlayRegistered) {
           return _me._getCelSlideShowObj().getHtmlContainer();
         } else {
-          return _me._currentHtmlElem;
+          return _me._wrapperHtmlElem;
         }
       },
 
@@ -225,8 +229,49 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         }
       },
 
-      startSlideShow : function() {
+      _moveStyleToWrapper : function(divWrapper, element, styleName) {
+        var newStyle = new Hash();
+        newStyle.set(styleName, element.getStyle(styleName));
+        divWrapper.setStyle(newStyle.toObject());
+        newStyle.set(styleName, '');
+        element.setStyle(newStyle.toObject());
+      },
+
+      _initNonOverlaySlideShow : function() {
         var _me = this;
+        var slideShowImg = $(_me._currentHtmlElem);
+        if (!_me._wrapperHtmlElem) {
+          var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
+              ).without('celimage_overlay').without('highslide-image');
+          var divWrapper = slideShowImg.wrap('div', {
+              'class' : 'celimage_slideshow_wrapper' }
+            );
+          //TODO get wrapper dimensions from where?
+  //        divWrapper.setStyle({ 'height' : slideShowImg.getHeight() + 'px' });
+  //        divWrapper.setStyle({ 'width' : slideShowImg.getWidth() + 'px' });
+          otherCssClassNames.each(function(className) {
+                if (!className.startsWith('cel_effekt_')) {
+                  divWrapper.addClassName(className);
+                }
+          });
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'float');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-top');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-bottom');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-left');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-right');
+      // adding border to Wrapper leads to problems with double borders. Thus removed.
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-top');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-bottom');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-right');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-left');
+          _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
+          _me._wrapperHtmlElem = divWrapper;
+        }
+      },
+
+      startNonOverlaySlideShow : function() {
+        var _me = this;
+        _me._initNonOverlaySlideShow();
         _me._getCelSlideShowObj().register();
         _me._imageSlideShowLoadFirstContent_internal();
       },
