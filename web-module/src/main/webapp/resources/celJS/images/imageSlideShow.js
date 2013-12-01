@@ -266,7 +266,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
   //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-left');
           _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
           _me._wrapperHtmlElem = divWrapper;
-        }
+          _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
+          }
       },
 
       startNonOverlaySlideShow : function() {
