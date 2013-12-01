@@ -1,0 +1,49 @@
+#set($title = "$!slidedoc.getTitle()")
+#set($slideFN = $services.model.serialize($slidedoc.documentReference, 'local'))
+#set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
+#if("$!albumobj.getProperty('hasOverview').getValue()" != "0")
+  #set($slideLink = "$!xwiki.getURL($slideFN, 'view')")
+#else
+  #set($slideLink = "$!xwiki.getURL($slideFN, 'view')?diapo=1")
+#end
+<span class="celements_gallery_link" href="$slideLink">
+#set($gallerySpace = '')
+#set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
+#set($gallerySpace = $navObj.getProperty('menu_space').getValue())
+#set($slideContent = $services.celementsweb.renderCelementsDocument($slidedoc.documentReference))
+#set($imgCssClasses = 'celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton')
+#if("$!imgGalSlidecount" == '')
+  #set($imgGalSlidecount = 0)
+#end
+##<!-- $doc ; $albumobj ; $albumobj.getProperty('photoWidth').getValue() ; $albumobj.getProperty('height2').getValue() -->
+#set($imgGalSlidecount = $imgGalSlidecount + 1)
+###set($thumbWidth = "$!albumobj.getProperty('thumbWidth').getValue()")
+###set($thumbHeight = "$!albumobj.getProperty('height').getValue()")
+#set($photoWidth = "$!albumobj.getProperty('photoWidth').getValue()")
+#if("$!photoWidth" == '')
+  #set($photoWidth = "662")
+#end
+#set($photoHeight = "$!albumobj.getProperty('height2').getValue()")
+#if("$!photoHeight" == '')
+  #set($photoHeight = "662")
+#end
+  #set($zoomFactor = $mathtool.div(100, $photoHeight))
+  <div id="ImgGallerySlide$!{imgGalSlidecount}:${slideFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!gallerySpace"##
+   class="$imgCssClasses" style="width:100px;height:100px;">
+  #*
+      zoom: 2; /* all browsers */
+     -moz-transform: scale(2);  /* Firefox */
+     position: absolute;
+     -moz-transform-origin: 0 0 0;
+  *#
+      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
+        <div class="slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
+          <div class="slideWrapper">
+          $slideContent
+          </div>
+        </div>
+      </div>
+  </div>
+  <span class="background"></span>
+  <span class="text">$!title</span>
+</span>
