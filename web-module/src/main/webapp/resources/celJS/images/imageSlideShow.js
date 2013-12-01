@@ -61,6 +61,10 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
   var CISS_SlideShowObjHash = new Hash();
 
+  CELEMENTS.image.getSlideShowObj = function(slideShowElemId) {
+    return CISS_SlideShowObjHash.get(slideShowElemId);
+  };
+
   var initializeImageSlideShow = function() {
     $$('.celimage_slideshow').each(function(slideShowElem) {
       CISS_SlideShowObjHash.set(slideShowElem.id, new CELEMENTS.image.SlideShow(
@@ -221,15 +225,26 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         }
       },
 
+      startSlideShow : function() {
+        var _me = this;
+        _me._getCelSlideShowObj().register();
+        _me._imageSlideShowLoadFirstContent_internal();
+      },
+
+      _imageSlideShowLoadFirstContent_internal : function() {
+        var _me = this;
+        _me._getCelSlideShowObj().getHtmlContainer().observe(
+            'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
+        var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
+        var startAt = _me._startAtSlideName || _me.getStartSlideNum();
+        _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
+      },
+
       _imageSlideShowLoadFirstContent : function(event) {
         var _me = this;
         var dialogConfig = event.memo;
         if (dialogConfig.slideShowElem) {
-          _me._getCelSlideShowObj().getHtmlContainer().observe(
-              'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
-          var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
-          var startAt = _me._startAtSlideName || _me.getStartSlideNum();
-          _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
+          _me._imageSlideShowLoadFirstContent_internal();
           event.stop();
         }
       },
