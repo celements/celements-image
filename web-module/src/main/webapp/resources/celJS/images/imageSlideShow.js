@@ -117,6 +117,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
             _me._fixStartImage(); 
           } else if (_me._currentHtmlElem.down('.slideWrapper')) {
+            //TODO check if recenter here still is needed after it is correctly done in CelementsSlideShow.js
             _me._currentHtmlElem.select('img').each(function(imgElem) {
               imgElem.observe('load', _me._imgLoadedReCenterStartSlideBind.curry(imgElem));
             });
@@ -264,9 +265,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
   //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-bottom');
   //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-right');
   //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-left');
-          _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
           _me._wrapperHtmlElem = divWrapper;
           _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
+          _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
           }
       },
 
