@@ -244,8 +244,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
               ).without('celimage_overlay').without('highslide-image');
           var divWrapper = slideShowImg.wrap('div', {
-              'class' : 'celimage_slideshow_wrapper' }
-            );
+              'id' : ('slideRoot_' + slideShowImg.id),
+              'class' : 'celimage_slideshow_wrapper slideRoot'
+           });
           //TODO get wrapper dimensions from where?
   //        divWrapper.setStyle({ 'height' : slideShowImg.getHeight() + 'px' });
   //        divWrapper.setStyle({ 'width' : slideShowImg.getWidth() + 'px' });
