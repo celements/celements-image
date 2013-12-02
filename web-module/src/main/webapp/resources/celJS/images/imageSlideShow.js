@@ -246,10 +246,14 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           var divWrapper = slideShowImg.wrap('div', {
               'id' : ('slideRoot_' + slideShowImg.id),
               'class' : 'celimage_slideshow_wrapper slideRoot'
+           }).setStyle({
+             'position' : relative
            });
           //TODO get wrapper dimensions from where?
-  //        divWrapper.setStyle({ 'height' : slideShowImg.getHeight() + 'px' });
-  //        divWrapper.setStyle({ 'width' : slideShowImg.getWidth() + 'px' });
+          divWrapper.setStyle({
+            'height' : slideShowImg.getHeight() + 'px',
+            'width' : slideShowImg.getWidth() + 'px'
+          });
           otherCssClassNames.each(function(className) {
                 if (!className.startsWith('cel_effekt_')) {
                   divWrapper.addClassName(className);
