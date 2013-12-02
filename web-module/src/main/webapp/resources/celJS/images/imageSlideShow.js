@@ -280,6 +280,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       startNonOverlaySlideShow : function() {
         var _me = this;
         _me._initNonOverlaySlideShow();
+        _me._getCelSlideShowObj().setAutoresize(true);
         _me._getCelSlideShowObj().register();
         _me._imageSlideShowLoadFirstContent_internal();
       },
