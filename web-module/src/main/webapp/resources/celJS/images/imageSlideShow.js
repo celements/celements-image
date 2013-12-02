@@ -214,8 +214,10 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         if (_me._isOverlayRegistered) {
           return _me._getCelSlideShowObj().getHtmlContainer();
-        } else {
+        } else if (_me._wrapperHtmlElem) {
           return _me._wrapperHtmlElem;
+        } else {
+          return _me._currentHtmlElem;
         }
       },
 
