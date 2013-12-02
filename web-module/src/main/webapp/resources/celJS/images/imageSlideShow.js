@@ -249,7 +249,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
               'id' : ('slideRoot_' + slideShowImg.id),
               'class' : 'celimage_slideshow_wrapper slideRoot'
            }).setStyle({
-             'position' : relative
+             'position' : 'relative'
            });
           //TODO get wrapper dimensions from where?
           divWrapper.setStyle({
