@@ -52,9 +52,8 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
       if (slideShowElem.hasClassName('celimage_overlay')) {
         CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
       } else {
-        if ((typeof console != 'undefined') && (typeof console.warn != 'undefined')) {
-          console.warn('celimage_slideshow not in overlay discovered. ', slideShowElem);
-        }
+        var imgSlideShow = CELEMENTS.image.getSlideShowObj(slideShowElem.id);
+        imgSlideShow.startNonOverlaySlideShow();
       }
     });
   });
