@@ -247,7 +247,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
               ).without('celimage_overlay').without('highslide-image');
           var divInnerWrapper = slideShowImg.wrap('div', {
             'id' : ('slideWrapper_' + slideShowImg.id),
-            'class' : 'cel_sideShow_slideWrapper'
+            'class' : 'cel_slideShow_slideWrapper'
            }).setStyle({
              'position' : 'relative'
            });
