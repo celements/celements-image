@@ -414,7 +414,11 @@ var pickMotive = function(event) {
         onComplete : function(transport) {
           if (transport.responseText.isJSON()) {
             var responseObject = transport.responseText.evalJSON();
-            alert('successful: ' + responseObject.successful);
+            if(responseObject.successful) {
+              alert('Slide(s) erfolgreich erstellt.');
+            } else {
+              alert('Fehlgeschlagen: "' + responseObject.errMsg + '"');
+            }
           } else if ((typeof console != 'undefined')
               && (typeof console.error != 'undefined')) {
             console.error('noJSON!!! ', transport.responseText);
