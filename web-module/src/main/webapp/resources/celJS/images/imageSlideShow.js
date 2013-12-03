@@ -246,13 +246,18 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
               ).without('celimage_overlay').without('highslide-image');
           //to allow propper scaling we need to add a slideRoot element
-          var divSlideRoot = slideShowImg.wrap('div', {
+          var divInnerWrapper = slideShowImg.wrap('div', {
+            'id' : ('slideWrapper_' + slideShowImg.id),
+            'class' : 'celimage_slideshow_wrapper'
+           }).setStyle({
+             'position' : 'relative'
+           });
+          var divSlideRoot = divInnerWrapper.wrap('div', {
             'id' : ('slideRoot_' + slideShowImg.id),
             'class' : 'cel_sideShow_slideRoot'
            });
           var divWrapper = divSlideRoot.wrap('div', {
-            'id' : ('slideWrapper_' + slideShowImg.id),
-            'class' : 'celimage_slideshow_wrapper'
+            'id' : ('slideContainer_' + slideShowImg.id)
            }).setStyle({
              'position' : 'relative'
            });
