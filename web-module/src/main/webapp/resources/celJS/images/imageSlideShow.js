@@ -247,7 +247,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
               ).without('celimage_overlay').without('highslide-image');
           var divInnerWrapper = slideShowImg.wrap('div', {
             'id' : ('slideWrapper_' + slideShowImg.id),
-            'class' : 'celimage_slideshow_wrapper'
+            'class' : 'cel_sideShow_slideWrapper'
            }).setStyle({
              'position' : 'relative'
            });
@@ -257,7 +257,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
             'class' : 'cel_sideShow_slideRoot'
            });
           var divWrapper = divSlideRoot.wrap('div', {
-            'id' : ('slideContainer_' + slideShowImg.id)
+            'id' : ('slideContainer_' + slideShowImg.id),
+            'class' : 'celimage_slideshow_wrapper'
            }).setStyle({
              'position' : 'relative'
            });
