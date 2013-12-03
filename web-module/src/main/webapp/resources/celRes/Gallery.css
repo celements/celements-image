@@ -6,7 +6,8 @@
 	list-style: none;
 }
 
-.presentationList ul .cel_cm_gallery {
+.presentationList ul .cel_cm_gallery,
+.presentationList ul .cel_cm_gallery_view {
 	position: relative;
 	float: left;
 	width: 100px;
@@ -15,7 +16,8 @@
 	margin: 0px 5px 5px 0px;
 }
 
-.presentationList ul .cel_cm_gallery .text {
+.presentationList ul .cel_cm_gallery .text,
+.presentationList ul .cel_cm_gallery_view .text {
 	position: absolute;
 	display: block;
 	top: 40px;
@@ -26,7 +28,8 @@
 	font-weight: bold;
 }
 
-.presentationList ul .cel_cm_gallery .background {
+.presentationList ul .cel_cm_gallery .background,
+.presentationList ul .cel_cm_gallery_view .background {
 	display: block;
 	position: absolute;
 	top: 0px;
@@ -38,19 +41,25 @@
 	filter: alpha(opacity=90);
 }
 .presentationList ul .cel_cm_gallery:hover .text,
-.presentationList ul .cel_cm_gallery:hover .background {
+.presentationList ul .cel_cm_gallery:hover .background,
+.presentationList ul .cel_cm_gallery_view:hover .text,
+.presentationList ul .cel_cm_gallery_view:hover .background {
 	display: none;
 }
 
-.presentationList ul .cel_cm_gallery .slideshowButton {
+.presentationList ul .cel_cm_gallery .slideshowButton,
+.presentationList ul .cel_cm_gallery_view .slideshowButton {
 	visibility: hidden;
 }
-.presentationList ul .cel_cm_gallery:hover .slideshowButton {
+.presentationList ul .cel_cm_gallery:hover .slideshowButton,
+.presentationList ul .cel_cm_gallery_view:hover .slideshowButton {
 	visibility: visible;
 }
 
 .presentationList ul .cel_cm_gallery .celanim_slideShow_navLeft,
-.presentationList ul .cel_cm_gallery .celanim_slideShow_navRight {
+.presentationList ul .cel_cm_gallery .celanim_slideShow_navRight,
+.presentationList ul .cel_cm_gallery_view .celanim_slideShow_navLeft,
+.presentationList ul .cel_cm_gallery_view .celanim_slideShow_navRight {
 	display: none;
 }
 

@@ -37,7 +37,8 @@ CiG.prototype = {
     if (window.location.port != '80') {
       port = window.location.port;
     }
-    if(spaceImgs) {
+    if (!spaceImgs) {
+      //1.12.2013 FP; image picker does not use spaceImgs but calls galleryClass with callDocRef equals gallery FN
       var colDocRefSplit = _me._collDocRef.split('.');
       return window.location.protocol + '//' + window.location.host + '/'
         + colDocRefSplit[0] + '/' + colDocRefSplit[1];

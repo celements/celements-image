@@ -51,11 +51,18 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
     $$('.celimage_slideshow').each(function(slideShowElem) {
       if (slideShowElem.hasClassName('celimage_overlay')) {
         CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
+      } else {
+        var imgSlideShow = CELEMENTS.image.getSlideShowObj(slideShowElem.id);
+        imgSlideShow.startNonOverlaySlideShow();
       }
     });
   });
 
   var CISS_SlideShowObjHash = new Hash();
+
+  CELEMENTS.image.getSlideShowObj = function(slideShowElemId) {
+    return CISS_SlideShowObjHash.get(slideShowElemId);
+  };
 
   var initializeImageSlideShow = function() {
     $$('.celimage_slideshow').each(function(slideShowElem) {
@@ -86,6 +93,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startSlideNum : undefined,
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
+      _imgLoadedReCenterStartSlideBind : undefined,
+      _wrapperHtmlElem : undefined,
+      _hasRandomStart : false,
       _autoresize : false,
       _debug : false,
 
@@ -99,13 +109,26 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
         _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
+        _me._imgLoadedReCenterStartSlideBind = _me._imgLoadedReCenterStartSlide.bind(_me);
         if (_me._currentHtmlElem) {
+          _me._hasRandomStart = _me._currentHtmlElem.hasClassName(
+              'celimage_slideshowRandomStart');
           if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
             _me._fixStartImage(); 
           } else if (_me._currentHtmlElem.down('.slideWrapper')) {
+            //TODO check if recenter here still is needed after it is correctly done in CelementsSlideShow.js
+            _me._currentHtmlElem.select('img').each(function(imgElem) {
+              imgElem.observe('load', _me._imgLoadedReCenterStartSlideBind.curry(imgElem));
+            });
             _me._centerStartSlide();
           }
         }
+      },
+
+      _imgLoadedReCenterStartSlide : function(imgElem, event) {
+        var _me = this;
+        imgElem.stopObserving('load', _me._imgLoadedReCenterStartSlideBind);
+        _me._centerStartSlide();
       },
 
       _centerStartSlide : function() {
@@ -113,8 +136,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var slideWrapper = _me._currentHtmlElem.down('.slideWrapper');
         slideWrapper.setStyle({
           'position' : 'absolute',
-          'width' : 'auto'
-          });
+          'width' : 'auto',
+          'height' : 'auto',
+          'top' : 0,
+          'marginLeft' : 0,
+          'marginRight' : 0
+        });
         var slideWidth = slideWrapper.getWidth();
         var slideHeight = slideWrapper.getHeight();
         var parentDiv = slideWrapper.up('.slideRoot') || slideWrapper;
@@ -128,7 +155,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           'width' : slideWidth + 'px',
           'height' : slideHeight + 'px',
           'top' : topPos + 'px'
-          });
+        });
       },
 
       registerOpenInOverlay : function(htmlElem) {
@@ -187,6 +214,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         if (_me._isOverlayRegistered) {
           return _me._getCelSlideShowObj().getHtmlContainer();
+        } else if (_me._wrapperHtmlElem) {
+          return _me._wrapperHtmlElem;
         } else {
           return _me._currentHtmlElem;
         }
@@ -202,15 +231,86 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         }
       },
 
+      _moveStyleToWrapper : function(divWrapper, element, styleName) {
+        var newStyle = new Hash();
+        newStyle.set(styleName, element.getStyle(styleName));
+        divWrapper.setStyle(newStyle.toObject());
+        newStyle.set(styleName, '');
+        element.setStyle(newStyle.toObject());
+      },
+
+      _initNonOverlaySlideShow : function() {
+        var _me = this;
+        var slideShowImg = $(_me._currentHtmlElem);
+        if (!_me._wrapperHtmlElem) {
+          var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
+              ).without('celimage_overlay').without('highslide-image');
+          var divInnerWrapper = slideShowImg.wrap('div', {
+            'id' : ('slideWrapper_' + slideShowImg.id),
+            'class' : 'cel_sideShow_slideWrapper'
+           }).setStyle({
+             'position' : 'relative'
+           });
+          //to allow propper scaling we need to add a slideRoot element
+          var divSlideRoot = divInnerWrapper.wrap('div', {
+            'id' : ('slideRoot_' + slideShowImg.id),
+            'class' : 'cel_sideShow_slideRoot'
+           });
+          var divWrapper = divSlideRoot.wrap('div', {
+            'id' : ('slideContainer_' + slideShowImg.id),
+            'class' : 'celimage_slideshow_wrapper'
+           }).setStyle({
+             'position' : 'relative'
+           });
+          //TODO get wrapper dimensions from where? Maybe we should make this flexible to
+          //TODO choise for the user in the image picker...
+          divWrapper.setStyle({
+            'height' : slideShowImg.getHeight() + 'px',
+            'width' : slideShowImg.getWidth() + 'px'
+          });
+          otherCssClassNames.each(function(className) {
+                if (!className.startsWith('cel_effekt_')) {
+                  divWrapper.addClassName(className);
+                }
+          });
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'float');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-top');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-bottom');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-left');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-right');
+      // adding border to Wrapper leads to problems with double borders. Thus removed.
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-top');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-bottom');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-right');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-left');
+          _me._wrapperHtmlElem = divWrapper;
+          _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
+          _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
+          }
+      },
+
+      startNonOverlaySlideShow : function() {
+        var _me = this;
+        _me._initNonOverlaySlideShow();
+        _me._getCelSlideShowObj().setAutoresize(true);
+        _me._getCelSlideShowObj().register();
+        _me._imageSlideShowLoadFirstContent_internal();
+      },
+
+      _imageSlideShowLoadFirstContent_internal : function() {
+        var _me = this;
+        _me._getCelSlideShowObj().getHtmlContainer().observe(
+            'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
+        var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
+        var startAt = _me._startAtSlideName || _me.getStartSlideNum();
+        _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
+      },
+
       _imageSlideShowLoadFirstContent : function(event) {
         var _me = this;
         var dialogConfig = event.memo;
         if (dialogConfig.slideShowElem) {
-          _me._getCelSlideShowObj().getHtmlContainer().observe(
-              'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
-          var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
-          var startAt = _me._startAtSlideName || _me.getStartSlideNum();
-          _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
+          _me._imageSlideShowLoadFirstContent_internal();
           event.stop();
         }
       },
