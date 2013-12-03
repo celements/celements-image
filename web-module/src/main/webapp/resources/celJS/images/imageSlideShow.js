@@ -245,16 +245,16 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if (!_me._wrapperHtmlElem) {
           var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
               ).without('celimage_overlay').without('highslide-image');
-          var divWrapper = slideShowImg.wrap('div', {
+          //to allow propper scaling we need to add a slideRoot element
+          var divSlideRoot = slideShowImg.wrap('div', {
+            'id' : ('slideRoot_' + slideShowImg.id),
+            'class' : 'cel_sideShow_slideRoot'
+           });
+          var divWrapper = divSlideRoot.wrap('div', {
             'id' : ('slideWrapper_' + slideShowImg.id),
             'class' : 'celimage_slideshow_wrapper'
            }).setStyle({
              'position' : 'relative'
-           });
-          //to allow propper scaling we need to add a slideRoot element
-          divWrapper.wrap('div', {
-            'id' : ('slideRoot_' + slideShowImg.id),
-            'class' : 'cel_sideShow_slideRoot'
            });
           //TODO get wrapper dimensions from where? Maybe we should make this flexible to
           //TODO choise for the user in the image picker...
