@@ -254,7 +254,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           //to allow propper scaling we need to add a slideRoot element
           var divSlideRoot = divInnerWrapper.wrap('div', {
             'id' : ('slideRoot_' + slideShowImg.id),
-            'class' : 'cel_sideShow_slideRoot'
+            'class' : 'cel_slideShow_slideRoot'
            });
           var divWrapper = divSlideRoot.wrap('div', {
             'id' : ('slideContainer_' + slideShowImg.id),
