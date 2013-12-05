@@ -190,10 +190,10 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         var galleryFN = _me._getPart(_me._currentHtmlElem.id, 1, '');
         if (!_me._gallery && (galleryFN != '')) {
-          _me._gallery = new CELEMENTS.images.Gallery(galleryFN, callbackFN,
+          _me._gallery = new CELEMENTS.images.Gallery(galleryFN, callbackFN.bind(_me),
               onlyFirstNumImages);
         } else {
-          callbackFN(_me._gallery);
+          _me._gallery.executeAfterLoad(callbackFN.bind(_me));
         }
       },
 
@@ -291,10 +291,14 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       startNonOverlaySlideShow : function() {
         var _me = this;
-        _me._initNonOverlaySlideShow();
-        _me._getCelSlideShowObj().setAutoresize(true);
-        _me._getCelSlideShowObj().register();
-        _me._imageSlideShowLoadFirstContent_internal();
+        _me._getGallery(function(galleryObj) {
+          _me._celSlideShowObj = null;
+          _me._getCelSlideShowObj(galleryObj.getLayoutName());
+          _me._initNonOverlaySlideShow();
+          _me._getCelSlideShowObj().setAutoresize(true);
+          _me._getCelSlideShowObj().register();
+          _me._imageSlideShowLoadFirstContent_internal();
+        });
       },
 
       _imageSlideShowLoadFirstContent_internal : function() {
@@ -391,14 +395,16 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         } else if (startSlideNum >= images.size()) {
           startSlideNum = images.size() - 1;
         }
-        _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
-        _me._currentHtmlElem.removeAttribute('width');
-        _me._currentHtmlElem.removeAttribute('height');
-        _me._currentHtmlElem.setStyle({
-          'visibility' : '',
-          'width' : '',
-          'height' : ''
-        });
+        if (images[startSlideNum]) {
+          _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
+          _me._currentHtmlElem.removeAttribute('width');
+          _me._currentHtmlElem.removeAttribute('height');
+          _me._currentHtmlElem.setStyle({
+            'visibility' : '',
+            'width' : '',
+            'height' : ''
+          });
+        }
       },
 
       _resizeOverlay : function() {
