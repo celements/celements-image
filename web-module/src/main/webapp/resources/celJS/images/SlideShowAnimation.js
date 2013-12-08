@@ -10,9 +10,10 @@ if(typeof CELEMENTS.presentation=="undefined"){CELEMENTS.presentation={};};
 //////////////////////////////////////////////////////////////////////////////
 // Celements presentation Slideshow Animation
 //////////////////////////////////////////////////////////////////////////////
-CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj) {
+CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
+    slideShowEffect) {
   // constructor
-  this._init(celSlideShowObj);
+  this._init(celSlideShowObj, timeout, slideShowEffect);
 };
 
 (function() {
@@ -24,7 +25,7 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj) {
       _slideShowDelayedThread : undefined,
       _debug : false,
 
-      _init : function(celSlideShowObj, timeout, slideShowEffect ) {
+      _init : function(celSlideShowObj, timeout, slideShowEffect) {
         var _me = this;
         _me._celSlideShowObj = celSlideShowObj;
         _me._restartDelayBind = _me._restartDelay.bind(_me);
