@@ -75,7 +75,11 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
       _changeContentWithAnimation : function(event) {
         var _me = this;
         var memoObj = event.memo;
-        console.log('transition fade: ', memoObj);
+        if (_me._slideShowEffect != 'none') {
+          if ((typeof console != 'undefined') && (typeof console.warn != 'undefined')) {
+            console.warn('unsupported transition effect: ', _me._slideShowEffect, memoObj);
+          }
+        }
       }
 
   };
