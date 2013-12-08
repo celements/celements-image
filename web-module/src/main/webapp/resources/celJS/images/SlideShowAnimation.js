@@ -7,20 +7,6 @@ if(typeof CELEMENTS.presentation=="undefined"){CELEMENTS.presentation={};};
 
 (function(window, undefined) {
 
-  $j(document).ready(function() {
-    if (!CISS_OverlaySlideShowObj) {
-      CISS_OverlaySlideShowObj = new CELEMENTS.presentation.SlideShow();
-    }
-    $$('.celimage_slideshow').each(function(slideShowElem) {
-      if (slideShowElem.hasClassName('celimage_overlay')) {
-        CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
-      } else {
-        var imgSlideShow = CELEMENTS.presentation.getSlideShowObj(slideShowElem.id);
-        imgSlideShow.startNonOverlaySlideShow();
-      }
-    });
-  });
-
 //////////////////////////////////////////////////////////////////////////////
 // Celements presentation Slideshow Animation
 //////////////////////////////////////////////////////////////////////////////
