@@ -14,7 +14,7 @@
 #set($galleryLayoutRef = $services.model.createDocumentReference('', "$!{galleryLayout}", '').getLastSpaceReference())
 #if(!$recursiveCheck)
 #set($recursiveCheck = true)
-#set($slideContent = $services.celementsweb.renderCelementsDocumentWithLayout($slidedoc.documentReference, $galleryLayoutRef))
+#set($slideContent = $celementsweb.renderCelementsDocumentWithLayout($slidedoc.documentReference, $galleryLayoutRef))
 #end
 #set($recursiveCheck = false)
 #set($imgCssClasses = 'celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton')
