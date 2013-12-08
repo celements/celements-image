@@ -94,6 +94,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
       _imgLoadedReCenterStartSlideBind : undefined,
+      _slideShowAnimation : undefined,
       _wrapperHtmlElem : undefined,
       _hasRandomStart : false,
       _autoresize : false,
@@ -293,10 +294,16 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         _me._getGallery(function(galleryObj) {
           _me._celSlideShowObj = null;
-          _me._getCelSlideShowObj(galleryObj.getLayoutName());
+          var elemId = $(_me._currentHtmlElem).id;
+          var slideShowEffect = _me._getPart(elemId, 3, 'none');
+          var timeout = _me._getPart(elemId, 2, 3);
+          _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
+              _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
+              slideShowEffect);
           _me._initNonOverlaySlideShow();
           _me._getCelSlideShowObj().setAutoresize(true);
           _me._getCelSlideShowObj().register();
+          _me._slideShowAnimation.register();
           _me._imageSlideShowLoadFirstContent_internal();
         });
       },
