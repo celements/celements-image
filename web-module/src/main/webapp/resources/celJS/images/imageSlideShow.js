@@ -240,6 +240,24 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         element.setStyle(newStyle.toObject());
       },
 
+      _initNonOverlaySlideShowStarter : function(callbackFN) {
+        var _me = this;
+        var slideShowImg = $(_me._currentHtmlElem);
+        if (!_me._wrapperHtmlElem) {
+          if (!slideShowImg.complete) {
+            var _initNonOverlaySlideShowStarterBind =
+              _me._initNonOverlaySlideShowStarter.bind(_me);
+            slideShowImg.observe('load', _initNonOverlaySlideShowStarterBind.curry(
+                callbackFN));
+          } else {
+            _me._initNonOverlaySlideShow();
+            if (callbackFN) {
+              callbackFN();
+            }
+          }
+        }
+      },
+
       _initNonOverlaySlideShow : function() {
         var _me = this;
         var slideShowImg = $(_me._currentHtmlElem);
@@ -302,11 +320,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
                 _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
                 slideShowEffect);
           }
-          _me._initNonOverlaySlideShow();
-          _me._getCelSlideShowObj().setAutoresize(true);
-          _me._getCelSlideShowObj().register();
-          _me._slideShowAnimation.register();
-          _me._imageSlideShowLoadFirstContent_internal();
+          _me._initNonOverlaySlideShowStarter(function() {
+            _me._getCelSlideShowObj().setAutoresize(true);
+            _me._getCelSlideShowObj().register();
+            _me._slideShowAnimation.register();
+            _me._imageSlideShowLoadFirstContent_internal();
+          });
         });
       },
 
