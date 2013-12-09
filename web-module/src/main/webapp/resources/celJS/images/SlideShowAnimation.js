@@ -24,7 +24,6 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
       _timeout : undefined,
       _slideShowDelayedThread : undefined,
       _changeContentWithAnimationBind : undefined,
-      _afterFinishTransitionBind : undefined,
       _debug : false,
 
       _init : function(celSlideShowObj, timeout, slideShowEffect) {
@@ -33,7 +32,6 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
         _me._restartDelayBind = _me._restartDelay.bind(_me);
         _me._delayedNextBind = _me._delayedNext.bind(_me);
         _me._changeContentWithAnimationBind = _me._changeContentWithAnimation.bind(_me);
-        _me._afterFinishTransition = _me._afterFinishTransition.bind(_me);
         _me._slideShowEffect = slideShowEffect || 'none';
         _me._timeout = timeout || 9999;
       },
@@ -72,7 +70,7 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
           _me._celSlideShowObj.getHtmlContainer().stopObserving(
               'cel_yuiOverlay:changeContent', _me._changeContentWithAnimationBind);
           _me._celSlideShowObj.getHtmlContainer().observe('cel_yuiOverlay:changeContent',
-              _me._changeContentWithAnimation);
+              _me._changeContentWithAnimationBind);
         }
         _me._celSlideShowObj._navObj.nextSlide();
       },
@@ -86,15 +84,26 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
           if (_me._slideShowEffect == 'fade') {
             var oldSlide = memoObj.slides[0];
             var newSlide = memoObj.slides[1];
+            oldSlide.setStyle({ 'position' : 'absolute' });
             new Effect.Parallel(
                 [
-                  new Effect.Appear(newSlide, { from : 0, to : 1, sync: true }),
-                  new Effect.Fade(oldSlide, { from : 1, to : 0, sync: true })
+                  new Effect.Appear(newSlide, {
+                    from : 0,
+                    to : 1,
+                    sync: true
+                  }),
+                  new Effect.Fade(oldSlide, {
+                    from : 1,
+                    to : 0,
+                    sync: true
+                  })
                 ],
                 {
                   'duration' : 2.0,
                   'slideShowAnimObj' : memoObj,
-                  'afterFinish' : _me._afterFinishTransitionBind
+                  'afterFinish' : function(effect) {
+                    _me._afterFinishTransition(effect);
+                  }
                 }
             );
             event.stop();
@@ -108,7 +117,8 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
 
       _afterFinishTransition : function(effect) {
         var _me = this;
-//        var slideConfig = effect.options.slideShowAnimObj;
+//        var slideShowAnimObj = effect.options.slideShowAnimObj;
+//        console.log('_afterFinishTransition: ', slideShowAnimObj);
         _me._celSlideShowObj.getHtmlContainer().fire(
             'cel_slideShow:slideTransitionFinished');
       }
