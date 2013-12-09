@@ -522,7 +522,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if(isMobile.any()) {
           if(isMobile.iOS() && _me._isOrientationLandscape()) {
             width = screen.height;
-          } else {
+          } else if (!isMobile.Android()) {
             width = screen.width;
           }
         }
