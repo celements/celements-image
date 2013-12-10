@@ -19,11 +19,28 @@ CiG.prototype = {
     _galleryData : undefined,
     _imagesArray : undefined,
     _imagesHash : undefined,
+    _afterLoadListener : undefined,
+    _loading : false,
+    _loaded : false,
 
   _init : function(collDocRef, callbackFN, onlyFirstNumImages, spaceImgs) {
     var _me = this;
     _me._collDocRef = collDocRef;
-    _me._loadData(callbackFN, onlyFirstNumImages, spaceImgs);
+    _me._afterLoadListener = new Array();
+    _me.executeAfterLoad(callbackFN, onlyFirstNumImages, spaceImgs);
+  },
+
+  executeAfterLoad : function(callbackFN, onlyFirstNumImages, spaceImgs) {
+    var _me = this;
+    if (_me.loaded) {
+      callbackFN(_me);
+    } else {
+      _me._afterLoadListener.push(callbackFN);
+      if (!_me._loading) {
+        _me._loading = true;
+        _me._loadData(onlyFirstNumImages, spaceImgs);
+      }
+    }
   },
 
   getDocRef : function() {
@@ -48,8 +65,9 @@ CiG.prototype = {
     }
   },
 
-  _loadData : function(callbackFN, onlyFirstNumImages, spaceImgs) {
+  _loadData : function(onlyFirstNumImages, spaceImgs) {
     var _me = this;
+    _me._loading = true;
     var params = {
         'xpage' : 'celements_ajax',
         'ajax_mode' : 'GalleryData'
@@ -77,9 +95,20 @@ CiG.prototype = {
             var index = _me._imagesArray.push(image);
             _me._imagesHash.set(imageId, index - 1);
           });
-          if (callbackFN) {
-            callbackFN(_me);
-          }
+          _me._loaded = true;
+          _me._afterLoadListener.each(function(callbackFN) {
+            if (callbackFN) {
+              try {
+                callbackFN(_me);
+              } catch (exp){
+                if ((typeof console != 'undefined')
+                    && (typeof console.error != 'undefined')) {
+                  console.error('failed to execute afterLoadListener: ', callbackFN, exp);
+                }
+              }
+            }
+          });
+          _me._loading = false;
         } else if ((typeof console != 'undefined')
             && (typeof console.error != 'undefined')) {
           console.error('noJSON!!! ', transport.responseText);

@@ -94,6 +94,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
       _imgLoadedReCenterStartSlideBind : undefined,
+      _slideShowAnimation : undefined,
       _wrapperHtmlElem : undefined,
       _hasRandomStart : false,
       _autoresize : false,
@@ -190,10 +191,10 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         var galleryFN = _me._getPart(_me._currentHtmlElem.id, 1, '');
         if (!_me._gallery && (galleryFN != '')) {
-          _me._gallery = new CELEMENTS.images.Gallery(galleryFN, callbackFN,
+          _me._gallery = new CELEMENTS.images.Gallery(galleryFN, callbackFN.bind(_me),
               onlyFirstNumImages);
         } else {
-          callbackFN(_me._gallery);
+          _me._gallery.executeAfterLoad(callbackFN.bind(_me));
         }
       },
 
@@ -237,6 +238,24 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         divWrapper.setStyle(newStyle.toObject());
         newStyle.set(styleName, '');
         element.setStyle(newStyle.toObject());
+      },
+
+      _initNonOverlaySlideShowStarter : function(callbackFN) {
+        var _me = this;
+        var slideShowImg = $(_me._currentHtmlElem);
+        if (!_me._wrapperHtmlElem) {
+          if (!slideShowImg.complete) {
+            var _initNonOverlaySlideShowStarterBind =
+              _me._initNonOverlaySlideShowStarter.bind(_me);
+            slideShowImg.observe('load', _initNonOverlaySlideShowStarterBind.curry(
+                callbackFN));
+          } else {
+            _me._initNonOverlaySlideShow();
+            if (callbackFN) {
+              callbackFN();
+            }
+          }
+        }
       },
 
       _initNonOverlaySlideShow : function() {
@@ -291,10 +310,23 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       startNonOverlaySlideShow : function() {
         var _me = this;
-        _me._initNonOverlaySlideShow();
-        _me._getCelSlideShowObj().setAutoresize(true);
-        _me._getCelSlideShowObj().register();
-        _me._imageSlideShowLoadFirstContent_internal();
+        _me._getGallery(function(galleryObj) {
+          _me._celSlideShowObj = null;
+          var elemId = $(_me._currentHtmlElem).id;
+          if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
+            var slideShowEffect = _me._getPart(elemId, 3, 'none');
+            var timeout = _me._getPart(elemId, 2, 3);
+            _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
+                _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
+                slideShowEffect);
+          }
+          _me._initNonOverlaySlideShowStarter(function() {
+            _me._getCelSlideShowObj().setAutoresize(true);
+            _me._getCelSlideShowObj().register();
+            _me._slideShowAnimation.register();
+            _me._imageSlideShowLoadFirstContent_internal();
+          });
+        });
       },
 
       _imageSlideShowLoadFirstContent_internal : function() {
@@ -391,14 +423,16 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         } else if (startSlideNum >= images.size()) {
           startSlideNum = images.size() - 1;
         }
-        _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
-        _me._currentHtmlElem.removeAttribute('width');
-        _me._currentHtmlElem.removeAttribute('height');
-        _me._currentHtmlElem.setStyle({
-          'visibility' : '',
-          'width' : '',
-          'height' : ''
-        });
+        if (images[startSlideNum]) {
+          _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
+          _me._currentHtmlElem.removeAttribute('width');
+          _me._currentHtmlElem.removeAttribute('height');
+          _me._currentHtmlElem.setStyle({
+            'visibility' : '',
+            'width' : '',
+            'height' : ''
+          });
+        }
       },
 
       _resizeOverlay : function() {
@@ -488,7 +522,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         if(isMobile.any()) {
           if(isMobile.iOS() && _me._isOrientationLandscape()) {
             width = screen.height;
-          } else {
+          } else if (!isMobile.Android()) {
             width = screen.width;
           }
         }
