@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class entity-name="Classes.PhotoAlbumClass" table="cel_image_photo_album_class">
+    <id name="id" type="integer" unsaved-value="undefined">
+      <column name="IPA_ID" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="space_name" type="string">
+      <column name="IPA_SPACE_NAME" length="255" />
+    </property>
+    <property name="copyright" type="string">
+      <column name="IPA_COPYRIGHT" length="255" />
+    </property>
+    <property name="watermark" type="string">
+      <column name="IPA_WATERMARK" length="255"/>
+    </property>
+  </class>
+  <class entity-name="Classes.PhotoImageClass" table="cel_image_photo_image_class">
+    <id name="id" type="integer" unsaved-value="undefined">
+      <column name="IPI_ID" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="image_filename" type="string">
+      <column name="IPI_FILENAME" length="255" />
+    </property>
+    <property name="image_hash" type="string">
+      <column name="IPI_IMAGE_HASH" length="255" />
+    </property>
+    <property name="zip_filename" type="string">
+      <column name="IPI_ZIP_FILENAME" length="255"/>
+    </property>
+    <property name="zip_directory" type="string">
+      <column name="IPI_ZIP_DIRECTORY" length="255"/>
+    </property>
+    <property name="revision" type="integer">
+      <column name="IPI_REVISION" />
+    </property>
+    <property name="deleted" type="integer">
+      <column name="IPI_DELETED" />
+    </property>
+    <property name="width" type="integer">
+      <column name="IPI_WIDTH" />
+    </property>
+    <property name="height" type="integer">
+      <column name="IPI_HEIGHT" />
+    </property>
+  </class>
+  <class entity-name="Classes.PhotoMetainfoClass" table="cel_image_metainfo_class">
+    <id name="id" type="integer" unsaved-value="undefined">
+      <column name="IPM_ID" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="name" type="string">
+      <column name="IPM_NAME" length="255" />
+    </property>
+    <property name="description" type="text">
+      <column name="IPM_DESCRIPTION" />
+    </property>
+    <property name="lang" type="string">
+      <column name="IPM_LANG" length="16" />
+    </property>
+    <property name="source" type="string">
+      <column name="IPM_SOURCE" length="255"/>
+    </property>
+  </class>
+</hibernate-mapping>
