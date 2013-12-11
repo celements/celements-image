@@ -117,7 +117,7 @@ public class MetaInfoExtractor {
     return metadata;
   }
   
-  String cleanCtrlChars(String tag) {
+  public String cleanCtrlChars(String tag) {
     String cleanTag = tag;
     Pattern p = Pattern.compile("\\p{C}");
     Matcher m = p.matcher(tag);
