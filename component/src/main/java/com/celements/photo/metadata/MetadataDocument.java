@@ -67,7 +67,7 @@ public class MetadataDocument implements IMetadataDocumentRole {
           tagValue = tagValue.substring(tag.length() + 3);
         }
         tagObj.setStringValue(ImageLibStrings.METAINFO_CLASS_NAME, tag);
-        tagObj.setStringValue(ImageLibStrings.METAINFO_CLASS_DESCRIPTION, tagValue);
+        tagObj.setLargeStringValue(ImageLibStrings.METAINFO_CLASS_DESCRIPTION, tagValue);
         tagObj.setStringValue("lang", "");
         tagObj.setStringValue("source", "system " + tagSource);
       }
