@@ -63,6 +63,11 @@ public class PhotoImageClass {
     needsUpdate |= bclass.addBooleanField(ImageLibStrings.PHOTO_IMAGE_DELETED, ImageLibStrings.PHOTO_IMAGE_DELETED_PRETTY, "yesno");
     needsUpdate |= bclass.addNumberField(ImageLibStrings.PHOTO_IMAGE_WIDTH, ImageLibStrings.PHOTO_IMAGE_WIDTH_PRETTY, 30, "integer");
     needsUpdate |= bclass.addNumberField(ImageLibStrings.PHOTO_IMAGE_HEIGHT, ImageLibStrings.PHOTO_IMAGE_HEIGHT_PRETTY, 30, "integer");
+
+    if(!"internal".equals(bclass.getCustomMapping())){
+      needsUpdate = true;
+      bclass.setCustomMapping("internal");
+    }
     
     if (needsUpdate){
       xwiki.saveDocument(doc, context);
