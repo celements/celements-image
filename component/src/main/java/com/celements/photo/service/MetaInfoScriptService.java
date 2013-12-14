@@ -153,6 +153,14 @@ public class MetaInfoScriptService implements ScriptService {
     extractMetadataToDocument(source, filename, destination, true);
   }
   
+  public String cleanCtrlChars(String tag) {
+    if(!getContext().containsKey("nInfoExtractor")) {
+      getContext().put("nInfoExtractor", new MetaInfoExtractor());
+    }
+    MetaInfoExtractor extractor = (MetaInfoExtractor)getContext().get("nInfoExtractor");
+    return extractor.cleanCtrlChars(tag);
+  }
+  
   
   //TODO move out of ScriptService
   

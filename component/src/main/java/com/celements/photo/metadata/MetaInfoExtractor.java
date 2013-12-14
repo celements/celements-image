@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,8 +112,25 @@ public class MetaInfoExtractor {
   Hashtable<String, String> getDirsTags(Directory dir) throws MetadataException{
     Hashtable<String, String> metadata = new Hashtable<String, String>();
     for (Tag tag : dir.getTags()) {
-      metadata.put(tag.getTagName(), tag.toString());
+      metadata.put(cleanCtrlChars(tag.getTagName()), cleanCtrlChars(tag.toString()));
     }
     return metadata;
+  }
+  
+  public String cleanCtrlChars(String tag) {
+    String cleanTag = tag;
+    Pattern p = Pattern.compile("\\p{C}");
+    Matcher m = p.matcher(tag);
+    while(m.find()) {
+      String dirtyChar = m.group();
+      if(!"\t".equals(dirtyChar) && !"\r".equals(dirtyChar) && !"\n".equals(dirtyChar)) {
+        String cleanTagTmp = cleanTag;
+        cleanTag = "";
+        for(String part : cleanTagTmp.split(dirtyChar)) {
+          cleanTag += part;
+        }
+      }
+    }
+    return cleanTag;
   }
 }
