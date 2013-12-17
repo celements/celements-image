@@ -310,23 +310,30 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       startNonOverlaySlideShow : function() {
         var _me = this;
-        _me._getGallery(function(galleryObj) {
-          _me._celSlideShowObj = null;
-          var elemId = $(_me._currentHtmlElem).id;
-          if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
-            var slideShowEffect = _me._getPart(elemId, 3, 'none');
-            var timeout = _me._getPart(elemId, 2, 3);
-            _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
-                _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
-                slideShowEffect);
-          }
-          _me._initNonOverlaySlideShowStarter(function() {
-            _me._getCelSlideShowObj().setAutoresize(true);
-            _me._getCelSlideShowObj().register();
-            _me._slideShowAnimation.register();
-            _me._imageSlideShowLoadFirstContent_internal();
-          });
-        });
+        _me._getGallery(_me._startNonOverlaySlideShowCallback.bind(_me));
+      },
+
+      _startNonOverlaySlideShowCallback : function(galleryObj) {
+        var _me = this;
+        _me._celSlideShowObj = null;
+        var elemId = $(_me._currentHtmlElem).id;
+        if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
+          var slideShowEffect = _me._getPart(elemId, 3, 'none');
+          var timeout = _me._getPart(elemId, 2, 3);
+          _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
+              _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
+              slideShowEffect);
+        }
+        _me._initNonOverlaySlideShowStarter(
+            _me._initNonOverlaySlideShowStarterCallback.bind(_me));
+      },
+
+      _initNonOverlaySlideShowStarterCallback : function() {
+        var _me = this;
+        _me._getCelSlideShowObj().setAutoresize(true);
+        _me._getCelSlideShowObj().register();
+        _me._slideShowAnimation.register();
+        _me._imageSlideShowLoadFirstContent_internal();
       },
 
       _imageSlideShowLoadFirstContent_internal : function() {
