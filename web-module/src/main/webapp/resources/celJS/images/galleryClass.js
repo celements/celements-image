@@ -108,6 +108,7 @@ CiG.prototype = {
               }
             }
           });
+          _me._afterLoadListener = new Array();
           _me._loading = false;
         } else if ((typeof console != 'undefined')
             && (typeof console.error != 'undefined')) {
