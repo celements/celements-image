@@ -25,6 +25,7 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
       _slideShowDelayedThread : undefined,
       _changeContentWithAnimationBind : undefined,
       _debug : false,
+      _paused : false,
 
       _init : function(celSlideShowObj, timeout, slideShowEffect) {
         var _me = this;
@@ -56,23 +57,51 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
 
       _restartDelay : function() {
         var _me = this;
+        _me._cancelDelayedNext();
+        _me._slideShowDelayedThread = _me._delayedNextBind.delay(_me._timeout);
+      },
+
+      /**
+       * _delayedNext may only be called delayed by _restartDelay
+       */
+      _delayedNext : function() {
+        var _me = this;
+        _me._slideShowDelayedThread = undefined;
+        if (!_me._paused) {
+          if (_me._slideShowEffect != 'none') {
+            _me._celSlideShowObj.getHtmlContainer().stopObserving(
+                'cel_yuiOverlay:changeContent', _me._changeContentWithAnimationBind);
+            _me._celSlideShowObj.getHtmlContainer().observe('cel_yuiOverlay:changeContent',
+                _me._changeContentWithAnimationBind);
+          }
+          _me._celSlideShowObj._navObj.nextSlide();
+        }
+      },
+
+      _cancelDelayedNext : function() {
+        var _me = this;
         if (_me._slideShowDelayedThread) {
           window.clearTimeout(_me._slideShowDelayedThread);
           _me._slideShowDelayedThread = undefined;
         }
-        _me._slideShowDelayedThread = _me._delayedNextBind.delay(_me._timeout);
       },
 
-      _delayedNext : function() {
+      stopAnimation : function() {
         var _me = this;
-        _me._slideShowDelayedThread = undefined;
-        if (_me._slideShowEffect != 'none') {
-          _me._celSlideShowObj.getHtmlContainer().stopObserving(
-              'cel_yuiOverlay:changeContent', _me._changeContentWithAnimationBind);
-          _me._celSlideShowObj.getHtmlContainer().observe('cel_yuiOverlay:changeContent',
-              _me._changeContentWithAnimationBind);
-        }
-        _me._celSlideShowObj._navObj.nextSlide();
+        _me._paused = true;
+        _me._cancelDelayedNext();
+      },
+
+      startAnimation : function() {
+        var _me = this;
+        _me._paused = false;
+        _me._cancelDelayedNext();
+        _me._delayedNext();
+      },
+
+      isStopped : function() {
+        var _me = this;
+        return _me._paused;
       },
 
       _changeContentWithAnimation : function(event) {
