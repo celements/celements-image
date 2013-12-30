@@ -51,9 +51,6 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
     $$('.celimage_slideshow').each(function(slideShowElem) {
       if (slideShowElem.hasClassName('celimage_overlay')) {
         CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
-      } else {
-        var imgSlideShow = CELEMENTS.image.getSlideShowObj(slideShowElem.id);
-        imgSlideShow.startNonOverlaySlideShow();
       }
     });
   });
@@ -66,8 +63,11 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
   var initializeImageSlideShow = function() {
     $$('.celimage_slideshow').each(function(slideShowElem) {
-      CISS_SlideShowObjHash.set(slideShowElem.id, new CELEMENTS.image.SlideShow(
-          slideShowElem.id));
+      var imgSlideShow = new CELEMENTS.image.SlideShow(slideShowElem.id);
+      CISS_SlideShowObjHash.set(slideShowElem.id, imgSlideShow);
+      //important that the start happens before document.ready to allow the slideshow
+      // context menu beeing loaded
+      imgSlideShow.startNonOverlaySlideShow();
     });
   };
 
@@ -277,7 +277,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
            });
           var divWrapper = divSlideRoot.wrap('div', {
             'id' : ('slideContainer_' + slideShowImg.id),
-            'class' : 'celimage_slideshow_wrapper'
+            'class' : 'celimage_slideshow_wrapper cel_cm_celimage_slideshow'
            }).setStyle({
              'position' : 'relative'
            });
