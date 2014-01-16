@@ -71,11 +71,14 @@ $services.celementsphoto.addImage($jsonBuilder, $attach)
       #set($imageSplit = $util.decodeURI($imageInSlide).split('/'))
       #if($imageSplit.size() > 4)
         #set($imageDocRef = $services.model.createDocumentReference('', $imageSplit.get(2), $imageSplit.get(3)))
-        #set($imageRef = $services.model.createAttachmentReference($imageDocRef, $imageSplit.get(4)))
-        #set($imgAttach = $services.celementsphoto.getImageAttachment($imageRef))
-      #end
-      #if("$!imgAttach" != '')
-  $services.celementsphoto.addImage($jsonBuilder, $imgAttach)
+        #set($imageDoc = $xwiki.getDocument($imageDocRef))
+        #if("$!imageDoc.getAttachment($imageSplit.get(4))" != '')
+          #set($imageRef = $services.model.createAttachmentReference($imageDocRef, $imageSplit.get(4)))
+          #set($imgAttach = $services.celementsphoto.getImageAttachment($imageRef))
+          #if("$!imgAttach" != '')
+      $services.celementsphoto.addImage($jsonBuilder, $imgAttach)
+          #end
+        #end
       #end
     #end
   #end

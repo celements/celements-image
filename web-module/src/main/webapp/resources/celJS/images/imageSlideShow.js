@@ -51,9 +51,6 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
     $$('.celimage_slideshow').each(function(slideShowElem) {
       if (slideShowElem.hasClassName('celimage_overlay')) {
         CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
-      } else {
-        var imgSlideShow = CELEMENTS.image.getSlideShowObj(slideShowElem.id);
-        imgSlideShow.startNonOverlaySlideShow();
       }
     });
   });
@@ -66,8 +63,11 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
   var initializeImageSlideShow = function() {
     $$('.celimage_slideshow').each(function(slideShowElem) {
-      CISS_SlideShowObjHash.set(slideShowElem.id, new CELEMENTS.image.SlideShow(
-          slideShowElem.id));
+      var imgSlideShow = new CELEMENTS.image.SlideShow(slideShowElem.id);
+      CISS_SlideShowObjHash.set(slideShowElem.id, imgSlideShow);
+      //important that the start happens before document.ready to allow the slideshow
+      // context menu beeing loaded
+      imgSlideShow.startNonOverlaySlideShow();
     });
   };
 
@@ -277,7 +277,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
            });
           var divWrapper = divSlideRoot.wrap('div', {
             'id' : ('slideContainer_' + slideShowImg.id),
-            'class' : 'celimage_slideshow_wrapper'
+            'class' : 'celimage_slideshow_wrapper cel_cm_celimage_slideshow'
            }).setStyle({
              'position' : 'relative'
            });
@@ -310,23 +310,30 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       startNonOverlaySlideShow : function() {
         var _me = this;
-        _me._getGallery(function(galleryObj) {
-          _me._celSlideShowObj = null;
-          var elemId = $(_me._currentHtmlElem).id;
-          if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
-            var slideShowEffect = _me._getPart(elemId, 3, 'none');
-            var timeout = _me._getPart(elemId, 2, 3);
-            _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
-                _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
-                slideShowEffect);
-          }
-          _me._initNonOverlaySlideShowStarter(function() {
-            _me._getCelSlideShowObj().setAutoresize(true);
-            _me._getCelSlideShowObj().register();
-            _me._slideShowAnimation.register();
-            _me._imageSlideShowLoadFirstContent_internal();
-          });
-        });
+        _me._getGallery(_me._startNonOverlaySlideShowCallback.bind(_me));
+      },
+
+      _startNonOverlaySlideShowCallback : function(galleryObj) {
+        var _me = this;
+        _me._celSlideShowObj = null;
+        var elemId = $(_me._currentHtmlElem).id;
+        if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
+          var slideShowEffect = _me._getPart(elemId, 3, 'none');
+          var timeout = _me._getPart(elemId, 2, 3);
+          _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
+              _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
+              slideShowEffect);
+        }
+        _me._initNonOverlaySlideShowStarter(
+            _me._initNonOverlaySlideShowStarterCallback.bind(_me));
+      },
+
+      _initNonOverlaySlideShowStarterCallback : function() {
+        var _me = this;
+        _me._getCelSlideShowObj().setAutoresize(true);
+        _me._getCelSlideShowObj().register();
+        _me._slideShowAnimation.register();
+        _me._imageSlideShowLoadFirstContent_internal();
       },
 
       _imageSlideShowLoadFirstContent_internal : function() {
