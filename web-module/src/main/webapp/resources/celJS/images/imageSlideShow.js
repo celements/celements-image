@@ -69,6 +69,9 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         //important that the start happens before document.ready to allow the slideshow
         // context menu beeing loaded
         imgSlideShow.startNonOverlaySlideShow();
+      } else if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+        console.log('skip auto start image-slideshow because css class'
+            + ' celimage_manualstart found on', slideShowElem.id);
       }
     });
   };
