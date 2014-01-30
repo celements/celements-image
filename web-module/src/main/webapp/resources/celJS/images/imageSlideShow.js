@@ -65,9 +65,14 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
     $$('.celimage_slideshow').each(function(slideShowElem) {
       var imgSlideShow = new CELEMENTS.image.SlideShow(slideShowElem.id);
       CISS_SlideShowObjHash.set(slideShowElem.id, imgSlideShow);
-      //important that the start happens before document.ready to allow the slideshow
-      // context menu beeing loaded
-      imgSlideShow.startNonOverlaySlideShow();
+      if (!slideShowElem.hasClassName('celimage_manualstart')) {
+        //important that the start happens before document.ready to allow the slideshow
+        // context menu beeing loaded
+        imgSlideShow.startNonOverlaySlideShow();
+      } else if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+        console.log('skip auto start image-slideshow because css class'
+            + ' celimage_manualstart found on', slideShowElem.id);
+      }
     });
   };
 
