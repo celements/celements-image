@@ -19,17 +19,24 @@
  */
 package com.celements.photo.utilities;
 
+import org.xwiki.model.reference.DocumentReference;
+
 public class ImportFileObject {
   public static final short ACTION_SKIP = -1;
   public static final short ACTION_OVERWRITE = 0;
   public static final short ACTION_ADD = 1;
   
+  private DocumentReference docRef;
   private String filename;
   private short action;
+  private boolean isImg;
   
-  public ImportFileObject(String filename, short action){
+  public ImportFileObject(DocumentReference docRef, String filename, short action, 
+      boolean isImg) {
+    this.docRef = docRef;
     this.filename = filename;
     this.action = action;
+    this.isImg = isImg;
   }
   
   public String getFilename() {
@@ -38,5 +45,13 @@ public class ImportFileObject {
   
   public short getAction() {
     return action;
+  }
+  
+  public DocumentReference getDocRef() {
+    return docRef;
+  }
+  
+  public boolean isImg() {
+    return isImg;
   }
 }

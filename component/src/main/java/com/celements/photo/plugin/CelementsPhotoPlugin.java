@@ -23,6 +23,9 @@ import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -336,7 +339,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
     List<ImportFileObject> resultList = new ArrayList<ImportFileObject>();
     
     if(importFile != null){
-      if(isZipFile(importFile, context)){
+      if(isZipFile(importFile, context)) {
         List<String> fileList;
         try {
           fileList = (new Unzip()).getZipContentList(
@@ -346,17 +349,16 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
             String fileName = (String) fileIterator.next();
             if(!fileName.endsWith(fileSep)
                 && !fileName.startsWith(".") && !fileName.contains(fileSep + ".")){
-              ImportFileObject file = new ImportFileObject(fileName, getActionForFile(
-                  fileName, galleryDoc, context));
+              ImportFileObject file = getImportFileObject(fileName, galleryDoc, context);
               resultList.add(file);
             }
           }
         } catch (IOException ioe) {
           LOGGER.error("Error reading file.", ioe);
         }
-      } else if(isImgFile(importFile, context)){
-        ImportFileObject file = new ImportFileObject(importFile.getFilename(), 
-            getActionForFile(importFile.getFilename(), galleryDoc, context));
+      } else if(isImgFile(importFile, context)) {
+        ImportFileObject file = getImportFileObject(importFile.getFilename(), galleryDoc, 
+            context);
         resultList.add(file);
       }
     } else{
@@ -371,25 +373,51 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * For a given filename return if, in the specified gallery, its import 
    * should be added, overwritten or skiped.
    * 
-   * @param fileName Filename of the file to check.
+   * @param filename Filename of the file to check.
    * @param galleryDoc Document of the gallery to check if the file already exists.
    * @return action when importing: -1 skip, 0 overwrite, 1 add
    */
-  private short getActionForFile(String fileName, XWikiDocument galleryDoc, 
+  private ImportFileObject getImportFileObject(String filename, XWikiDocument galleryDoc, 
       XWikiContext context) {
     short action = ImportFileObject.ACTION_SKIP;
-    if(isImgFile(fileName)){
-      fileName = fileName.replace(System.getProperty("file.separator"), ".");
-      fileName = context.getWiki().clearName(fileName, false, true, context);
-      XWikiAttachment attachment = galleryDoc.getAttachment(fileName);
-      if(attachment == null){
-        action = ImportFileObject.ACTION_ADD;
-      } else{
+    DocumentReference docRef = null;
+    boolean attachmentExists = false;
+    filename = filename.replace(System.getProperty("file.separator"), ".");
+    filename = context.getWiki().clearName(filename, false, true, context);
+    if(galleryDoc != null) {
+      attachmentExists = galleryDoc.getAttachment(filename) != null;
+      docRef = galleryDoc.getDocumentReference();
+    } else {
+      docRef = getDocRefForFilename(filename);
+      attachmentExists = context.getWiki().exists(docRef, context);
+    }
+    boolean isImg = isImgFile(filename);
+    if(isImg || (galleryDoc == null)) {
+      if(attachmentExists){
         action = ImportFileObject.ACTION_OVERWRITE;
+      } else{
+        action = ImportFileObject.ACTION_ADD;
       }
     }
-    
-    return action;
+    return new ImportFileObject(docRef, filename, action, isImg);
+  }
+  
+  private DocumentReference getDocRefForFilename(String filename, XWikiContext context) {
+    String algo = "MD5";
+    String filenameId = filename.replaceAll("[a-zA-Z0-9]", ""); -> fix regex to everything NOT
+    try {
+      String digest = "";
+      MessageDigest md = MessageDigest.getInstance(algo);
+      for(byte b : md.digest(filename.getBytes())) {
+        digest += Integer.toHexString(Math.abs((int)b));
+      }
+      filenameId = digest + "-" + filenameId;
+    } catch (NoSuchAlgorithmException nsae) {
+      LOGGER.error(algo + " algorithm not available", nsae);
+    }
+    String fileBase = context.getWiki().getWebPreference("cel_centralfilebase", context);
+    String space = fileBase.substring(0, fileBase.indexOf('.'));
+    return new DocumentReference(context.getDatabase(), space, filenameId);
   }
 
   /**
