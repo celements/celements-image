@@ -4,7 +4,6 @@ package com.celements.photo.service;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.ImageDimensions;
-import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.image.ICropImage;
 import com.celements.photo.unpack.IUnpackComponentRole;
 import com.celements.sajson.Builder;
