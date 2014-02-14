@@ -1,6 +1,7 @@
 package com.celements.photo.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.AttachmentReference;
@@ -10,6 +11,7 @@ import org.xwiki.model.reference.SpaceReference;
 import com.celements.photo.container.ImageDimensions;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.objects.BaseObject;
 
 @ComponentRole
@@ -36,5 +38,7 @@ public interface IImageService {
       ) throws XWikiException;
 
   public DocumentReference getImageSlideTemplateRef();
+
+  public Map<String, String> getImageURLinAllAspectRatios(XWikiAttachment image);
 
 }

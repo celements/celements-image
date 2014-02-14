@@ -14,6 +14,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.NavigationClasses;
+import com.celements.photo.container.ImageDimensions;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -288,4 +289,151 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(0, ((Map<String, String>)vcontext.get("metaTagMap")).size());
   }
 
+  @Test
+  public void testGetFixedAspectURL_isSquare_tarSquare() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(300, 300), 1, 1);
+    assertEquals("Expecting no params if image matches target aspect ratio.", "", params);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isPortrait_tarSquare() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(300, 400), 1, 1);
+    assertTrue("Expecting no crop on left. [" + params + "]", 
+        params.indexOf("cropX=0") >= 0);
+    assertTrue("Expecting full width. [" + params + "]", 
+        params.indexOf("cropW=300") >= 0);
+    assertTrue("Expecting cropped border on top. [" + params + "]", 
+        params.indexOf("cropY=50") >= 0);
+    assertTrue("Expecting height equals full width. [" + params + "]", 
+        params.indexOf("cropH=300") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isLandscape_tarSquare() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(400, 300), 1, 1);
+    assertTrue("Expecting cropped border on left. [" + params + "]", 
+        params.indexOf("cropX=50") >= 0);
+    assertTrue("Expecting width equals full height. [" + params + "]", 
+        params.indexOf("cropW=300") >= 0);
+    assertTrue("Expecting no crop on top. [" + params + "]", 
+        params.indexOf("cropY=0") >= 0);
+    assertTrue("Expecting full height. [" + params + "]", 
+        params.indexOf("cropH=300") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_is3to4_tar3to4() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(300, 400), 3, 4);
+    assertEquals("Expecting no params if image matches target aspect ratio.", "", params);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isSquare_tar3to4() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(300, 300), 3, 4);
+    assertTrue("Expecting cropped border on left. [" + params + "]", 
+        params.indexOf("cropX=37") >= 0);
+    assertTrue("Expecting width equals .75 * height. [" + params + "]", 
+        params.indexOf("cropW=225") >= 0);
+    assertTrue("Expecting no crop on top. [" + params + "]", 
+        params.indexOf("cropY=0") >= 0);
+    assertTrue("Expecting full height. [" + params + "]", 
+        params.indexOf("cropH=300") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isLandscape_tar3to4() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(400, 300), 3, 4);
+    assertTrue("Expecting cropped border on left. [" + params + "]", 
+        params.indexOf("cropX=87") >= 0);
+    assertTrue("Expecting width equals .75 * height. [" + params + "]", 
+        params.indexOf("cropW=225") >= 0);
+    assertTrue("Expecting no crop on top. [" + params + "]", 
+        params.indexOf("cropY=0") >= 0);
+    assertTrue("Expecting full height. [" + params + "]", 
+        params.indexOf("cropH=300") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isPortraitWide_tar3to4() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(350, 400), 3, 4);
+    assertTrue("Expecting cropped border on left. [" + params + "]", 
+        params.indexOf("cropX=25") >= 0);
+    assertTrue("Expecting width equals .75 * height. [" + params + "]", 
+        params.indexOf("cropW=300") >= 0);
+    assertTrue("Expecting no crop on top. [" + params + "]", 
+        params.indexOf("cropY=0") >= 0);
+    assertTrue("Expecting full height. [" + params + "]", 
+        params.indexOf("cropH=400") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isPortraitSmall_tar3to4() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(240, 400), 3, 4);
+    assertTrue("Expecting no crop on left. [" + params + "]", 
+        params.indexOf("cropX=0") >= 0);
+    assertTrue("Expecting full width. [" + params + "]", 
+        params.indexOf("cropW=240") >= 0);
+    assertTrue("Expecting cropped border on top. [" + params + "]", 
+        params.indexOf("cropY=40") >= 0);
+    assertTrue("Expecting width * 4/3. [" + params + "]", 
+        params.indexOf("cropH=320") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_is4to3_tar4to3() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(400, 300), 4, 3);
+    assertEquals("Expecting no params if image matches target aspect ratio.", "", params);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isSquare_tar4to3() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(300, 300), 4, 3);
+    assertTrue("Expecting no crop on left. [" + params + "]", 
+        params.indexOf("cropX=0") >= 0);
+    assertTrue("Expecting full width. [" + params + "]", 
+        params.indexOf("cropW=300") >= 0);
+    assertTrue("Expecting cropped border on top. [" + params + "]", 
+        params.indexOf("cropY=37") >= 0);
+    assertTrue("Expecting height equals .75 * width. [" + params + "]", 
+        params.indexOf("cropH=225") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isPortrait_tar4to3() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(300, 400), 4, 3);
+    assertTrue("Expecting no crop on left. [" + params + "]", 
+        params.indexOf("cropX=0") >= 0);
+    assertTrue("Expecting full width. [" + params + "]", 
+        params.indexOf("cropW=300") >= 0);
+    assertTrue("Expecting cropped border on top. [" + params + "]", 
+        params.indexOf("cropY=87") >= 0);
+    assertTrue("Expecting height equals .75 * width. [" + params + "]", 
+        params.indexOf("cropH=225") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isLandscapeHigh_tar4to3() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(400, 350), 4, 3);
+    assertTrue("Expecting no crop on left. [" + params + "]", 
+        params.indexOf("cropX=0") >= 0);
+    assertTrue("Expecting full width. [" + params + "]", 
+        params.indexOf("cropW=400") >= 0);
+    assertTrue("Expecting cropped border on top. [" + params + "]", 
+        params.indexOf("cropY=25") >= 0);
+    assertTrue("Expecting height equals .75 * width. [" + params + "]", 
+        params.indexOf("cropH=300") >= 0);
+  }
+
+  @Test
+  public void testGetFixedAspectURL_isLandscapeLow_tar4to3() {
+    String params = imageService.getFixedAspectURL(new ImageDimensions(400, 240), 4, 3);
+    assertTrue("Expecting cropped border on left. [" + params + "]", 
+        params.indexOf("cropX=40") >= 0);
+    assertTrue("Expecting width * 4/3. [" + params + "]", 
+        params.indexOf("cropW=320") >= 0);
+    assertTrue("Expecting no crop on top. [" + params + "]", 
+        params.indexOf("cropY=0") >= 0);
+    assertTrue("Expecting full height. [" + params + "]", 
+        params.indexOf("cropH=240") >= 0);
+  }
 }

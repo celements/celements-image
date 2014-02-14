@@ -4,7 +4,9 @@ package com.celements.photo.service;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +18,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.photo.container.ImageDimensions;
+import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.image.ICropImage;
 import com.celements.photo.unpack.IUnpackComponentRole;
 import com.celements.sajson.Builder;
@@ -218,6 +221,15 @@ public class ImageScriptService implements ScriptService {
       String slideBaseName, String[] attFullNameList) {
     return addSlidesFromTemplate(galleryDocRef, slideBaseName, Arrays.asList(
         attFullNameList));
+  }
+  
+  /**
+   * Get crops (if necessary) for different (all meaning 1:1, 3:4, 4:3, 16:9, 16:10)
+   * aspect ratios
+   * @return
+   */
+  public Map<String, String> getImageURLinAllAspectRatios(Attachment image) {
+    return imageService.getImageURLinAllAspectRatios(image.getAttachment());
   }
 
 }
