@@ -402,10 +402,17 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       _fixStartImage : function() {
         var _me = this;
-        _me._currentHtmlElem.setStyle({
-          'visibility' : 'hidden'
-        });
-        _me._getGallery(_me._replaceStartImage.bind(_me), _me.getStartSlideNum() + 1);
+        var startSlideNum = _me.getStartSlideNum();
+        if (startSlideNum >= 0) {
+          _me._currentHtmlElem.setStyle({
+            'visibility' : 'hidden'
+          });
+          _me._getGallery(_me._replaceStartImage.bind(_me), startSlideNum + 1);
+        } else if ((typeof console != 'undefined')
+            && (typeof console.log != 'undefined')) {
+          console.log('skip fix start image because start slide number is below zero',
+              startSlideNum);
+        }
       },
 
       _getStartSlideNumFromId : function() {
