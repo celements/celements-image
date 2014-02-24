@@ -4,7 +4,9 @@ package com.celements.photo.service;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -218,6 +220,28 @@ public class ImageScriptService implements ScriptService {
       String slideBaseName, String[] attFullNameList) {
     return addSlidesFromTemplate(galleryDocRef, slideBaseName, Arrays.asList(
         attFullNameList));
+  }
+  
+  /**
+   * Returns a map containing the external URLs to a specified image attachment in 
+   * different aspect ratios (crops)
+   * "all" aspect ratios as of now meaning 1:1, 3:4, 4:3, 16:9, 16:10
+   * 
+   * @return Map containing external URLs to the specified image.
+   */
+  @SuppressWarnings("unchecked")
+  public Map<String, String> getImageURLinAllAspectRatios(Attachment image) {
+    Map<String, String> urls = null;
+    try {
+      urls = imageService.getImageURLinAllAspectRatios(image.getAttachment());
+    } catch(Exception ex) {
+      //Catching Exception since this method is used to build an XML export which
+      //should not throw an exception simply because one of many images can't be read 
+      //correctly e.g. due to a JAI problem.
+      LOGGER.error("Could not get image URLs in different aspect ratios for attachment ["
+          + ((image != null)? image.getFilename() : "null") + "]", ex);
+    }
+    return (Map<String, String>) ((urls != null)? urls : Collections.emptyMap());
   }
 
 }

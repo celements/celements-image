@@ -59,6 +59,11 @@ public class PhotoAlbumClass {
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_SPACE_NAME, ImageLibStrings.PHOTO_ALBUM_SPACE_NAME_PRETTY, 50);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_COPYRIGHT, ImageLibStrings.PHOTO_ALBUM_COPYRIGHT_PRETTY, 50);
     needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_WATERMARK, ImageLibStrings.PHOTO_ALBUM_WATERMARK_PRETTY, 50);
+
+    if(!"internal".equals(bclass.getCustomMapping())){
+      needsUpdate = true;
+      bclass.setCustomMapping("internal");
+    }
     
     if (needsUpdate){
       xwiki.saveDocument(doc, context);

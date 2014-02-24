@@ -57,6 +57,11 @@ public class PhotoMetainfoClass {
     needsUpdate |= bclass.addTextAreaField(ImageLibStrings.METAINFO_CLASS_DESCRIPTION, ImageLibStrings.METAINFO_CLASS_DESCRIPTION_PRETTY, 50, 10);
     needsUpdate |= bclass.addTextField("lang", "Language", 50);
     needsUpdate |= bclass.addTextField("source", "Tag Source", 50);
+
+    if(!"internal".equals(bclass.getCustomMapping())){
+      needsUpdate = true;
+      bclass.setCustomMapping("internal");
+    }
     
     if (needsUpdate){
       xwiki.saveDocument(doc, context);

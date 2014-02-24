@@ -324,4 +324,53 @@ public class ImageService implements IImageService {
     return slideTemplateRef;
   }
 
+  public Map<String, String> getImageURLinAllAspectRatios(XWikiAttachment ximage) {
+    ImageDimensions dim = null;
+    try {
+      dim = (new GenerateThumbnail()).getThumbnailDimensions(ximage.getContentInputStream(
+          getContext()), -1, -1, false, null);
+    } catch (XWikiException xwe) {
+      LOGGER.error("Exception reading image dimensions", xwe);
+    }
+    Map<String, String> urlMap = new HashMap<String, String>();
+    if(dim != null) {
+      String baseURL = ximage.getDoc().getExternalAttachmentURL(
+          ximage.getFilename(), "download", getContext());
+      if(baseURL.indexOf("?") < 0) {
+        baseURL += "?";
+      } else if(!baseURL.endsWith("&")) {
+        baseURL += "&";
+      }
+      urlMap.put("1:1", baseURL + getFixedAspectURL(dim, 1, 1));
+      urlMap.put("3:4", baseURL + getFixedAspectURL(dim, 3, 4));
+      urlMap.put("4:3", baseURL + getFixedAspectURL(dim, 4, 3));
+      urlMap.put("16:9", baseURL + getFixedAspectURL(dim, 16, 9));
+      urlMap.put("16:10", baseURL + getFixedAspectURL(dim, 16, 10));
+    }
+    return urlMap;
+  }
+
+  String getFixedAspectURL(ImageDimensions dim, int xFact, int yFact) {
+    double width = dim.getWidth();
+    double height = dim.getHeight();
+    double isAspRatio = width / (double)height;
+    double targetAspRatio = xFact / (double)yFact;
+    double epsylon = 0.00001;
+    String urlParams = "";
+    //only crop if dim does not matche target aspect ratio
+    if(Math.abs(isAspRatio - targetAspRatio) > epsylon) {
+      if(isAspRatio < targetAspRatio) {
+        urlParams += "cropX=0&cropW=" + (int)width;
+        int newHeight = (int)Math.floor(width * (1 / targetAspRatio));
+        int top = (int)Math.floor((height - (double)newHeight) / 2);
+        urlParams += "&cropY=" + top + "&cropH=" + newHeight;
+      } else {
+        int newWidth = (int)Math.floor(height * targetAspRatio);
+        int left = (int)Math.floor((width - (double)newWidth) / 2);
+        urlParams += "cropX=" + left + "&cropW=" + newWidth;
+        urlParams += "&cropY=0&cropH=" + (int)height;
+      }
+    }
+    return urlParams;
+  }
 }
