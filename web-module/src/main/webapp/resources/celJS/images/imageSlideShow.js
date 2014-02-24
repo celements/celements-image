@@ -377,6 +377,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var htmlElem = event.findElement('.celimage_overlay') || event.element();
         _me._currentHtmlElem = htmlElem;
         _me._startAtSlideName = event.memo;
+        if (isNaN(_me._startAtSlideName)) {
+          _me._startAtSlideName = undefined;
+        }
         _me._startSlideNum = undefined;
         var hasCloseButton = htmlElem.hasClassName('celimage_overlay_addCloseButton');
         var openDialog = CELEMENTS.presentation.getOverlayObj({
