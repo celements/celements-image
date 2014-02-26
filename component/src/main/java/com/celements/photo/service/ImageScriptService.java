@@ -229,9 +229,8 @@ public class ImageScriptService implements ScriptService {
    * 
    * @return Map containing external URLs to the specified image.
    */
-  @SuppressWarnings("unchecked")
   public Map<String, String> getImageURLinAllAspectRatios(Attachment image) {
-    Map<String, String> urls = null;
+    Map<String, String> urls = Collections.emptyMap();
     try {
       urls = imageService.getImageURLinAllAspectRatios(image.getAttachment());
     } catch(Exception ex) {
@@ -241,7 +240,7 @@ public class ImageScriptService implements ScriptService {
       LOGGER.error("Could not get image URLs in different aspect ratios for attachment ["
           + ((image != null)? image.getFilename() : "null") + "]", ex);
     }
-    return (Map<String, String>) ((urls != null)? urls : Collections.emptyMap());
+    return urls;
   }
 
 }
