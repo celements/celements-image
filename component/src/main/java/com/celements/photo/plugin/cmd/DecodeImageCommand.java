@@ -150,12 +150,17 @@ public class DecodeImageCommand {
   // conflicting information on where the actual image data begins (JFIF != EXIF)
   BufferedImage readUsingJAI(InputStream inputStream, String mimeType)
       throws IOException, XWikiException {
-    BufferedImage image;
+    BufferedImage image = null;
     SeekableStream seekableStream = new FileCacheSeekableStream(inputStream);
     ParameterBlock paramBlock = new ParameterBlock();
     paramBlock.add(seekableStream);
-    image = JAI.create(mimeType.replaceAll("image/", ""), paramBlock
-        ).getAsBufferedImage();
+    try {
+      Class.forName("javax.media.jai.JAI"); //throws a run time exception without
+      image = JAI.create(mimeType.replaceAll("image/", ""), paramBlock
+          ).getAsBufferedImage();
+    } catch (ClassNotFoundException cnfe) {
+      LOGGER.error("Class javax.media.jai.JAI not found.", cnfe);
+    }
     return image;
   }
   
