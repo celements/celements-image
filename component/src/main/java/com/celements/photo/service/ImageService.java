@@ -280,8 +280,12 @@ public class ImageService implements IImageService {
         Map<String, String> metaTagMap = new HashMap<String, String>();
         DocumentReference attDocRef = webUtilsService.resolveDocumentReference(
             attFullName.replaceAll("^(.*);.*$", "$1"));
-        DocumentReference centralFBDocRef = webUtilsService.resolveDocumentReference(
-            getContext().getWiki().getWebPreference("cel_centralfilebase", getContext()));
+        DocumentReference centralFBDocRef = null;
+        String centralFB = getContext().getWiki().getWebPreference("cel_centralfilebase", 
+            getContext());
+        if((centralFB != null) && !"".equals(centralFB.trim())) {
+          centralFBDocRef = webUtilsService.resolveDocumentReference(centralFB);
+        }
         if(getContext().getWiki().exists(attDocRef, getContext()) 
             && !attDocRef.equals(centralFBDocRef)) {
           XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext(
