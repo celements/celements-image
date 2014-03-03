@@ -58,9 +58,6 @@ public class ImageService implements IImageService {
   @Requirement
   IWebUtilsService webUtilsService;
 
-  @Requirement
-  MetaInfoScriptService metaInfoService;
-
   NextFreeDocNameCommand nextFreeDocNameCmd;
 
   @Requirement
@@ -301,8 +298,8 @@ public class ImageService implements IImageService {
             }
           }
         } else if(attDocRef.equals(centralFBDocRef)) {
-          metaTagMap.putAll(metaInfoService.getAllTags(attDocRef, 
-              attFullName.replaceAll("^.*;(.*)$", "$1")));
+//          metaTagMap.putAll(metaInfoService.getAllTags(attDocRef, 
+//              attFullName.replaceAll("^.*;(.*)$", "$1")));
         }
         vcontext.put("metaTagMap", metaTagMap);
         DocumentReference slideContentRef = new DocumentReference(getContext(
