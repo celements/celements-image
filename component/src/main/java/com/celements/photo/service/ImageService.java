@@ -58,6 +58,9 @@ public class ImageService implements IImageService {
   @Requirement
   IWebUtilsService webUtilsService;
 
+  @Requirement
+  MetaInfoScriptService metaInfoService;
+
   NextFreeDocNameCommand nextFreeDocNameCmd;
 
   @Requirement
@@ -280,18 +283,26 @@ public class ImageService implements IImageService {
         Map<String, String> metaTagMap = new HashMap<String, String>();
         DocumentReference attDocRef = webUtilsService.resolveDocumentReference(
             attFullName.replaceAll("^(.*);.*$", "$1"));
-        XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext()
-            );
-        DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
-            "Classes.PhotoMetainfoClass");
-        List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
-        if(metaObjs != null) {
-          for(BaseObject tag : metaObjs) {
-            if(tag != null) {
-              metaTagMap.put(tag.getStringValue("name"), tag.getStringValue("description")
-                  );
+        DocumentReference centralFBDocRef = webUtilsService.resolveDocumentReference(
+            getContext().getWiki().getWebPreference("cel_centralfilebase", getContext()));
+        if(getContext().getWiki().exists(attDocRef, getContext()) 
+            && !attDocRef.equals(centralFBDocRef)) {
+          XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext(
+              ));
+          DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
+              "Classes.PhotoMetainfoClass");
+          List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
+          if(metaObjs != null) {
+            for(BaseObject tag : metaObjs) {
+              if(tag != null) {
+                metaTagMap.put(tag.getStringValue("name"), tag.getStringValue(
+                    "description"));
+              }
             }
           }
+        } else if(attDocRef.equals(centralFBDocRef)) {
+          metaTagMap.putAll(metaInfoService.getAllTags(attDocRef, 
+              attFullName.replaceAll("^.*;(.*)$", "$1")));
         }
         vcontext.put("metaTagMap", metaTagMap);
         DocumentReference slideContentRef = new DocumentReference(getContext(
