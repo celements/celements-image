@@ -1,10 +1,17 @@
 #set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
 $jsonBuilder.openDictionary()
 #set($imgDocRef = $services.model.resolveDocument("$!request.imageDoc"))
-#if($xwiki.exists($imgDocRef))
+#set($fileBaseDocRef = $services.model.resolveDocument("$!xwiki.getSpacePreference('cel_centralfilebase')"))
+#if($xwiki.exists($imgDocRef) && !$imgDocRef.equals($fileBaseDocRef))
 #foreach($obj in $xwiki.getDocument($imgDocRef).getObjects('Classes.PhotoMetainfoClass'))
 #set($tag = $services.celmetatags.cleanCtrlChars("$!obj.getProperty('description').getValue()"))
 $jsonBuilder.addStringProperty("$!obj.getProperty('name').getValue()", $tag)
+#end
+#elseif($imgDocRef.equals($fileBaseDocRef) && ("$!request.imageName" != ''))
+##TODO inefficient remove asap or at least make in memory or on disk cache
+#set($tagMap = $services.celmetatags.getAllTags($imgDocRef, "$!request.imageName"))
+#foreach($key in $tagMap.keySet())
+$jsonBuilder.addStringProperty("$!key", "$!tagMap.get($key)")
 #end
 #end
 $jsonBuilder.closeDictionary()
