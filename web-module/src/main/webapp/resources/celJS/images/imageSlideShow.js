@@ -114,6 +114,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
+        _me._addSlideShowCounterBind = _me._addSlideShowCounter.bind(_me);
         _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
         _me._imgLoadedReCenterStartSlideBind = _me._imgLoadedReCenterStartSlide.bind(_me);
         if (_me._currentHtmlElem) {
@@ -341,10 +342,18 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContent_internal();
       },
 
+      _addSlideShowCounter : function() {
+        var _me = this;
+        console.log('_addSlideShowCounter: adding');
+        //celPresSlideShow_countSlideNum
+      },
+
       _imageSlideShowLoadFirstContent_internal : function() {
         var _me = this;
         _me._getCelSlideShowObj().getHtmlContainer().observe(
             'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
+        _me._getCelSlideShowObj().getHtmlContainer().observe(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
         var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
         var startAt = _me._startAtSlideName || _me.getStartSlideNum();
         _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
