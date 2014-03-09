@@ -134,6 +134,14 @@ CiG.prototype = {
     return undefined;
   },
 
+  getNumImages : function() {
+    var _me = this;
+    if (_me._galleryData) {
+      return _me._galleryData.numberOfImages;
+    }
+    return undefined;
+  },
+
   getTitle : function() {
     var _me = this;
     if (_me._galleryData) {
