@@ -342,14 +342,14 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContent_internal();
       },
 
-      _addSlideShowCounter : function() {
-        var _me = this;
+      _addSlideShowCounter : function(event) {
+        var slideWrapperElem = event.memo.newSlideWrapperElem;
         var countSlideNumElem = new Element('div').addClassName(
             'celPresSlideShow_countSlideNum');
         var currentSlideNumElem = new Element('div').addClassName(
             'celPresSlideShow_currentSlideNum');
-        _me._getContainerElement().insert({'bottom' : countSlideNumElem});
-        _me._getContainerElement().insert({'bottom' : currentSlideNumElem});
+        slideWrapperElem.insert({'bottom' : countSlideNumElem});
+        slideWrapperElem.insert({'bottom' : currentSlideNumElem});
       },
 
       _imageSlideShowLoadFirstContent_internal : function() {
