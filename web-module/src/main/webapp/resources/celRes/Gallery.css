@@ -86,7 +86,7 @@
   color: #EDEDED;
 }
 
-.slideRoot .celPresSlideShow_countSlideNum,
-.slideRoot .celPresSlideShow_currentSlideNum {
+.cel_slideShow_slideRoot .celPresSlideShow_countSlideNum,
+.cel_slideShow_slideRoot .celPresSlideShow_currentSlideNum {
   display: none;
 }
