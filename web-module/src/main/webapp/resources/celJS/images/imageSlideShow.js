@@ -404,7 +404,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._getGallery(function(galleryObj) {
           _me._getCelSlideShowObj(galleryObj.getLayoutName());
           openDialog.intermediatOpenHandler();
-        });
+        }, 1);
       },
 
       _getPart : function(elemId, num, defaultvalue) {
@@ -443,9 +443,21 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       getStartSlideNum : function() {
         var _me = this;
+        console.log('getStartSlideNum: ', _me._startSlideNum, _me._celSlideShowObj);
         if (!_me._startSlideNum) {
-          //TODO check randomStartNum
-          _me.setStartSlideNum(_me._getStartSlideNumFromId() || 0);
+          if (_me._currentHtmlElem.hasClassName('celimage_slideshowRandomStart')) {
+            if (_me._gallery && _me._gallery.getNumImages()) {
+              var startSlideNum = Math.round(Math.random() * (
+                  _me._gallery.getNumImages() - 1));
+              console.log('getStartSlideNum: random start ', startSlideNum,
+                  _me._gallery.getNumImages());
+              _me.setStartSlideNum(startSlideNum);
+            } else {
+              return 0;
+            }
+          } else {
+            _me.setStartSlideNum(_me._getStartSlideNumFromId() || 0);
+          }
         }
         return _me._startSlideNum;
       },
@@ -453,12 +465,14 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _replaceStartImage : function(galleryObj) {
         var _me = this;
         var images = galleryObj.getImages();
+        console.log('_replaceStartImage: ', _me._startSlideNum, images.size());
         var startSlideNum = _me.getStartSlideNum();
         if (startSlideNum < 0) {
           startSlideNum = 0;
-        } else if (startSlideNum >= images.size()) {
-          startSlideNum = images.size() - 1;
+        } else if (startSlideNum >= galleryObj.getNumImages()) {
+          startSlideNum = galleryObj.getNumImages() - 1;
         }
+        console.log('_replaceStartImage: startSlideNum ', startSlideNum, images[startSlideNum]);
         if (images[startSlideNum]) {
           _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
           _me._currentHtmlElem.removeAttribute('width');
