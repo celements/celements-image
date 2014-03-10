@@ -443,14 +443,11 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       getStartSlideNum : function() {
         var _me = this;
-        console.log('getStartSlideNum: ', _me._startSlideNum, _me._celSlideShowObj);
         if (!_me._startSlideNum) {
           if (_me._currentHtmlElem.hasClassName('celimage_slideshowRandomStart')) {
             if (_me._gallery && _me._gallery.getNumImages()) {
               var startSlideNum = Math.round(Math.random() * (
                   _me._gallery.getNumImages() - 1));
-              console.log('getStartSlideNum: random start ', startSlideNum,
-                  _me._gallery.getNumImages());
               _me.setStartSlideNum(startSlideNum);
             } else {
               return 0;
@@ -462,27 +459,28 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         return _me._startSlideNum;
       },
 
+      _replaceStartImageInsert : function(imageElem) {
+        var _me = this;
+        _me._currentHtmlElem.src = imageElem.getThumbURL();
+        _me._currentHtmlElem.removeAttribute('width');
+        _me._currentHtmlElem.removeAttribute('height');
+        _me._currentHtmlElem.setStyle({
+          'visibility' : '',
+          'width' : '',
+          'height' : ''
+        });
+      },
+
       _replaceStartImage : function(galleryObj) {
         var _me = this;
         var images = galleryObj.getImages();
-        console.log('_replaceStartImage: ', _me._startSlideNum, images.size());
         var startSlideNum = _me.getStartSlideNum();
         if (startSlideNum < 0) {
           startSlideNum = 0;
         } else if (startSlideNum >= galleryObj.getNumImages()) {
           startSlideNum = galleryObj.getNumImages() - 1;
         }
-        console.log('_replaceStartImage: startSlideNum ', startSlideNum, images[startSlideNum]);
-        if (images[startSlideNum]) {
-          _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
-          _me._currentHtmlElem.removeAttribute('width');
-          _me._currentHtmlElem.removeAttribute('height');
-          _me._currentHtmlElem.setStyle({
-            'visibility' : '',
-            'width' : '',
-            'height' : ''
-          });
-        }
+        galleryObj.getImageForNum(startSlideNum, _me._replaceStartImageInsert.bind(_me));
       },
 
       _resizeOverlay : function() {
