@@ -232,7 +232,10 @@ public class ImageScriptService implements ScriptService {
   public Map<String, String> getImageURLinAllAspectRatios(Attachment image) {
     Map<String, String> urls = Collections.emptyMap();
     try {
-      urls = imageService.getImageURLinAllAspectRatios(image.getAttachment());
+      XWikiDocument doc = getContext().getWiki().getDocument(image.getDocument(
+          ).getDocumentReference(), getContext());
+      XWikiAttachment xatt = doc.getAttachment(image.getFilename());
+      urls = imageService.getImageURLinAllAspectRatios(xatt);
     } catch(Exception ex) {
       //Catching Exception since this method is used to build an XML export which
       //should not throw an exception simply because one of many images can't be read 
