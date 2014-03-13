@@ -277,7 +277,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), 
         eq(context.getLanguage()), eq("de"))).andReturn("content").once();
     expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(getContext()))
-        ).andReturn("");
+        ).andReturn("").once();
     expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
     replayDefault();
     replay(webUtils);
