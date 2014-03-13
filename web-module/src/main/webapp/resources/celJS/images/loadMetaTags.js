@@ -22,7 +22,7 @@
             'xpage' : 'celements_ajax',
             'ajax_mode' : 'getMetaTagsForImage',
             'imageDoc' : image.getSrc().replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2'),
-            'imageName' : image.getSrc().getFilename()
+            'imageName' : image.getFilename()
           },
           onComplete: function(transport) {
             loading--;
