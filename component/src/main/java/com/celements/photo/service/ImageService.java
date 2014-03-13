@@ -39,6 +39,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 public class ImageService implements IImageService {
@@ -57,9 +58,6 @@ public class ImageService implements IImageService {
 
   @Requirement
   IWebUtilsService webUtilsService;
-
-//  @Requirement
-//  IMetaInfoService metaInfoService;
 
   NextFreeDocNameCommand nextFreeDocNameCmd;
 
@@ -305,8 +303,8 @@ public class ImageService implements IImageService {
             }
           }
         } else if(attDocRef.equals(centralFBDocRef)) {
-//          metaTagMap.putAll(metaInfoService.getAllTags(attDocRef, 
-//              attFullName.replaceAll("^.*;(.*)$", "$1")));
+          metaTagMap.putAll(getMetaInfoService().getAllTags(attDocRef, 
+              attFullName.replaceAll("^.*;(.*)$", "$1")));
         }
         vcontext.put("metaTagMap", metaTagMap);
         DocumentReference slideContentRef = new DocumentReference(getContext(
@@ -387,5 +385,9 @@ public class ImageService implements IImageService {
       }
     }
     return urlParams;
+  }
+  
+  private IMetaInfoService getMetaInfoService() {
+    return (IMetaInfoService) Utils.getComponent(IMetaInfoService.class);
   }
 }
