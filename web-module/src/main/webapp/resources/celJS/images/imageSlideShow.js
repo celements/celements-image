@@ -114,6 +114,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
+        _me._addSlideShowCounterBind = _me._addSlideShowCounter.bind(_me);
         _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
         _me._imgLoadedReCenterStartSlideBind = _me._imgLoadedReCenterStartSlide.bind(_me);
         if (_me._currentHtmlElem) {
@@ -341,10 +342,22 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContent_internal();
       },
 
+      _addSlideShowCounter : function(event) {
+        var slideWrapperElem = event.memo.newSlideWrapperElem;
+        var countSlideNumElem = new Element('div').addClassName(
+            'celPresSlideShow_countSlideNum');
+        var currentSlideNumElem = new Element('div').addClassName(
+            'celPresSlideShow_currentSlideNum');
+        slideWrapperElem.insert({'bottom' : countSlideNumElem});
+        slideWrapperElem.insert({'bottom' : currentSlideNumElem});
+      },
+
       _imageSlideShowLoadFirstContent_internal : function() {
         var _me = this;
         _me._getCelSlideShowObj().getHtmlContainer().observe(
             'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
+        _me._getCelSlideShowObj().getHtmlContainer().observe(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
         var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
         var startAt = _me._startAtSlideName || _me.getStartSlideNum();
         _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
@@ -391,7 +404,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._getGallery(function(galleryObj) {
           _me._getCelSlideShowObj(galleryObj.getLayoutName());
           openDialog.intermediatOpenHandler();
-        });
+        }, 1);
       },
 
       _getPart : function(elemId, num, defaultvalue) {
@@ -431,9 +444,31 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       getStartSlideNum : function() {
         var _me = this;
         if (!_me._startSlideNum) {
-          _me.setStartSlideNum(_me._getStartSlideNumFromId() || 0);
+          if (_me._currentHtmlElem.hasClassName('celimage_slideshowRandomStart')) {
+            if (_me._gallery && _me._gallery.getNumImages()) {
+              var startSlideNum = Math.round(Math.random() * (
+                  _me._gallery.getNumImages() - 1));
+              _me.setStartSlideNum(startSlideNum);
+            } else {
+              return 0;
+            }
+          } else {
+            _me.setStartSlideNum(_me._getStartSlideNumFromId() || 0);
+          }
         }
         return _me._startSlideNum;
+      },
+
+      _replaceStartImageInsert : function(imageElem) {
+        var _me = this;
+        _me._currentHtmlElem.src = imageElem.getThumbURL();
+        _me._currentHtmlElem.removeAttribute('width');
+        _me._currentHtmlElem.removeAttribute('height');
+        _me._currentHtmlElem.setStyle({
+          'visibility' : '',
+          'width' : '',
+          'height' : ''
+        });
       },
 
       _replaceStartImage : function(galleryObj) {
@@ -442,19 +477,10 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var startSlideNum = _me.getStartSlideNum();
         if (startSlideNum < 0) {
           startSlideNum = 0;
-        } else if (startSlideNum >= images.size()) {
-          startSlideNum = images.size() - 1;
+        } else if (startSlideNum >= galleryObj.getNumImages()) {
+          startSlideNum = galleryObj.getNumImages() - 1;
         }
-        if (images[startSlideNum]) {
-          _me._currentHtmlElem.src = images[startSlideNum].getThumbURL();
-          _me._currentHtmlElem.removeAttribute('width');
-          _me._currentHtmlElem.removeAttribute('height');
-          _me._currentHtmlElem.setStyle({
-            'visibility' : '',
-            'width' : '',
-            'height' : ''
-          });
-        }
+        galleryObj.getImageForNum(startSlideNum, _me._replaceStartImageInsert.bind(_me));
       },
 
       _resizeOverlay : function() {

@@ -1,4 +1,3 @@
-
 package com.celements.photo.service;
 
 import java.io.OutputStream;

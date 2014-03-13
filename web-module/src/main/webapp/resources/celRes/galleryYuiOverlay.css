@@ -90,3 +90,8 @@ body div.mask.cel-YuiOverlay {
 .celimage_overlay {
   cursor: pointer;
 }
+
+.cel_slideShow_slideRoot .celPresSlideShow_countSlideNum,
+.cel_slideShow_slideRoot .celPresSlideShow_currentSlideNum {
+  display: none;
+}

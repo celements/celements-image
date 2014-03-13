@@ -18,9 +18,10 @@ CiG.prototype = {
     _collDocRef : undefined,
     _galleryData : undefined,
     _imagesArray : undefined,
-    _imagesHash : undefined,
+    _imagesHash : new Hash(),
     _afterLoadListener : undefined,
     _loading : false,
+    _loadingSlice : false,
     _loaded : false,
 
   _init : function(collDocRef, callbackFN, onlyFirstNumImages, spaceImgs) {
@@ -86,7 +87,6 @@ CiG.prototype = {
           var responseObject = transport.responseText.evalJSON();
           _me._galleryData = responseObject;
           _me._imagesArray = new Array();
-          _me._imagesHash = new Hash();
           _me._galleryData.imageArray.each(function(imageObj) {
             var imageId = 'GI:' + _me._collDocRef + ':' + imageObj.filename;
             var image = new CELEMENTS.images.Image(imageObj, imageId);
@@ -118,6 +118,75 @@ CiG.prototype = {
     });
   },
 
+  _loadImagesSlice : function(offsetNumImages, getNumImages, callbackFN) {
+    var _me = this;
+    _me._loadingSlice = true;
+    var params = {
+        'xpage' : 'celements_ajax',
+        'ajax_mode' : 'GalleryData'
+      };
+    if(offsetNumImages) {
+      params['offsetNumImages'] = offsetNumImages;
+    }
+    if(getNumImages) {
+      params['getNumImages'] = getNumImages;
+    }
+    new Ajax.Request(_me._getGalleryURL(''), {
+      method : "POST",
+      parameters: params,
+      onSuccess : function(transport) {
+        if (transport.responseText.isJSON()) {
+          var responseObject = transport.responseText.evalJSON();
+          _me._galleryData = responseObject;
+          var newArraySize = offsetNumImages + getNumImages - 1;
+          if (newArraySize < _me._imagesArray.size()) {
+            newArraySize = _me._imagesArray.size();
+          }
+          var newImagesArray = new Array(newArraySize);
+          newImagesArray.splice(0, _me._imagesArray.size(), _me._imagesArray);
+          _me._imagesArray = newImagesArray;
+          var indexPreAdd = offsetNumImages - 1;
+          _me._galleryData.imageArray.each(function(imageObj, loadImageIdx) {
+            var index = indexPreAdd + loadImageIdx;
+            var imageId = 'GI:' + _me._collDocRef + ':' + imageObj.filename;
+            var image = new CELEMENTS.images.Image(imageObj, imageId);
+            image.setThumbDimension(_me._galleryData.thumbWidth,
+                _me._galleryData.thumbHeight);
+            _me._imagesArray[index] = image;
+            _me._imagesHash.set(imageId, index);
+          });
+          _me._loaded = true;
+          if (callbackFN) {
+            try {
+              callbackFN(_me);
+            } catch (exp){
+              if ((typeof console != 'undefined')
+                  && (typeof console.error != 'undefined')) {
+                console.error('failed to execute _loadImagesSlice callbackFN: ',
+                    callbackFN, exp);
+              }
+            }
+          }
+          _me._loadingSlice = false;
+        } else if ((typeof console != 'undefined')
+            && (typeof console.error != 'undefined')) {
+          console.error('noJSON!!! ', transport.responseText);
+        }
+      }
+    });
+  },
+
+  getImageForNum : function(imageNumber, callbackFN) {
+    var _me = this;
+    if (_me._imagesArray[imageNumber]) {
+      callbackFN(_me._imagesArray[imageNumber]);
+    } else {
+      _me._loadImagesSlice(imageNumber + 1, 1, function() {
+        callbackFN(_me._imagesArray[imageNumber]);
+      });
+    }
+  },
+
   getImageForId : function(imageId) {
     var _me = this;
     if (typeof _me._imagesHash.get(imageId) != 'undefined') {
@@ -130,6 +199,14 @@ CiG.prototype = {
     var _me = this;
     if (_me._imagesArray) {
       return _me._imagesArray;
+    }
+    return undefined;
+  },
+
+  getNumImages : function() {
+    var _me = this;
+    if (_me._galleryData) {
+      return _me._galleryData.numberOfImages;
     }
     return undefined;
   },

@@ -85,3 +85,8 @@
 .presentationList ul .celimage_slideshow .slideRoot h6 {
   color: #EDEDED;
 }
+
+.cel_slideShow_slideRoot .celPresSlideShow_countSlideNum,
+.cel_slideShow_slideRoot .celPresSlideShow_currentSlideNum {
+  display: none;
+}
