@@ -211,6 +211,8 @@ public class ImageScriptService implements ScriptService {
         }
       }
       return successfullAdded;
+    } else {
+      LOGGER.debug("Not enaught rigths to add slide to " + galleryDocRef);
     }
     return false;
   }

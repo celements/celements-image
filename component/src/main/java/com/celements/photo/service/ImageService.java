@@ -289,6 +289,7 @@ public class ImageService implements IImageService {
         }
         if(getContext().getWiki().exists(attDocRef, getContext()) 
             && !attDocRef.equals(centralFBDocRef)) {
+          LOGGER.debug("get meta tags from attachment document " + attDocRef);
           XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext(
               ));
           DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
@@ -303,8 +304,13 @@ public class ImageService implements IImageService {
             }
           }
         } else if(attDocRef.equals(centralFBDocRef)) {
-          metaTagMap.putAll(getMetaInfoService().getAllTags(attDocRef, 
-              attFullName.replaceAll("^.*;(.*)$", "$1")));
+          String filename = attFullName.replaceAll("^.*;(.*)$", "$1");
+          LOGGER.debug("get meta tags for central file base image" + attDocRef);
+          LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
+          metaTagMap.putAll(getMetaInfoService().getAllTags(attDocRef, filename));
+        } else {
+          LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not" +
+              "exist and is not central file base " + centralFBDocRef);
         }
         vcontext.put("metaTagMap", metaTagMap);
         DocumentReference slideContentRef = new DocumentReference(getContext(
