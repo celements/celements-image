@@ -29,7 +29,8 @@ var observeImgs = function(event) {
   });
 //  var aGal = undefined;
   
-  var galleryFullName = $('filebaseLink').value;
+  //TODO set and get space dynamic
+  var galleryFullName = 'Content_attachments';
   var allActiveGalleries = [galleryFullName];
   var loadingCallbackFN = function(theGallery) {
     finishedLoadingGalleries.push(theGallery._collDocRef);
@@ -38,8 +39,10 @@ var observeImgs = function(event) {
     }
   };
 
-  loadedGalleries.set(galleryFullName, new CELEMENTS.images.Gallery(galleryFullName,
-      loadingCallbackFN, false, (galleryFullName.split('.').size() < 2)));
+  var fileBaseLink = $('filebaseLink').value;
+  loadedGalleries.set(galleryFullName, new CELEMENTS.images.Gallery(
+      fileBaseLink, loadingCallbackFN, false,
+      (fileBaseLink.split('.').size() < 2)));
   addToGalleriesList(galleryFullName);
 };
 
