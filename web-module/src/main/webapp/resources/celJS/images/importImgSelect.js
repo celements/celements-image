@@ -29,9 +29,8 @@ var observeImgs = function(event) {
   });
 //  var aGal = undefined;
   
-  //TODO set and get space dynamic
-  var galleryFullName = 'Content_attachments';
-  var allActiveGalleries = [galleryFullName];
+  var fileBaseLink = $('filebaseLink').value;
+  var allActiveGalleries = [fileBaseLink];
   var loadingCallbackFN = function(theGallery) {
     finishedLoadingGalleries.push(theGallery._collDocRef);
     if (finishedLoadingGalleries.size() >= allActiveGalleries.size()) {
@@ -39,11 +38,10 @@ var observeImgs = function(event) {
     }
   };
 
-  var fileBaseLink = $('filebaseLink').value;
-  loadedGalleries.set(galleryFullName, new CELEMENTS.images.Gallery(
+  loadedGalleries.set(fileBaseLink, new CELEMENTS.images.Gallery(
       fileBaseLink, loadingCallbackFN, false,
       (fileBaseLink.split('.').size() < 2)));
-  addToGalleriesList(galleryFullName);
+  addToGalleriesList(fileBaseLink);
 };
 
 var mouseIsOver = function(event) {
@@ -394,10 +392,10 @@ var pickMotive = function(event) {
   });
   if(url) {
     var imageFNs = new Array();
-    //TODO set and get space dynamic
-    var galleryFullName = 'Content_attachments';
-    var gallery = loadedGalleries.get(galleryFullName);
     $$('.bild.selected').each(function(bild) {
+      var galleryId = bild.id.replace(/^.*:(.*?):.*$/g, '$1');
+      console.log('galleryId: ', galleryId);
+      var gallery = loadedGalleries.get(galleryId);
       var image = gallery.getImageForId(bild.id);
       var imageDocFN = image.getURL().replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2');
       imageFNs.push(imageDocFN + ';' + image.getFilename());
