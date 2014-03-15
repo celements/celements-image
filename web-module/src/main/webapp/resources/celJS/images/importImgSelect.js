@@ -362,8 +362,8 @@ var navigateImage = function(change, event) {
 var getGalObjForImgId = function(id) {
   var retval = undefined;
   loadedGalleries.values().each(function(gal) {
-//    var img = gal.getImageForId(id);
-    if(typeof(img) != 'undefined') {
+    var image = gal.getImageForId(id);
+    if(image && (typeof(image) !== 'undefined')) {
       retval = gal;
     }
   });
