@@ -9,16 +9,21 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
@@ -104,9 +109,59 @@ public class GalleryPresentationTypeTest
     verifyDefault();
   }
 
+  @Test
+  public void testGetPageLayoutForDoc_noGalery() {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "MyPage");
+    XWikiDocument galleryDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(galleryDoc);
+    replayDefault();
+    assertNull(vtPresType.getPageLayoutForDoc(contextDocRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetPageLayoutForDoc_empty() {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "MyPage");
+    XWikiDocument galleryDoc = new XWikiDocument(contextDocRef);
+    BaseObject albumObj = new BaseObject();
+    albumObj.setStringValue(OldCoreClasses.PHOTO_ALBUM_GALLERY_LAYOUT, "");
+    albumObj.setXClassReference(getOldCoreClasses().getPhotoAlbumClassRef(
+        context.getDatabase()));
+    galleryDoc.addXObject(albumObj);
+    context.setDoc(galleryDoc);
+    replayDefault();
+    assertNull(vtPresType.getPageLayoutForDoc(contextDocRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetPageLayoutForDoc() {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "MyPage");
+    XWikiDocument galleryDoc = new XWikiDocument(contextDocRef);
+    BaseObject albumObj = new BaseObject();
+    albumObj.setStringValue(OldCoreClasses.PHOTO_ALBUM_GALLERY_LAYOUT,
+        "galleryLayoutSpace");
+    albumObj.setXClassReference(getOldCoreClasses().getPhotoAlbumClassRef(
+        context.getDatabase()));
+    galleryDoc.addXObject(albumObj);
+    context.setDoc(galleryDoc);
+    replayDefault();
+    assertEquals(new SpaceReference("galleryLayoutSpace", new WikiReference(
+        context.getDatabase())), vtPresType.getPageLayoutForDoc(contextDocRef));
+    verifyDefault();
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
+
+  private OldCoreClasses getOldCoreClasses() {
+    return (OldCoreClasses) Utils.getComponent(IClassCollectionRole.class,
+        "celements.oldCoreClasses");
+  }
 
   public class TestRenderEngine implements XWikiRenderingEngine {
 

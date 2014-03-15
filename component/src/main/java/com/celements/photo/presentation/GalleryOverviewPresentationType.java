@@ -7,6 +7,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
@@ -83,6 +84,10 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole {
 
   public String getEmptyDictionaryKey() {
     return "cel_nav_empty_presentation";
+  }
+
+  public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
+    return null;
   }
 
 }
