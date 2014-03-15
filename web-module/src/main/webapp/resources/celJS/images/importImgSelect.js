@@ -294,10 +294,6 @@ var showHideGallery = function() {
   activeGalleries.each(function(galleryFullName) {
     loadedGalleries.get(galleryFullName).getImages().each(function(image) {
       $$('.bilder').each(function(imgContainer) {
-        var selected = '';
-        if(selectedList.indexOf(image.getId()) >= 0) {
-          selected = ' selected';
-        }
         var thumbURL = image.getThumbURL();
         var defaultDim = 75;
         if(!image.getThumbDimension().width && !image.getThumbDimension().height) {
@@ -306,10 +302,14 @@ var showHideGallery = function() {
         }
         thumbURL += '&background=00000022';
         var img = new Element('div', {
-          'class' : 'bild' + selected,
-          'style' : 'background-image: url(' + thumbURL + ')',
           'id' : image.getId()
+        }).addClassName('bild'
+            ).setStyle({
+          'backgroundImage' : 'url(' + thumbURL + ')'
         });
+        if(selectedList.indexOf(image.getId()) >= 0) {
+          img.addClassName('selected');
+        }
         imgContainer.insert(img);
       });
     });
