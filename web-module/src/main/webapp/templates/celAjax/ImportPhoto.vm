@@ -1,5 +1,4 @@
 ## @deprecated -> import to gallery / central filebase and to be replaced by ImportImages
-{pre}
 #if("$!attDoc" == '')
   #set($attDoc = $xwiki.getDocument("$!request.get('attDoc')"))
 #end
@@ -79,4 +78,3 @@
  </div> <!-- c3_import_list -->
 </form>
 </div><!-- /c3_import_preimport_result -->
-{/pre}
