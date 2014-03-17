@@ -229,10 +229,14 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _addNavigationButtons : function(event) {
         var _me = this;
         if (_me._currentHtmlElem.hasClassName('celimage_addNavigation')) {
-          var nextButton = new Element('div').addClassName('celPresSlideShow_next');
-          var prevButton = new Element('div').addClassName('celPresSlideShow_prev');
-          _me._getContainerElement().insert({'bottom' : nextButton});
-          _me._getContainerElement().insert({'top' : prevButton});
+          if (!_me._getContainerElement().down('> div.celPresSlideShow_next')) {
+            var nextButton = new Element('div').addClassName('celPresSlideShow_next');
+            _me._getContainerElement().insert({'bottom' : nextButton});
+          }
+          if (!_me._getContainerElement().down('> div.celPresSlideShow_prev')) {
+            var prevButton = new Element('div').addClassName('celPresSlideShow_prev');
+            _me._getContainerElement().insert({'top' : prevButton});
+          }
         }
       },
 
@@ -414,12 +418,16 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       _addSlideShowCounter : function(event) {
         var slideWrapperElem = event.memo.newSlideWrapperElem;
-        var countSlideNumElem = new Element('div').addClassName(
-            'celPresSlideShow_countSlideNum');
-        var currentSlideNumElem = new Element('div').addClassName(
-            'celPresSlideShow_currentSlideNum');
-        slideWrapperElem.insert({'bottom' : countSlideNumElem});
-        slideWrapperElem.insert({'bottom' : currentSlideNumElem});
+        if (!slideWrapperElem.down('> div.celPresSlideShow_countSlideNum')) {
+          var countSlideNumElem = new Element('div').addClassName(
+              'celPresSlideShow_countSlideNum');
+          slideWrapperElem.insert({'bottom' : countSlideNumElem});
+        }
+        if (!slideWrapperElem.down('> div.celPresSlideShow_currentSlideNum')) {
+          var currentSlideNumElem = new Element('div').addClassName(
+              'celPresSlideShow_currentSlideNum');
+          slideWrapperElem.insert({'bottom' : currentSlideNumElem});
+        }
       },
 
       _imageSlideShowLoadFirstContent_internal : function() {
