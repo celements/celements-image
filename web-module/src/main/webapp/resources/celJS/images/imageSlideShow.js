@@ -48,11 +48,11 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
     if (!CISS_OverlaySlideShowObj) {
       CISS_OverlaySlideShowObj = new CELEMENTS.image.SlideShow();
     }
-    $$('.celimage_slideshow').each(function(slideShowElem) {
-      if (slideShowElem.hasClassName('celimage_overlay')) {
-        CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
-      }
-    });
+//    $$('.celimage_slideshow').each(function(slideShowElem) {
+//      if (slideShowElem.hasClassName('celimage_overlay')) {
+//        CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
+//      }
+//    });
   });
 
   var CISS_SlideShowObjHash = new Hash();
@@ -65,14 +65,9 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
     $$('.celimage_slideshow').each(function(slideShowElem) {
       var imgSlideShow = new CELEMENTS.image.SlideShow(slideShowElem.id);
       CISS_SlideShowObjHash.set(slideShowElem.id, imgSlideShow);
-      if (!slideShowElem.hasClassName('celimage_manualstart')) {
-        //important that the start happens before document.ready to allow the slideshow
-        // context menu beeing loaded
-        imgSlideShow.startNonOverlaySlideShow();
-      } else if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
-        console.log('skip auto start image-slideshow because css class'
-            + ' celimage_manualstart found on', slideShowElem.id);
-      }
+      //important that the start happens before document.ready to allow the slideshow
+      // context menu beeing loaded
+      imgSlideShow.startNonOverlaySlideShow();
     });
   };
 
@@ -99,6 +94,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startAtSlideName : undefined,
       _resizeOverlayBind : undefined,
       _imgLoadedReCenterStartSlideBind : undefined,
+      _celSlideShowManualStartStopClickHandlerBind : undefined,
       _slideShowAnimation : undefined,
       _wrapperHtmlElem : undefined,
       _hasRandomStart : false,
@@ -111,6 +107,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._currentHtmlElem = $(htmlElem) || null;
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
+        _me._celSlideShowManualStartStopClickHandlerBind =
+          _me._celSlideShowManualStartStopClickHandler.bind(_me);
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
@@ -269,7 +267,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var slideShowImg = $(_me._currentHtmlElem);
         if (!_me._wrapperHtmlElem) {
           var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
-              ).without('celimage_overlay').without('highslide-image');
+              ).without('highslide-image');
           var divInnerWrapper = slideShowImg.wrap('div', {
             'id' : ('slideWrapper_' + slideShowImg.id),
             'class' : 'cel_slideShow_slideWrapper'
@@ -330,6 +328,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
               _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
               slideShowEffect);
         }
+        var isManualStart = $(elemId).hasClassName('celimage_manualstart');
+        if (isManualStart) {
+          _me.celSlideShowManualStartStop(false);
+          _me._currentHtmlElem.observe('celimage_slideshow:afterInit',
+              _me._initManualStartButton.bind(_me));
+        }
         _me._initNonOverlaySlideShowStarter(
             _me._initNonOverlaySlideShowStarterCallback.bind(_me));
       },
@@ -340,6 +344,57 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._getCelSlideShowObj().register();
         _me._slideShowAnimation.register();
         _me._imageSlideShowLoadFirstContent_internal();
+      },
+
+      _initManualStartButton : function() {
+        var _me = this;
+        var isCelimageOverlay = _me._wrapperHtmlElem.hasClassName('celimage_overlay');
+        var startButtonDiv = new Element('div', { 'class' : 'slideshowButton' });
+        startButtonDiv.hide();
+        _me._wrapperHtmlElem.insert({ bottom : startButtonDiv });
+        if (isCelimageOverlay) {
+          CISS_OverlaySlideShowObj.registerOpenInOverlay(_me._wrapperHtmlElem);
+        } else {
+          $(_me._wrapperHtmlElem).stopObserving('click',
+              _me._celSlideShowManualStartStopClickHandlerBind);
+          $(_me._wrapperHtmlElem).observe('click',
+              _me._celSlideShowManualStartStopClickHandlerBind);
+        }
+        Effect.Appear(startButtonDiv, { duration : 3.0 , to : 0.8 });
+      },
+
+      _celSlideShowManualStartStopClickHandler : function(event) {
+        var _me = this;
+        event.stop();
+        _me.celSlideShowManualStartStop();
+      },
+
+      celSlideShowManualStartStop : function(isStart) {
+        var _me = this;
+        if (typeof isStart === 'undefined') {
+          isStart = _me._slideShowAnimation._paused;
+        }
+        var slideShowButton = undefined;
+        if (_me._wrapperHtmlElem) {
+          slideShowButton = _me._wrapperHtmlElem.down('.slideshowButton');
+        }
+        if (isStart) {
+          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+            console.log('animation started for image slideshow', _me._currentHtmlElem.id);
+          }
+          _me._slideShowAnimation.startAnimation();
+          if (slideShowButton) {
+            Effect.Fade(slideShowButton, { duration : 1.0 });
+          }
+        } else {
+          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+            console.log('animation stopped for image slideshow', _me._currentHtmlElem.id);
+          }
+          _me._slideShowAnimation.stopAnimation();
+          if (slideShowButton) {
+            Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
+          }
+        }
       },
 
       _addSlideShowCounter : function(event) {
