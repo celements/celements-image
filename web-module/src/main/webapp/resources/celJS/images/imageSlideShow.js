@@ -285,11 +285,13 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
            }).setStyle({
              'position' : 'relative'
            });
-          //TODO get wrapper dimensions from where? Maybe we should make this flexible to
-          //TODO choise for the user in the image picker...
+          var containerAnimWidth = _me._getPart(_me._currentHtmlElem.id, 8,
+              slideShowImg.getWidth());
+          var containerAnimHeight = _me._getPart(_me._currentHtmlElem.id, 9,
+              slideShowImg.getHeight());
           divWrapper.setStyle({
-            'height' : slideShowImg.getHeight() + 'px',
-            'width' : slideShowImg.getWidth() + 'px'
+            'height' : containerAnimHeight + 'px',
+            'width' : containerAnimWidth + 'px'
           });
           otherCssClassNames.each(function(className) {
                 if (!className.startsWith('cel_effekt_')) {
