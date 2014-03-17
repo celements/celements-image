@@ -439,4 +439,17 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     assertTrue("Expecting full height. [" + params + "]", 
         params.indexOf("cropH=240") >= 0);
   }
+  
+  @Test
+  public void testCleanMetaTagKey_clean() {
+    String cleanTag = "Compression Type";
+    assertEquals(cleanTag, imageService.cleanMetaTagKey(cleanTag));
+  }
+  
+  @Test
+  public void testCleanMetaTagKey_unclean() {
+    String cleanTag = "Compression Type";
+    String tag = "[Jpeg] Compression Type";
+    assertEquals(cleanTag, imageService.cleanMetaTagKey(tag));
+  }
 }

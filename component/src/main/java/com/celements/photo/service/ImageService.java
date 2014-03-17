@@ -309,7 +309,7 @@ public class ImageService implements IImageService {
           LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
           Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
           for(String key : map.keySet()) {
-            metaTagMap.put(key.replaceAll("^(\\[.*\\] )?(.*)$", "$2"), map.get(key));
+            metaTagMap.put(cleanMetaTagKey(key), map.get(key));
           }
         } else {
           LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not" +
@@ -334,6 +334,10 @@ public class ImageService implements IImageService {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
     }
     return false;
+  }
+
+  String cleanMetaTagKey(String key) {
+    return key.replaceAll("^(\\[.*\\] )?(.*)$", "$2");
   }
 
   public DocumentReference getImageSlideTemplateRef() {
