@@ -307,7 +307,10 @@ public class ImageService implements IImageService {
           String filename = attFullName.replaceAll("^.*;(.*)$", "$1");
           LOGGER.debug("get meta tags for central file base image" + attDocRef);
           LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
-          metaTagMap.putAll(getMetaInfoService().getAllTags(attDocRef, filename));
+          Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
+          for(String key : map.keySet()) {
+            metaTagMap.put(key.replaceAll("^(\\[.*\\] )?(.*)$", "$2"), map.get(key));
+          }
         } else {
           LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not" +
               "exist and is not central file base " + centralFBDocRef);
