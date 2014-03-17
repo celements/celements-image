@@ -452,4 +452,18 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     String tag = "[Jpeg] Compression Type";
     assertEquals(cleanTag, imageService.cleanMetaTagKey(tag));
   }
+  
+  @Test
+  public void testCleanMetaTagValue_clean() {
+    String key = "Compression Type";
+    String value = "8 bits";
+    assertEquals(value, imageService.cleanMetaTagValue(key, value));
+  }
+  
+  @Test
+  public void testCleanMetaTagValue_unclean() {
+    String key = "[Jpeg] Compression Type";
+    String value = "8 bits";
+    assertEquals(value, imageService.cleanMetaTagValue(key, key + " - " + value));
+  }
 }
