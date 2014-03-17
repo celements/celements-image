@@ -307,7 +307,10 @@ public class ImageService implements IImageService {
           String filename = attFullName.replaceAll("^.*;(.*)$", "$1");
           LOGGER.debug("get meta tags for central file base image" + attDocRef);
           LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
-          metaTagMap.putAll(getMetaInfoService().getAllTags(attDocRef, filename));
+          Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
+          for(String key : map.keySet()) {
+            metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
+          }
         } else {
           LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not" +
               "exist and is not central file base " + centralFBDocRef);
@@ -331,6 +334,18 @@ public class ImageService implements IImageService {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
     }
     return false;
+  }
+
+  String cleanMetaTagValue(String key, String value) {
+    key = key.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)");
+    key = key.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
+    key = key.replaceAll("\\{", "\\\\{").replaceAll("\\}", "\\\\}");
+    System.out.println(key);
+    return value.replaceAll("^.*?" + key + " - (.*)$", "$1");
+  }
+
+  String cleanMetaTagKey(String key) {
+    return key.replaceAll("^(\\[.*\\] )?(.*)$", "$2");
   }
 
   public DocumentReference getImageSlideTemplateRef() {

@@ -1,0 +1,31 @@
+## @deprecated -> import to gallery / central filebase and to be replaced by ImportImagesNow
+<div class="c3_import_title c3_title_imported">$adminMsg.get('cel_import_photo_imported')</div><!-- /c3_import_title -->
+<div class="c3_import_preimport_result c3_import_tabbox" id="c3_import_preimport_result">
+<!-- import photos now -->
+#set($attDoc = $xwiki.getDocument("$request.get('attDoc')"))
+#set($isGallery = "$!request.get('gallery')" != '')
+#if($isGallery)
+#set($galleryDoc = $xwiki.getDocument("$request.get('gallery')"))
+#else
+#set($galleryDoc = $attDoc)
+#end
+#set($galleryObj = $galleryDoc.getObject("XWiki.PhotoAlbumClass"))
+#set($width = $galleryObj.getProperty('photoWidth').getValue())
+#if("$!width" == '')
+  #set($width = 999999)
+#end
+#set($height = $galleryObj.getProperty('height2').getValue())
+#if("$!height" == '')
+  #set($height = 999999)
+#end
+<ul>
+#foreach($param in $request.getParameterNames())
+  #if(("$!param.indexOf('filename_')" == '0') && ("$!request.get($param)" != ''))
+    <li>$request.get($param)</li>
+    ## API call in a comment to prevent empty output (extra <p />)
+    <!-- $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height) -->
+  #end
+#end
+</ul>
+</div><!-- /c3_import_preimport_result -->
+$xwiki.flushCache()
