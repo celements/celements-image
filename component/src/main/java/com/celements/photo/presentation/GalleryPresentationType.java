@@ -1,5 +1,6 @@
 package com.celements.photo.presentation;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -7,14 +8,19 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 @Component("gallerySlidesOverview")
 public class GalleryPresentationType implements IPresentationTypeRole {
@@ -27,6 +33,9 @@ public class GalleryPresentationType implements IPresentationTypeRole {
 
   RenderCommand renderCmd;
 
+  @Requirement("celements.oldCoreClasses")
+  IClassCollectionRole oldCoreClasses;
+
   @Requirement
   IWebUtilsService webUtilsService;
 
@@ -35,6 +44,10 @@ public class GalleryPresentationType implements IPresentationTypeRole {
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+
+  private OldCoreClasses getOldCoreClasses() {
+    return (OldCoreClasses) oldCoreClasses;
   }
 
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
@@ -83,6 +96,20 @@ public class GalleryPresentationType implements IPresentationTypeRole {
 
   public String getEmptyDictionaryKey() {
     return "cel_nav_empty_presentation";
+  }
+
+  public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
+    BaseObject albumObj = getContext().getDoc().getXObject(getOldCoreClasses(
+        ).getPhotoAlbumClassRef(getContext().getDatabase()));
+    if (albumObj != null) {
+      String galleryLayout = albumObj.getStringValue(
+          OldCoreClasses.PHOTO_ALBUM_GALLERY_LAYOUT);
+      if (!StringUtils.isEmpty(galleryLayout)) {
+        return new SpaceReference(galleryLayout, new WikiReference(
+            getContext().getDatabase()));
+      }
+    }
+    return null;
   }
 
 }

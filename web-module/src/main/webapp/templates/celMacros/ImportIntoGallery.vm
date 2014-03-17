@@ -3,8 +3,14 @@ $celementsweb.addExtJSfileOnce(':celJS/images/importImgSelect.js')
 $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/importIntoGallery.css', 'file')" type="text/css" media="all" />
 #if($xwiki.hasAccessLevel('edit'))
+  #if(("$!xwiki.getSpacePreference('cel_centralfilebase')" != '') && ("$!xwiki.getSpacePreference('cel_centralfilebase')" != '-'))
+    #set($wiki_filbase_path = "$!xwiki.getSpacePreference('cel_centralfilebase')")
+  #else
+    #set($wiki_filbase_path = "$doc.getFullName()")
+  #end
 <form action="" method="post">
   <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
+  <input type="hidden" id="filebaseLink" name="filebaseLink" value="$!wiki_filbase_path" />
 #if("$!doc.getObject('XWiki.PhotoAlbumClass')" == '')
   <div style="border: 1px dotted grey; padding-bottom: 20px;">
     #foreach($gal in $services.query.xwql("from doc.object(XWiki.PhotoAlbumClass) as obj").execute())
@@ -35,7 +41,7 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
     <input class="absolute right25 top2 motiveSubmit" type="submit" value="Auswahl Importieren">
     <input type="hidden" name="xpage" value="celements_ajax" />
     <input type="hidden" name="ajax_mode" value="generateImageSlides" />
-    <input type="hidden" class="motive imageFN" name="imageFN" value="Content_attachments.FileBaseDoc;photo.jpg" />
+    <input type="hidden" class="motive imageFN" name="imageFN" value="${wiki_filbase_path};photo.jpg" />
     <br>
 </div>
 <div class="bilder"></div>

@@ -10,9 +10,10 @@
 #set($gallerySpace = '')
 #set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
 #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
-#set($galleryLayout = $albumobj.getPreoperty('galleryLayout').getValue())
+#set($galleryLayout = $albumobj.getProperty('galleryLayout').getValue())
 #set($galleryLayoutRef = $services.model.createDocumentReference('', "$!{galleryLayout}", '').getLastSpaceReference())
 #if(("$!galleryLayout" == '') || !$celementsweb.layoutExists($galleryLayoutRef))
+#set($galleryLayout = 'SimpleLayout')
 #set($galleryLayoutRef = $services.model.createDocumentReference('', "SimpleLayout", '').getLastSpaceReference())
 #end
 #if(!$recursiveCheck)
@@ -20,7 +21,7 @@
 #set($slideContent = $celementsweb.renderCelementsDocumentWithLayout($slidedoc.documentReference, $galleryLayoutRef))
 #end
 #set($recursiveCheck = false)
-#set($imgCssClasses = 'celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton')
+#set($imgCssClasses = "celimagelayout_${galleryLayout} celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton")
 #if("$!imgGalSlidecount" == '')
   #set($imgGalSlidecount = 0)
 #end
