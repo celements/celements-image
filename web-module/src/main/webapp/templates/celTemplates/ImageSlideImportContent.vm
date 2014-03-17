@@ -30,7 +30,6 @@
   #end
 #else
   #set($slideContent = "$!request.slideContent")
-  <!-- $metaTagMap -->
   #foreach($key in $metaTagMap.keySet())
     #set($slideContent = $slideContent.replaceAll("\{metatag:${key}\}", "$!metaTagMap.get($key)"))
   #end
