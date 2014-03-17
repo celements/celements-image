@@ -248,7 +248,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         var slideShowImg = $(_me._currentHtmlElem);
         if (!_me._wrapperHtmlElem) {
-          if (!slideShowImg.complete) {
+          if ((slideShowImg.tagName.toLowerCase() == 'img') && !slideShowImg.complete) {
             var _initNonOverlaySlideShowStarterBind =
               _me._initNonOverlaySlideShowStarter.bind(_me);
             slideShowImg.observe('load', _initNonOverlaySlideShowStarterBind.curry(
@@ -265,7 +265,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _initNonOverlaySlideShow : function() {
         var _me = this;
         var slideShowImg = $(_me._currentHtmlElem);
-        if (!_me._wrapperHtmlElem) {
+        if (!_me._wrapperHtmlElem && (slideShowImg.tagName.toLowerCase() == 'img')) {
           var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
               ).without('highslide-image');
           var divInnerWrapper = slideShowImg.wrap('div', {
@@ -311,12 +311,21 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           _me._wrapperHtmlElem = divWrapper;
           _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
           _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
+        } else if (!_me._wrapperHtmlElem) {
+          _me._wrapperHtmlElem = slideShowImg;
+          _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
+          _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
+        } else {
+          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+            console.log('skipping creating wrapperHTMLElem because already exists.',
+                _me._wrapperHtmlElem);
           }
+        }
       },
 
       startNonOverlaySlideShow : function() {
         var _me = this;
-        _me._getGallery(_me._startNonOverlaySlideShowCallback.bind(_me));
+        _me._getGallery(_me._startNonOverlaySlideShowCallback.bind(_me), 1);
       },
 
       _startNonOverlaySlideShowCallback : function(galleryObj) {
@@ -333,8 +342,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var isManualStart = $(elemId).hasClassName('celimage_manualstart');
         if (isManualStart) {
           _me.celSlideShowManualStartStop(false);
-          _me._currentHtmlElem.observe('celimage_slideshow:afterInit',
-              _me._initManualStartButton.bind(_me));
+          if (!_me._wrapperHtmlElem) {
+            _me._currentHtmlElem.observe('celimage_slideshow:afterInit',
+                _me._initManualStartButton.bind(_me));
+          } else {
+            _me._initManualStartButton();
+          }
         }
         _me._initNonOverlaySlideShowStarter(
             _me._initNonOverlaySlideShowStarterCallback.bind(_me));
