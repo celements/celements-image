@@ -47,6 +47,12 @@
 	display: none;
 }
 
+.celimage_gallerylistview ul li div.ImageGallery .slideshowButton,
+.celimage_gallerylistview ul li div.ImageGallery .celPresSlideShow_prev,
+.celimage_gallerylistview ul li div.ImageGallery .celPresSlideShow_next {
+  display: none;
+}
+
 .presentationList ul .cel_cm_gallery .slideshowButton,
 .presentationList ul .cel_cm_gallery_view .slideshowButton {
 	visibility: hidden;
