@@ -95,6 +95,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _resizeOverlayBind : undefined,
       _imgLoadedReCenterStartSlideBind : undefined,
       _celSlideShowManualStartStopClickHandlerBind : undefined,
+      _origStyleValues : undefined,
       _slideShowAnimation : undefined,
       _wrapperHtmlElem : undefined,
       _hasRandomStart : false,
@@ -241,8 +242,13 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       },
 
       _moveStyleToWrapper : function(divWrapper, element, styleName) {
+        var _me = this;
         var newStyle = new Hash();
-        newStyle.set(styleName, element.getStyle(styleName));
+        var elemStyleValue = _me._getOriginalStyleValues(element).get(styleName);
+        if (!elemStyleValue || (elemStyleValue == '')) {
+          elemStyleValue = element.getStyle(styleName);
+        }
+        newStyle.set(styleName, elemStyleValue);
         divWrapper.setStyle(newStyle.toObject());
         newStyle.set(styleName, '');
         element.setStyle(newStyle.toObject());
@@ -264,6 +270,34 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
             }
           }
         }
+      },
+
+      _camelCase : function (input) { 
+        return input.toLowerCase().replace(/-(.)/g, function(match, group1) {
+            return group1.toUpperCase();
+        });
+      },
+
+      /**
+       * _getOriginalStyleValues gets the original element styles opposed to getStyle
+       * from prototype-js which gets the browser resolved style.
+       *   e.g. for margin-left: auto _getOriginalStyleValues returns 'auto' yet
+       *   protoptype-js returns the real pixel value.
+       */
+      _getOriginalStyleValues : function(htmlElement) {
+        var _me = this;
+        if (!_me._origStyleValues) {
+          var origStyles = new Hash();
+          htmlElement.getAttribute('style').split(';').each(function(styleElem) {
+            var styleElemSplit = styleElem.split(':');
+            if (styleElemSplit.size() > 1) {
+              origStyles.set(_me._camelCase(styleElemSplit[0].strip()),
+                  styleElemSplit[1].strip());
+            }
+          });
+          _me._origStyleValues = origStyles;
+        }
+        return _me._origStyleValues;
       },
 
       _initNonOverlaySlideShow : function() {
@@ -303,15 +337,15 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
                 }
           });
           _me._moveStyleToWrapper(divWrapper, slideShowImg, 'float');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-top');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-bottom');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-left');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'margin-right');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginTop');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginBottom');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginLeft');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginRight');
       // adding border to Wrapper leads to problems with double borders. Thus removed.
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-top');
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-bottom');
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-right');
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'border-left');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderTop');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderBottom');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderRight');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderLeft');
           _me._wrapperHtmlElem = divWrapper;
           _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
           _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
