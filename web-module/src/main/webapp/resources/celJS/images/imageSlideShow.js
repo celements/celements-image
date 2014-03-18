@@ -345,7 +345,6 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
           _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
         } else if (!_me._wrapperHtmlElem) {
-          console.log('no new wrapper generated.');
           _me._wrapperHtmlElem = slideShowImg;
           _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
           _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
