@@ -32,7 +32,7 @@ $xwiki.celementsweb.flushCache()
 $galleryNav.loadConfigFromDoc($celldoc.documentReference)
 #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
 #set($galleryPresentationCount = $galleryPresentationCount + 1)
-<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery">
+<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery celimage_gallerylistview">
 <div class="pfeil_links"></div>
 <div class="pfeil_rechts"></div>
 #parse('celTemplates/PresentationView.vm')
