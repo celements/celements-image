@@ -12,7 +12,7 @@
 #if($gallerydoc.attachmentList.size() > 0)
 #set($attach = $gallerydoc.attachmentList.get(0))
 #set($firstImageLink = $gallerydoc.getAttachmentURL($attach.filename, "download"))
-#set($imgCssClasses = 'celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation celanim_overlay_addCloseButton')
+#set($imgCssClasses = 'celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation celanim_overlay_addCloseButton celimage_customStartSlide')
 #elseif("$!services.pageType.getPageTypeRef($gallerydoc.documentReference).configName" == 'ImageGallery')
   #set($navObj = $!gallerydoc.getObject("Celements2.NavigationConfigClass"))
   #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
@@ -30,7 +30,7 @@
 ##    #set($firstImageLink = $imageInSlide)
     #set($firstSlideContent = $slideContent)
   #end
-  #set($imgCssClasses = 'celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton')
+  #set($imgCssClasses = 'celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton celimage_customStartSlide')
 #end
   #if("$!imgGalcount" == '')
     #set($imgGalcount = 0)
