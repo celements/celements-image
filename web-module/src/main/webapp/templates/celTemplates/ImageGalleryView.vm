@@ -6,7 +6,7 @@ $xwiki.celementsweb.flushCache()
 #else   
 #set($contentDoc = $tdoc)
 #end
-#set($overwritePresCmCssClass = '')
+#set($overwritePresCmCssClass = ' ')
 #set($overwriteNavCMcssClass = 'cel_cm_gallery_view')
 #set($emptyDictKeySuffix = '_gallery_overview')
 #set($overwriteNavPresentationType = 'gallerySlidesOverview')
