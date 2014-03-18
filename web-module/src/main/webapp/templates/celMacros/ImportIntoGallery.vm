@@ -48,6 +48,9 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
 <input class="motiveSubmit" style="margin-left:296px; margin-bottom:5px" type="submit" value="Auswahl Importieren">
 <div style="border: 1px dotted grey">
   <h2>Slideaufbau</h2>
+  #if("$!gObj" != '')
+    Maximale Grösse (automatischer resize): $!gObj.getProperty("photoWidth").getValue() px x $!gObj.getProperty("height2").getValue() px<br />
+  #end
   Der Inhalt dieses Textfeldes wird jedem Slide hinzugef&uuml;gt.
   <textarea id="slideContent" style="width: 550px; height: 100px;" name="slideContent">#*<h1 class="imageHeadline">{metatag:Headline}</h1>
 <p class="imageTitle">{metatag:Object Name}</p>*#</textarea>
