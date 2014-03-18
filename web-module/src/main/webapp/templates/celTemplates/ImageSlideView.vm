@@ -1,0 +1,8 @@
+#set($xwql = "from doc.object(Celements2.PageType) as pt, doc.object(Celements2.NavigationConfigClass) as nav")
+#set($xwql = "$xwql where pt.page_type='ImageGallery'")
+#set($xwql = "$xwql and nav.menu_space=:space")
+#set($albumPages = $services.query.xwql($xwql).bindValue('space', $doc.getSpace()).execute())
+#if($albumPages.size() > 0)
+  $response.sendRedirect($xwiki.getURL($albumPages.get(0)))
+#end
+#parse('celTemplates/RichTextView.vm')
