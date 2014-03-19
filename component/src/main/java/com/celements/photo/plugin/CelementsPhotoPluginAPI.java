@@ -189,12 +189,17 @@ public class CelementsPhotoPluginAPI extends Api {
    * Get a List of all attachments in the specified archive and the suggested 
    * action when importing.
    * 
+   * -->!!! needs programming rights to get the XWikiDocument out of the attachmentDoc !!!
+   * 
    * @param attachmentDoc Zip archive to check the files for the existence in the gallery.
    * @param attachmentName Name of the zip archive attachment.
    * @param galleryDoc Gallery Document to check for the files.
    * @return List of {@link ImportFileObject} for each file.
    * @throws XWikiException
+   * 
+   * @deprecated instead use ImageScriptService.getAttachmentFileListWithActions
    */
+  @Deprecated
   public List<ImportFileObject> getAttachmentFileListWithActions(Document attachmentDoc, 
       String attachmentName, Document galleryDoc) throws XWikiException{
     XWikiAttachment zipFile = attachmentDoc.getDocument().getAttachment(attachmentName);

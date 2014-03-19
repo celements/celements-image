@@ -9,9 +9,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.photo.container.ImageDimensions;
+import com.celements.photo.utilities.ImportFileObject;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @ComponentRole
@@ -40,5 +43,8 @@ public interface IImageService {
   public DocumentReference getImageSlideTemplateRef();
 
   public Map<String, String> getImageURLinAllAspectRatios(XWikiAttachment image);
+
+  public List<ImportFileObject> getAttachmentFileListWithActions(XWikiAttachment zipFile,
+      XWikiDocument galleryDoc) throws XWikiException;
 
 }

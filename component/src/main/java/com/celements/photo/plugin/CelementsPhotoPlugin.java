@@ -329,7 +329,10 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
    * @param context XWikiContext
    * @return List of {@link ImportFileObject} for each file.
    * @throws XWikiException
+   * 
+   * @deprecated instead use ImageService.getAttachmentFileListWithActions
    */
+  @Deprecated
   public List<ImportFileObject>getAttachmentFileListWithActions(
       XWikiAttachment importFile, XWikiDocument galleryDoc, XWikiContext context
       ) throws XWikiException{

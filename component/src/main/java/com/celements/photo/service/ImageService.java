@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -27,7 +29,10 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.NavigationClasses;
 import com.celements.photo.container.ImageDimensions;
+import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.image.GenerateThumbnail;
+import com.celements.photo.utilities.ImportFileObject;
+import com.celements.photo.utilities.Unzip;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
@@ -411,4 +416,105 @@ public class ImageService implements IImageService {
   private IMetaInfoService getMetaInfoService() {
     return (IMetaInfoService) Utils.getComponent(IMetaInfoService.class);
   }
+
+  /**
+   * Get a List of all attachments in the specified archive and the suggested 
+   * action when importing.
+   * 
+   * @param importFile Zip archive to check the files for the existence in the gallery.
+   * @param galleryDoc Gallery Document to check for the files.
+   * @param context XWikiContext
+   * @return List of {@link ImportFileObject} for each file.
+   * @throws XWikiException
+   */
+  public List<ImportFileObject>getAttachmentFileListWithActions(
+      XWikiAttachment importFile, XWikiDocument galleryDoc) throws XWikiException {
+    List<ImportFileObject> resultList = new ArrayList<ImportFileObject>();
+    
+    if(importFile != null){
+      if(isZipFile(importFile)){
+        List<String> fileList;
+        try {
+          fileList = (new Unzip()).getZipContentList(
+              IOUtils.toByteArray(importFile.getContentInputStream(getContext())));
+          String fileSep = System.getProperty("file.separator");
+          for (Iterator<String> fileIterator = fileList.iterator(); fileIterator.hasNext();) {
+            String fileName = (String) fileIterator.next();
+            if(!fileName.endsWith(fileSep)
+                && !fileName.startsWith(".") && !fileName.contains(fileSep + ".")){
+              ImportFileObject file = new ImportFileObject(fileName, getActionForFile(
+                  fileName, galleryDoc));
+              resultList.add(file);
+            }
+          }
+        } catch (IOException ioe) {
+          LOGGER.error("Error reading file.", ioe);
+        }
+      } else if(isImgFile(importFile)){
+        ImportFileObject file = new ImportFileObject(importFile.getFilename(), 
+            getActionForFile(importFile.getFilename(), galleryDoc));
+        resultList.add(file);
+      }
+    } else{
+      LOGGER.error("zipFile='null' - galleryDoc='" + galleryDoc.getDocumentReference() + 
+          "'");
+    }
+    
+    return resultList;
+  }
+
+  /**
+   * For a given filename return if, in the specified gallery, its import 
+   * should be added, overwritten or skiped.
+   * 
+   * @param fileName Filename of the file to check.
+   * @param galleryDoc Document of the gallery to check if the file already exists.
+   * @return action when importing: -1 skip, 0 overwrite, 1 add
+   */
+  private short getActionForFile(String fileName, XWikiDocument galleryDoc) {
+    short action = ImportFileObject.ACTION_SKIP;
+    if(isImgFile(fileName)){
+      fileName = fileName.replace(System.getProperty("file.separator"), ".");
+      fileName = getContext().getWiki().clearName(fileName, false, true, getContext());
+      XWikiAttachment attachment = galleryDoc.getAttachment(fileName);
+      if(attachment == null){
+        action = ImportFileObject.ACTION_ADD;
+      } else{
+        action = ImportFileObject.ACTION_OVERWRITE;
+      }
+    }
+    
+    return action;
+  }
+
+  private boolean isZipFile(XWikiAttachment file) {
+    return file.getMimeType(getContext()).equalsIgnoreCase(ImageLibStrings.MIME_ZIP) 
+        || file.getMimeType(getContext()).equalsIgnoreCase(
+            ImageLibStrings.MIME_ZIP_MICROSOFT);
+  }
+
+  private boolean isImgFile(String fileName) {
+    return fileName.toLowerCase().endsWith("." + ImageLibStrings.MIME_BMP)
+        || fileName.toLowerCase().endsWith("." + ImageLibStrings.MIME_GIF)
+        || fileName.toLowerCase().endsWith("." + ImageLibStrings.MIME_JPE)
+        || fileName.toLowerCase().endsWith("." + ImageLibStrings.MIME_JPG)
+        || fileName.toLowerCase().endsWith("." + ImageLibStrings.MIME_JPEG)
+        || fileName.toLowerCase().endsWith("." + ImageLibStrings.MIME_PNG);
+  }
+
+  private boolean isImgFile(XWikiAttachment file) {
+    return file.getMimeType(getContext()).equalsIgnoreCase("image/"
+        + ImageLibStrings.MIME_BMP)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
+            + ImageLibStrings.MIME_GIF)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
+            + ImageLibStrings.MIME_JPE)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
+            + ImageLibStrings.MIME_JPG)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
+            + ImageLibStrings.MIME_JPEG)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
+            + ImageLibStrings.MIME_PNG);
+  }
+
 }

@@ -19,6 +19,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.ICropImage;
 import com.celements.photo.unpack.IUnpackComponentRole;
+import com.celements.photo.utilities.ImportFileObject;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
@@ -245,6 +246,33 @@ public class ImageScriptService implements ScriptService {
           + ((image != null)? image.getFilename() : "null") + "]", ex);
     }
     return urls;
+  }
+
+  /**
+   * Get a List of all attachments in the specified archive and the suggested 
+   * action when importing.
+   * 
+   * @param attachmentDoc Zip archive to check the files for the existence in the gallery.
+   * @param attachmentName Name of the zip archive attachment.
+   * @param galleryDoc Gallery Document to check for the files.
+   * @return List of {@link ImportFileObject} for each file.
+   */
+  public List<ImportFileObject> getAttachmentFileListWithActions(
+      DocumentReference attachmentDocRef, String attachmentName,
+      DocumentReference galleryDocRef) {
+    try {
+      XWikiDocument attachmentDoc = getContext().getWiki().getDocument(attachmentDocRef,
+          getContext());
+      XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef,
+          getContext());
+      XWikiAttachment zipFile = attachmentDoc.getAttachment(attachmentName);
+      return imageService.getAttachmentFileListWithActions(zipFile, galleryDoc);
+    } catch (Exception exp) {
+      LOGGER.error("Failed to getAttachmentFileListWithActions for attachmentDocRef ["
+          + attachmentDocRef + "], attachmentName [" + attachmentName
+          + "], galleryDocRef [" + galleryDocRef + "].", exp);
+    }
+    return Collections.emptyList();
   }
 
 }
