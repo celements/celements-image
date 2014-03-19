@@ -91,7 +91,7 @@ body div.mask.cel-YuiOverlay {
   cursor: pointer;
 }
 
-.cel_slideShow_slideRoot .celPresSlideShow_countSlideNum,
-.cel_slideShow_slideRoot .celPresSlideShow_currentSlideNum {
+#yuiOverlayContainer .celPresSlideShow_countSlideNum,
+#yuiOverlayContainer .celPresSlideShow_currentSlideNum {
   display: none;
 }

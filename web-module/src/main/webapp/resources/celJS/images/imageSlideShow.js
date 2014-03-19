@@ -450,16 +450,17 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       },
 
       _addSlideShowCounter : function(event) {
-        var slideWrapperElem = event.memo.newSlideWrapperElem;
-        if (!slideWrapperElem.down('> div.celPresSlideShow_countSlideNum')) {
+        var _me = this;
+//        var slideWrapperElem = event.memo.newSlideWrapperElem;
+        if (!_me._getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
           var countSlideNumElem = new Element('div').addClassName(
               'celPresSlideShow_countSlideNum');
-          slideWrapperElem.insert({'bottom' : countSlideNumElem});
+          _me._getContainerElement().insert({'bottom' : countSlideNumElem});
         }
-        if (!slideWrapperElem.down('> div.celPresSlideShow_currentSlideNum')) {
+        if (!_me._getContainerElement().down('> div.celPresSlideShow_currentSlideNum')) {
           var currentSlideNumElem = new Element('div').addClassName(
               'celPresSlideShow_currentSlideNum');
-          slideWrapperElem.insert({'bottom' : currentSlideNumElem});
+          _me._getContainerElement().insert({'bottom' : currentSlideNumElem});
         }
       },
 
