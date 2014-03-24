@@ -18,7 +18,7 @@ CiG.prototype = {
     _collDocRef : undefined,
     _galleryData : undefined,
     _imagesArray : undefined,
-    _imagesHash : new Hash(),
+    _imagesHash : undefined,
     _afterLoadListener : undefined,
     _loading : false,
     _loadingSlice : false,
@@ -28,6 +28,7 @@ CiG.prototype = {
     var _me = this;
     _me._collDocRef = collDocRef;
     _me._afterLoadListener = new Array();
+    _me._imagesHash = new Hash();
     _me.executeAfterLoad(callbackFN, onlyFirstNumImages, spaceImgs);
   },
 
