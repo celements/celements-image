@@ -2,9 +2,7 @@
 #set($xwql = "$xwql where pt.page_type='ImageGallery'")
 #set($xwql = "$xwql and nav.menu_space=:space")
 #set($albumPages = $services.query.xwql($xwql).bindValue('space', $doc.getSpace()).execute())
-#if(("$!slidedoc" == '') && ($albumPages.size() > 0) && ("$!albumPages.get(0)" != "$!doc.getFullName()"))
-##FIXME never execute redirect if context.action == edit
-##FIXME never execute redirect if loaded per ajax in slideshow
-##  $response.sendRedirect($xwiki.getURL($albumPages.get(0)))
+#if(("$!context.action" == 'view') && ("$!request.xpage" != 'celements_ajax') && ("$!slidedoc" == '') && ($albumPages.size() > 0) && ("$!albumPages.get(0)" != "$!doc.getFullName()"))
+  $response.sendRedirect($xwiki.getURL($albumPages.get(0)))
 #end
 #parse('celTemplates/RichTextView.vm')
