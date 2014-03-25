@@ -329,6 +329,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           otherCssClassNames.each(function(className) {
                 if (!className.startsWith('cel_effekt_')) {
                   divWrapper.addClassName(className);
+                } else {
+                  divWrapper.addClassName(className.replace(/cel_effekt_/,
+                      'cel_slideshow_effekt_'));
                 }
           });
           _me._moveStyleToWrapper(divWrapper, slideShowImg, 'float');
