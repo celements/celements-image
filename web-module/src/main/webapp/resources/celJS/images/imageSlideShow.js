@@ -115,7 +115,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           _me._hasRandomStart = _me._currentHtmlElem.hasClassName(
               'celimage_slideshowRandomStart');
           if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
-            _me._fixStartImage(); 
+            if (!_me._currentHtmlElem.hasClassName('celimage_customStartSlide')) {
+              _me._fixStartImage(); 
+            }
           } else if (_me._currentHtmlElem.down('.slideWrapper')) {
             //TODO check if recenter here still is needed after it is correctly done in CelementsSlideShow.js
             _me._currentHtmlElem.select('img').each(function(imgElem) {
