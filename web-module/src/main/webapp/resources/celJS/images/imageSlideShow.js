@@ -106,7 +106,32 @@ CELEMENTS.image.SlideShowStarter = function(htmlElem) {
             imgSlideShow.startNonOverlaySlideShow();
           }
         });
+      },
+      
+      initializeSlideShow : function() {
+        var _me = this;
+        _me.initializeImageSlideShow();
+        _me.initializeOverlayImageSlideShow();
+      },
+
+      autoRegisterOnSlides : function() {
+        var _me = this;
+        $(document.body).observe('cel_slideShow:registerAfterContentChanged',
+            _me.registerAfterContentChangedListener.bind(_me));
+      },
+
+      registerAfterContentChangedListener : function(event) {
+        var htmlContainer = event.memo;
+        if (htmlContainer) {
+          var registerStoppEvent = $(document.body).fire(
+              'celimage_slideshow:shouldAutoRegister', htmlContainer);
+          if (registerStoppEvent.stopped) {
+            var imgSlideShowStarter = new CELEMENTS.image.SlideShowStarter(htmlContainer);
+            imgSlideShowStarter.initializeSlideShow();
+          }
+        }
       }
+
   };
 })();
 
