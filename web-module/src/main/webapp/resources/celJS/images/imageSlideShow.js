@@ -7,41 +7,6 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
 (function(window, undefined) {
 
-  var isMobile = {
-      Android: function() {
-        return navigator.userAgent.match(/Android/i);
-      },
-      BlackBerry: function() {
-        return navigator.userAgent.match(/BlackBerry/i);
-      },
-      iOS: function() {
-        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-      },
-      iPhone: function() {
-        return navigator.userAgent.match(/iPhone/i);
-      },
-      iPod: function() {
-        return navigator.userAgent.match(/iPod/i);
-      },
-      iPad: function() {
-        return navigator.userAgent.match(/iPad/i);
-      },
-      Opera: function() {
-        return navigator.userAgent.match(/Opera Mini/i);
-      },
-      Windows: function() {
-        return navigator.userAgent.match(/IEMobile/i);
-      },
-      Simulator: function() {
-        // http://iphone4simulator.com/ maybe
-        return (window.top != window);
-      },
-      any: function() {
-        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() 
-            || isMobile.Opera() || isMobile.Windows());
-      }
-    };
-
   var CISS_OverlaySlideShowObj = undefined;
   var CISS_BodySlideShowStarter = undefined;
   var CISS_SlideShowObjHash = new Hash();
@@ -160,10 +125,13 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _hasRandomStart : false,
       _autoresize : false,
       _debug : false,
+      _mobileDim : undefined,
 
       _init : function(htmlElem) {
         var _me = this;
-        _me._autoresize = isMobile.iOS() || isMobile.Android();
+        _me._mobileDim = new CELEMENTS.mobile.Dimensions(); 
+        _me._isMobile = _me._mobileDim.isMobile;
+        _me._autoresize = _me._isMobile.iOS() || _me._isMobile.Android();
         _me._currentHtmlElem = $(htmlElem) || null;
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
@@ -714,14 +682,14 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         var oldWidth = parseInt(openDialog.getWidth());
         var newWidth = oldWidth;
-        if (oldWidth > _me._getInnerWidth()) {
-          newWidth = _me._getInnerWidth() - 20; // take care of close button
+        if (oldWidth > _me._mobileDim._getInnerWidth()) {
+          newWidth = _me._mobileDim._getInnerWidth() - 20; // take care of close button
         }
         var zoomWidthFactor = newWidth / oldWidth;
         var oldHeight = parseInt(openDialog.getHeight());
         var newHeight = oldHeight;
-        if (oldHeight > _me._getInnerHeight()) {
-          newHeight = _me._getInnerHeight() - 20; // take care of close button
+        if (oldHeight > _me._mobileDim._getInnerHeight()) {
+          newHeight = _me._mobileDim._getInnerHeight() - 20; // take care of close button
         }
         var zoomHeightFactor = newHeight / oldHeight;
         var zoomFactor;
@@ -731,41 +699,6 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           zoomFactor = zoomWidthFactor;
         }
         return zoomFactor;
-      },
-
-      _isOrientationLandscape : function() {
-//        var _me = this;
-        var innerWidth = window.innerWidth || document.documentElement.clientWidth;
-        var innerHeight = window.innerHeight || document.documentElement.clientHeight;
-        //window.orientation works only correct on load, but has whimsical behavior when 
-        //  rotating 
-        return innerWidth > innerHeight;
-      },
-
-      _getInnerWidth : function() {
-        var _me = this;
-        var width = window.innerWidth || document.documentElement.clientWidth;
-        if(isMobile.any()) {
-          if(isMobile.iOS() && _me._isOrientationLandscape()) {
-            width = screen.height;
-          } else if (!isMobile.Android()) {
-            width = screen.width;
-          }
-        }
-        return width;
-      },
-
-      _getInnerHeight : function() {
-//        var _me = this;
-        var height = window.innerHeight || document.documentElement.clientHeight;
-//        if(isMobile.any()) {
-//          if(isMobile.iOS() && _me._isOrientationLandscape()) {
-//            height = screen.width;
-//          } else {
-//            height = screen.height;
-//          }
-//        }
-        return height;
       }
 
   };
