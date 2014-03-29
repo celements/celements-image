@@ -552,7 +552,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _checkIsImageSlideShowOverlay : function(event) {
 //        var _me = this;
         var openDialog = CELEMENTS.presentation.getOverlayObj();
-        if (openDialog._dialogConfig.slideShowElem) {
+        if (openDialog._dialogConfig.slideShowElem
+            && (event.memo.slideShow._htmlContainerId === openDialog.getContainerId())) {
           event.stop();
         }
       },
