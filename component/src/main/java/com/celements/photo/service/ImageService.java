@@ -473,8 +473,10 @@ public class ImageService implements IImageService {
    */
   private short getActionForFile(String fileName, XWikiDocument galleryDoc) {
     short action = ImportFileObject.ACTION_SKIP;
+    LOGGER.debug("getActionForFile [" + fileName + "] on gallery doc [" + galleryDoc 
+        + "]");
     VelocityContext vcontext = ((VelocityContext) getContext().get("vcontext")); 
-    if(isImgFile(fileName) || ((Boolean) vcontext.get("isImportToFilebase"))){
+    if(isImgFile(fileName) || ((vcontext != null) && (Boolean) vcontext.get("isImportToFilebase"))){
       fileName = fileName.replace(System.getProperty("file.separator"), ".");
       fileName = getContext().getWiki().clearName(fileName, false, true, getContext());
       XWikiAttachment attachment = galleryDoc.getAttachment(fileName);
