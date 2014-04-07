@@ -497,15 +497,17 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _addSlideShowCounter : function(event) {
         var _me = this;
 //        var slideWrapperElem = event.memo.newSlideWrapperElem;
-        if (!_me._getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
-          var countSlideNumElem = new Element('div').addClassName(
-              'celPresSlideShow_countSlideNum');
-          _me._getContainerElement().insert({'bottom' : countSlideNumElem});
-        }
-        if (!_me._getContainerElement().down('> div.celPresSlideShow_currentSlideNum')) {
-          var currentSlideNumElem = new Element('div').addClassName(
-              'celPresSlideShow_currentSlideNum');
-          _me._getContainerElement().insert({'bottom' : currentSlideNumElem});
+        if (!_me._currentHtmlElem.hasClassName('celimage_addCounterNone')) {
+          if (!_me._getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
+            var countSlideNumElem = new Element('div').addClassName(
+                'celPresSlideShow_countSlideNum');
+            _me._getContainerElement().insert({'bottom' : countSlideNumElem});
+          }
+          if (!_me._getContainerElement().down('> div.celPresSlideShow_currentSlideNum')) {
+            var currentSlideNumElem = new Element('div').addClassName(
+                'celPresSlideShow_currentSlideNum');
+            _me._getContainerElement().insert({'bottom' : currentSlideNumElem});
+          }
         }
       },
 
