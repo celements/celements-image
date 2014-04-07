@@ -110,6 +110,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _openInOverlayBind : undefined,
       _imageSlideShowLoadFirstContentBind : undefined,
       _addNavigationButtonsBind : undefined,
+      _initAnimationBind : undefined,
       _celSlideShowObj : null,
       _isOverlayRegistered : false,
       _currentHtmlElem : undefined,
@@ -140,6 +141,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
+        _me._initAnimationBind = _me._initAnimation.bind(_me);
         _me._addSlideShowCounterBind = _me._addSlideShowCounter.bind(_me);
         _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
         _me._imgLoadedReCenterStartSlideBind = _me._imgLoadedReCenterStartSlide.bind(_me);
@@ -401,24 +403,9 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
       _startNonOverlaySlideShowCallback : function(galleryObj) {
         var _me = this;
         _me._celSlideShowObj = null;
-        var elemId = $(_me._currentHtmlElem).id;
-        if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
-          var slideShowEffect = _me._getPart(elemId, 3, 'none');
-          var timeout = _me._getPart(elemId, 2, 3);
-          _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
-              _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
-              slideShowEffect);
-        }
-        var isManualStart = $(elemId).hasClassName('celimage_manualstart');
-        if (isManualStart) {
-          _me.celSlideShowManualStartStop(false);
-          if (!_me._wrapperHtmlElem) {
-            _me._currentHtmlElem.observe('celimage_slideshow:afterInit',
-                _me._initManualStartButton.bind(_me));
-          } else {
-            _me._initManualStartButton();
-          }
-        }
+        _me._getCelSlideShowObj(galleryObj.getLayoutName());
+//        console.log('before starting _initAnimation');
+//        _me._initAnimation();
         _me._initNonOverlaySlideShowStarter(
             _me._initNonOverlaySlideShowStarterCallback.bind(_me));
       },
@@ -427,8 +414,30 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         var _me = this;
         _me._getCelSlideShowObj().setAutoresize(true);
         _me._getCelSlideShowObj().register();
-        _me._slideShowAnimation.register();
         _me._imageSlideShowLoadFirstContent_internal();
+      },
+
+      _initAnimation : function(event) {
+        var _me = this;
+        var elemId = $(_me._currentHtmlElem).id;
+        if (_me._getCelSlideShowObj().getHtmlContainer()) {
+          _me._getCelSlideShowObj().getHtmlContainer().stopObserving(
+              'cel_yuiOverlay:afterContentChanged', _me._initAnimationBind);
+        }
+        if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
+          var slideShowEffect = _me._getPart(elemId, 3, 'none');
+          var timeout = _me._getPart(elemId, 2, 3);
+          _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
+              _me._getCelSlideShowObj(), timeout, slideShowEffect);
+          var hasAnimation = !$(_me._currentHtmlElem).hasClassName('celimage_nonestart');
+          if (hasAnimation) {
+            _me._slideShowAnimation.register();
+            var isAutoStart = !$(_me._currentHtmlElem).hasClassName('celimage_manualstart')
+                            || $(_me._currentHtmlElem).hasClassName('celimage_autostart');
+            _me._initManualStartButton();
+            _me.celSlideShowManualStartStop(isAutoStart, true);
+          }
+        }
       },
 
       _initManualStartButton : function() {
@@ -438,6 +447,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         startButtonDiv.hide();
         _me._wrapperHtmlElem.insert({ bottom : startButtonDiv });
         if (isCelimageOverlay) {
+          //XXX is this still at the right place?
           CISS_OverlaySlideShowObj.registerOpenInOverlay(_me._wrapperHtmlElem);
         } else {
           $(_me._wrapperHtmlElem).stopObserving('click',
@@ -445,7 +455,6 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           $(_me._wrapperHtmlElem).observe('click',
               _me._celSlideShowManualStartStopClickHandlerBind);
         }
-        Effect.Appear(startButtonDiv, { duration : 3.0 , to : 0.8 });
       },
 
       _celSlideShowManualStartStopClickHandler : function(event) {
@@ -454,10 +463,13 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         _me.celSlideShowManualStartStop();
       },
 
-      celSlideShowManualStartStop : function(isStart) {
+      celSlideShowManualStartStop : function(isStart, delayedStart) {
         var _me = this;
         if (typeof isStart === 'undefined') {
           isStart = _me._slideShowAnimation._paused;
+        }
+        if (typeof delayedStart === 'undefined') {
+          delayedStart = false;
         }
         var slideShowButton = undefined;
         if (_me._wrapperHtmlElem) {
@@ -467,7 +479,7 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
             console.log('animation started for image slideshow', _me._currentHtmlElem.id);
           }
-          _me._slideShowAnimation.startAnimation();
+          _me._slideShowAnimation.startAnimation(delayedStart);
           if (slideShowButton) {
             Effect.Fade(slideShowButton, { duration : 1.0 });
           }
@@ -499,6 +511,8 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
 
       _imageSlideShowLoadFirstContent_internal : function() {
         var _me = this;
+        _me._getCelSlideShowObj().getHtmlContainer().observe(
+            'cel_yuiOverlay:afterContentChanged', _me._initAnimationBind);
         _me._getCelSlideShowObj().getHtmlContainer().observe(
             'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
         _me._getCelSlideShowObj().getHtmlContainer().observe(
