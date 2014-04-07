@@ -475,7 +475,7 @@ public class ImageService implements IImageService {
     short action = ImportFileObject.ACTION_SKIP;
     DocumentReference importClassRef = webUtilsService.resolveDocumentReference(
         "Classes.ImportClass");
-    boolean isImportToFilebase = getContext().getDoc().getXObjectSize(importClassRef) > 0;
+    boolean isImportToFilebase = getContext().getDoc().getXObjectSize(importClassRef) == 0;
     LOGGER.debug("getActionForFile [" + fileName + "] on gallery doc [" + galleryDoc 
         + "], isImportToFilebase [" + isImportToFilebase + "]");
     if(isImgFile(fileName) || isImportToFilebase){
