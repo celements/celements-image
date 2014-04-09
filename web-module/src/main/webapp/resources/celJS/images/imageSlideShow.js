@@ -579,6 +579,11 @@ window.CELEMENTS.image.SlideShow = function(config) {
           _me._celSlideShowObj = new CELEMENTS.presentation.SlideShow(
               _me._getContainerElemId());
           overwriteLayout = overwriteLayout || 'SimpleLayout';
+          //TODO check gallery layout
+//        _me._getGallery(function(galleryObj) {
+//          _me._getCelSlideShowObj(galleryObj.getLayoutName());
+//          openDialog.intermediatOpenHandler();
+//        }, 1);
           //TODO check layout!!!
           _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
         } else if (overwriteLayout) {
