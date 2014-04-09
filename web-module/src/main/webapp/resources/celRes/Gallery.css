@@ -139,7 +139,7 @@
   line-height: 18px;
   border-right: 1px solid #3D3D3D;
 }
-
+#yuiOverlayContainer .slideshowButton,
 .celimage_slideshow_wrapper .slideshowButton { 
   background-image: url(celanim/buttons500.png);
   height: 66px !important; 
@@ -154,8 +154,10 @@
   opacity: 0.9; 
   background-position: -41px -44px !important; 
   background-repeat: no-repeat; 
+  z-index : 2;
 }
 
+#yuiOverlayContainer .slideshowButton:hover,
 .celimage_slideshow_wrapper .slideshowButton:hover { 
   background-image: url(celanim/buttons500-hover.png);
 }
