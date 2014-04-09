@@ -92,11 +92,6 @@
   color: #EDEDED;
 }
 
-#yuiOverlayContainer .celPresSlideShow_countSlideNum,
-#yuiOverlayContainer .celPresSlideShow_currentSlideNum {
-  display: none;
-}
-
 .celimage_slideshow_wrapper .slideshowButton { 
   background-image: url(celanim/buttons500.png);
   height: 66px !important; 
