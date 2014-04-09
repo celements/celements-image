@@ -41,7 +41,7 @@
   #set($photoHeight = "662")
 #end
   ## #set($zoomFactor = $mathtool.div(100, $photoHeight))
-  <div id="ImgGallerySlide$!{imgGalSlidecount}:${slideFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!gallerySpace"##
+  <div id="ImgGallerySlide$!{imgGalSlidecount}:${slideFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:100:100"##
    class="$imgCssClasses" style="width:100px;height:100px;">
   #*
       zoom: 2; /* all browsers */
