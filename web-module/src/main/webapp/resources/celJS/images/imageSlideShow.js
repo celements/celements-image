@@ -516,13 +516,10 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'oldHtmlId' : _me._htmlElemId,
             'newHtmlId' : _me._containerHtmlElem.id
           });
-          //XXX still in the right place!?!?
-          slideShowImg.fire('celimage_slideshow:afterInit', _me);
-//          console.log('_initNonOverlaySlideShow: for wrapper ', slideShowImg);
+          slideShowImg.fire('celimage_slideshow:afterWrapSplashImage', _me);
         } else if (!_me._containerHtmlElem) {
           _me._containerHtmlElem = slideShowImg;
-          //XXX still in the right place!?!?
-          slideShowImg.fire('celimage_slideshow:afterInit', _me);
+          slideShowImg.fire('celimage_slideshow:afterWrapSplashImage', _me);
         } else {
           if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
             console.log('skipping creating wrapperHTMLElem because already exists.',
