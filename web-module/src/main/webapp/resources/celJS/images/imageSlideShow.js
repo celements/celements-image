@@ -113,6 +113,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       _htmlElemId : undefined,
       _containerHtmlElem : undefined,
       _configReader : undefined,
+      _resizeOverlayBind : undefined,
       _registerHandlerBind : undefined,
       _replaceNotifyHandlerBind : undefined,
       _openInOverlayClickHandlerBind : undefined,
@@ -138,6 +139,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           'addCounterNone' : 'celimage_addCounterOverlayNone'
         });
         _me._isOverlayRegistered = false;
+        _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
         _me._replaceNotifyHandlerBind = _me._replaceNotifyHandler.bind(_me);
         _me._registerHandlerBind = _me._registerHandler.bind(_me);
         _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
@@ -182,13 +184,12 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         var _me = this;
         if (!_me._isOverlayRegistered) {
           _me._isOverlayRegistered = true;
-//          _me._celSlideShowObj = getCelSlideShowObj();
           $(document.body).observe('cel_slideShow:shouldRegister',
               _me._checkIsImageSlideShowOverlay.bind(_me));
           $(document.body).observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlay.bind(_me));
-//          Event.observe(window, "resize", _me._resizeOverlayBind);
-//          Event.observe(window, "orientationchange", _me._resizeOverlayBind);
+          Event.observe(window, "resize", _me._resizeOverlayBind);
+          Event.observe(window, "orientationchange", _me._resizeOverlayBind);
         }
         _me._getHtmlElem().observe('click', _me._openInOverlayClickHandlerBind);
         _me._getHtmlElem().observe('cel_ImageSlideShow:startSlideShow',
@@ -197,11 +198,83 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
             _me._imageSlideShowLoadFirstContentBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
-//        $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
-//            _me._resizeOverlayBind);
-//        $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
-        console.log('registerOpenInOverlay:', _me._getHtmlElem(), _me._htmlElemId);
-        console.warn('registerOpenInOverlay not yet implemented');
+        $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
+            _me._resizeOverlayBind);
+      },
+
+      /**
+       * TODO move to celYuiOverlay
+       */
+      _resizeOverlay : function() {
+        var _me = this;
+        if (_me._configReader.isAutoResize()) {
+          var openDialog = CELEMENTS.presentation.getOverlayObj();
+          var zoomFactor = _me._computeZoomFactor();
+          if (zoomFactor <= 1) {
+            var oldWidth = parseInt(openDialog.getWidth());
+            var oldHeight = parseInt(openDialog.getHeight());
+            newHeight = oldHeight * zoomFactor;
+            newWidth = oldWidth * zoomFactor;
+            var eventMemo = {
+                'fullWidth' : oldWidth,
+                'fullHeight' : oldHeight,
+                'zoomFactor' : zoomFactor,
+                'newWidth' : newWidth,
+                'newHeight' : newHeight
+            };
+            if (_me._debug && (typeof console != 'undefined')
+                && (typeof console.log != 'undefined')) {
+              console.log('final resize factor: ', eventMemo);
+            }
+            $(document.body).fire('cel_imageSlideShow:beforeResizeDialog_General',
+                eventMemo);
+            openDialog._overlayDialog.cfg.setProperty('width', newWidth + 'px');
+            openDialog._overlayDialog.cfg.setProperty('height', newHeight + 'px');
+            $(document.body).fire('cel_imageSlideShow:afterResizeDialog_General',
+                eventMemo);
+            var resizeEvent = $('yuiOverlayContainer').fire(
+                'cel_imageSlideShow:resizeDialogContent', eventMemo);
+            if (!resizeEvent.stopped) {
+              $('yuiOverlayContainer').setStyle({
+                'zoom' : zoomFactor,
+                'transform' : 'scale(' + zoomFactor + ')',
+                'transformOrigin' : '0 0 0',
+                'height' : oldHeight + 'px',  // important for FF
+                'width' : oldWidth + 'px' // important for FF
+              });
+            }
+          } else {
+            if (_me._debug && (typeof console != 'undefined')
+                && (typeof console.log != 'undefined')) {
+              console.log('no resize needed.', zoomFactor);
+            }
+          }
+          openDialog._overlayDialog.center();
+        }
+      },
+
+      _computeZoomFactor : function() {
+        var _me = this;
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
+        var oldWidth = parseInt(openDialog.getWidth());
+        var newWidth = oldWidth;
+        if (oldWidth > _me._mobileDim._getInnerWidth()) {
+          newWidth = _me._mobileDim._getInnerWidth() - 20; // take care of close button
+        }
+        var zoomWidthFactor = newWidth / oldWidth;
+        var oldHeight = parseInt(openDialog.getHeight());
+        var newHeight = oldHeight;
+        if (oldHeight > _me._mobileDim._getInnerHeight()) {
+          newHeight = _me._mobileDim._getInnerHeight() - 20; // take care of close button
+        }
+        var zoomHeightFactor = newHeight / oldHeight;
+        var zoomFactor;
+        if (zoomHeightFactor < zoomWidthFactor) {
+          zoomFactor = zoomHeightFactor;
+        } else {
+          zoomFactor = zoomWidthFactor;
+        }
+        return zoomFactor;
       },
 
       _removeIsImageSlideShowOverlay : function() {
@@ -255,11 +328,6 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           "height" : _me._configReader.getOverlayHeight() + 'px',
           fixedcenter: !_me._configReader.isAutoResize()
         });
-        //TODO check gallery layout
-//        _me._getGallery(function(galleryObj) {
-//          _me._getCelSlideShowObj(galleryObj.getLayoutName());
-//          openDialog.intermediatOpenHandler();
-//        }, 1);
         openDialog.intermediatOpenHandler();
       }
 
