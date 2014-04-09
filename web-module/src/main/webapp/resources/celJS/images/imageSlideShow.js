@@ -136,6 +136,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           'nonestart' : 'celimage_overlaynonestart',
           'autostart' : 'celimage_overlayautostart',
           'addNavigation' : 'celimage_addNavigationOverlay',
+          'customStart' : 'celimage_customStartSlideOverlay',
           'addCounterNone' : 'celimage_addCounterOverlayNone'
         });
         _me._isOverlayRegistered = false;
@@ -193,13 +194,14 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         }
         _me._getHtmlElem().observe('click', _me._openInOverlayClickHandlerBind);
         _me._getHtmlElem().observe('cel_ImageSlideShow:startSlideShow',
-            _me.openInOverlayBind);
+            _me._openInOverlayBind);
         $(document.body).stopObserving('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
         $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
             _me._resizeOverlayBind);
+        $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
       },
 
       /**
@@ -313,11 +315,10 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
 
       openInOverlay : function(event) {
         var _me = this;
-        _me._startAtSlideName = event.memo;
-        if (isNaN(_me._startAtSlideName)) {
-          _me._startAtSlideName = undefined;
+        var startAtSlideName = event.memo;
+        if (startAtSlideName) {
+          _me._configReader.setStartSlideNum(startAtSlideName);
         }
-        _me._startSlideNum = undefined;
         var hasCloseButton = _me._configReader.hasCloseButton();
         var openDialog = CELEMENTS.presentation.getOverlayObj({
           'close' : hasCloseButton,
@@ -736,6 +737,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       _mobileDim : undefined,
       _isMobile : undefined,
       _autoresize : undefined,
+      _startSlideNum : undefined,
 
       _init : function(htmlElem, configDef) {
         var _me = this;
@@ -855,8 +857,16 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         return _me._getPart(3, 'none');
       },
 
+      setStartSlideNum : function(startSlideNum) {
+        var _me = this;
+        _me._startSlideNum = startSlideNum;
+      },
+
       getStartSlideNum : function() {
         var _me = this;
+        if (_me._startSlideNum) {
+          return _me._startSlideNum;
+        }
         return parseInt(_me._getPart(6, 1)) - 1;
       },
 
