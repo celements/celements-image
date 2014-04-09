@@ -21,7 +21,10 @@
 #set($slideContent = $celementsweb.renderCelementsDocumentWithLayout($slidedoc.documentReference, $galleryLayoutRef))
 #end
 #set($recursiveCheck = false)
-#set($imgCssClasses = "celimagelayout_${galleryLayout} celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton celimage_customStartSlide")
+#set($imgCssClasses = "celimagelayout_${galleryLayout} celimage_slideshow")
+#set($imgCssClasses = "${imgCssClasses} celimage_nonestart celimage_overlay ")
+#set($imgCssClasses = "${imgCssClasses} celimage_addNavigationOverlay celimage_overlay_addCloseButton")
+#set($imgCssClasses = "${imgCssClasses} celimage_overlaynonestart celimage_customStartSlide")
 #if("$!imgGalSlidecount" == '')
   #set($imgGalSlidecount = 0)
 #end
