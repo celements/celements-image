@@ -64,7 +64,8 @@
      -moz-transform-origin: 0 0 0;
   *#
 ##      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
-        <div class="cel_slideShow_slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
+##        <div class="cel_slideShow_slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
+        <div class="cel_slideShow_slideRoot">
           <div class="cel_slideShow_slideWrapper">
           $firstSlideContent
           </div>
