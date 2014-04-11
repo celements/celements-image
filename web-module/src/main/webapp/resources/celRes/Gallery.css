@@ -69,7 +69,7 @@
 	display: none;
 }
 
-.presentationList ul .celimage_slideshow .cel_slideShow_slideRoot {
+.presentationList ul .celimage_slideshow {
   color: #EDEDED;
   border: 0px solid black;
   background-color: black;
