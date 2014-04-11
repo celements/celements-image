@@ -590,6 +590,9 @@ window.CELEMENTS.image.SlideShow = function(config) {
         return _me._celSlideShowObj;
       },
 
+      /**
+       * adds slide counter if image animation config asks for.
+       */
       _addSlideShowCounter : function(event) {
         var _me = this;
 //        var slideWrapperElem = event.memo.newSlideWrapperElem;
@@ -624,7 +627,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _imageSlideShowLoadFirstContent_internal : function() {
         var _me = this;
         _me.getContainerElement().observe(
-            'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
+            'cel_yuiOverlay:beforeSlideInsert', _me._addNavigationButtonsBind);
         _me.getContainerElement().observe(
             'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
         if (_me._configReader.hasCustomStart()) {
