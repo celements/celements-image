@@ -135,6 +135,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           'manualstart' : 'celimage_overlaymanualstart',
           'nonestart' : 'celimage_overlaynonestart',
           'autostart' : 'celimage_overlayautostart',
+          'autostartnostop' : 'celimage_overlayautostartnostop',
           'addNavigation' : 'celimage_addNavigationOverlay',
           'customStart' : 'celimage_customStartSlideOverlay',
           'addCounterNone' : 'celimage_addCounterOverlayNone'
@@ -653,9 +654,10 @@ window.CELEMENTS.image.SlideShow = function(config) {
               _me._configReader.getSlideShowEffect());
           if (_me._configReader.hasAnimation()) {
             _me._slideShowAnimation.register();
-            var isAutoStart = (_me._configReader.getStartMode() == 'auto');
-            _me._initManualStartButton();
-            _me.startStop(isAutoStart, true);
+            if (_me._configReader.hasManualButton()) {
+              _me._initManualStartButton();
+            }
+            _me.startStop(_me._configReader.hasAutoStart(), true);
           }
         }
       },
@@ -755,6 +757,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
           'manualstart' : 'celimage_manualstart',
           'nonestart' : 'celimage_nonestart',
           'autostart' : 'celimage_autostart',
+          'autostartnostop' : 'celimage_autostartnostop',
           'addNavigation' : 'celimage_addNavigation',
           'addCounterNone' : 'celimage_addCounterNone',
           'randomStart' : 'celimage_slideshowRandomStart',
@@ -795,13 +798,26 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
           return 'none';
         } else if (_me._hasClassName(_me._configDef.autostart)) {
           return 'auto';
+        } else if (_me._hasClassName(_me._configDef.autostartnostop)) {
+          return 'autonostop';
         }
-        return 'auto';
+        return 'autonostop';
       },
 
       hasAnimation : function() {
         var _me = this;
         return (_me.getStartMode() != 'none');
+      },
+
+      hasAutoStart : function() {
+        var _me = this;
+        return (_me.getStartMode() == 'auto')
+          || (_me.getStartMode() == 'autonostop');
+      },
+
+      hasManualButton : function() {
+        var _me = this;
+        return (_me.getStartMode() != 'autonostop');
       },
 
       getContainerAnimWidth : function() {
