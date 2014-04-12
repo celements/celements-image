@@ -317,7 +317,9 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       openInOverlay : function(event) {
         var _me = this;
         var startAtSlideName = event.memo;
-        if (startAtSlideName) {
+        // event.memo is an empty object if prototypejs fire is used without
+        // a memo object
+        if (startAtSlideName && (typeof startAtSlideName !== 'object')) {
           _me._configReader.setStartSlideNum(startAtSlideName);
         }
         var hasCloseButton = _me._configReader.hasCloseButton();
