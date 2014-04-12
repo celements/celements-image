@@ -433,8 +433,9 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
        */
       _getOriginalStyleValues : function(htmlElement) {
         var _me = this;
-        if (!_me._origStyleValues) {
+        if (!_me._origStyleValues && htmlElement.getAttribute('style')) {
           var origStyles = new Hash();
+          console.log('_getOriginalStyleValues: ', htmlElement, htmlElement.getAttribute('style'));
           htmlElement.getAttribute('style').split(';').each(function(styleElem) {
             var styleElemSplit = styleElem.split(':');
             if (styleElemSplit.size() > 1) {
@@ -443,6 +444,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             }
           });
           _me._origStyleValues = origStyles;
+        } else {
+          return new Hash();
         }
         return _me._origStyleValues;
       },
