@@ -393,11 +393,17 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       install : function() {
         var _me = this;
         _me._wrapSplashImage();
-        _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
-          'configReader' : _me._configReader,
-          'containerHtmlElem' : _me._containerHtmlElem
-        });
-        _me._imageSlideShowObj.start();
+        if (_me._configReader.hasAnimation() || _me._configReader.hasAddNavigation()) {
+          _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
+            'configReader' : _me._configReader,
+            'containerHtmlElem' : _me._containerHtmlElem
+          });
+          _me._imageSlideShowObj.start();
+        } else if ((typeof console != 'undefined')
+            && (typeof console.log != 'undefined')) {
+            console.log('skipping init image slide show (no nav and anim) for ',
+                _me._htmlElemId);
+        }
       },
 
       _isSplashImageNotYetWrapped : function() {
