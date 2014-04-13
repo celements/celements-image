@@ -395,7 +395,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       install : function() {
         var _me = this;
         _me._wrapSplashImage();
-        if (_me._configReader.hasAnimation() || _me._configReader.hasAddNavigation()) {
+        if (!_me._configReader.hasCustomStart() || _me._configReader.hasAnimation()
+            || _me._configReader.hasAddNavigation()) {
           _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
             'configReader' : _me._configReader,
             'containerHtmlElem' : _me._containerHtmlElem
