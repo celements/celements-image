@@ -138,7 +138,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           'autostartnostop' : 'celimage_overlayautostartnostop',
           'addNavigation' : 'celimage_addNavigationOverlay',
           'customStart' : 'celimage_customStartSlideOverlay',
-          'addCounterNone' : 'celimage_addCounterOverlayNone'
+          'addCounterNone' : 'celimage_addCounterOverlayNone',
+          'addCounterZeros' : 'celimage_addCounterOverlayZeros'
         });
         _me._isOverlayRegistered = false;
         _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
@@ -599,6 +600,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
         } else if (overwriteLayout) {
           _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
         }
+        _me._celSlideShowObj.setCounterLeadingZeros(_me._configReader.hasLeadingZeros());
         return _me._celSlideShowObj;
       },
 
@@ -773,7 +775,8 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
           'addCounterNone' : 'celimage_addCounterNone',
           'randomStart' : 'celimage_slideshowRandomStart',
           'customStart' : 'celimage_customStartSlide',
-          'addCloseButton' : 'celimage_overlay_addCloseButton'
+          'addCloseButton' : 'celimage_overlay_addCloseButton',
+          'addCounterZeros' : 'celimage_addCounterZeros'
          }).update(configDef).toObject();
         _me._overlayWidth = _me._getPart(4, _me._overlayWidthDefault);
         _me._overlayHeight = _me._getPart(5, _me._overlayHeightDefault);
@@ -824,6 +827,11 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         var _me = this;
         return (_me.getStartMode() == 'auto')
           || (_me.getStartMode() == 'autonostop');
+      },
+
+      hasLeadingZeros : function() {
+        var _me = this;
+        return _me._hasClassName(_me._configDef.addCounterZeros);
       },
 
       hasManualButton : function() {
