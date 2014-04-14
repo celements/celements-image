@@ -27,7 +27,7 @@
     #foreach($filter in $request.getParameterValues('uploadFilterItem'))
       #set($filterRef = $services.model.resolveDocument("$!filter"))
       #if(("$!filter" != '') && ($xwiki.exists($filterRef)))
-        <!-- $filter $services.celementsweb.addFileToFileBaseTag($attDoc.getDocumentReference(), "$!request.get('filename')", $filterRef) -->
+        <!-- $filter $services.celementsweb.addFileToFileBaseTag($attDoc.getDocumentReference(), "$!request.get($param)", $filterRef) -->
       #end
     #end
   #end
