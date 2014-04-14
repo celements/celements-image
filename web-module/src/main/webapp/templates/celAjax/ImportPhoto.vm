@@ -35,6 +35,22 @@
   <input type="hidden" name="attDoc" value="$!request.get('attDoc')" />
   <input type="hidden" name="filename" value="$!request.get('filename')" />
   
+  #if("$!doc.getObject('Classes.ImportClass')" == '')
+    #set($fbDoc = "$!xwiki.getWebPreference('cel_centralfilebase')")
+    #set($menuSpace = "$!fbDoc.substring(0, $fbDoc.indexOf('.'))")
+    <div>
+    #foreach($item in $xwiki.getSpaceDocsName("$menuSpace"))
+      #if($item.indexOf('.') <= 0)
+        #set($item = "$!{menuSpace}.${item}")
+      #end
+      #set($menuName = $helpNav.getMultilingualMenuName("$item", $admin_language))
+      <div class="c3_fb_upload_filter">
+        <input type="checkbox" name="uploadFilterItem" value="$menuDocName"/>$menuName
+      </div>
+    #end
+    </div>
+  #end
+  
   <span id="c3_import_button_div" class="c3_import_scrollabe_ignore"><input type="submit" id="c3_import_button" value="$adminMsg.get('cel_photo_import_selected_now')" /></span>
   <div class="c3_import_row">
     <div class="c3_import_count_selected c3_import_checkbox">
