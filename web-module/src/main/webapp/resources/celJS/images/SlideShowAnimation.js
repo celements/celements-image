@@ -6,17 +6,20 @@ if(typeof CELEMENTS=="undefined"){var CELEMENTS={};};
 if(typeof CELEMENTS.presentation=="undefined"){CELEMENTS.presentation={};};
 
 (function(window, undefined) {
+  "use strict";
 
 //////////////////////////////////////////////////////////////////////////////
 // Celements presentation Slideshow Animation
 //////////////////////////////////////////////////////////////////////////////
-CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
+window.CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
     slideShowEffect) {
   // constructor
   this._init(celSlideShowObj, timeout, slideShowEffect);
 };
 
 (function() {
+  "use strict";
+
   CELEMENTS.presentation.SlideShowAnimation.prototype = {
       _restartDelayBind : undefined,
       _celSlideShowObj : undefined,
@@ -92,11 +95,15 @@ CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, timeout,
         _me._cancelDelayedNext();
       },
 
-      startAnimation : function() {
+      startAnimation : function(delayedStart) {
         var _me = this;
         _me._paused = false;
         _me._cancelDelayedNext();
-        _me._delayedNext();
+        if (delayedStart) {
+          _me._restartDelay();
+        } else {
+          _me._delayedNext();
+        }
       },
 
       isStopped : function() {

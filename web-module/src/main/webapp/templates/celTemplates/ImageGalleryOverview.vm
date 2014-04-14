@@ -30,7 +30,10 @@
 ##    #set($firstImageLink = $imageInSlide)
     #set($firstSlideContent = $slideContent)
   #end
-  #set($imgCssClasses = 'celimage_slideshow celimage_manualstart celimage_overlay celimage_addNavigation celimage_overlay_addCloseButton celimage_customStartSlide')
+  #set($imgCssClasses = "celimage_slideshow")
+  #set($imgCssClasses = "${imgCssClasses} celimage_nonestart celimage_overlay ")
+  #set($imgCssClasses = "${imgCssClasses} celimage_addNavigationOverlay celimage_overlay_addCloseButton")
+  #set($imgCssClasses = "${imgCssClasses} celimage_overlaynonestart celimage_customStartSlide")
 #end
   #if("$!imgGalcount" == '')
     #set($imgGalcount = 0)
@@ -48,11 +51,11 @@
     #set($photoHeight = "662")
   #end
 #if("$!firstImageLink" != '')
-  <img id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!gallerySpace"##
+  <img id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:100:100"##
    class="$imgCssClasses" src="${firstImageLink}?celwidth=100&celheight=100&lowBound=1" alt="" />
 #elseif("$firstSlideContent" != '')
-  #set($zoomFactor = $mathtool.div(100, $photoHeight))
-  <div id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!gallerySpace"##
+  ## #set($zoomFactor = $mathtool.div(100, $photoHeight))
+  <div id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:100:100"##
    class="$imgCssClasses" style="width:100px;height:100px;">
   #*
       zoom: 2; /* all browsers */
@@ -60,13 +63,14 @@
      position: absolute;
      -moz-transform-origin: 0 0 0;
   *#
-      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
-        <div class="slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
-          <div class="slideWrapper">
+##      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
+##        <div class="cel_slideShow_slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
+        <div class="cel_slideShow_slideRoot">
+          <div class="cel_slideShow_slideWrapper">
           $firstSlideContent
           </div>
         </div>
-      </div>
+##      </div>
   </div>
 #else
   <span class="cel_gal_no_pictures_text">##

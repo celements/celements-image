@@ -6,42 +6,42 @@ if(typeof CELEMENTS=="undefined"){var CELEMENTS={};};
 if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
 (function(window, undefined) {
+  "use strict";
 
-  var CISS_OverlaySlideShowObj = undefined;
   var CISS_BodySlideShowStarter = undefined;
   var CISS_SlideShowObjHash = new Hash();
+  var CISS_SlideShowOverlayObjHash = new Hash();
 
-  CELEMENTS.image.getSlideShowObj = function(slideShowElemId) {
+  window.CELEMENTS.image.getSlideShowObj = function(slideShowElemId) {
     return CISS_SlideShowObjHash.get(slideShowElemId);
   };
 
-  CELEMENTS.image.getBodySlideShowStarter = function() {
+  window.CELEMENTS.image.getSlideShowOverlayObj = function(slideShowElemId) {
+    return CISS_SlideShowOverlayObjHash.get(slideShowElemId);
+  };
+
+  window.CELEMENTS.image.getBodySlideShowStarter = function() {
     if (!CISS_BodySlideShowStarter) {
       CISS_BodySlideShowStarter = new CELEMENTS.image.SlideShowStarter($(document.body));
     }
     return CISS_BodySlideShowStarter;
   };
 
-  $j(document).ready(function() {
-    if (!CISS_OverlaySlideShowObj) {
-      CISS_OverlaySlideShowObj = new CELEMENTS.image.SlideShow();
-    }
-    CELEMENTS.image.getBodySlideShowStarter().initializeOverlayImageSlideShow();
-  });
-
-  celAddOnBeforeLoadListener(function() {
-    CELEMENTS.image.getBodySlideShowStarter().initializeImageSlideShow();
+  window.celAddOnBeforeLoadListener(function() {
+    window.CELEMENTS.image.getBodySlideShowStarter().initializeSlideShow();
   });
 
 //////////////////////////////////////////////////////////////////////////////
 // Celements image Slideshow
 //////////////////////////////////////////////////////////////////////////////
-CELEMENTS.image.SlideShowStarter = function(htmlElem) {
-  // constructor
-  this._init(htmlElem);
-};
+  window.CELEMENTS.image.SlideShowStarter = function(htmlElem) {
+    // constructor
+    this._init(htmlElem);
+  };
 
 (function() {
+  "use strict";
+
   CELEMENTS.image.SlideShowStarter.prototype = {
       _parentElem: undefined,
   
@@ -54,7 +54,8 @@ CELEMENTS.image.SlideShowStarter = function(htmlElem) {
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (slideShowElem.hasClassName('celimage_overlay')) {
-            CISS_OverlaySlideShowObj.registerOpenInOverlay(slideShowElem);
+            var overlayContainerObj = new CELEMENTS.image.OverlayContainer(slideShowElem);
+            CISS_SlideShowOverlayObjHash.set(slideShowElem.id, overlayContainerObj);
           }
         });
       },
@@ -62,14 +63,8 @@ CELEMENTS.image.SlideShowStarter = function(htmlElem) {
       initializeImageSlideShow : function() {
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
-          var imgSlideShow = new CELEMENTS.image.SlideShow(slideShowElem.id);
-          CISS_SlideShowObjHash.set(slideShowElem.id, imgSlideShow);
-          //important that the start happens before document.ready to allow the slideshow
-          // context menu being loaded
-          if (!slideShowElem.hasClassName('celimage_customStartSlide')
-              || !slideShowElem.hasClassName('celimage_overlay')) {
-            imgSlideShow.startNonOverlaySlideShow();
-          }
+          var inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem);
+          CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
         });
       },
       
@@ -77,6 +72,9 @@ CELEMENTS.image.SlideShowStarter = function(htmlElem) {
         var _me = this;
         _me.initializeImageSlideShow();
         _me.initializeOverlayImageSlideShow();
+        $(document.body).fire('celimage_slideshowstarter:replaceElem', _me._parentElem);
+        $(document.body).fire('celimage_slideshowstarter:afterReplace', _me._parentElem);
+        $(document.body).fire('celimage_slideshowstarter:afterInit', _me._parentElem);
       },
 
       autoRegisterOnSlides : function() {
@@ -100,114 +98,107 @@ CELEMENTS.image.SlideShowStarter = function(htmlElem) {
   };
 })();
 
-CELEMENTS.image.SlideShow = function(htmlElem) {
+//////////////////////////////////////////////////////////////////////////////
+// image SlideShow container in a celYuiOverlay
+//////////////////////////////////////////////////////////////////////////////
+window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
   // constructor
   this._init(htmlElem);
 };
 
 (function() {
-  CELEMENTS.image.SlideShow.prototype = {
-      _openInOverlayBind : undefined,
-      _imageSlideShowLoadFirstContentBind : undefined,
-      _addNavigationButtonsBind : undefined,
-      _celSlideShowObj : null,
-      _isOverlayRegistered : false,
-      _currentHtmlElem : undefined,
-      _gallery : undefined,
-      _startSlideNum : undefined,
-      _startAtSlideName : undefined,
-      _resizeOverlayBind : undefined,
-      _imgLoadedReCenterStartSlideBind : undefined,
-      _celSlideShowManualStartStopClickHandlerBind : undefined,
-      _origStyleValues : undefined,
-      _slideShowAnimation : undefined,
-      _wrapperHtmlElem : undefined,
-      _hasRandomStart : false,
-      _autoresize : false,
-      _debug : false,
-      _mobileDim : undefined,
+  "use strict";
 
+  CELEMENTS.image.OverlayContainer.prototype = {
+      _htmlElemId : undefined,
+      _containerHtmlElem : undefined,
+      _configReader : undefined,
+      _resizeOverlayBind : undefined,
+      _registerHandlerBind : undefined,
+      _replaceNotifyHandlerBind : undefined,
+      _openInOverlayClickHandlerBind : undefined,
+      _imageSlideShowLoadFirstContentBind : undefined,
+      _openInOverlayBind : undefined,
+      _imageSlideShowObj : undefined,
+      _isOverlayRegistered : undefined,
+
+      /**
+       * Read all configuration information from the original element.
+       * It might be replaced/changed later on and the configuration
+       * information might geht lost. Only keep the htmlElem.id because
+       * the element might get replaced.
+       */
       _init : function(htmlElem) {
         var _me = this;
-        _me._mobileDim = new CELEMENTS.mobile.Dimensions(); 
-        _me._isMobile = _me._mobileDim.isMobile;
-        _me._autoresize = _me._isMobile.iOS() || _me._isMobile.Android();
-        _me._currentHtmlElem = $(htmlElem) || null;
-        _me._openInOverlayBind = _me.openInOverlay.bind(_me);
+        _me._htmlElemId = htmlElem.id;
+        _me._configReader = new CELEMENTS.image.ConfigReader(htmlElem, {
+          'manualstart' : 'celimage_overlaymanualstart',
+          'nonestart' : 'celimage_overlaynonestart',
+          'autostart' : 'celimage_overlayautostart',
+          'autostartnostop' : 'celimage_overlayautostartnostop',
+          'addNavigation' : 'celimage_addNavigationOverlay',
+          'customStart' : 'celimage_customStartSlideOverlay',
+          'addCounterNone' : 'celimage_addCounterOverlayNone',
+          'addCounterZeros' : 'celimage_addCounterOverlayZeros'
+        });
+        _me._isOverlayRegistered = false;
+        _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
+        _me._replaceNotifyHandlerBind = _me._replaceNotifyHandler.bind(_me);
+        _me._registerHandlerBind = _me._registerHandler.bind(_me);
         _me._openInOverlayClickHandlerBind = _me._openInOverlayClickHandler.bind(_me);
-        _me._celSlideShowManualStartStopClickHandlerBind =
-          _me._celSlideShowManualStartStopClickHandler.bind(_me);
+        _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
-        _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
-        _me._addSlideShowCounterBind = _me._addSlideShowCounter.bind(_me);
-        _me._resizeOverlayBind = _me._resizeOverlay.bind(_me);
-        _me._imgLoadedReCenterStartSlideBind = _me._imgLoadedReCenterStartSlide.bind(_me);
-        if (_me._currentHtmlElem) {
-          _me._hasRandomStart = _me._currentHtmlElem.hasClassName(
-              'celimage_slideshowRandomStart');
-          if (_me._currentHtmlElem.tagName.toLowerCase() == 'img') {
-            if (!_me._currentHtmlElem.hasClassName('celimage_customStartSlide')) {
-              _me._fixStartImage(); 
-            }
-          } else if (_me._currentHtmlElem.down('.slideWrapper')) {
-            //TODO check if recenter here still is needed after it is correctly done in CelementsSlideShow.js
-            _me._currentHtmlElem.select('img').each(function(imgElem) {
-              imgElem.observe('load', _me._imgLoadedReCenterStartSlideBind.curry(imgElem));
-            });
-            _me._centerStartSlide();
-          }
+        $(document.body).observe('celimage_slideshow:replaceNotify',
+            _me._replaceNotifyHandlerBind);
+        $(document.body).observe('celimage_slideshowstarter:afterReplace',
+            _me._registerHandlerBind);
+      },
+
+      _getHtmlElem : function() {
+        var _me = this;
+        return $(_me._htmlElemId);
+      },
+
+      _replaceNotifyHandler : function(event) {
+        var _me = this;
+        var replaceNotice = event.memo;
+        if (replaceNotice.oldHtmlId == _me._htmlElemId) {
+          _me._htmlElemId = replaceNotice.newHtmlId;
         }
       },
 
-      _imgLoadedReCenterStartSlide : function(imgElem, event) {
+      _registerHandler : function(event) {
         var _me = this;
-        imgElem.stopObserving('load', _me._imgLoadedReCenterStartSlideBind);
-        _me._centerStartSlide();
+        var parentElem = event.memo;
+        if (_me._getHtmlElem() && _me._getHtmlElem().descendantOf(parentElem)) {
+          $(document.body).stopObserving('celimage_slideshowstarter:afterReplace',
+              _me._registerHandlerBind);
+          _me.register();
+        }
       },
 
-      _centerStartSlide : function() {
-        var _me = this;
-        var slideWrapper = _me._currentHtmlElem.down('.slideWrapper');
-        slideWrapper.setStyle({
-          'position' : 'absolute',
-          'width' : 'auto',
-          'height' : 'auto',
-          'top' : 0,
-          'marginLeft' : 0,
-          'marginRight' : 0
-        });
-        var slideWidth = slideWrapper.getWidth();
-        var slideHeight = slideWrapper.getHeight();
-        var parentDiv = slideWrapper.up('.slideRoot') || slideWrapper;
-        var parentHeight = parentDiv.getHeight();
-        var topPos = (parentHeight - slideHeight) / 2;
-        slideWrapper.setStyle({
-          'position' : 'relative',
-          'margin' : '0',
-          'marginLeft' : 'auto',
-          'marginRight' : 'auto',
-          'width' : slideWidth + 'px',
-          'height' : slideHeight + 'px',
-          'top' : topPos + 'px'
-        });
-      },
-
-      registerOpenInOverlay : function(htmlElem) {
+      /** before: registerOpenInOverlay **/
+      /**
+       * Register on element with same id as htmlElem.
+       * The original element might be replaced in between.
+       */
+      register : function() {
         var _me = this;
         if (!_me._isOverlayRegistered) {
           _me._isOverlayRegistered = true;
-          _me._celSlideShowObj = getCelSlideShowObj();
-          var bodyElem = $$('body')[0];
-          bodyElem.observe('cel_slideShow:shouldRegister',
+          $(document.body).observe('cel_slideShow:shouldRegister',
               _me._checkIsImageSlideShowOverlay.bind(_me));
-          bodyElem.observe('cel_yuiOverlay:hideEvent',
+          $(document.body).observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlay.bind(_me));
           Event.observe(window, "resize", _me._resizeOverlayBind);
           Event.observe(window, "orientationchange", _me._resizeOverlayBind);
         }
-        htmlElem.observe('click', _me._openInOverlayClickHandlerBind);
-        htmlElem.observe('cel_ImageSlideShow:startSlideShow', _me._openInOverlayBind);
+        _me._getHtmlElem().observe('click', _me._openInOverlayClickHandlerBind);
+        _me._getHtmlElem().observe('cel_ImageSlideShow:startSlideShow',
+            _me._openInOverlayBind);
+        $(document.body).stopObserving('cel_yuiOverlay:loadFirstContent',
+            _me._imageSlideShowLoadFirstContentBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
         $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
@@ -215,423 +206,12 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
         $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
       },
 
-      _openInOverlayClickHandler : function(event) {
-        var _me = this;
-        event.stop();
-        _me.openInOverlay(event);
-      },
-
-      _getGallery : function(callbackFN, onlyFirstNumImages) {
-        var _me = this;
-        var galleryFN = _me._getPart(_me._currentHtmlElem.id, 1, '');
-        if (!_me._gallery && (galleryFN != '')) {
-          _me._gallery = new CELEMENTS.images.Gallery(galleryFN, callbackFN.bind(_me),
-              onlyFirstNumImages);
-        } else {
-          _me._gallery.executeAfterLoad(callbackFN.bind(_me));
-        }
-      },
-
-      _getCelSlideShowObj : function(overwriteLayout) {
-        var _me = this;
-        if (!_me._celSlideShowObj) {
-          _me._celSlideShowObj = new CELEMENTS.presentation.SlideShow(
-              _me._currentHtmlElem.id);
-          overwriteLayout = overwriteLayout || 'SimpleLayout';
-          _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
-        } else if (overwriteLayout) {
-          _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
-        }
-        return _me._celSlideShowObj;
-      },
-
-      _getContainerElement : function() {
-        var _me = this;
-        if (_me._isOverlayRegistered) {
-          return _me._getCelSlideShowObj().getHtmlContainer();
-        } else if (_me._wrapperHtmlElem) {
-          return _me._wrapperHtmlElem;
-        } else {
-          return _me._currentHtmlElem;
-        }
-      },
-
-      _addNavigationButtons : function(event) {
-        var _me = this;
-        if (_me._currentHtmlElem.hasClassName('celimage_addNavigation')) {
-          if (!_me._getContainerElement().down('> div.celPresSlideShow_next')) {
-            var nextButton = new Element('div').addClassName('celPresSlideShow_next');
-            _me._getContainerElement().insert({'bottom' : nextButton});
-          }
-          if (!_me._getContainerElement().down('> div.celPresSlideShow_prev')) {
-            var prevButton = new Element('div').addClassName('celPresSlideShow_prev');
-            _me._getContainerElement().insert({'top' : prevButton});
-          }
-        }
-      },
-
-      _moveStyleToWrapper : function(divWrapper, element, styleName) {
-        var _me = this;
-        var newStyle = new Hash();
-        var elemStyleValue = _me._getOriginalStyleValues(element).get(styleName);
-        if (!elemStyleValue || (elemStyleValue == '')) {
-          elemStyleValue = element.getStyle(styleName);
-        }
-        newStyle.set(styleName, elemStyleValue);
-        divWrapper.setStyle(newStyle.toObject());
-        newStyle.set(styleName, '');
-        element.setStyle(newStyle.toObject());
-      },
-
-      _initNonOverlaySlideShowStarter : function(callbackFN) {
-        var _me = this;
-        var slideShowImg = $(_me._currentHtmlElem);
-        if (!_me._wrapperHtmlElem) {
-          if ((slideShowImg.tagName.toLowerCase() == 'img') && !slideShowImg.complete) {
-            var _initNonOverlaySlideShowStarterBind =
-              _me._initNonOverlaySlideShowStarter.bind(_me);
-            slideShowImg.observe('load', _initNonOverlaySlideShowStarterBind.curry(
-                callbackFN));
-          } else {
-            _me._initNonOverlaySlideShow();
-            if (callbackFN) {
-              callbackFN();
-            }
-          }
-        }
-      },
-
-      _camelCase : function (input) { 
-        return input.toLowerCase().replace(/-(.)/g, function(match, group1) {
-            return group1.toUpperCase();
-        });
-      },
-
       /**
-       * _getOriginalStyleValues gets the original element styles opposed to getStyle
-       * from prototype-js which gets the browser resolved style.
-       *   e.g. for margin-left: auto _getOriginalStyleValues returns 'auto' yet
-       *   protoptype-js returns the real pixel value.
+       * TODO move to celYuiOverlay
        */
-      _getOriginalStyleValues : function(htmlElement) {
-        var _me = this;
-        if (!_me._origStyleValues) {
-          var origStyles = new Hash();
-          htmlElement.getAttribute('style').split(';').each(function(styleElem) {
-            var styleElemSplit = styleElem.split(':');
-            if (styleElemSplit.size() > 1) {
-              origStyles.set(_me._camelCase(styleElemSplit[0].strip()),
-                  styleElemSplit[1].strip());
-            }
-          });
-          _me._origStyleValues = origStyles;
-        }
-        return _me._origStyleValues;
-      },
-
-      _initNonOverlaySlideShow : function() {
-        var _me = this;
-        var slideShowImg = $(_me._currentHtmlElem);
-        if (!_me._wrapperHtmlElem && (slideShowImg.tagName.toLowerCase() == 'img')) {
-          var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
-              ).without('highslide-image');
-          var divInnerWrapper = slideShowImg.wrap('div', {
-            'id' : ('slideWrapper_' + slideShowImg.id),
-            'class' : 'cel_slideShow_slideWrapper'
-           }).setStyle({
-             'position' : 'relative'
-           });
-          //to allow propper scaling we need to add a slideRoot element
-          var divSlideRoot = divInnerWrapper.wrap('div', {
-            'id' : ('slideRoot_' + slideShowImg.id),
-            'class' : 'cel_slideShow_slideRoot'
-           });
-          var divWrapper = divSlideRoot.wrap('div', {
-            'id' : ('slideContainer_' + slideShowImg.id),
-            'class' : 'celimage_slideshow_wrapper cel_cm_celimage_slideshow'
-           }).setStyle({
-             'position' : 'relative'
-           });
-          var containerAnimWidth = _me._getPart(_me._currentHtmlElem.id, 8,
-              slideShowImg.getWidth());
-          var containerAnimHeight = _me._getPart(_me._currentHtmlElem.id, 9,
-              slideShowImg.getHeight());
-          divWrapper.setStyle({
-            'height' : containerAnimHeight + 'px',
-            'width' : containerAnimWidth + 'px'
-          });
-          otherCssClassNames.each(function(className) {
-                if (!className.startsWith('cel_effekt_')) {
-                  divWrapper.addClassName(className);
-                } else {
-                  divWrapper.addClassName(className.replace(/cel_effekt_/,
-                      'cel_slideshow_effekt_'));
-                }
-          });
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'float');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginTop');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginBottom');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginLeft');
-          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginRight');
-      // adding border to Wrapper leads to problems with double borders. Thus removed.
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderTop');
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderBottom');
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderRight');
-  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderLeft');
-          _me._wrapperHtmlElem = divWrapper;
-          _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
-          _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
-        } else if (!_me._wrapperHtmlElem) {
-          _me._wrapperHtmlElem = slideShowImg;
-          _me._getCelSlideShowObj()._htmlContainer = _me._wrapperHtmlElem;
-          _me._currentHtmlElem.fire('celimage_slideshow:afterInit', _me);
-        } else {
-          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
-            console.log('skipping creating wrapperHTMLElem because already exists.',
-                _me._wrapperHtmlElem);
-          }
-        }
-      },
-
-      startNonOverlaySlideShow : function() {
-        var _me = this;
-        _me._getGallery(_me._startNonOverlaySlideShowCallback.bind(_me), 1);
-      },
-
-      _startNonOverlaySlideShowCallback : function(galleryObj) {
-        var _me = this;
-        _me._celSlideShowObj = null;
-        var elemId = $(_me._currentHtmlElem).id;
-        if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
-          var slideShowEffect = _me._getPart(elemId, 3, 'none');
-          var timeout = _me._getPart(elemId, 2, 3);
-          _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
-              _me._getCelSlideShowObj(galleryObj.getLayoutName()), timeout,
-              slideShowEffect);
-        }
-        var isManualStart = $(elemId).hasClassName('celimage_manualstart');
-        if (isManualStart) {
-          _me.celSlideShowManualStartStop(false);
-          if (!_me._wrapperHtmlElem) {
-            _me._currentHtmlElem.observe('celimage_slideshow:afterInit',
-                _me._initManualStartButton.bind(_me));
-          } else {
-            _me._initManualStartButton();
-          }
-        }
-        _me._initNonOverlaySlideShowStarter(
-            _me._initNonOverlaySlideShowStarterCallback.bind(_me));
-      },
-
-      _initNonOverlaySlideShowStarterCallback : function() {
-        var _me = this;
-        _me._getCelSlideShowObj().setAutoresize(true);
-        _me._getCelSlideShowObj().register();
-        _me._slideShowAnimation.register();
-        _me._imageSlideShowLoadFirstContent_internal();
-      },
-
-      _initManualStartButton : function() {
-        var _me = this;
-        var isCelimageOverlay = _me._wrapperHtmlElem.hasClassName('celimage_overlay');
-        var startButtonDiv = new Element('div', { 'class' : 'slideshowButton' });
-        startButtonDiv.hide();
-        _me._wrapperHtmlElem.insert({ bottom : startButtonDiv });
-        if (isCelimageOverlay) {
-          CISS_OverlaySlideShowObj.registerOpenInOverlay(_me._wrapperHtmlElem);
-        } else {
-          $(_me._wrapperHtmlElem).stopObserving('click',
-              _me._celSlideShowManualStartStopClickHandlerBind);
-          $(_me._wrapperHtmlElem).observe('click',
-              _me._celSlideShowManualStartStopClickHandlerBind);
-        }
-        Effect.Appear(startButtonDiv, { duration : 3.0 , to : 0.8 });
-      },
-
-      _celSlideShowManualStartStopClickHandler : function(event) {
-        var _me = this;
-        event.stop();
-        _me.celSlideShowManualStartStop();
-      },
-
-      celSlideShowManualStartStop : function(isStart) {
-        var _me = this;
-        if (typeof isStart === 'undefined') {
-          isStart = _me._slideShowAnimation._paused;
-        }
-        var slideShowButton = undefined;
-        if (_me._wrapperHtmlElem) {
-          slideShowButton = _me._wrapperHtmlElem.down('.slideshowButton');
-        }
-        if (isStart) {
-          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
-            console.log('animation started for image slideshow', _me._currentHtmlElem.id);
-          }
-          _me._slideShowAnimation.startAnimation();
-          if (slideShowButton) {
-            Effect.Fade(slideShowButton, { duration : 1.0 });
-          }
-        } else {
-          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
-            console.log('animation stopped for image slideshow', _me._currentHtmlElem.id);
-          }
-          _me._slideShowAnimation.stopAnimation();
-          if (slideShowButton) {
-            Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
-          }
-        }
-      },
-
-      _addSlideShowCounter : function(event) {
-        var _me = this;
-//        var slideWrapperElem = event.memo.newSlideWrapperElem;
-        if (!_me._getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
-          var countSlideNumElem = new Element('div').addClassName(
-              'celPresSlideShow_countSlideNum');
-          _me._getContainerElement().insert({'bottom' : countSlideNumElem});
-        }
-        if (!_me._getContainerElement().down('> div.celPresSlideShow_currentSlideNum')) {
-          var currentSlideNumElem = new Element('div').addClassName(
-              'celPresSlideShow_currentSlideNum');
-          _me._getContainerElement().insert({'bottom' : currentSlideNumElem});
-        }
-      },
-
-      _imageSlideShowLoadFirstContent_internal : function() {
-        var _me = this;
-        _me._getCelSlideShowObj().getHtmlContainer().observe(
-            'cel_yuiOverlay:afterContentChanged', _me._addNavigationButtonsBind);
-        _me._getCelSlideShowObj().getHtmlContainer().observe(
-            'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
-        var gallerySpace = _me._getPart(_me._currentHtmlElem.id, 7, '');
-        var startAt = _me._startAtSlideName || _me.getStartSlideNum();
-        _me._getCelSlideShowObj().loadMainSlides(gallerySpace, startAt);
-      },
-
-      _imageSlideShowLoadFirstContent : function(event) {
-        var _me = this;
-        var dialogConfig = event.memo;
-        if (dialogConfig.slideShowElem) {
-          _me._imageSlideShowLoadFirstContent_internal();
-          event.stop();
-        }
-      },
-
-      _checkIsImageSlideShowOverlay : function(event) {
-//        var _me = this;
-        var openDialog = CELEMENTS.presentation.getOverlayObj();
-        if (openDialog._dialogConfig.slideShowElem
-            && (event.memo.slideShow._htmlContainerId === openDialog.getContainerId())) {
-          event.stop();
-        }
-      },
-
-      _removeIsImageSlideShowOverlay : function() {
-        var openDialog = CELEMENTS.presentation.getOverlayObj();
-        openDialog.updateOpenConfig({ 'slideShowElem' : null });
-      },
-
-      openInOverlay : function(event) {
-        var _me = this;
-        var htmlElem = event.findElement('.celimage_overlay') || event.element();
-        _me._currentHtmlElem = htmlElem;
-        _me._startAtSlideName = event.memo;
-        if (isNaN(_me._startAtSlideName)) {
-          _me._startAtSlideName = undefined;
-        }
-        _me._startSlideNum = undefined;
-        var hasCloseButton = htmlElem.hasClassName('celimage_overlay_addCloseButton');
-        var openDialog = CELEMENTS.presentation.getOverlayObj({
-          'close' : hasCloseButton,
-          'slideShowElem' : htmlElem,
-          'link' : htmlElem,
-          fixedcenter: !_me._autoresize
-        });
-        _me._getGallery(function(galleryObj) {
-          _me._getCelSlideShowObj(galleryObj.getLayoutName());
-          openDialog.intermediatOpenHandler();
-        }, 1);
-      },
-
-      _getPart : function(elemId, num, defaultvalue) {
-        var parts = elemId.split(':');
-        if ((num < parts.length) && (parts[num] != '')) {
-          return parts[num];
-        } else {
-          return defaultvalue;
-        }
-      },
-
-      _fixStartImage : function() {
-        var _me = this;
-        var startSlideNum = _me.getStartSlideNum();
-        if (startSlideNum >= 0) {
-          _me._currentHtmlElem.setStyle({
-            'visibility' : 'hidden'
-          });
-          _me._getGallery(_me._replaceStartImage.bind(_me), startSlideNum + 1);
-        } else if ((typeof console != 'undefined')
-            && (typeof console.log != 'undefined')) {
-          console.log('skip fix start image because start slide number is below zero',
-              startSlideNum);
-        }
-      },
-
-      _getStartSlideNumFromId : function() {
-        var _me = this;
-        return parseInt(_me._getPart(_me._currentHtmlElem.id, 6, 1)) - 1;
-      },
-
-      setStartSlideNum : function(newStartSlideNum) {
-        var _me = this;
-        _me._startSlideNum = newStartSlideNum;
-      },
-
-      getStartSlideNum : function() {
-        var _me = this;
-        if (!_me._startSlideNum) {
-          if (_me._currentHtmlElem.hasClassName('celimage_slideshowRandomStart')) {
-            if (_me._gallery && _me._gallery.getNumImages()) {
-              var startSlideNum = Math.round(Math.random() * (
-                  _me._gallery.getNumImages() - 1));
-              _me.setStartSlideNum(startSlideNum);
-            } else {
-              return 0;
-            }
-          } else {
-            _me.setStartSlideNum(_me._getStartSlideNumFromId() || 0);
-          }
-        }
-        return _me._startSlideNum;
-      },
-
-      _replaceStartImageInsert : function(imageElem) {
-        var _me = this;
-        _me._currentHtmlElem.src = imageElem.getThumbURL();
-        _me._currentHtmlElem.removeAttribute('width');
-        _me._currentHtmlElem.removeAttribute('height');
-        _me._currentHtmlElem.setStyle({
-          'visibility' : '',
-          'width' : '',
-          'height' : ''
-        });
-      },
-
-      _replaceStartImage : function(galleryObj) {
-        var _me = this;
-        var images = galleryObj.getImages();
-        var startSlideNum = _me.getStartSlideNum();
-        if (startSlideNum < 0) {
-          startSlideNum = 0;
-        } else if (startSlideNum >= galleryObj.getNumImages()) {
-          startSlideNum = galleryObj.getNumImages() - 1;
-        }
-        galleryObj.getImageForNum(startSlideNum, _me._replaceStartImageInsert.bind(_me));
-      },
-
       _resizeOverlay : function() {
         var _me = this;
-        if (_me._autoresize) {
+        if (_me._configReader.isAutoResize()) {
           var openDialog = CELEMENTS.presentation.getOverlayObj();
           var zoomFactor = _me._computeZoomFactor();
           if (zoomFactor <= 1) {
@@ -699,6 +279,653 @@ CELEMENTS.image.SlideShow = function(htmlElem) {
           zoomFactor = zoomWidthFactor;
         }
         return zoomFactor;
+      },
+
+      _removeIsImageSlideShowOverlay : function() {
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
+        openDialog.updateOpenConfig({ 'slideShowElem' : null });
+      },
+
+      _checkIsImageSlideShowOverlay : function(event) {
+//      var _me = this;
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
+        if (openDialog._dialogConfig.slideShowElem
+            && (event.memo.slideShow._htmlContainerId === openDialog.getContainerId())) {
+          event.stop();
+        }
+      },
+
+      _imageSlideShowLoadFirstContent : function(event) {
+        var _me = this;
+        var dialogConfig = event.memo;
+        if (dialogConfig.slideShowElem && (dialogConfig.slideShowElem === _me)) {
+          _me._containerHtmlElem = $('yuiOverlayContainer');
+          _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
+            'configReader' : _me._configReader,
+            'containerHtmlElem' : _me._containerHtmlElem
+          });
+          _me._imageSlideShowObj.start();
+          event.stop();
+        }
+      },
+
+      _openInOverlayClickHandler : function(event) {
+        var _me = this;
+        event.stop();
+        _me.openInOverlay(event);
+      },
+
+      openInOverlay : function(event) {
+        var _me = this;
+        var startAtSlideName = event.memo;
+        // event.memo is an empty object if prototypejs fire is used without
+        // a memo object
+        if (startAtSlideName && (typeof startAtSlideName !== 'object')) {
+          _me._configReader.setStartSlideNum(startAtSlideName);
+        }
+        var hasCloseButton = _me._configReader.hasCloseButton();
+        var openDialog = CELEMENTS.presentation.getOverlayObj({
+          'close' : hasCloseButton,
+          'slideShowElem' : _me,
+          'link' : null,
+          'suppressDimFromId' : true,
+          "width" : _me._configReader.getOverlayWidth() + 'px',
+          "height" : _me._configReader.getOverlayHeight() + 'px',
+          fixedcenter: !_me._configReader.isAutoResize()
+        });
+        openDialog.intermediatOpenHandler();
+      }
+
+  };
+})();
+
+//////////////////////////////////////////////////////////////////////////////
+// image SlideShow container in a rich text context (inline)
+//////////////////////////////////////////////////////////////////////////////
+window.CELEMENTS.image.InlineContainer = function(htmlElem) {
+  // constructor
+  this._init(htmlElem);
+};
+
+(function() {
+  "use strict";
+
+  CELEMENTS.image.InlineContainer.prototype = {
+      _htmlElemId : undefined,
+      _configReader : undefined,
+      _containerHtmlElem : undefined,
+      _replaceElemHandlerBind : undefined,
+      _imageSlideShowObj : undefined,
+      _origStyleValues : undefined,
+
+      /**
+       * Read all configuration information from the original element.
+       * It might be replaced/changed later on and the configuration
+       * information might geht lost. Only keep the htmlElem.id because
+       * the element might get replaced.
+       */
+      _init : function(htmlElem) {
+        var _me = this;
+        _me._htmlElemId = htmlElem.id;
+        _me._configReader = new CELEMENTS.image.ConfigReader(htmlElem);
+        _me._replaceElemHandlerBind = _me._replaceElemHandler.bind(_me);
+        $(document.body).observe('celimage_slideshowstarter:replaceElem',
+            _me._replaceElemHandlerBind);
+      },
+
+      _getHtmlElem : function() {
+        var _me = this;
+        return $(_me._htmlElemId);
+      },
+
+      /**
+       * important that the start happens before document.ready to allow the slideshow
+       * context menu being loaded
+       */
+      _replaceElemHandler : function(event) {
+        var _me = this;
+        var parentElem = event.memo;
+        if (_me._getHtmlElem().descendantOf(parentElem)) {
+          $(document.body).stopObserving('celimage_slideshowstarter:replaceElem',
+              _me._replaceElemHandlerBind);
+          _me.install();
+        }
+      },
+
+      /** before: startNonOverlaySlideShow **/
+      install : function() {
+        var _me = this;
+        _me._wrapSplashImage();
+        if (!_me._configReader.hasCustomStart() || _me._configReader.hasAnimation()
+            || _me._configReader.hasAddNavigation()) {
+          _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
+            'configReader' : _me._configReader,
+            'containerHtmlElem' : _me._containerHtmlElem
+          });
+          _me._imageSlideShowObj.start();
+        } else if ((typeof console != 'undefined')
+            && (typeof console.log != 'undefined')) {
+            console.log('skipping init image slide show (no nav and anim) for ',
+                _me._htmlElemId);
+        }
+      },
+
+      _isSplashImageNotYetWrapped : function() {
+        var _me = this;
+        var slideShowImg = $(_me._htmlElemId);
+        return !_me._containerHtmlElem && (slideShowImg.tagName.toLowerCase() == 'img');
+      },
+
+      _moveStyleToWrapper : function(divWrapper, element, styleName) {
+        var _me = this;
+        var newStyle = new Hash();
+        var elemStyleValue = _me._getOriginalStyleValues(element).get(styleName);
+        if (!elemStyleValue || (elemStyleValue == '')) {
+          elemStyleValue = element.getStyle(styleName);
+        }
+        newStyle.set(styleName, elemStyleValue);
+        divWrapper.setStyle(newStyle.toObject());
+        newStyle.set(styleName, '');
+        element.setStyle(newStyle.toObject());
+      },
+
+      _camelCase : function (input) { 
+        return input.toLowerCase().replace(/-(.)/g, function(match, group1) {
+            return group1.toUpperCase();
+        });
+      },
+
+      /**
+       * _getOriginalStyleValues gets the original element styles opposed to getStyle
+       * from prototype-js which gets the browser resolved style.
+       *   e.g. for margin-left: auto _getOriginalStyleValues returns 'auto' yet
+       *   protoptype-js returns the real pixel value.
+       */
+      _getOriginalStyleValues : function(htmlElement) {
+        var _me = this;
+        if (!_me._origStyleValues && htmlElement.getAttribute('style')) {
+          var origStyles = new Hash();
+          htmlElement.getAttribute('style').split(';').each(function(styleElem) {
+            var styleElemSplit = styleElem.split(':');
+            if (styleElemSplit.size() > 1) {
+              origStyles.set(_me._camelCase(styleElemSplit[0].strip()),
+                  styleElemSplit[1].strip());
+            }
+          });
+          _me._origStyleValues = origStyles;
+        } else if (!htmlElement.getAttribute('style')) {
+          return new Hash();
+        }
+        return _me._origStyleValues;
+      },
+
+      _getStartImage : function(slideShowImg) {
+        var _me = this;
+        if (_me._configReader.hasCustomStart()) {
+          return slideShowImg;
+        } else {
+          var loadingImg = new Image();
+          loadingImg.src = '/file/resources/celRes/ajax-loader.gif';
+          loadingImg.height = 32;
+          loadingImg.width = 32;
+          loadingImg.setStyle({
+            'display' : 'block',
+            'marginLeft' : 'auto',
+            'marginRight' : 'auto',
+            'position' : 'relative',
+            'top' : '48%'
+          });
+          slideShowImg.replace(loadingImg);
+          return loadingImg;
+        }
+      },
+
+      _wrapSplashImage : function() {
+        var _me = this;
+        var slideShowImg = $(_me._htmlElemId);
+        if (_me._isSplashImageNotYetWrapped()) {
+          var otherCssClassNames = $w(slideShowImg.className).without('celimage_slideshow'
+              ).without('highslide-image');
+          var divInnerWrapper = _me._getStartImage(slideShowImg).wrap('div', {
+            'id' : ('slideWrapper_' + slideShowImg.id),
+            'class' : 'cel_slideShow_slideWrapper'
+           }).setStyle({
+             'position' : 'relative'
+           });
+          //to allow propper scaling we need to add a slideRoot element
+          var divSlideRoot = divInnerWrapper.wrap('div', {
+            'id' : ('slideRoot_' + slideShowImg.id),
+            'class' : 'cel_slideShow_slideRoot'
+           });
+          var divWrapper = divSlideRoot.wrap('div', {
+            'id' : ('slideContainer_' + slideShowImg.id),
+            'class' : 'celimage_slideshow_wrapper cel_cm_celimage_slideshow'
+           }).setStyle({
+             'position' : 'relative'
+           });
+          divWrapper.setStyle({
+            'height' : _me._configReader.getContainerAnimHeight() + 'px',
+            'width' : _me._configReader.getContainerAnimWidth() + 'px'
+          });
+          otherCssClassNames.each(function(className) {
+                if (!className.startsWith('cel_effekt_')) {
+                  divWrapper.addClassName(className);
+                } else {
+                  divWrapper.addClassName(className.replace(/cel_effekt_/,
+                      'cel_slideshow_effekt_'));
+                }
+          });
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'float');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginTop');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginBottom');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginLeft');
+          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'marginRight');
+      // adding border to Wrapper leads to problems with double borders. Thus removed.
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderTop');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderBottom');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderRight');
+  //          _me._moveStyleToWrapper(divWrapper, slideShowImg, 'borderLeft');
+          _me._containerHtmlElem = divWrapper;
+          $(document.body).fire('celimage_slideshow:replaceNotify', {
+            'oldHtmlId' : _me._htmlElemId,
+            'newHtmlId' : _me._containerHtmlElem.id
+          });
+          slideShowImg.fire('celimage_slideshow:afterWrapSplashImage', _me);
+        } else if (!_me._containerHtmlElem) {
+          _me._containerHtmlElem = slideShowImg;
+          slideShowImg.fire('celimage_slideshow:afterWrapSplashImage', _me);
+        } else {
+          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+            console.log('skipping creating wrapperHTMLElem because already exists.',
+                _me._containerHtmlElem);
+          }
+        }
+      }
+
+  };
+})();
+
+//////////////////////////////////////////////////////////////////////////////
+//image SlideShow logic independent of container
+//////////////////////////////////////////////////////////////////////////////
+window.CELEMENTS.image.SlideShow = function(config) {
+  // constructor
+  this._init(config);
+};
+
+(function() {
+  "use strict";
+
+  CELEMENTS.image.SlideShow.prototype = {
+      _configReader : undefined,
+      _config : undefined,
+      _celSlideShowObj : undefined,
+      _startStopClickHandlerBind : undefined,
+      _addNavigationButtonsBind : undefined,
+      _addSlideShowCounterBind : undefined,
+
+      _init : function(config) {
+        var _me = this;
+        _me._config = config;
+        _me._configReader = config.configReader;
+        _me._getCelSlideShowObj()._htmlContainer = _me.getContainerElement();
+        _me._startStopClickHandlerBind = _me._startStopClickHandler.bind(_me);
+        _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
+        _me._addSlideShowCounterBind = _me._addSlideShowCounter.bind(_me);
+      },
+
+      _getContainerElemId : function() {
+        var _me = this;
+        return _me._config.containerHtmlElem.id;
+      },
+
+      getContainerElement : function() {
+        var _me = this;
+        return _me._config.containerHtmlElem;
+      },
+
+      _getCelSlideShowObj : function(overwriteLayout) {
+        var _me = this;
+        if (!_me._celSlideShowObj) {
+          _me._celSlideShowObj = new CELEMENTS.presentation.SlideShow(
+              _me._getContainerElemId());
+          overwriteLayout = overwriteLayout || 'SimpleLayout';
+          //TODO check gallery layout
+//        _me._getGallery(function(galleryObj) {
+//          _me._getCelSlideShowObj(galleryObj.getLayoutName());
+//          openDialog.intermediatOpenHandler();
+//        }, 1);
+          //TODO check layout!!!
+          _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
+        } else if (overwriteLayout) {
+          _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
+        }
+        _me._celSlideShowObj.setCounterLeadingZeros(_me._configReader.hasLeadingZeros());
+        return _me._celSlideShowObj;
+      },
+
+      /**
+       * adds slide counter if image animation config asks for.
+       */
+      _addSlideShowCounter : function(event) {
+        var _me = this;
+//        var slideWrapperElem = event.memo.newSlideWrapperElem;
+        if (!_me._configReader.hasAddCounterNone()) {
+          if (!_me.getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
+            var countSlideNumElem = new Element('div').addClassName(
+                'celPresSlideShow_countSlideNum');
+            _me.getContainerElement().insert({'bottom' : countSlideNumElem});
+          }
+          if (!_me.getContainerElement().down('> div.celPresSlideShow_currentSlideNum')) {
+            var currentSlideNumElem = new Element('div').addClassName(
+                'celPresSlideShow_currentSlideNum');
+            _me.getContainerElement().insert({'bottom' : currentSlideNumElem});
+          }
+        }
+      },
+
+      _addNavigationButtons : function(event) {
+        var _me = this;
+        if (_me._configReader.hasAddNavigation()) {
+          if (!_me.getContainerElement().down('> div.celPresSlideShow_next')) {
+            var nextButton = new Element('div').addClassName('celPresSlideShow_next');
+            _me.getContainerElement().insert({'bottom' : nextButton});
+          }
+          if (!_me.getContainerElement().down('> div.celPresSlideShow_prev')) {
+            var prevButton = new Element('div').addClassName('celPresSlideShow_prev');
+            _me.getContainerElement().insert({'top' : prevButton});
+          }
+        }
+      },
+
+      _imageSlideShowLoadFirstContent_internal : function() {
+        var _me = this;
+        _me.getContainerElement().observe(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addNavigationButtonsBind);
+        _me.getContainerElement().observe(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
+        if (_me._configReader.hasCustomStart()) {
+          var navObj = _me._getCelSlideShowObj()._navObj;
+          _me._getCelSlideShowObj().loadAndAddMainSlides(
+              _me._configReader.getGallerySpace(), function(allSlides) {
+                navObj._nextIndex = _me._configReader.getStartSlideNum();
+                navObj._preloadFunc(allSlides[navObj._nextIndex],
+                    navObj._updateNextContent.bind(navObj));
+              });
+        } else {
+          _me._getCelSlideShowObj().loadMainSlides(_me._configReader.getGallerySpace(),
+              _me._configReader.getStartSlideNum());
+        }
+        _me._initAnimation();
+      },
+
+      _initAnimation : function(event) {
+        var _me = this;
+        if (typeof CELEMENTS.presentation.SlideShowAnimation != 'undefined') {
+          _me._slideShowAnimation = new CELEMENTS.presentation.SlideShowAnimation(
+              _me._getCelSlideShowObj(), _me._configReader.getTimeout(),
+              _me._configReader.getSlideShowEffect());
+          if (_me._configReader.hasAnimation()) {
+            _me._slideShowAnimation.register();
+            if (_me._configReader.hasManualButton()) {
+              _me._initManualStartButton();
+            }
+            _me.startStop(_me._configReader.hasAutoStart(), true);
+          }
+        }
+      },
+
+      _initManualStartButton : function() {
+        var _me = this;
+        var startButtonDiv = new Element('div', { 'class' : 'slideshowButton' });
+        startButtonDiv.hide();
+        _me.getContainerElement().insert({ bottom : startButtonDiv });
+        $(_me.getContainerElement()).stopObserving('click', _me._startStopClickHandlerBind);
+        $(_me.getContainerElement()).observe('click', _me._startStopClickHandlerBind);
+      },
+
+      _startStopClickHandler : function(event) {
+        var _me = this;
+        event.stop();
+        _me.startStop();
+      },
+
+      startStop : function(isStart, delayedStart) {
+        var _me = this;
+        if (typeof isStart === 'undefined') {
+          isStart = _me._slideShowAnimation._paused;
+        }
+        if (typeof delayedStart === 'undefined') {
+          delayedStart = false;
+        }
+        var slideShowButton = _me.getContainerElement().down('.slideshowButton');
+        if (isStart) {
+          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+            console.log('animation started for image slideshow',
+                _me._getContainerElemId());
+          }
+          _me._slideShowAnimation.startAnimation(delayedStart);
+          if (slideShowButton) {
+            Effect.Fade(slideShowButton, { duration : 1.0 });
+          }
+        } else {
+          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
+            console.log('animation stopped for image slideshow',
+                _me._getContainerElemId());
+          }
+          _me._slideShowAnimation.stopAnimation();
+          if (slideShowButton) {
+            Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
+          }
+        }
+      },
+
+      start : function() {
+        var _me = this;
+        _me._getCelSlideShowObj().setAutoresize(true);
+        _me._getCelSlideShowObj().register();
+        _me._imageSlideShowLoadFirstContent_internal();
+      }
+
+  };
+})();
+
+//////////////////////////////////////////////////////////////////////////////
+//image SlideShow config reader
+//////////////////////////////////////////////////////////////////////////////
+window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
+  // constructor
+  var configDefParam = configDef || {};
+  this._init(htmlElem, configDefParam);
+};
+
+(function() {
+  "use strict";
+
+  CELEMENTS.image.ConfigReader.prototype = {
+      _htmlElemId : undefined,
+      _htmlElemClasses : undefined,
+      _configDef : undefined,
+      _containerAnimWidth : undefined,
+      _containerAnimHeight : undefined,
+      _overlayWidthDefault : undefined,
+      _overlayHeightDefault : undefined,
+      _overlayWidth : undefined,
+      _overlayHeight : undefined,
+      _mobileDim : undefined,
+      _isMobile : undefined,
+      _autoresize : undefined,
+      _startSlideNum : undefined,
+
+      _init : function(htmlElem, configDef) {
+        var _me = this;
+        _me._htmlElemId = htmlElem.id;
+        _me._htmlElemClasses = $w(htmlElem.className);
+        _me._mobileDim = new CELEMENTS.mobile.Dimensions(); 
+        _me._isMobile = _me._mobileDim.isMobile;
+        _me._autoresize = _me._isMobile.iOS() || _me._isMobile.Android();
+        _me._overlayWidthDefault = 800;
+        _me._overlayHeightDefault = 800;
+        _me._configDef = new Hash({
+          'manualstart' : 'celimage_manualstart',
+          'nonestart' : 'celimage_nonestart',
+          'autostart' : 'celimage_autostart',
+          'autostartnostop' : 'celimage_autostartnostop',
+          'addNavigation' : 'celimage_addNavigation',
+          'addCounterNone' : 'celimage_addCounterNone',
+          'randomStart' : 'celimage_slideshowRandomStart',
+          'customStart' : 'celimage_customStartSlide',
+          'addCloseButton' : 'celimage_overlay_addCloseButton',
+          'addCounterZeros' : 'celimage_addCounterZeros'
+         }).update(configDef).toObject();
+        _me._overlayWidth = _me._getPart(4, _me._overlayWidthDefault);
+        _me._overlayHeight = _me._getPart(5, _me._overlayHeightDefault);
+        _me._containerAnimWidth = _me._getPart(8, htmlElem.getWidth());
+        _me._containerAnimHeight = _me._getPart(9, htmlElem.getHeight());
+      },
+
+      _getPart : function(num, defaultvalue) {
+        var _me = this;
+        var parts = _me._htmlElemId.split(':');
+        if ((num < parts.length) && (parts[num] != '')) {
+          return parts[num];
+        } else {
+          return defaultvalue;
+        }
+      },
+
+      _hasClassName : function(className) {
+        var _me = this;
+        return (_me._htmlElemClasses.indexOf(className) > -1);
+      },
+
+      isAutoResize : function() {
+        var _me = this;
+        return _me._autoresize;
+      },
+
+      getStartMode : function() {
+        var _me = this;
+        if (_me._hasClassName(_me._configDef.manualstart)) {
+          return 'manual';
+        } else if (_me._hasClassName(_me._configDef.nonestart)) {
+          return 'none';
+        } else if (_me._hasClassName(_me._configDef.autostart)) {
+          return 'auto';
+        } else if (_me._hasClassName(_me._configDef.autostartnostop)) {
+          return 'autonostop';
+        }
+        return 'autonostop';
+      },
+
+      hasAnimation : function() {
+        var _me = this;
+        return (_me.getStartMode() != 'none');
+      },
+
+      hasAutoStart : function() {
+        var _me = this;
+        return (_me.getStartMode() == 'auto')
+          || (_me.getStartMode() == 'autonostop');
+      },
+
+      hasLeadingZeros : function() {
+        var _me = this;
+        return _me._hasClassName(_me._configDef.addCounterZeros);
+      },
+
+      hasManualButton : function() {
+        var _me = this;
+        return (_me.getStartMode() != 'autonostop');
+      },
+
+      getContainerAnimWidth : function() {
+        var _me = this;
+        if ((_me._containerAnimWidth == '') || isNaN(parseInt(_me._containerAnimWidth))
+            || (parseInt(_me._containerAnimWidth) <= 0)) {
+          _me._containerAnimWidth = _me._getPart(8, htmlElem.getWidth());
+        }
+        return parseInt(_me._containerAnimWidth);
+      },
+
+      getContainerAnimHeight : function() {
+        var _me = this;
+        if ((_me._containerAnimHeight == '') || isNaN(parseInt(_me._containerAnimHeight))
+            || (parseInt(_me._containerAnimHeight) <= 0)) {
+          _me._containerAnimHeight = _me._getPart(9, htmlElem.getHeight());
+        }
+        return parseInt(_me._containerAnimHeight);
+      },
+
+      getOverlayWidth : function() {
+        var _me = this;
+        if ((_me._overlayWidth == '') || isNaN(parseInt(_me._overlayWidth))
+            || (parseInt(_me._overlayWidth) <= 0)) {
+          _me._overlayWidth = _me._getPart(4, _me._overlayWidthDefault);
+        }
+        return parseInt(_me._overlayWidth);
+      },
+
+      getOverlayHeight : function() {
+        var _me = this;
+        if ((_me._overlayHeight == '') || isNaN(parseInt(_me._overlayHeight))
+            || (parseInt(_me._overlayHeight) <= 0)) {
+          _me._overlayHeight = _me._getPart(5, _me._overlayHeightDefault);
+        }
+        return parseInt(_me._overlayHeight);
+      },
+
+      hasRandomStart : function() {
+        var _me = this;
+        return _me._hasClassName(_me._configDef.randomStart);
+      },
+
+      hasCustomStart : function() {
+        var _me = this;
+        return _me._hasClassName(_me._configDef.customStart);
+      },
+
+      getGallerySpace : function() {
+        var _me = this;
+        return _me._getPart(7, '');
+      },
+
+      getSlideShowEffect : function() {
+        var _me = this;
+        return _me._getPart(3, 'none');
+      },
+
+      setStartSlideNum : function(startSlideNum) {
+        var _me = this;
+        _me._startSlideNum = startSlideNum;
+      },
+
+      getStartSlideNum : function() {
+        var _me = this;
+        if (_me._startSlideNum) {
+          return _me._startSlideNum;
+        }
+        return parseInt(_me._getPart(6, 1)) - 1;
+      },
+
+      getTimeout : function() {
+        var _me = this;
+        return _me._getPart(2, 3);
+      },
+
+      hasAddNavigation : function() {
+        var _me = this;
+        return _me._hasClassName(_me._configDef.addNavigation);
+      },
+
+      hasCloseButton : function() {
+        var _me = this;
+        return _me._hasClassName(_me._configDef.addCloseButton);
+      },
+
+      hasAddCounterNone : function() {
+        var _me = this;
+        return _me._hasClassName(_me._configDef.addCounterNone);
       }
 
   };
