@@ -24,6 +24,12 @@
     <li>$request.get($param)</li>
     ## API call in a comment to prevent empty output (extra <p />)
     <!-- $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height) -->
+    #foreach($filter in $request.getParameterValues('uploadFilterItem'))
+      #set($filterRef = $services.model.resolveDocument("$!filter"))
+      #if(("$!filter" != '') && ($xwiki.exists($filterRef)))
+        <!-- $services.celementsweb.addFileToFileBaseTag($attDoc.getDocumentReference(), "$!request.get('filename')", $filterRef) -->
+      #end
+    #end
   #end
 #end
 </ul>
