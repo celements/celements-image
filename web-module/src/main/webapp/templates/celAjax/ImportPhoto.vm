@@ -19,10 +19,6 @@
 <div class="c3_import_title c3_title_preimport">$adminMsg.get('cel_import_preimport')
 #if("$!filename" != '') - $!filename #end </div><!-- /c3_import_title -->
 <div class="c3_import_preimport_result c3_import_tabbox" id="c3_import_preimport_result">
-<span class="c3_import_checkbox_all_none">
-  <span id="check_all">$adminMsg.get('cel_photo_all')</span> 
-  <span id="check_none">$adminMsg.get('cel_photo_none')</span>
-</span>
 <input type="hidden" id="c3_not_yet_imported_msg" value="$adminMsg.get('cel_import_photo_unimported_preimport')" />
 <input type="hidden" id="c3_import_url" value="$!{doc.getURL()}?xpage=celements_ajax&ajax_mode=ImportPhotoNow" />
 <input type="hidden" id="c3_title_importing" value="$adminMsg.get('cel_import_photo_importing')" />
@@ -35,10 +31,20 @@
   <input type="hidden" name="attDoc" value="$!request.get('attDoc')" />
   <input type="hidden" name="filename" value="$!request.get('filename')" />
   
+  <style>
+    #importForm .c3_fb_upload_filter {
+      display: inline;
+      padding-right: 20px;
+    }
+    #importForm .c3_import_checkbox_all_none {
+      padding-top: 12px;
+    }
+  </style>
   #if("$!doc.getObject('Classes.ImportClass')" == '')
     #set($fbDoc = "$!xwiki.getWebPreference('cel_centralfilebase')")
     #set($menuSpace = "$!fbDoc.substring(0, $fbDoc.indexOf('.'))")
     <div>
+      <p>$adminMsg.get('cel_photo_import_add_tags')</p>
     #set($helpNav = $xwiki.celementsweb.createNavigation())
     #set($menuSpaceRef = $services.model.createDocumentReference('', $menuSpace, '').lastSpaceReference)
     ## get $menu with list of all menu items in space
@@ -49,11 +55,16 @@
       #set($itemName = $services.model.serialize($item.documentReference, 'local'))
       #set($menuName = $helpNav.getMultilingualMenuName("$itemName", $admin_language))
       <div class="c3_fb_upload_filter">
-        <input type="checkbox" name="uploadFilterItem" value="$itemName"/>$menuName
+        <input type="checkbox" name="uploadFilterItem" value="$itemName"/> $menuName
       </div>
     #end
     </div>
   #end
+
+<span class="c3_import_checkbox_all_none">
+  <span id="check_all">$adminMsg.get('cel_photo_all')</span> 
+  <span id="check_none">$adminMsg.get('cel_photo_none')</span>
+</span>
   
   <span id="c3_import_button_div" class="c3_import_scrollabe_ignore"><input type="submit" id="c3_import_button" value="$adminMsg.get('cel_photo_import_selected_now')" /></span>
   <div class="c3_import_row">
