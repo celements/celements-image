@@ -44,7 +44,9 @@
     ## get $menu with list of all menu items in space
     #set($menu = $celementsweb.getSubNodesForParentRef($menuSpaceRef))
     #foreach($item in $menu)
-      #set($itemName = $services.model.serialize($treeNode.documentReference, 'local'))
+      #set($itemName = '')
+      #set($menuName = '')
+      #set($itemName = $services.model.serialize($item.documentReference, 'local'))
       #set($menuName = $helpNav.getMultilingualMenuName("$itemName", $admin_language))
       <div class="c3_fb_upload_filter">
         <input type="checkbox" name="uploadFilterItem" value="$item"/>$menuName
