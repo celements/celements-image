@@ -453,7 +453,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             }
           });
           _me._origStyleValues = origStyles;
-        } else {
+        } else if (!htmlElement.getAttribute('style')) {
           return new Hash();
         }
         return _me._origStyleValues;
