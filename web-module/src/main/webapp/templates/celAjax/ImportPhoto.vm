@@ -49,7 +49,7 @@
       #set($itemName = $services.model.serialize($item.documentReference, 'local'))
       #set($menuName = $helpNav.getMultilingualMenuName("$itemName", $admin_language))
       <div class="c3_fb_upload_filter">
-        <input type="checkbox" name="uploadFilterItem" value="$item"/>$menuName
+        <input type="checkbox" name="uploadFilterItem" value="$itemName"/>$menuName
       </div>
     #end
     </div>
