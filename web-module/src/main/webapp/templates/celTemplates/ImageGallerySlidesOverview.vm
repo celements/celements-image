@@ -57,10 +57,10 @@
           <div class="cel_slideShow_slideWrapper"##
           style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
           $slideContent
-          </div>
-        </div>
+          <!-- slideWrapper --></div>
+        <!-- slideRoot --></div>
 ##      </div>
-  </div>
+  <!-- ImgGallerySlide --></div>
 #*
   <span class="background"></span>
   <span class="text">$!title</span>
