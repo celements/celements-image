@@ -42,7 +42,7 @@
   #set($thumbHeight = "100")
   #set($thumbWidth = "100")
 #end
-  ## #set($zoomFactor = $mathtool.div(100, $photoHeight))
+  #set($zoomFactor = $mathtool.div(100, $photoHeight))
   <div id="ImgGallerySlide$!{imgGalSlidecount}:${slideFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;">
   #*
