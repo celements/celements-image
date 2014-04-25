@@ -50,13 +50,15 @@
   #if("$!photoHeight" == '')
     #set($photoHeight = "662")
   #end
+  #set($thumbHeight = "100")
+  #set($thumbWidth = "100")
 #if("$!firstImageLink" != '')
-  <img id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:100:100"##
-   class="$imgCssClasses" src="${firstImageLink}?celwidth=100&celheight=100&lowBound=1" alt="" />
+  <img id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
+   class="$imgCssClasses" src="${firstImageLink}?celwidth=$!{thumbWidth}&celheight=$!{thumbHeight}&lowBound=1" alt="" />
 #elseif("$firstSlideContent" != '')
-  ## #set($zoomFactor = $mathtool.div(100, $photoHeight))
-  <div id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:100:100"##
-   class="$imgCssClasses" style="width:100px;height:100px;">
+  #set($zoomFactor = $mathtool.div($!{thumbHeight}, $photoHeight))
+  <div id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
+   class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;">
   #*
       zoom: 2; /* all browsers */
      -moz-transform: scale(2);  /* Firefox */
@@ -66,7 +68,8 @@
 ##      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
 ##        <div class="cel_slideShow_slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
         <div class="cel_slideShow_slideRoot">
-          <div class="cel_slideShow_slideWrapper">
+          <div class="cel_slideShow_slideWrapper"##
+          style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
           $firstSlideContent
           </div>
         </div>
