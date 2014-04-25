@@ -21,4 +21,4 @@ $galleryNav.loadConfigFromDoc($celldoc.documentReference)
 <div class="pfeil_links"></div>
 <div class="pfeil_rechts"></div>
 #parse('celTemplates/PresentationView.vm')
-</div>
+<!-- GP$!{galleryPresentationCount}$!{contentDoc.getName()} --></div>
