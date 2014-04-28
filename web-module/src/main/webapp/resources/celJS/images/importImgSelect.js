@@ -131,7 +131,7 @@
     }
     return zoomedEle;
   };
-  
+
   var showZoomedElement = function(show) {
     if(show) {
       zoomedEle.show();
