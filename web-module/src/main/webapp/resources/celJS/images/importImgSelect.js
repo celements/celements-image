@@ -13,7 +13,11 @@
   var defaultImgName = '';
   var defaultImgInfo = '';
   var isMotivePicker = false;
-  
+
+  window.getLoadedGalleries = function() {
+    return loadedGalleries;
+  };
+
   var observeImgs = function(event) {
     var loaderimg = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif' });
     $$('.bilder').each(function(imgContainer) {

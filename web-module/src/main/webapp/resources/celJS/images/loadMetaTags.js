@@ -9,7 +9,7 @@
       loading++;
       var galleryId = imageId.replace(/^.*:(.*?):.*$/g, '$1');
       var image = null;
-      loadedGalleries.get(galleryId).getImages().each(function(galImg) {
+      window.getLoadedGalleries().get(galleryId).getImages().each(function(galImg) {
         if(galImg.getId() == imageId) {
           image = galImg;
         }
@@ -60,7 +60,7 @@
         var allTagContent = new Object();
         $$('.bild.selected').each(function(img) {
           var tags = loadedMetaTags[img.id];
-          for(tagKey in tags) {
+          for(var tagKey in tags) {
             if(allTagArray.indexOf(tagKey) < 0) {
               allTagArray.push(tagKey);
               allTagContent[tagKey] = { 
