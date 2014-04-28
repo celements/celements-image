@@ -7,7 +7,7 @@
   #set($imgAltTag = "$!metaTagMap.get('Headline')")
 #end
 <img src="$imageURL" alt="$imgAltTag"/>
-#if("$!request.slideContent" == '')
+#if("$!request.slideContent" == '{metatagtest:slidetest}')
   #if($metaTagMap.containsKey('Headline'))
     <h1 class="imageHeadline">$!metaTagMap.get('Headline')</h1>
   #end
