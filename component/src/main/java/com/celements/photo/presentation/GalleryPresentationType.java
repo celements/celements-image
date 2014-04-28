@@ -58,17 +58,18 @@ public class GalleryPresentationType implements IPresentationTypeRole {
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
         numItem) + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
-    outStream.append(getRenderGalleryOverviewScript(docRef));
+    outStream.append(getRenderGalleryOverviewScript(docRef, numItem));
     outStream.append("</div>\n");
   }
 
-  private String getRenderGalleryOverviewScript(DocumentReference docRef) {
+  private String getRenderGalleryOverviewScript(DocumentReference docRef, int numItem) {
     String templatePath = webUtilsService.getInheritedTemplatedPath(
         getImageGalleryOverviewRef());
     try {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       XWikiDocument slideDoc = getContext().getWiki().getDocument(docRef, getContext());
       vcontext.put("slidedoc", slideDoc.newDocument(getContext()));
+      vcontext.put("slidenum", numItem);
       return getRenderCommand().renderTemplatePath(templatePath, getContext(
           ).getLanguage());
     } catch (XWikiException exp) {
