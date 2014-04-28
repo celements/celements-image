@@ -5,7 +5,8 @@
 if(typeof CELEMENTS=="undefined"){var CELEMENTS={};};
 if(typeof CELEMENTS.images=="undefined"){CELEMENTS.images={};};
 
-(function() {
+(function(window, undefined) {
+  "use strict";
 
 CELEMENTS.images.Gallery = function(galleryDocRef, callbackFN, onlyFirstNumImages,
     spaceImgs, sortImages) {
@@ -409,4 +410,4 @@ CiI.prototype = {
 
 };
 
-})();
+})(window);
