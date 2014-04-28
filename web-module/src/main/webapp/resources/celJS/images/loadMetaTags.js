@@ -41,7 +41,7 @@
     selected.each(function(imgDiv) {
       loadMeta(imgDiv.id);
     });
-    if(loading == 0) {
+    if (loading == 0) {
       displayMetaSelection();
     }
   };
