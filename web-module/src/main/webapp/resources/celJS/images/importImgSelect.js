@@ -40,7 +40,7 @@ var observeImgs = function(event) {
 
   loadedGalleries.set(fileBaseLink, new CELEMENTS.images.Gallery(
       fileBaseLink, loadingCallbackFN, false,
-      (fileBaseLink.split('.').size() < 2)));
+      (fileBaseLink.split('.').size() < 2)), 'NameAsc');
   addToGalleriesList(fileBaseLink);
 };
 
