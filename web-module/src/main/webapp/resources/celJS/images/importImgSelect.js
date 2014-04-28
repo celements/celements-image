@@ -51,7 +51,7 @@
     onThumb = true;
     var ele = event.element();
     mouseOverEleId = ele.id;
-    setTimeout("hoverImg('" + ele.id + "')", 1500);
+    hoverImg.delay(1.5, ele.id);
     activePos = getImgNrInList(mouseOverEleId);
   };
   
