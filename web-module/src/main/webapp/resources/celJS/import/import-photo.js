@@ -95,7 +95,7 @@
   };
   
   var preimport = function(event){
-    var origEvent = eventmemo;
+    var origEvent = event.memo;
     var src = "";
     var filename = "";
     var element = origEvent.target.down('.c3_file_link');
