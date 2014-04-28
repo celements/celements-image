@@ -14,6 +14,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.NavigationClasses;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
@@ -30,6 +31,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
   private ImageService imageService;
   private XWiki xwiki;
   private XWikiRightService rightServiceMock;
+  private ITreeNodeService treeNodeServiceMock;
 
   @Before
   public void setUp_ImageServiceTest() throws Exception {
@@ -38,6 +40,8 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     rightServiceMock = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightServiceMock).anyTimes();
     imageService = (ImageService) getComponentManager().lookup(IImageService.class);
+    treeNodeServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
+    imageService.treeNodeService = treeNodeServiceMock;
   }
 
   @Test
@@ -279,8 +283,8 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(getContext()))
         ).andReturn("").once();
     expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
-    replayDefault();
-    replay(webUtils);
+    expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
+    replayDefault(webUtils);
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
     String expectedImgURL = imgAttURL + "?celwidth=" + maxWidth + "&celheight=" 

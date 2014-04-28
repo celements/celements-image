@@ -28,6 +28,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.NavigationClasses;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.image.GenerateThumbnail;
@@ -63,6 +64,9 @@ public class ImageService implements IImageService {
 
   @Requirement
   IWebUtilsService webUtilsService;
+
+  @Requirement
+  ITreeNodeService treeNodeService;
 
   NextFreeDocNameCommand nextFreeDocNameCmd;
 
@@ -326,6 +330,7 @@ public class ImageService implements IImageService {
         String slideContent = webUtilsService.renderInheritableDocument(slideContentRef, 
             getContext().getLanguage(), webUtilsService.getDefaultLanguage());
         newSlideDoc.setContent(slideContent);
+        fixMenuItemPosition(newSlideDoc);
         getContext().getWiki().saveDocument(newSlideDoc, "add default image slide"
             + " content", true, getContext());
         return true;
@@ -337,6 +342,20 @@ public class ImageService implements IImageService {
       LOGGER.error("failed to addSlideFromTemplate because no gallery doc.", exp);
     } catch (XWikiException exp) {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
+    }
+    return false;
+  }
+
+  private boolean fixMenuItemPosition(XWikiDocument newSlideDoc) {
+    if (treeNodeService.isTreeNode(newSlideDoc.getDocumentReference())) {
+      BaseObject menuItemObj = newSlideDoc.getXObject(getNavigationClasses(
+          ).getMenuItemClassRef(getContext().getDatabase()));
+      if (menuItemObj != null) {
+        int numElem = treeNodeService.getSubNodesForParent(
+            newSlideDoc.getDocumentReference().getLastSpaceReference(), "").size();
+        menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, numElem);
+        return true;
+      }
     }
     return false;
   }
