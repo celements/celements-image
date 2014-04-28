@@ -7,9 +7,10 @@ if(typeof CELEMENTS.images=="undefined"){CELEMENTS.images={};};
 
 (function() {
 
-CELEMENTS.images.Gallery = function(galleryDocRef, callbackFN, onlyFirstNumImages, spaceImgs) {
+CELEMENTS.images.Gallery = function(galleryDocRef, callbackFN, onlyFirstNumImages,
+    spaceImgs, sortImages) {
   // constructor
-  this._init(galleryDocRef, callbackFN, onlyFirstNumImages, spaceImgs);
+  this._init(galleryDocRef, callbackFN, onlyFirstNumImages, spaceImgs, sortImages);
 };
 
 var CiG = CELEMENTS.images.Gallery;
@@ -20,15 +21,20 @@ CiG.prototype = {
     _imagesArray : undefined,
     _imagesHash : undefined,
     _afterLoadListener : undefined,
-    _loading : false,
-    _loadingSlice : false,
-    _loaded : false,
+    _loading : undefined,
+    _loadingSlice : undefined,
+    _loaded : undefined,
+    _sortImages : undefined,
 
-  _init : function(collDocRef, callbackFN, onlyFirstNumImages, spaceImgs) {
+  _init : function(collDocRef, callbackFN, onlyFirstNumImages, spaceImgs, sortImages) {
     var _me = this;
     _me._collDocRef = collDocRef;
     _me._afterLoadListener = new Array();
     _me._imagesHash = new Hash();
+    _me._loading = false;
+    _me._loaded = false;
+    _me._loadingSlice = false;
+    _me._sortImages = sortImages || '';
     _me.executeAfterLoad(callbackFN, onlyFirstNumImages, spaceImgs);
   },
 
@@ -72,7 +78,8 @@ CiG.prototype = {
     _me._loading = true;
     var params = {
         'xpage' : 'celements_ajax',
-        'ajax_mode' : 'GalleryData'
+        'ajax_mode' : 'GalleryData',
+        'sortImages' : _me._sortImages
       };
     if(onlyFirstNumImages) {
       params['onlyFirstNumImages'] = onlyFirstNumImages;
