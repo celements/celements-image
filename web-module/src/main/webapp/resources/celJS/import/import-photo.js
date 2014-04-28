@@ -107,7 +107,7 @@
       }
     });
     
-    url = $('c3_preimport_url').value + "&attDoc=" + src + "&filename=" + filename;
+    var url = $('c3_preimport_url').value + "&attDoc=" + src + "&filename=" + filename;
     getProgressBar($('c3_title_preimport').value);
     new Ajax.Request(url, { 
       method: 'post', 
