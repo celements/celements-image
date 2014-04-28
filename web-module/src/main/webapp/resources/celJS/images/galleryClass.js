@@ -300,9 +300,10 @@ CiG.prototype = {
 
 };
 
-})();
+})(window, undefined);
 
-(function() {
+(function(window, undefined) {
+  "use strict";
 
 CELEMENTS.images.Image = function(imageData, id) {
   // constructor
