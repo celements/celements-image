@@ -4,11 +4,6 @@
   var loadedMetaTags = new Object();
   var loading = 0;
 
-  Event.observe(window, 'load', function() {
-    $(document.body).observe('celimage:imageSelectionChanged', loadMetaTags);
-    $(document.body).observe('celimage:imageLoadingDone', displayMetaSelection);
-  });
-  
   var loadMeta = function(imageId) {
     if(!loadedMetaTags[imageId]) {
       loading++;
@@ -93,4 +88,9 @@
     }
   };
 
+  Event.observe(window, 'load', function() {
+    $(document.body).observe('celimage:imageSelectionChanged', loadMetaTags);
+    $(document.body).observe('celimage:imageLoadingDone', displayMetaSelection);
+  });
+  
 })(window);
