@@ -1,3 +1,6 @@
+(function(window, undefined) {
+  "use strict";
+
   var loadedMetaTags = new Object();
   var loading = 0;
 
@@ -46,8 +49,13 @@
     if(loading == 0) {
       displayMetaSelection();
     }
-  }
-  
+  };
+
+  var cpyToClipboardHandler = function(event) {
+    window.prompt("Copy to clipboard: Ctrl+C, Enter", '{metatag:'
+        + event.element().innerHTML + '}');
+  };
+
   var displayMetaSelection = function() {
     if(loading == 0) {
       var tagContainer = $('metaTags');
@@ -78,11 +86,11 @@
           tagDom.insert(tagSpan);
           tagDom.insert(new Element('span', { 'class' : 'ocurrences' }).insert('(' + tagContent.nr + ')'));
           tagContainer.insert(tagDom);
-          tagSpan.observe('click', function(event) {
-            window.prompt ("Copy to clipboard: Ctrl+C, Enter", '{metatag:' + event.element().innerText + '}');
-          });
+          tagSpan.observe('click', cpyToClipboardHandler);
         });
         tagContainer.up().show();
       }
     }
   };
+
+})(window);
