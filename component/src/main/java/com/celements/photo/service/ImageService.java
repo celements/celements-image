@@ -392,8 +392,9 @@ public class ImageService implements IImageService {
     }
     Map<String, String> urlMap = new HashMap<String, String>();
     if(dim != null) {
-      String baseURL = ximage.getDoc().getExternalAttachmentURL(
-          ximage.getFilename(), "download", getContext());
+      String baseURL = ximage.getDoc().getExternalAttachmentURL(ximage.getFilename(), 
+          "download", getContext());
+      urlMap.put("orig", baseURL);
       if(baseURL.indexOf("?") < 0) {
         baseURL += "?";
       } else if(!baseURL.endsWith("&")) {
