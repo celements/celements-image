@@ -1,6 +1,10 @@
+#*
+## FP 04/05/2014 removing flushCache. flushCache needed what for? since 2.45.0 menuItems
+## changes are taken care of by TreeNodeCacheListener
 #if("$!request.deleted" == '1')
-$xwiki.celementsweb.flushCache()
+## $xwiki.celementsweb.flushCache()
 #end
+*#
 #if("$!celldoc" != '')
 #set($contentDoc = $celldoc)
 #else   

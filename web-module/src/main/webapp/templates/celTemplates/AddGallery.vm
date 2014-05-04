@@ -52,7 +52,9 @@
  $album_obj.set("description", $!request.get("description")) 
  $album_obj.set("id", $xwiki.parseInt($!request.get("id")))
  $new_doc.save()
- $xwiki.celementsweb.flushCache()
+## FP 04/05/2014 removing flushCache. flushCache needed what for? since 2.45.0 menuItems
+## changes are taken care of by TreeNodeCacheListener
+## $xwiki.celementsweb.flushCache()
  ## redirect to edit album
  $context.getResponse().sendRedirect($new_doc.getURL("edit", "xredirect=$!xredirect"))
 #else

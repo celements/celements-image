@@ -13,9 +13,13 @@ $celementsweb.addExtJSfileOnce(':celJS/images/gallerylist-mobile-fix.js', 'file'
 ##TODO fix broken exended layout by Gartnernzuft
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/Gallery.css', 'file')" type="text/css" media="screen" />
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/galleryYuiOverlay.css', 'file')" type="text/css" media="screen" />
+#*
+## FP 04/05/2014 removing flushCache. flushCache needed what for? since 2.45.0 menuItems
+## changes are taken care of by TreeNodeCacheListener
 #if("$!request.deleted" == '1')
-$xwiki.celementsweb.flushCache()
+## $xwiki.celementsweb.flushCache()
 #end
+*#
 #if("$!celldoc" != '')
 #set($contentDoc = $celldoc)
 #else   

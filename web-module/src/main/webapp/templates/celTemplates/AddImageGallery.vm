@@ -40,7 +40,9 @@
     #set($position = $next_menu_item_nr)
     $menu_item_obj.set("menu_position", $!position)
     $new_doc.save()
-    $xwiki.celementsweb.flushCache()
+## FP 04/05/2014 removing flushCache. flushCache needed what for? since 2.45.0 menuItems
+## changes are taken care of by TreeNodeCacheListener
+##    $xwiki.celementsweb.flushCache()
   #end
   #set($galleryDoc = $new_doc)
   #parse('celMacros/checkImageGalleryObjects.vm')
