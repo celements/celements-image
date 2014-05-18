@@ -103,17 +103,50 @@ public class Image {
 
   public void setMaxWidth(Integer maxWidth) {
     this.maxWidth = maxWidth;
+    String newMaxWidthStr = "celwidth=" + this.maxWidth;
+    if (origURL.matches("^.*\\?.*celwidth=(\\d*).*$")) {
+      origURL = origURL.replaceAll("celwidth=(\\d*)", newMaxWidthStr);
+    } else {
+      if (origURL.indexOf("?") < 0) {
+        origURL = origURL + "?"; 
+      } else {
+        origURL = origURL + "&"; 
+      }
+      origURL = origURL + newMaxWidthStr;
+    }
   }
 
   public Integer getMaxWidth() {
+    if (this.maxWidth == null) {
+      if (getURL().matches("^.*celwidth=(\\d*).*$")) {
+        maxWidth = Integer.parseInt(getURL().replaceAll("^.*celwidth=(\\d*).*$", "$1"));
+      }
+    }
     return this.maxWidth;
   }
 
   public void setMaxHeight(Integer maxHeight) {
     this.maxHeight = maxHeight;
+    String newMaxHeightStr = "celheight=" + this.maxHeight;
+    if (origURL.matches("^.*\\?.*celheight=(\\d*).*$")) {
+      origURL = origURL.replaceAll("celheight=(\\d*)", newMaxHeightStr);
+    } else {
+      if (origURL.indexOf("?") < 0) {
+        origURL = origURL + "?"; 
+      } else {
+        origURL = origURL + "&"; 
+      }
+      origURL = origURL + newMaxHeightStr;
+    }
+    this.maxHeight = maxHeight;
   }
 
   public Integer getMaxHeight() {
+    if (this.maxHeight == null) {
+      if (getURL().matches("^.*celheight=(\\d*).*$")) {
+        maxHeight = Integer.parseInt(getURL().replaceAll("^.*celheight=(\\d*).*$", "$1"));
+      }
+    }
     return this.maxHeight;
   }
 
