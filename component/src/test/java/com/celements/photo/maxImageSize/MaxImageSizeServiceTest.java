@@ -168,13 +168,13 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAllImagesInSource_oneImage() {
-    String pageContent = "<div><p>the content</p>\n"
-        + "<img id=\"firstImage\" src=\"/download/testSpace/test/fileName.jpg"
-        + "?celwidth=600&celheight=500\" />"
-        + "<p>second paragraph</p></div>";
+    String basisURL = "/download/testSpace/test/fileName.jpg";
+    String urlQueryPart = "?celwidth=600&celheight=500";
+    String imgURL = basisURL + urlQueryPart;
+    String pageContent = "<div><p>the content</p>\n" + "<img id=\"firstImage\" src=\""
+        + imgURL + "\" />" + "<p>second paragraph</p></div>";
     Map<String, Image> expImages = new HashMap<String, Image>();
-    Image firstImage = new Image("firstImage", "firstImage",
-        "/download/testSpace/test/fileName.jpg");
+    Image firstImage = new Image("firstImage", "firstImage", imgURL);
     expImages.put(firstImage.getId(), firstImage);
     replayDefault();
     List<Image> allImagesInSource = maxImageSizeService.getAllImagesInSource(pageContent);
@@ -185,14 +185,16 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
       assertEquals(expectedImage.getURL(), theImage.getURL());
       assertEquals(expectedImage.getMaxHeight(), theImage.getMaxHeight());
       assertEquals(expectedImage.getMaxWidth(), theImage.getMaxWidth());
+      assertEquals(basisURL, theImage.getBasisURL());
     }
     verifyDefault();
   }
 
   @Test
   public void testGetAllImagesInSource_oneImage_noParamsInSrc() {
+    String basisURL = "/download/testSpace/test/fileName.jpg";
     String pageContent = "<div><p>the content</p>\n"
-        + "<img id=\"firstImage\" src=\"/download/testSpace/test/fileName.jpg\" />"
+        + "<img id=\"firstImage\" src=\"" + basisURL + "\" />"
         + "<p>second paragraph</p></div>";
     Map<String, Image> expImages = new HashMap<String, Image>();
     Image firstImage = new Image("firstImage", "firstImage",
@@ -207,6 +209,7 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
       assertEquals(expectedImage.getURL(), theImage.getURL());
       assertEquals(expectedImage.getMaxHeight(), theImage.getMaxHeight());
       assertEquals(expectedImage.getMaxWidth(), theImage.getMaxWidth());
+      assertEquals(basisURL, theImage.getBasisURL());
     }
     verifyDefault();
   }

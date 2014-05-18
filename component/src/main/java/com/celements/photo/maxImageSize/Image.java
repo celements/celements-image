@@ -28,21 +28,22 @@ import com.celements.sajson.Builder;
 public class Image {
   private String id;
   private String name;
-  private String basisUrl;
   private String thumb;
   private Integer maxWidth;
   private Integer maxHeight;
+  private String origURL;
+  private String basisURL;
 
   /**
    * Initialises image's id, name, URL.
    * @param id Id of the image. 
    * @param name Name of the image.
-   * @param basisUrl URL to the image.
+   * @param origURL URL to the image.
    */
-  public Image(String id, String name, String basisUrl){
+  public Image(String id, String name, String origURL){
     this.id = id;
     this.name = name;
-    this.basisUrl = basisUrl;
+    this.origURL = origURL;
   }
   
   /**
@@ -55,7 +56,7 @@ public class Image {
   public Image(String id, String name, String url, String thumb){
     this.id = id;
     this.name = name;
-    this.basisUrl = url;
+    this.origURL = url;
     this.thumb = thumb;
   }
   
@@ -89,7 +90,7 @@ public class Image {
    * @return URL to the image.
    */
   public String getURL() {
-    return basisUrl;
+    return origURL;
   }
 
   /**
@@ -130,4 +131,12 @@ public class Image {
     jsonBuilder.closeDictionary();
     return jsonBuilder.getJSON();
   }
+
+  public String getBasisURL() {
+    if (basisURL == null) {
+      basisURL = this.origURL.split("\\?")[0];
+    }
+    return basisURL;
+  }
+
 }

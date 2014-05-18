@@ -47,7 +47,7 @@ public class MaxImageSizeService implements IMaxImageSizeServiceRole {
     while (imgMatcher.find()) {
       Map<String, String> imgAttrMap = getImageAttrMap(imgMatcher.group());
       imagesList.add(new Image(imgAttrMap.get("id"), imgAttrMap.get("name"),
-          imgAttrMap.get("src").split("\\?")[0]));
+          imgAttrMap.get("src")));
     }
     return imagesList;
   }
