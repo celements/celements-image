@@ -38,6 +38,8 @@ public class MaxImageSizeService implements IMaxImageSizeServiceRole {
 
   public String fixMaxImageSizes(String pageContent, int maxWidth, int maxHeight) {
     List<Image> allImages = getAllImagesInSource(pageContent);
+    //TODO get greatest resize factor over all images
+    //TODO reduce max sizes of all images and apply to pageContent
     return pageContent;
   }
 
