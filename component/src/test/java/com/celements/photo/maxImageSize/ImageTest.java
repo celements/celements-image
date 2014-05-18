@@ -69,6 +69,28 @@ public class ImageTest {
     assertEquals(newMaxWidth, testImage.getMaxWidth());
     assertEquals(IMAGE_BASIS_URL + "?celwidth=" + newMaxWidth + "&celheight="
         + IMAGE_MAX_HEIGHT, testImage.getURL());
+    assertEquals(IMAGE_ORIG_URL, testImage.getOrigURL());
+  }
+
+  @Test
+  public void testSetMaxWidth_lastParam() {
+    Integer newMaxWidth = IMAGE_MAX_WIDTH + 100;
+    String origURL = IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT + "&celwidth="
+        + IMAGE_MAX_WIDTH;
+    testImage = new Image(IMAGE_ID, IMAGE_NAME, origURL);
+    testImage.setMaxWidth(newMaxWidth);
+    assertEquals(newMaxWidth, testImage.getMaxWidth());
+    assertEquals(IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT + "&celwidth="
+        + newMaxWidth, testImage.getURL());
+    assertEquals(origURL, testImage.getOrigURL());
+  }
+
+  @Test
+  public void testSetMaxWidth_null() {
+    testImage.setMaxWidth(null);
+    assertNull(testImage.getMaxWidth());
+    assertEquals(IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT, testImage.getURL());
+    assertEquals(IMAGE_ORIG_URL, testImage.getOrigURL());
   }
 
   @Test
@@ -78,17 +100,18 @@ public class ImageTest {
     testImage.setMaxWidth(newMaxWidth);
     assertEquals(newMaxWidth, testImage.getMaxWidth());
     assertEquals(IMAGE_BASIS_URL + "?celwidth=" + newMaxWidth, testImage.getURL());
+    assertEquals(IMAGE_BASIS_URL, testImage.getOrigURL());
   }
 
   @Test
   public void testSetMaxWidth_noCelWidth() {
     Integer newMaxWidth = IMAGE_MAX_WIDTH + 100;
-    testImage = new Image(IMAGE_ID, IMAGE_NAME, IMAGE_BASIS_URL + "?celheight="
-        + IMAGE_MAX_HEIGHT);
+    String origURL = IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT;
+    testImage = new Image(IMAGE_ID, IMAGE_NAME, origURL);
     testImage.setMaxWidth(newMaxWidth);
     assertEquals(newMaxWidth, testImage.getMaxWidth());
-    assertEquals(IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT + "&celwidth="
-        + newMaxWidth, testImage.getURL());
+    assertEquals(origURL + "&celwidth=" + newMaxWidth, testImage.getURL());
+    assertEquals(origURL, testImage.getOrigURL());
   }
 
   @Test
@@ -105,10 +128,32 @@ public class ImageTest {
   @Test
   public void testSetMaxHeight() {
     Integer newMaxHeight = IMAGE_MAX_HEIGHT + 100;
+    String origURL = IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT + "&celwidth="
+        + IMAGE_MAX_WIDTH;
+    testImage = new Image(IMAGE_ID, IMAGE_NAME, origURL);
+    testImage.setMaxHeight(newMaxHeight);
+    assertEquals(newMaxHeight, testImage.getMaxHeight());
+    assertEquals(IMAGE_BASIS_URL + "?celheight=" + newMaxHeight + "&celwidth="
+        + IMAGE_MAX_WIDTH, testImage.getURL());
+    assertEquals(origURL, testImage.getOrigURL());
+  }
+
+  @Test
+  public void testSetMaxHeight_lastParam() {
+    Integer newMaxHeight = IMAGE_MAX_HEIGHT + 100;
     testImage.setMaxHeight(newMaxHeight);
     assertEquals(newMaxHeight, testImage.getMaxHeight());
     assertEquals(IMAGE_BASIS_URL + "?celwidth=" + IMAGE_MAX_WIDTH + "&celheight="
         + newMaxHeight, testImage.getURL());
+    assertEquals(IMAGE_ORIG_URL, testImage.getOrigURL());
+  }
+
+  @Test
+  public void testSetMaxHeight_null() {
+    testImage.setMaxHeight(null);
+    assertNull(testImage.getMaxHeight());
+    assertEquals(IMAGE_BASIS_URL + "?celwidth=" + IMAGE_MAX_WIDTH, testImage.getURL());
+    assertEquals(IMAGE_ORIG_URL, testImage.getOrigURL());
   }
 
   @Test
@@ -118,17 +163,18 @@ public class ImageTest {
     testImage.setMaxHeight(newMaxHeight);
     assertEquals(newMaxHeight, testImage.getMaxHeight());
     assertEquals(IMAGE_BASIS_URL + "?celheight=" + newMaxHeight, testImage.getURL());
+    assertEquals(IMAGE_BASIS_URL, testImage.getOrigURL());
   }
 
   @Test
   public void testSetMaxHeight_noCelHeight() {
     Integer newMaxHeight = IMAGE_MAX_HEIGHT + 100;
-    testImage = new Image(IMAGE_ID, IMAGE_NAME, IMAGE_BASIS_URL + "?celwidth="
-        + IMAGE_MAX_WIDTH);
+    String origURL = IMAGE_BASIS_URL + "?celwidth=" + IMAGE_MAX_WIDTH;
+    testImage = new Image(IMAGE_ID, IMAGE_NAME, origURL);
     testImage.setMaxHeight(newMaxHeight);
     assertEquals(newMaxHeight, testImage.getMaxHeight());
-    assertEquals(IMAGE_BASIS_URL + "?celwidth=" + IMAGE_MAX_WIDTH + "&celheight="
-        + newMaxHeight, testImage.getURL());
+    assertEquals(origURL + "&celheight=" + newMaxHeight, testImage.getURL());
+    assertEquals(origURL, testImage.getOrigURL());
   }
 
   @Test

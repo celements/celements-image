@@ -32,6 +32,7 @@ public class Image {
   private Integer maxWidth;
   private Integer maxHeight;
   private String origURL;
+  private String imgURL;
   private String basisURL;
 
   /**
@@ -44,6 +45,7 @@ public class Image {
     this.id = id;
     this.name = name;
     this.origURL = origURL;
+    this.imgURL = origURL;
   }
   
   /**
@@ -57,6 +59,7 @@ public class Image {
     this.id = id;
     this.name = name;
     this.origURL = url;
+    this.imgURL = url;
     this.thumb = thumb;
   }
   
@@ -90,7 +93,7 @@ public class Image {
    * @return URL to the image.
    */
   public String getURL() {
-    return origURL;
+    return imgURL;
   }
 
   /**
@@ -103,23 +106,30 @@ public class Image {
 
   public void setMaxWidth(Integer maxWidth) {
     this.maxWidth = maxWidth;
-    String newMaxWidthStr = "celwidth=" + this.maxWidth;
-    if (origURL.matches("^.*\\?.*celwidth=(\\d*).*$")) {
-      origURL = origURL.replaceAll("celwidth=(\\d*)", newMaxWidthStr);
-    } else {
-      if (origURL.indexOf("?") < 0) {
-        origURL = origURL + "?"; 
+    if (maxWidth != null) {
+      String newMaxWidthStr = "celwidth=" + this.maxWidth;
+      if (imgURL.matches("^.*\\?.*celwidth=(\\d*).*$")) {
+        imgURL = imgURL.replaceAll("celwidth=(\\d*)", newMaxWidthStr);
       } else {
-        origURL = origURL + "&"; 
+        if (imgURL.indexOf("?") < 0) {
+          imgURL = imgURL + "?"; 
+        } else {
+          imgURL = imgURL + "&"; 
+        }
+        imgURL = imgURL + newMaxWidthStr;
       }
-      origURL = origURL + newMaxWidthStr;
+    } else {
+      imgURL = imgURL.replaceAll("celwidth=(\\d*)&?", "");
+      if (imgURL.endsWith("&")) {
+        imgURL = imgURL.replaceAll("&+$", "");
+      }
     }
   }
 
   public Integer getMaxWidth() {
     if (this.maxWidth == null) {
-      if (getURL().matches("^.*celwidth=(\\d*).*$")) {
-        maxWidth = Integer.parseInt(getURL().replaceAll("^.*celwidth=(\\d*).*$", "$1"));
+      if (getURL().matches("^.*celwidth=(\\d+).*$")) {
+        maxWidth = Integer.parseInt(getURL().replaceAll("^.*celwidth=(\\d+).*$", "$1"));
       }
     }
     return this.maxWidth;
@@ -127,24 +137,30 @@ public class Image {
 
   public void setMaxHeight(Integer maxHeight) {
     this.maxHeight = maxHeight;
-    String newMaxHeightStr = "celheight=" + this.maxHeight;
-    if (origURL.matches("^.*\\?.*celheight=(\\d*).*$")) {
-      origURL = origURL.replaceAll("celheight=(\\d*)", newMaxHeightStr);
-    } else {
-      if (origURL.indexOf("?") < 0) {
-        origURL = origURL + "?"; 
+    if (maxHeight != null) {
+      String newMaxHeightStr = "celheight=" + this.maxHeight;
+      if (imgURL.matches("^.*\\?.*celheight=(\\d*).*$")) {
+        imgURL = imgURL.replaceAll("celheight=(\\d*)", newMaxHeightStr);
       } else {
-        origURL = origURL + "&"; 
+        if (imgURL.indexOf("?") < 0) {
+          imgURL = imgURL + "?"; 
+        } else {
+          imgURL = imgURL + "&"; 
+        }
+        imgURL = imgURL + newMaxHeightStr;
       }
-      origURL = origURL + newMaxHeightStr;
+    } else {
+      imgURL = imgURL.replaceAll("celheight=(\\d*)&?", "");
+      if (imgURL.endsWith("&")) {
+        imgURL = imgURL.replaceAll("&+$", "");
+      }
     }
-    this.maxHeight = maxHeight;
   }
 
   public Integer getMaxHeight() {
     if (this.maxHeight == null) {
-      if (getURL().matches("^.*celheight=(\\d*).*$")) {
-        maxHeight = Integer.parseInt(getURL().replaceAll("^.*celheight=(\\d*).*$", "$1"));
+      if (getURL().matches("^.*celheight=(\\d+).*$")) {
+        maxHeight = Integer.parseInt(getURL().replaceAll("^.*celheight=(\\d+).*$", "$1"));
       }
     }
     return this.maxHeight;
@@ -167,9 +183,13 @@ public class Image {
 
   public String getBasisURL() {
     if (basisURL == null) {
-      basisURL = this.origURL.split("\\?")[0];
+      basisURL = this.imgURL.split("\\?")[0];
     }
     return basisURL;
+  }
+
+  public String getOrigURL() {
+    return this.origURL;
   }
 
 }
