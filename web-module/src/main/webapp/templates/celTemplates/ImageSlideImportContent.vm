@@ -6,7 +6,7 @@
 #if($metaTagMap.containsKey('Headline'))
   #set($imgAltTag = "$!metaTagMap.get('Headline')")
 #end
-<img src="$imageURL" alt="$imgAltTag"/>
+<img src="$escapetool.html($imageURL)" alt="$imgAltTag"/>
 #if("$!request.slideContent" == '{metatagtest:slidetest}')
   #if($metaTagMap.containsKey('Headline'))
     <h1 class="imageHeadline">$!metaTagMap.get('Headline')</h1>
