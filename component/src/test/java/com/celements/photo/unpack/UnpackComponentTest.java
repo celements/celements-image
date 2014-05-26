@@ -38,7 +38,8 @@ public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testUnzipFileToAttachment_parameterPromotion() throws XWikiException, IOException {
     String filename = "file.zip";
-    String imgName = "file.png";
+    String imgName = "file 1.png";
+    String cleanImgName = "file1.png";
     DocumentReference zipSrcDocRef = new DocumentReference(getContext().getDatabase(),
         "AttSpace", "ZipDoc");
     DocumentReference imgDestDocRef = new DocumentReference(getContext().getDatabase(),
@@ -65,18 +66,20 @@ public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
     AddAttachmentToDoc addAtt = createMock(AddAttachmentToDoc.class);
     upc.inject_addAttachmentToDoc = addAtt;
     XWikiAttachment newAtt = new XWikiAttachment();
-    newAtt.setFilename(imgName);
+    newAtt.setFilename(cleanImgName);
     newAtt.setFilesize(123);
     newAtt.setDoc(destDoc);
-    expect(addAtt.addAtachment(same(destDoc), /*eq(inArray)*/(byte[])anyObject(), eq(imgName), same(getContext())
+    expect(addAtt.addAtachment(same(destDoc), /*eq(inArray)*/(byte[])anyObject(), eq(cleanImgName), same(getContext())
         )).andReturn(newAtt);
     expect(xwiki.clearName(eq(imgName), eq(false), eq(true), same(getContext()))
-        ).andReturn(imgName);
+        ).andReturn(cleanImgName);
     expect(xwiki.getDocument(same(zipSrcDocRef), same(getContext()))).andReturn(srcDoc);
     expect(xwiki.getDocument(same(imgDestDocRef), same(getContext()))).andReturn(destDoc);
     replay(addAtt, att, unzip, xwiki);
-    upc.unzipFileToAttachment(zipSrcDocRef, filename, imgName, imgDestDocRef);
+    String resultImgName = upc.unzipFileToAttachment(zipSrcDocRef, filename, imgName, 
+        imgDestDocRef);
     verify(addAtt, att, unzip, xwiki);
+    assertEquals(cleanImgName, resultImgName);
   }
   
   @Test
