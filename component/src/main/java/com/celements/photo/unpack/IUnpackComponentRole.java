@@ -7,7 +7,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 @ComponentRole
 public interface IUnpackComponentRole {
-  public void unzipFileToAttachment(DocumentReference zipSourceDoc, String attachmentName, 
+  public String unzipFileToAttachment(DocumentReference zipSourceDoc, String attachmentName, 
       String unzipFileName, DocumentReference destinationDoc);
 
   public String unzipFileToAttachment(XWikiAttachment zipSrcFile, String attachmentName, 

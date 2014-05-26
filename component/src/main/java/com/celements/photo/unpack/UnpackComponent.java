@@ -30,16 +30,18 @@ public class UnpackComponent implements IUnpackComponentRole {
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       UnpackComponent.class);
   
-  public void unzipFileToAttachment(DocumentReference zipSrcDocRef, String attachmentName,
+  public String unzipFileToAttachment(DocumentReference zipSrcDocRef, String attachmentName,
       String unzipFileName, DocumentReference destinationDoc) {
+    String cleanName = "";
     try {
       XWikiDocument zipSourceDoc = getContext().getWiki().getDocument(zipSrcDocRef, 
           getContext());
       XWikiAttachment zipAtt = zipSourceDoc.getAttachment(attachmentName);
-      unzipFileToAttachment(zipAtt, unzipFileName, destinationDoc);
+      cleanName = unzipFileToAttachment(zipAtt, unzipFileName, destinationDoc);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception getting zip source document", xwe);
     }
+    return cleanName;
   }
   
   public String unzipFileToAttachment(XWikiAttachment zipSrcFile, String attName,

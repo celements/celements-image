@@ -216,15 +216,16 @@ public class CelementsPhotoPluginAPI extends Api {
    * @param attachToDoc Document to attach the extracted and resized image.
    * @param width Width (max - aspect ratio is maintained) to resize the image to.
    * @param height Height (max - aspect ratio is maintained) to resize the image to.
+   * @return The cleaned up file name of the unpacked file.
    * @throws XWikiException
    */
   @Deprecated
-  public void unzipFileToAttachment(Document zipDoc, String attachmentName, 
+  public String unzipFileToAttachment(Document zipDoc, String attachmentName, 
       String unzipFileName, Document attachToDoc, int width, int height
       ) throws XWikiException, IOException{
     IUnpackComponentRole comp = (IUnpackComponentRole)Utils.getComponent(
         IUnpackComponentRole.class);
-    comp.unzipFileToAttachment(zipDoc.getDocumentReference(), attachmentName, 
+    return comp.unzipFileToAttachment(zipDoc.getDocumentReference(), attachmentName, 
         unzipFileName, attachToDoc.getDocumentReference());
   }
 

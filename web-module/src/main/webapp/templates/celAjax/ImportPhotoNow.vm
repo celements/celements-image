@@ -22,12 +22,11 @@
 #foreach($param in $request.getParameterNames())
   #if(("$!param.indexOf('filename_')" == '0') && ("$!request.get($param)" != ''))
     <li>$request.get($param)</li>
-    ## API call in a comment to prevent empty output (extra <p />)
-    <!-- $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height) -->
+    #set($cleanedFilename = $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height))
     #foreach($filter in $request.getParameterValues('uploadFilterItem'))
       #set($filterRef = $services.model.resolveDocument("$!filter"))
       #if(("$!filter" != '') && ($xwiki.exists($filterRef)))
-        <!-- $filter $services.celementsweb.addFileToFileBaseTag($attDoc.getDocumentReference(), "$!request.get($param)", $filterRef) -->
+        <!-- $filter $services.celementsweb.addFileToFileBaseTag($attDoc.getDocumentReference(), "$!cleanedFilename", $filterRef) -->
       #end
     #end
   #end
