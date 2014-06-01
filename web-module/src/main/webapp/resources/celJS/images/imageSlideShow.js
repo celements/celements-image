@@ -304,7 +304,9 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
             'configReader' : _me._configReader,
             'containerHtmlElem' : _me._containerHtmlElem
           });
-          _me._imageSlideShowObj.start();
+          _me._configReader.loadOverlayLayoutName(function(galleryLayoutName) {
+            _me._imageSlideShowObj.start();
+          });
           event.stop();
         }
       },
@@ -584,18 +586,12 @@ window.CELEMENTS.image.SlideShow = function(config) {
         return _me._config.containerHtmlElem;
       },
 
-      _getCelSlideShowObj : function(overwriteLayout) {
+      _getCelSlideShowObj : function() {
         var _me = this;
+        var overwriteLayout = _me._configReader.getLayoutName() || 'SimpleLayout';
         if (!_me._celSlideShowObj) {
           _me._celSlideShowObj = new CELEMENTS.presentation.SlideShow(
               _me._getContainerElemId());
-          overwriteLayout = overwriteLayout || 'SimpleLayout';
-          //TODO check gallery layout
-//        _me._getGallery(function(galleryObj) {
-//          _me._getCelSlideShowObj(galleryObj.getLayoutName());
-//          openDialog.intermediatOpenHandler();
-//        }, 1);
-          //TODO check layout!!!
           _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
         } else if (overwriteLayout) {
           _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
@@ -756,6 +752,9 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       _isMobile : undefined,
       _autoresize : undefined,
       _startSlideNum : undefined,
+      _galleryFN : undefined,
+      _galleryObj : undefined,
+      _layoutName : undefined,
 
       _init : function(htmlElem, configDef) {
         var _me = this;
@@ -778,6 +777,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
           'addCloseButton' : 'celimage_overlay_addCloseButton',
           'addCounterZeros' : 'celimage_addCounterZeros'
          }).update(configDef).toObject();
+        _me._galleryFN = _me._getPart(1, null);
         _me._overlayWidth = _me._getPart(4, _me._overlayWidthDefault);
         _me._overlayHeight = _me._getPart(5, _me._overlayHeightDefault);
         _me._containerAnimWidth = _me._getPart(8, htmlElem.getWidth());
@@ -926,6 +926,36 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       hasAddCounterNone : function() {
         var _me = this;
         return _me._hasClassName(_me._configDef.addCounterNone);
+      },
+
+      _getGalleryObj : function(callbackFN) {
+        var _me = this;
+        if (!_me._galleryObj) {
+          _me._galleryObj = new CELEMENTS.images.Gallery(
+              _me._galleryFN, callbackFN, 0);
+
+        } else {
+          _me._galleryObj.executeAfterLoad(callbackFN, 0);
+        }
+      },
+
+      loadOverlayLayoutName : function(callbackFN) {
+        var _me = this;
+        _me._getGalleryObj(function(galleryObj) {
+          if (callbackFN) {
+            _me._layoutName = galleryObj.getLayoutName(); 
+            callbackFN(_me._layoutName);
+          }
+        });
+      },
+
+      getLayoutName : function() {
+        var _me = this;
+        var layoutName = _me._layoutName;
+        if (typeof(_me._layoutName) === 'undefined') {
+          layoutName = 'SimpleLayout';
+        }
+        return layoutName;
       }
 
   };
