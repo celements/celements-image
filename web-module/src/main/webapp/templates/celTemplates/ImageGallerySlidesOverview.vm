@@ -30,8 +30,6 @@
 #end
 ##<!-- $doc ; $albumobj ; $albumobj.getProperty('photoWidth').getValue() ; $albumobj.getProperty('height2').getValue() -->
 #set($imgGalSlidecount = $imgGalSlidecount + 1)
-###set($thumbWidth = "$!albumobj.getProperty('thumbWidth').getValue()")
-###set($thumbHeight = "$!albumobj.getProperty('height').getValue()")
 #set($photoWidth = "$!albumobj.getProperty('photoWidth').getValue()")
 #if("$!photoWidth" == '')
   #set($photoWidth = "662")
@@ -39,7 +37,13 @@
 #set($photoHeight = "$!albumobj.getProperty('height2').getValue()")
 #if("$!photoHeight" == '')
   #set($photoHeight = "662")
+#end
+#set($thumbHeight = "$!albumobj.getProperty('height').getValue()")
+#if("$!thumbHeight" == '')
   #set($thumbHeight = "100")
+#end
+#set($thumbWidth = "$!albumobj.getProperty('thumbWidth').getValue()")
+#if("$!thumbWidth" == '')
   #set($thumbWidth = "100")
 #end
   #set($zoomFactor = $mathtool.div(100, $photoHeight))
