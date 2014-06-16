@@ -357,6 +357,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       _configReader : undefined,
       _containerHtmlElem : undefined,
       _replaceElemHandlerBind : undefined,
+      _centerSplashImageBind : undefined,
       _imageSlideShowObj : undefined,
       _origStyleValues : undefined,
 
@@ -371,6 +372,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         _me._htmlElemId = htmlElem.id;
         _me._configReader = new CELEMENTS.image.ConfigReader(htmlElem);
         _me._replaceElemHandlerBind = _me._replaceElemHandler.bind(_me);
+        _me._centerSplashImageBind = _me._centerSplashImage.bind(_me);
         $(document.body).observe('celimage_slideshowstarter:replaceElem',
             _me._replaceElemHandlerBind);
       },
@@ -390,6 +392,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         if (_me._getHtmlElem().descendantOf(parentElem)) {
           $(document.body).stopObserving('celimage_slideshowstarter:replaceElem',
               _me._replaceElemHandlerBind);
+          _me._getHtmlElem().observe('celimage_slideshow:afterWrapSplashImage',
+              _me._centerSplashImageBind);
           _me.install();
         }
       },
@@ -541,6 +545,97 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             console.log('skipping creating wrapperHTMLElem because already exists.',
                 _me._containerHtmlElem);
           }
+        }
+      },
+
+      /**
+       * if the slide is scaled down to fit in the <code>htmlContainer</code> element then
+       * we need an additional div between the <code>.cel_slideShow_slideWrapper</code>
+       *  and the <code>htmlContainer</code> to get the reduced dimensions of the slide.
+       * This intermediate div must present the .cel_slideShow_slideRoot css class.
+       * 
+       * prerequisite: slideWrapper MUST have a height and width asigned (e.g. by resize)
+       * @TODO move to CelementsSlides js class and refactor CelementsSlideShow too.
+       */
+      _centerCurrentSlide : function(htmlContainerIn) {
+        var htmlContainer = htmlContainerIn.down('.cel_slideShow_centerContainer')
+            || htmlContainerIn;
+        var slideWrapper = htmlContainer.down('.cel_slideShow_slideWrapper');
+        var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
+        if (!slideWrapper || !slideRoot) {
+          if ((typeof console != 'undefined') && (typeof console.warn != 'undefined')) {
+            console.warn('incorrect usage of _centerCurrentSlide!');
+          }
+          return;
+        }
+        //we cannot read element dimension if any parent is hidden (display:none)
+        var hiddenParentElems = [];
+        slideWrapper.ancestors().each(function(parentElem) {
+          if (!parentElem.visible()) {
+            hiddenParentElems.push(parentElem);
+            parentElem.show();
+          }
+        });
+        //FF has problem in getting the right width for slideOuterWidth if slideRoot is
+        // in position: relative
+        slideRoot.setStyle({
+          'position' : 'absolute'
+        });
+        //use jquery to get dimensions, because it works correctly inside iframes.
+        var slideOuterHeight = $j(slideRoot).height();
+        var slideOuterWidth = $j(slideRoot).width();
+        var parentHeight = htmlContainer.getHeight();
+        var parentWidth = htmlContainer.getWidth();
+        //FIXED: why slideOuterHeight? !!! FP; 2/1/2014
+        //--> it must be slideOuterHeight to get correct size of scaled down slides.
+        //--> see method comment
+        var topPos = (parentHeight - slideOuterHeight) / 2;
+        var leftPos = (parentWidth - slideOuterWidth) / 2;
+        hiddenParentElems.each(Element.hide);
+        slideWrapper.setStyle({
+          'position' : 'relative',
+          'margin' : '0'
+        });
+        // horizontal centering with absolut left position needed, because FF gets
+        // conflict with transform-origin and margin auto
+        slideRoot.setStyle({
+          'position' : 'absolute',
+          'left' : leftPos + 'px',
+          'top' : topPos + 'px',
+          'margin' : '0'
+        });
+      },
+
+      _centerSplashImage : function() {
+        var _me = this;
+        if (_me._configReader.isCenterSplashImage()) {
+          var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+          var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
+          _me._origStyleValues = null;
+          var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
+          var zoomFactor = slideWrapperStyles.get('zoom') || 1.0;
+          if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
+            //FF has problem in getting the right width for slideWrapper if slideWrapper
+            // is in position: relative
+            slideWrapper.setStyle({
+              'position' : 'absolute',
+              'zoom' : '1',
+              'transform' : 'scale(1)'
+             });
+            slideRoot.setStyle({
+              'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
+              'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
+            });
+            slideWrapper.setStyle({
+              'position' : 'relative',
+              'zoom' : zoomFactor,
+              'transform' : 'scale(' + zoomFactor + ')',
+              'transformOrigin' : '0 0 0',
+              'height' : slideWrapper.getHeight(),
+              'width' : slideWrapper.getWidth()
+             });
+          }
+          _me._centerCurrentSlide(_me._containerHtmlElem);
         }
       }
 
@@ -755,6 +850,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       _galleryFN : undefined,
       _galleryObj : undefined,
       _layoutName : undefined,
+      _centerSplashImage : undefined,
 
       _init : function(htmlElem, configDef) {
         var _me = this;
@@ -782,6 +878,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         _me._overlayHeight = _me._getPart(5, _me._overlayHeightDefault);
         _me._containerAnimWidth = _me._getPart(8, htmlElem.getWidth());
         _me._containerAnimHeight = _me._getPart(9, htmlElem.getHeight());
+        _me._centerSplashImage = true;
       },
 
       _getPart : function(num, defaultvalue) {
@@ -802,6 +899,16 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       isAutoResize : function() {
         var _me = this;
         return _me._autoresize;
+      },
+
+      isCenterSplashImage : function() {
+        var _me = this;
+        return _me._centerSplashImage;
+      },
+
+      setCenterSplashImage : function(isCenter) {
+        var _me = this;
+        _me._centerSplashImage = (isCenter == true);
       },
 
       getStartMode : function() {
