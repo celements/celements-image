@@ -390,6 +390,13 @@
   };
   
   var pickMotive = function(event) {
+    event.stop();
+    var loader = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif', 
+        'class': 'importLoader'});
+    $$('.motiveSubmit').each(function(ele) {
+      ele.hide();
+      ele.insert({ after : loader });
+    });
     var url = null;
     $$('.galleries').each(function(ele) {
       if(ele.checked || (ele.type == 'hidden')) {
@@ -430,6 +437,11 @@
                 && (typeof console.error != 'undefined')) {
               console.error('noJSON!!! ', transport.responseText);
             }
+
+            $$('.motiveSubmit').each(function(ele) {
+              ele.next('.importLoader').remove();
+              ele.show();
+            });
           }
         });
       } else {
@@ -438,7 +450,6 @@
     } else {
       alert('Galerie auswaehlen.');
     }
-    event.stop();
   };
   
   var resetSelection = function(event) {
