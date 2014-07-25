@@ -28,8 +28,7 @@ public class GalleryPresentationType implements IPresentationTypeRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       GalleryPresentationType.class);
 
-  private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS =
-    "cel_cm_presentation_treenode";
+  private static final String _CEL_CM_GALLERY_DEFAULT_CSSCLASS = "cel_cm_gallery_view";
 
   RenderCommand renderCmd;
 
@@ -92,7 +91,7 @@ public class GalleryPresentationType implements IPresentationTypeRole {
   }
 
   public String getDefaultCssClass() {
-    return _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
+    return _CEL_CM_GALLERY_DEFAULT_CSSCLASS;
   }
 
   public String getEmptyDictionaryKey() {
