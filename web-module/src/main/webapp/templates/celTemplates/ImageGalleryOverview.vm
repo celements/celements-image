@@ -56,7 +56,9 @@
   <img id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" src="${firstImageLink}?celwidth=$!{thumbWidth}&celheight=$!{thumbHeight}&lowBound=1" alt="" />
 #elseif("$firstSlideContent" != '')
-  #set($zoomFactor = $mathtool.div($!{thumbHeight}, $photoHeight))
+  #set($zoomFactorH = $mathtool.div($!{thumbHeight}, $!{photoHeight}))
+  #set($zoomFactorW = $mathtool.div($!{thumbWidth}, $!{photoWidth}))
+  #set($zoomFactor = $mathtool.min($!{zoomFactorH}, $!{zoomFactorH}))
   <div id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;">
   #*
