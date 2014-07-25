@@ -391,10 +391,10 @@
   
   var pickMotive = function(event) {
     event.stop();
-    var loader = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif', 
-        'class': 'importLoader'});
     $$('.motiveSubmit').each(function(ele) {
       ele.hide();
+      var loader = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif', 
+          'class': 'importLoader'});
       ele.insert({ after : loader });
     });
     var url = null;
