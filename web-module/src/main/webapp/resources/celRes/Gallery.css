@@ -135,13 +135,19 @@ overflow: hidden;
   left: 50%;
   border-right: 1px solid white;
 }
-.celimage_slideshow_wrapper  .celPresSlideShow_currentSlideNum  {
+.celimage_slideshow_wrapper .celPresSlideShow_currentSlideNum {
   top: -20px;
   height: 19px;
   font-size: 14px;
   line-height: 18px;
   border-right: 1px solid #3D3D3D;
 }
+#sitecontainer .celimage_slideshow_wrapper.celimage_addCounterNormal,
+#sitecontainer .celimage_slideshow_wrapper.celimage_addCounterZeros {
+	/* in sitecontainer */
+	margin-top: 30px !important;
+}
+
 #yuiOverlayContainer .slideshowButton,
 .celimage_slideshow_wrapper .slideshowButton { 
   background-image: url(celanim/buttons500.png);
