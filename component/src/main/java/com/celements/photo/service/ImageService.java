@@ -271,6 +271,7 @@ public class ImageService implements IImageService {
             getContext());
         newSlideDoc.setDefaultLanguage(webUtilsService.getDefaultLanguage(
             gallerySpaceName));
+        //TODO refactor and use com.celements.web.plugin.cmd.CreateDocumentCommand instead
         Date creationDate = new Date();
         newSlideDoc.setLanguage("");
         newSlideDoc.setCreationDate(creationDate);
