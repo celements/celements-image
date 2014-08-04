@@ -6,7 +6,7 @@
 #if($metaTagMap.containsKey('Headline'))
   #set($imgAltTag = "$!metaTagMap.get('Headline')")
 #end
-<img src="$escapetool.html($imageURL)" alt="$imgAltTag"/>
+<p><img src="$escapetool.html($imageURL)" alt="$imgAltTag"/></p>
 #if("$!request.slideContent" == '{metatagtest:slidetest}')
   #if($metaTagMap.containsKey('Headline'))
     <h1 class="imageHeadline">$!metaTagMap.get('Headline')</h1>
@@ -34,5 +34,7 @@
     #set($slideContent = $slideContent.replaceAll("\{metatag:${key}\}", "$!metaTagMap.get($key)"))
   #end
   #set($slideContent = $slideContent.replaceAll("\{metatag:.*?\}", '')) ## empty non existent tags
-  $slideContent
+  #if("$!slideContent" != '')
+    <p>$slideContent</p>
+  #end
 #end
