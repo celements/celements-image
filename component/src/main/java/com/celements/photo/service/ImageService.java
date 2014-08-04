@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -124,7 +125,12 @@ public class ImageService implements IImageService {
   public int getPhotoAlbumMaxHeight(DocumentReference galleryDocRef
       ) throws NoGalleryDocumentException {
     try {
-      return getPhotoAlbumObject(galleryDocRef).getIntValue("height2");
+      int maxImageHeight = getPhotoAlbumObject(galleryDocRef).getIntValue("height2");
+      //TODO allow template to reduce height
+      if (!StringUtils.isEmpty(getContext().getRequest().getParameter("slideContent"))) {
+        maxImageHeight = Math.max(maxImageHeight - 20, 0);
+      }
+      return maxImageHeight;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to getPhotoAlbumSpaceRef.", exp);
     }

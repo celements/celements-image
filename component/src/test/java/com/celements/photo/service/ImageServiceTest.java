@@ -24,6 +24,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class ImageServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -210,7 +211,6 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testAddSlideFromTemplate() throws Exception {
     String editorUser = "XWiki.myEditor";
@@ -255,7 +255,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     String imgAttURL = "/download/ContentAttachment/FileBaseDoc/myImg.png";
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
         ).andReturn(imgAttURL).once();
-    imageService.webUtilsService = createMock(IWebUtilsService.class);
+    imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(), 
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
@@ -284,16 +284,192 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         ).andReturn("").once();
     expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
-    replayDefault(webUtils);
+    XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
+    expect(mockRequest.getParameter(eq("slideContent"))).andReturn("");
+    context.setRequest(mockRequest);
+    replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
     String expectedImgURL = imgAttURL + "?celwidth=" + maxWidth + "&celheight=" 
         + maxHeight;
     verifyDefault();
-    verify(webUtils);
     assertEquals(expectedImgURL, vcontext.get("imageURL"));
     assertEquals(attFullName, vcontext.get("attFullName"));
-    assertEquals(0, ((Map<String, String>)vcontext.get("metaTagMap")).size());
+    assertEquals(0, ((Map<?, ?>)vcontext.get("metaTagMap")).size());
+  }
+
+  @Test
+  public void testAddSlideFromTemplate_slideContentNull() throws Exception {
+    String editorUser = "XWiki.myEditor";
+    context.setUser(editorUser);
+    AttachmentURLCommand attURLCmdMock = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
+    imageService.attURLCmd = attURLCmdMock;
+    DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "galleryDoc");
+    XWikiDocument galleryDoc = new XWikiDocument(galleryDocRef);
+    BaseObject photoAlbumNavObj = new BaseObject();
+    photoAlbumNavObj.setXClassReference(new NavigationClasses(
+        ).getNavigationConfigClassRef(context.getDatabase()));
+    String gallerySpaceName = "gallerySpace";
+    photoAlbumNavObj.setStringValue("menu_space", gallerySpaceName);
+    galleryDoc.addXObject(photoAlbumNavObj);
+    BaseObject photoAlbumObj = new BaseObject();
+    photoAlbumObj.setXClassReference(new OldCoreClasses().getPhotoAlbumClassRef(
+        context.getDatabase()));
+    int maxWidth = 800;
+    int maxHeight = 800;
+    photoAlbumObj.setIntValue("height2", maxHeight);
+    photoAlbumObj.setIntValue("photoWidth", maxWidth);
+    galleryDoc.addXObject(photoAlbumObj);
+    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc
+        ).atLeastOnce();
+    DocumentReference slideDocRef = new DocumentReference(context.getDatabase(),
+        gallerySpaceName, "Slide1");
+    XWikiDocument slideDocMock = createMockAndAddToDefault(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(
+        slideDocMock).once();
+    expect(xwiki.exists(eq(slideDocRef), same(context))).andReturn(false).once();
+    expect(slideDocMock.getLock(same(context))).andReturn(null).once();
+    XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
+    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "ImageGalleryTemplates", "NewImageGallerySlide");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
+    expect(xwiki.copyDocument(eq(localTemplateRef), eq(slideDocRef), eq(true),
+        same(context))).andReturn(true).once();
+    String attFullName = "ContentAttachment.FileBaseDoc;myImg.png";
+    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/myImg.png";
+    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
+        ).andReturn(imgAttURL).once();
+    imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
+    DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(), 
+        "ContentAttachment", "FileBaseDoc");
+    IWebUtilsService webUtils = imageService.webUtilsService;
+    expect(webUtils.resolveDocumentReference(
+        eq("ContentAttachment.FileBaseDoc"))).andReturn(attDocRef).once();
+    XWikiDocument attDoc = new XWikiDocument(new DocumentReference("a", "b", "c"));
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
+    expect(webUtils.resolveDocumentReference(
+        eq("Classes.PhotoMetainfoClass"))).andReturn(attDocRef).once();
+    xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true),
+        same(context));
+    expectLastCall().once();
+    expect(webUtils.getWikiRef((DocumentReference)anyObject())
+        ).andReturn(attDocRef.getWikiReference()).anyTimes();
+    expect(webUtils.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(webUtils.getDefaultLanguage((String)anyObject())).andReturn("de").anyTimes();
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""),
+        same(context))).andReturn("de").anyTimes();
+    VelocityContext vcontext = new VelocityContext();
+    context.put("vcontext", vcontext);
+    DocumentReference imgImportContentRef = new DocumentReference(context.getDatabase(),
+        "Templates", "ImageSlideImportContent");
+    expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), 
+        eq(context.getLanguage()), eq("de"))).andReturn("content").once();
+    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(getContext()))
+        ).andReturn("").once();
+    expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
+    expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
+    XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
+    expect(mockRequest.getParameter(eq("slideContent"))).andReturn(null);
+    context.setRequest(mockRequest);
+    replayDefault();
+    assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
+        galleryDocRef, "Slide", attFullName));
+    String expectedImgURL = imgAttURL + "?celwidth=" + maxWidth + "&celheight=" 
+        + maxHeight;
+    verifyDefault();
+    assertEquals(expectedImgURL, vcontext.get("imageURL"));
+    assertEquals(attFullName, vcontext.get("attFullName"));
+    assertEquals(0, ((Map<?, ?>)vcontext.get("metaTagMap")).size());
+  }
+
+  @Test
+  public void testAddSlideFromTemplate_with_caption() throws Exception {
+    String editorUser = "XWiki.myEditor";
+    context.setUser(editorUser);
+    AttachmentURLCommand attURLCmdMock = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
+    imageService.attURLCmd = attURLCmdMock;
+    DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "galleryDoc");
+    XWikiDocument galleryDoc = new XWikiDocument(galleryDocRef);
+    BaseObject photoAlbumNavObj = new BaseObject();
+    photoAlbumNavObj.setXClassReference(new NavigationClasses(
+        ).getNavigationConfigClassRef(context.getDatabase()));
+    String gallerySpaceName = "gallerySpace";
+    photoAlbumNavObj.setStringValue("menu_space", gallerySpaceName);
+    galleryDoc.addXObject(photoAlbumNavObj);
+    BaseObject photoAlbumObj = new BaseObject();
+    photoAlbumObj.setXClassReference(new OldCoreClasses().getPhotoAlbumClassRef(
+        context.getDatabase()));
+    int maxWidth = 800;
+    int maxHeight = 800;
+    photoAlbumObj.setIntValue("height2", maxHeight);
+    photoAlbumObj.setIntValue("photoWidth", maxWidth);
+    galleryDoc.addXObject(photoAlbumObj);
+    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc
+        ).atLeastOnce();
+    DocumentReference slideDocRef = new DocumentReference(context.getDatabase(),
+        gallerySpaceName, "Slide1");
+    XWikiDocument slideDocMock = createMockAndAddToDefault(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(
+        slideDocMock).once();
+    expect(xwiki.exists(eq(slideDocRef), same(context))).andReturn(false).once();
+    expect(slideDocMock.getLock(same(context))).andReturn(null).once();
+    XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
+    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "ImageGalleryTemplates", "NewImageGallerySlide");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
+    expect(xwiki.copyDocument(eq(localTemplateRef), eq(slideDocRef), eq(true),
+        same(context))).andReturn(true).once();
+    String attFullName = "ContentAttachment.FileBaseDoc;myImg.png";
+    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/myImg.png";
+    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
+        ).andReturn(imgAttURL).once();
+    imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
+    DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(), 
+        "ContentAttachment", "FileBaseDoc");
+    IWebUtilsService webUtils = imageService.webUtilsService;
+    expect(webUtils.resolveDocumentReference(
+        eq("ContentAttachment.FileBaseDoc"))).andReturn(attDocRef).once();
+    XWikiDocument attDoc = new XWikiDocument(new DocumentReference("a", "b", "c"));
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
+    expect(webUtils.resolveDocumentReference(
+        eq("Classes.PhotoMetainfoClass"))).andReturn(attDocRef).once();
+    xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true),
+        same(context));
+    expectLastCall().once();
+    expect(webUtils.getWikiRef((DocumentReference)anyObject())
+        ).andReturn(attDocRef.getWikiReference()).anyTimes();
+    expect(webUtils.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(webUtils.getDefaultLanguage((String)anyObject())).andReturn("de").anyTimes();
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""),
+        same(context))).andReturn("de").anyTimes();
+    VelocityContext vcontext = new VelocityContext();
+    context.put("vcontext", vcontext);
+    DocumentReference imgImportContentRef = new DocumentReference(context.getDatabase(),
+        "Templates", "ImageSlideImportContent");
+    expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), 
+        eq(context.getLanguage()), eq("de"))).andReturn("content").once();
+    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(getContext()))
+        ).andReturn("").once();
+    expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
+    expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
+    XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
+    expect(mockRequest.getParameter(eq("slideContent"))).andReturn("test content line");
+    context.setRequest(mockRequest);
+    replayDefault();
+    assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
+        galleryDocRef, "Slide", attFullName));
+    String expectedImgURL = imgAttURL + "?celwidth=" + maxWidth + "&celheight=" 
+        + (maxHeight - 20);
+    verifyDefault();
+    assertEquals(expectedImgURL, vcontext.get("imageURL"));
+    assertEquals(attFullName, vcontext.get("attFullName"));
+    assertEquals(0, ((Map<?, ?>)vcontext.get("metaTagMap")).size());
   }
 
   @Test
