@@ -3,7 +3,6 @@ package com.celements.photo.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
