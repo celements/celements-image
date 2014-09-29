@@ -1,5 +1,6 @@
 ## #set($title = "$!slidedoc.getTitle()")
 #set($slideFN = $services.model.serialize($slidedoc.documentReference, 'local'))
+#set($galleryFN = $services.model.serialize($doc.documentReference, 'local'))
 #set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
 #if("$!albumobj.getProperty('hasOverview').getValue()" != "0")
   #set($slideLink = "$!xwiki.getURL($slideFN, 'view')")
@@ -53,7 +54,9 @@
   #set($slideThumbWidth = $mathtool.mul($photoWidth, $zoomFactor))
   #set($slideTop = $mathtool.div($mathtool.sub($thumbHeight, $slideThumbHeight), 2))
   #set($slideLeft = $mathtool.div($mathtool.sub($thumbWidth, $slideThumbWidth), 2))
-  <div id="ImgGallerySlide$!{imgGalSlidecount}:${slideFN}:1::$!{photoWidth}:$!{photoHeight}:$!{slidenum}:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
+  ##IMPORTANT first id part MUST be the galleryFN otherwise the Gallery Layout will not
+  ##IMPOETNAT be loaded correctly in overlay 
+  <div id="ImgGallerySlide$!{imgGalSlidecount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:$!{slidenum}:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;">
   #*
       zoom: 2; /* all browsers */
