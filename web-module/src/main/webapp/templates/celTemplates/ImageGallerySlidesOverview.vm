@@ -1,7 +1,12 @@
 ## #set($title = "$!slidedoc.getTitle()")
 #set($slideFN = $services.model.serialize($slidedoc.documentReference, 'local'))
-#set($galleryFN = $services.model.serialize($doc.documentReference, 'local'))
-#set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
+#if("$!contentDoc" != '') ## gets set in ImageGalleryView.vm
+#set($theGalleryDoc = $contentDoc)
+#else
+#set($theGalleryDoc = $doc)
+#end
+#set($galleryFN = $services.model.serialize($theGalleryDoc.documentReference, 'local'))
+#set($albumobj = $!theGalleryDoc.getObject("XWiki.PhotoAlbumClass"))
 #if("$!albumobj.getProperty('hasOverview').getValue()" != "0")
   #set($slideLink = "$!xwiki.getURL($slideFN, 'view')")
 #else
@@ -9,7 +14,7 @@
 #end
 <span class="celements_gallery_link" href="$slideLink">
 #set($gallerySpace = '')
-#set($navObj = $!doc.getObject("Celements2.NavigationConfigClass"))
+#set($navObj = $!theGalleryDoc.getObject("Celements2.NavigationConfigClass"))
 #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
 #set($galleryLayout = $albumobj.getProperty('galleryLayout').getValue())
 #set($galleryLayoutRef = $services.model.createDocumentReference('', "$!{galleryLayout}", '').getLastSpaceReference())
@@ -29,7 +34,7 @@
 #if("$!imgGalSlidecount" == '')
   #set($imgGalSlidecount = 0)
 #end
-##<!-- $doc ; $albumobj ; $albumobj.getProperty('photoWidth').getValue() ; $albumobj.getProperty('height2').getValue() -->
+##<!-- $theGalleryDoc ; $albumobj ; $albumobj.getProperty('photoWidth').getValue() ; $albumobj.getProperty('height2').getValue() -->
 #set($imgGalSlidecount = $imgGalSlidecount + 1)
 #set($photoWidth = "$!albumobj.getProperty('photoWidth').getValue()")
 #if("$!photoWidth" == '')
