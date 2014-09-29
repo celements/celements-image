@@ -3,11 +3,15 @@ package com.celements.photo.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -15,6 +19,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
@@ -24,6 +29,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class ImageServiceTest extends AbstractBridgedComponentTestCase {
@@ -33,6 +39,10 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
   private XWiki xwiki;
   private XWikiRightService rightServiceMock;
   private ITreeNodeService treeNodeServiceMock;
+  private INextFreeDocRole defaultNextFreeDocService;
+  private ComponentManager componentManager;
+  private INextFreeDocRole nextFreeDocMock;
+  private ComponentDescriptor<INextFreeDocRole> nextFreeDocDesc;
 
   @Before
   public void setUp_ImageServiceTest() throws Exception {
@@ -43,6 +53,19 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     imageService = (ImageService) getComponentManager().lookup(IImageService.class);
     treeNodeServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
     imageService.treeNodeService = treeNodeServiceMock;
+    componentManager = Utils.getComponentManager();
+    defaultNextFreeDocService = componentManager.lookup(INextFreeDocRole.class);
+    componentManager.release(defaultNextFreeDocService);
+    nextFreeDocDesc = componentManager.getComponentDescriptor(INextFreeDocRole.class,
+        "default");
+    nextFreeDocMock = createMockAndAddToDefault(INextFreeDocRole.class);
+    componentManager.registerComponent(nextFreeDocDesc, nextFreeDocMock);
+  }
+
+  @After
+  public void teardown_ImageServiceTest() throws Exception {
+    componentManager.release(nextFreeDocMock);
+    componentManager.registerComponent(nextFreeDocDesc, defaultNextFreeDocService);
   }
 
   @Test
@@ -168,13 +191,12 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         ).once();
     DocumentReference testSlideDocRef = new DocumentReference(context.getDatabase(),
         gallerySpaceName, "Testname1");
-    XWikiDocument testSlideDocMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(testSlideDocRef), same(context))).andReturn(
-        testSlideDocMock).once();
-    expect(xwiki.exists(eq(testSlideDocRef), same(context))).andReturn(false).once();
-    expect(testSlideDocMock.getLock(same(context))).andReturn(null).once();
     expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(editorUser),
         eq("xwikidb:gallerySpace.Testname1"), same(context))).andReturn(true).once();
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Testname")).andReturn(
+        testSlideDocRef);
     replayDefault();
     assertTrue("Expecting addSlide rights if 'edit' rights on space available",
         imageService.checkAddSlideRights(galleryDocRef));
@@ -198,13 +220,12 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         ).once();
     DocumentReference testSlideDocRef = new DocumentReference(context.getDatabase(),
         gallerySpaceName, "Testname1");
-    XWikiDocument testSlideDocMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(testSlideDocRef), same(context))).andReturn(
-        testSlideDocMock).once();
-    expect(xwiki.exists(eq(testSlideDocRef), same(context))).andReturn(false).once();
-    expect(testSlideDocMock.getLock(same(context))).andReturn(null).once();
     expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(editorUser),
         eq("xwikidb:gallerySpace.Testname1"), same(context))).andReturn(false).once();
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Testname")).andReturn(
+        testSlideDocRef);
     replayDefault();
     assertFalse("Expecting no addSlide rights if no 'edit' rights on space available",
         imageService.checkAddSlideRights(galleryDocRef));
@@ -239,11 +260,6 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         ).atLeastOnce();
     DocumentReference slideDocRef = new DocumentReference(context.getDatabase(),
         gallerySpaceName, "Slide1");
-    XWikiDocument slideDocMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(
-        slideDocMock).once();
-    expect(xwiki.exists(eq(slideDocRef), same(context))).andReturn(false).once();
-    expect(slideDocMock.getLock(same(context))).andReturn(null).once();
     XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
     expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
@@ -287,6 +303,10 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("");
     context.setRequest(mockRequest);
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Slide")).andReturn(
+        slideDocRef);
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
@@ -326,11 +346,6 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         ).atLeastOnce();
     DocumentReference slideDocRef = new DocumentReference(context.getDatabase(),
         gallerySpaceName, "Slide1");
-    XWikiDocument slideDocMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(
-        slideDocMock).once();
-    expect(xwiki.exists(eq(slideDocRef), same(context))).andReturn(false).once();
-    expect(slideDocMock.getLock(same(context))).andReturn(null).once();
     XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
     expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
@@ -374,6 +389,10 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn(null);
     context.setRequest(mockRequest);
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Slide")).andReturn(
+        slideDocRef);
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
@@ -413,11 +432,6 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         ).atLeastOnce();
     DocumentReference slideDocRef = new DocumentReference(context.getDatabase(),
         gallerySpaceName, "Slide1");
-    XWikiDocument slideDocMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(
-        slideDocMock).once();
-    expect(xwiki.exists(eq(slideDocRef), same(context))).andReturn(false).once();
-    expect(slideDocMock.getLock(same(context))).andReturn(null).once();
     XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
     expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
@@ -461,6 +475,10 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("test content line");
     context.setRequest(mockRequest);
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Slide")).andReturn(
+        slideDocRef);
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
