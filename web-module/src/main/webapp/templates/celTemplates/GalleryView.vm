@@ -100,7 +100,7 @@ var lyteboxTheme = '$lyteboxTheme';
  data-lyte-options="$!{dataLyteOptions}"##
  title="$thumbDescription" style="width:$thumbWidthStr; height:$thumbHeightStr;">
 #if(!$withoutThumbnails)
-<img src="$galleryDoc.getAttachmentURL($attach.filename,"download")?celwidth=$thumbWidth&celheight=$thumbHeight" alt="" />
+<img src="$galleryDoc.getAttachmentURL($attach.filename,"download")?celwidth=$!{thumbWidth}&celheight=$!{thumbHeight}&background=00000000" alt="" />
 #end
 </a>
   #if("$!withoutDescription" != '1')
