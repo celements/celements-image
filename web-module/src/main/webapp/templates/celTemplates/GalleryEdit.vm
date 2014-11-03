@@ -123,7 +123,8 @@ $celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('validation.js', 's
 #set($cel_editobj_classname = "XWiki.PhotoAlbumClass")
 #set($cel_editobj_nb = $albumobj.getNumber())
 #set($cel_editobj_properties = "theme")
- $xwiki.includeForm('celements2web:Templates.ObjectEdit',false)</td>
+  $xwiki.parseTemplate("celTemplates/ObjectEdit.vm")
+</td>
 </tr>
 
 
