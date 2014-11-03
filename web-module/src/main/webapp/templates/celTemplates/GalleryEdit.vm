@@ -102,7 +102,7 @@ $celementsweb.addExtJSfileOnce(':celJS/validation.js')
 $celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('prototype.js', 'skin'))
 $celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('validation.js', 'skin'))
 #end*#
-<form id="edit" name="edit" method="post" action="?">
+<form id="galleryEdit" name="galleryEdit" method="post" action="?">
  <input type="hidden" class="celEditorRedirect" name="xredirect" value="$xredirect" />
 <input type="hidden" name="submitted" value="1" />
 #set($albumobj = $!doc.getObject("XWiki.PhotoAlbumClass"))
