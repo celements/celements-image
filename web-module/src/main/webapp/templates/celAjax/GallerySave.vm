@@ -1,0 +1,47 @@
+##TODO replace with saveDocumentWithValidation ajax
+#if("$!request.get('xredirect')" != '')
+#set($xredirect = "$!request.xredirect")
+#else
+#set($xredirect = "$doc.getURL('view')")
+#end
+#if("$!xredirect" == '')
+  #set($xredirect = '/')
+#end
+#set($filled = $request.get("submitted") == "1")
+#if($filled)
+ ## set album title
+ $doc.setTitle($!request.get("title"))
+ #set($pagetype_obj = $doc.getObject("Celements2.PageType"))
+ #if(!$pagetype_obj)
+  #set($pagetype_obj = $doc.newObject("Celements2.PageType"))
+  $pagetype_obj.set("page_type", "Gallery")
+ #end
+ ## create album object
+ #set($album_obj = $doc.getObject("XWiki.PhotoAlbumClass"))
+ #if(!$album_obj)
+  #set($album_obj = $doc.newObject("XWiki.PhotoAlbumClass"))
+ #end
+ #if("$!album_obj.getProperty('id').getValue()" == '')
+   #set($allGalleries = $services.query.getXWQL("from doc.object('XWiki.PhotoAlbumClass') as album order by album.id desc").execute())
+   #set($nextId = 0)
+   #if($allGalleries.size() > 0))
+     #set($lastGalDoc = $xwiki.getDocument($allGalleries.get(0)))
+     #set($lastGalObj = $lastGalDoc.getObject('XWiki.PhotoAlbumClass'))
+     #if("$!lastGalObj.get('id')" != '')
+       #set($nextId = $xwiki.parseInt($lastGalObj.get('id')) + 1)
+     #end
+   #end
+   $album_obj.set('id', $nextId)
+ #end
+ $album_obj.set("thumbWidth", $!request.get("thumbWidth"))
+ $album_obj.set("height", $!request.get("height"))
+ $album_obj.set("height2", $!request.get("height2"))
+ $album_obj.set("photoWidth", $!request.get("photoWidth"))
+ $album_obj.set("description", $!request.get("description"))
+ $album_obj.set('hasOverview',$!request.get('XWiki.PhotoAlbumClass_0_hasOverview'))
+ $album_obj.set('thumbDescription',$!request.get('thumbDescription'))
+ $album_obj.set('theme',$!request.get('XWiki.PhotoAlbumClass_0_theme'))
+ $doc.save()
+ ## redirect to edit album
+ $context.getResponse().sendRedirect($xredirect)
+#end
