@@ -59,12 +59,6 @@
 <div class="celements2_box_subtitle">$adminMsg.get('gallery_gallery_properties')</div>
 $celementsweb.addExtJSfileOnce(':celJS/prototype.js')
 $celementsweb.addExtJSfileOnce(':celJS/validation.js')
-## ATTENTION - Includes for old wikis - 
-#*#set($celSkin_doc = $xwiki.getDocument("celements2web:XWiki.Celements2Skin"))
-#if("$!celSkin_doc" != '')
-$celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('prototype.js', 'skin'))
-$celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('validation.js', 'skin'))
-#end*#
 <form id="galleryEdit" name="galleryEdit" method="post" action="?">
  <input type="hidden" name="xpage" value="celements_ajax" />
  <input type="hidden" name="ajax_mode" value="GallerySave" />
