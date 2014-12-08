@@ -34,7 +34,7 @@ $response.setStatus(200)
 #set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
 $jsonBuilder.openArray()
 #foreach ($attach in $attachments)
-#if(("$!tagList" == '') || $tagList.contains("${attach.getDocument().getFullName()}/$attach.getFilename()")
+#if(("$!tagList" == '') || $tagList.contains("${attach.getDocument().getFullName()}/$attach.getFilename()"))
 $services.celementsphoto.addImage($jsonBuilder, $attach)
 #end
 #end ## foreach
