@@ -19,6 +19,7 @@ a.celements_gallery_link_slideshow {
   padding: 5px 0px 10px 0px;
   height: auto;
   display: block;
+  overflow: hidden;
 }
 .celements_show_pic {
   margin: -12px -60px -6px -25px;
