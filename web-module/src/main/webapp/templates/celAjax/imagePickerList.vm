@@ -22,10 +22,21 @@ $response.setStatus(200)
 #else
 #set($attachments = $xwiki.celementsweb.getAttachmentListSorted($doc, $comparator, true, $start, $nb))
 #end
+#set($tagList = '')
+#if("$!request.tagList" != '')
+#set($tagDoc = $xwiki.getDocument("$!request.tagList"))
+#set($tagObjs = $tagDoc.getObjects('Classes.FilebaseTag'))
+#set($tagList = [])
+#foreach($tagObj in $tagObjs)
+#set($devNull = $tagList.add("$tagObj.getProperty('attachment').getValue()"))
+#end
+#end
 #set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
 $jsonBuilder.openArray()
 #foreach ($attach in $attachments)
+#if(("$!tagList" == '') || $tagList.contains("${attach.getDocument().getFullName()}/$attach.getFilename()")
 $services.celementsphoto.addImage($jsonBuilder, $attach)
+#end
 #end ## foreach
 $jsonBuilder.closeArray()
 $jsonBuilder.getJSON()
