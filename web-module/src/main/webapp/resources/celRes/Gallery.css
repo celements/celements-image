@@ -14,7 +14,9 @@
   width: 100px;
 	height: 100px;
 **/
-overflow: hidden;
+  height: auto;
+  width: auto;
+  overflow: hidden;
 	margin: 0px 5px 5px 0px;
 }
 
