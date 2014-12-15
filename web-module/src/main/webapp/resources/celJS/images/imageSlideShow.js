@@ -950,7 +950,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         var _me = this;
         if ((_me._containerAnimWidth == '') || isNaN(parseInt(_me._containerAnimWidth))
             || (parseInt(_me._containerAnimWidth) <= 0)) {
-          _me._containerAnimWidth = _me._getPart(8, htmlElem.getWidth());
+          _me._containerAnimWidth = _me._getPart(8, $(_me._htmlElemId).getWidth());
         }
         return parseInt(_me._containerAnimWidth);
       },
@@ -959,7 +959,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         var _me = this;
         if ((_me._containerAnimHeight == '') || isNaN(parseInt(_me._containerAnimHeight))
             || (parseInt(_me._containerAnimHeight) <= 0)) {
-          _me._containerAnimHeight = _me._getPart(9, htmlElem.getHeight());
+          _me._containerAnimHeight = _me._getPart(9, $(_me._htmlElemId).getHeight());
         }
         return parseInt(_me._containerAnimHeight);
       },
