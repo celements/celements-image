@@ -12,6 +12,22 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
   var CISS_SlideShowObjHash = new Hash();
   var CISS_SlideShowOverlayObjHash = new Hash();
 
+  window.celOnBeforeInitializeSlideShowListenerArray = [];
+
+  window.celAddOnBeforeInitializeSlideShowListener = function(listenerFunc) {
+    window.celOnBeforeInitializeSlideShowListenerArray.push(listenerFunc);
+  };
+
+  window.celBeforeInitializeSlideShowHandler = function() {
+    $A(window.celOnBeforeInitializeSlideShowListenerArray).each(function(listener) {
+      try {
+        listener();
+      } catch (exp) {
+        console.error('Failed to execute celOnBeforeInitializeSlideShow listener. ', exp);
+      }
+    });
+  };
+
   window.CELEMENTS.image.getSlideShowObj = function(slideShowElemId) {
     return CISS_SlideShowObjHash.get(slideShowElemId);
   };
@@ -28,6 +44,7 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
   };
 
   window.celAddOnBeforeLoadListener(function() {
+    window.celBeforeInitializeSlideShowHandler();
     window.CELEMENTS.image.getBodySlideShowStarter().initializeSlideShow();
   });
 
@@ -70,6 +87,8 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
       
       initializeSlideShow : function() {
         var _me = this;
+        $(document.body).fire('celimage_slideshowstarter:beforeInitializeSlideShow',
+            _me._parentElem);
         _me.initializeImageSlideShow();
         _me.initializeOverlayImageSlideShow();
         $(document.body).fire('celimage_slideshowstarter:replaceElem', _me._parentElem);
