@@ -1,5 +1,5 @@
 $response.setStatus(200)
-#set($xwql = "from doc.object(Classes.FilebaseTag) as tag")
+#set($xwql = "from doc.object(Classes.FilebaseTag) as tag group by doc.fullName")
 #set($tagDocs = $services.query.xwql($xwql).execute())
 #set($sortedTagDocs = $util.getTreeMap())
 #set($nav = $celementsweb.createNavigation())
