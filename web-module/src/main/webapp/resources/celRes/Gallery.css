@@ -7,7 +7,8 @@
 }
 
 .presentationList ul .cel_cm_gallery,
-.presentationList ul .cel_cm_gallery_view {
+.presentationList ul .cel_cm_gallery_view,
+.presentationList ul > li div.cel_cm_gallery_list {
 	position: relative;
 	float: left;
 /**
@@ -21,7 +22,8 @@
 }
 
 .presentationList ul .cel_cm_gallery .text,
-.presentationList ul .cel_cm_gallery_view .text {
+.presentationList ul .cel_cm_gallery_view .text,
+.presentationList ul .cel_cm_gallery_list .text {
 	position: absolute;
 	display: block;
 	top: 40px;
@@ -33,7 +35,8 @@
 }
 
 .presentationList ul .cel_cm_gallery .background,
-.presentationList ul .cel_cm_gallery_view .background {
+.presentationList ul .cel_cm_gallery_view .background,
+.presentationList ul .cel_cm_gallery_list .background {
 	display: block;
 	position: absolute;
 	top: 0px;
@@ -47,7 +50,9 @@
 .presentationList ul .cel_cm_gallery:hover .text,
 .presentationList ul .cel_cm_gallery:hover .background,
 .presentationList ul .cel_cm_gallery_view:hover .text,
-.presentationList ul .cel_cm_gallery_view:hover .background {
+.presentationList ul .cel_cm_gallery_view:hover .background,
+.presentationList ul .cel_cm_gallery_list:hover .text,
+.presentationList ul .cel_cm_gallery_list:hover .background {
 	display: none;
 }
 
@@ -58,18 +63,22 @@
 }
 
 .presentationList ul .cel_cm_gallery .slideshowButton,
-.presentationList ul .cel_cm_gallery_view .slideshowButton {
+.presentationList ul .cel_cm_gallery_view .slideshowButton,
+.presentationList ul .cel_cm_gallery_list .slideshowButton {
 	visibility: hidden;
 }
 .presentationList ul .cel_cm_gallery:hover .slideshowButton,
-.presentationList ul .cel_cm_gallery_view:hover .slideshowButton {
+.presentationList ul .cel_cm_gallery_view:hover .slideshowButton,
+.presentationList ul .cel_cm_gallery_list:hover .slideshowButton {
 	visibility: visible;
 }
 
 .presentationList ul .cel_cm_gallery .celanim_slideShow_navLeft,
 .presentationList ul .cel_cm_gallery .celanim_slideShow_navRight,
 .presentationList ul .cel_cm_gallery_view .celanim_slideShow_navLeft,
-.presentationList ul .cel_cm_gallery_view .celanim_slideShow_navRight {
+.presentationList ul .cel_cm_gallery_view .celanim_slideShow_navRight,
+.presentationList ul .cel_cm_gallery_list .celanim_slideShow_navLeft,
+.presentationList ul .cel_cm_gallery_list .celanim_slideShow_navRight {
 	display: none;
 }
 
