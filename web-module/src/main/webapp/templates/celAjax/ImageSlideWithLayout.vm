@@ -1,0 +1,58 @@
+#set($overwriteLayoutRef = '')
+#if("$!request.overwriteLayout" != '')
+#set($pageLayoutMainDocRef = $services.model.createDocumentReference('', "$!request.overwriteLayout", ''))
+#set($overwriteLayoutRef = $pageLayoutMainDocRef.getLastSpaceReference())
+#set($pageLayoutCentalMainDocRef = $services.model.createDocumentReference('celements2web', "$!request.overwriteLayout", ''))
+#set($overwriteLayoutCentralRef = $pageLayoutCentalMainDocRef.getLastSpaceReference())
+#end
+#if("$!request.galleryFN" != '')
+  #set($pageLayoutMainDocRef = $services.model.resolveDocument("$!request.galleryFN"))
+  #set($galleryDoc = $xwiki.getDocument($pageLayoutMainDocRef))
+  #set($navObj = $!galleryDoc.getObject("Celements2.NavigationConfigClass"))
+  #set($galleryLayout = $albumObj.getProperty('galleryLayout').getValue())
+  #set($galleryLayoutRef = $services.model.createDocumentReference('', "$!galleryLayout", ''))
+#end
+##only include if legacy celements2web.xar is installed
+#if($xwiki.exists($services.model.resolveDocument('celements2web:Macros.initCelements')))
+$xwiki.includeForm("celements2web:Macros.initCelements", false)
+#end
+#set($isAjaxCall = ("$!request.ajax" == '1'))
+#if(!$isAjaxCall)
+## start a Celements Document
+#parse("celMacros/startCelementsDocument.vm")
+##
+## start the celements body (and lacily finalise the header)
+#parse("celMacros/startCelementsBody.vm")
+##
+#end
+#if($services.celementsweb.isAppScriptRequest())
+#set($celAppScript = $services.celementsweb.getScriptNameFromURL())
+#set($overwriteRenderDocument = 'celInlineTemplates/app.vm')
+#end
+#set($isCellSkin = true)
+#set($doclang = $tdoc.getLanguage())
+#if("$!doclang" == '')
+  #set($doclang = $tdoc.getDefaultLanguage())
+#end
+<div class="lang_${language} doclang_$doclang">
+<!-- start celements cells -->
+#if(("$!overwriteLayoutRef" != '') && $celementsweb.layoutExists($overwriteLayoutRef))
+#set($pageContent = $celementsweb.renderPageLayout($overwriteLayoutRef))
+#elseif(("$!overwriteLayoutCentralRef" != '') && $celementsweb.layoutExists($overwriteLayoutCentralRef))
+#set($pageContent = $celementsweb.renderPageLayout($overwriteLayoutCentralRef))
+#elseif(("$!galleryLayoutRef" != '') && $celementsweb.layoutExists($galleryLayoutRef))
+#set($pageContent = $celementsweb.renderPageLayout($galleryLayoutRef))
+#else
+#set($pageContent = $celementsweb.renderPageLayout())
+#end
+#set($maxHeight = $util.parseInt("$!request.maxHeight"))
+#set($maxWidth = $util.parseInt("$!request.maxWidth"))
+#if(($maxHeight > 0) || ($maxWidth > 0))
+#set($pageContent = $services.celementsphoto.fixMaxImageSizes($pageContent, $maxWidth, $maxHeight))
+#end
+$!pageContent
+<!-- end celements cells -->
+</div><!-- main wrapper -->
+#if(!$isAjaxCall)
+#parse('celMacros/finaliseCelementsDocument.vm')
+#end
