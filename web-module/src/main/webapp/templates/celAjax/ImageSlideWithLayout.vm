@@ -2,8 +2,6 @@
 #if("$!request.overwriteLayout" != '')
 #set($pageLayoutMainDocRef = $services.model.createDocumentReference('', "$!request.overwriteLayout", ''))
 #set($overwriteLayoutRef = $pageLayoutMainDocRef.getLastSpaceReference())
-#set($pageLayoutCentalMainDocRef = $services.model.createDocumentReference('celements2web', "$!request.overwriteLayout", ''))
-#set($overwriteLayoutCentralRef = $pageLayoutCentalMainDocRef.getLastSpaceReference())
 #end
 #if("$!request.galleryFN" != '')
   #set($pageLayoutMainDocRef = $services.model.resolveDocument("$!request.galleryFN"))
@@ -36,11 +34,9 @@ $xwiki.includeForm("celements2web:Macros.initCelements", false)
 #end
 <div class="lang_${language} doclang_$doclang">
 <!-- start celements cells -->
-#if(("$!overwriteLayoutRef" != '') && $celementsweb.layoutExists($overwriteLayoutRef))
+#if(("$!overwriteLayoutRef" != '') && $celementsweb.canRenderLayout($overwriteLayoutRef))
 #set($pageContent = $celementsweb.renderPageLayout($overwriteLayoutRef))
-#elseif(("$!overwriteLayoutCentralRef" != '') && $celementsweb.layoutExists($overwriteLayoutCentralRef))
-#set($pageContent = $celementsweb.renderPageLayout($overwriteLayoutCentralRef))
-#elseif(("$!galleryLayoutRef" != '') && $celementsweb.layoutExists($galleryLayoutRef))
+#elseif(("$!galleryLayoutRef" != '') && $celementsweb.canRenderLayout($galleryLayoutRef))
 #set($pageContent = $celementsweb.renderPageLayout($galleryLayoutRef))
 #else
 #set($pageContent = $celementsweb.renderPageLayout())
