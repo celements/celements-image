@@ -6,9 +6,10 @@
 #if("$!request.galleryFN" != '')
   #set($pageLayoutMainDocRef = $services.model.resolveDocument("$!request.galleryFN"))
   #set($galleryDoc = $xwiki.getDocument($pageLayoutMainDocRef))
-  #set($navObj = $!galleryDoc.getObject("Celements2.NavigationConfigClass"))
+  #set($albumObj = $!galleryDoc.getObject("XWiki.PhotoAlbumClass"))
   #set($galleryLayout = $albumObj.getProperty('galleryLayout').getValue())
-  #set($galleryLayoutRef = $services.model.createDocumentReference('', "$!galleryLayout", ''))
+  #set($galleryLayoutWebHomeRef = $services.model.createDocumentReference('', "$!galleryLayout", ''))
+  #set($galleryLayoutRef = $galleryLayoutWebHomeRef.getLastSpaceReference())
 #end
 ##only include if legacy celements2web.xar is installed
 #if($xwiki.exists($services.model.resolveDocument('celements2web:Macros.initCelements')))

@@ -1089,11 +1089,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
 
       getLayoutName : function() {
         var _me = this;
-        var layoutName = _me._layoutName;
-        if (typeof(_me._layoutName) === 'undefined') {
-          layoutName = 'SimpleLayout';
-        }
-        return layoutName;
+        return _me._layoutName;
       }
 
   };
