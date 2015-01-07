@@ -28,9 +28,9 @@ $jsonBuilder.addBoolean($isNewImageGallery)
 #set($comparator = 'AttachmentDescendingChangeDateComparator')
 #end
 #if("$!request.spaceImgs" != '')
-#set($attachments = $xwiki.celementsweb.getAttachmentListSortedSpace("$!request.spaceImgs", $comparator, true, 0, 0))
+#set($attachments = $xwiki.celementsweb.getAttachmentListForTagSortedSpace("$!request.spaceImgs", "$!request.tagList", $comparator, true, 0, 0))
 #else
-#set($attachments = $xwiki.celementsweb.getAttachmentListSorted($doc, $comparator))
+#set($attachments = $xwiki.celementsweb.getAttachmentListForTagSorted($doc, "$!request.tagList", $comparator, true, 0, 0))
 #end
 #if($isNewImageGallery && ("$!navObj" != ''))
   #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
