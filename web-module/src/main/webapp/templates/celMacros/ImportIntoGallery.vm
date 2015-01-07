@@ -12,7 +12,7 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
   <input type="hidden" id="filebaseLink" name="filebaseLink" value="$!wiki_filbase_path" />
   <div id="tagPicker" style="height:20px;width:auto;overflow:auto;">
-    <label for="tagPicker_list">$msg.get('cel_img_tag')</label>
+    <label for="tagPicker_list">$msg.get('cel_ml_tag')</label>
     <select id="tagPicker_list" name="tagPicker">
       <option value="">---</option>
     </select>
