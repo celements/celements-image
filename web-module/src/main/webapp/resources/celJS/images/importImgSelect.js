@@ -55,7 +55,7 @@
   var loadTagList = function() {
     if($('tagPicker_list')) {
       $('tagPicker_list').observe('change', tagSelectedLoadAttachmentList);
-      new Ajax.Request(baseurl, {
+      new Ajax.Request(getCelHost(), {
         method: 'post',
         parameters: {
            'xpage' : 'celements_ajax',
