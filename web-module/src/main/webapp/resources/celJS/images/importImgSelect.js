@@ -19,6 +19,11 @@
   };
 
   var observeImgs = function(event) {
+	  
+	  
+	  //TODO load tag list and observe tag list change triggering image list reload
+	  
+	  
     var loaderimg = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif' });
     $$('.bilder').each(function(imgContainer) {
       imgContainer.update(loaderimg);
