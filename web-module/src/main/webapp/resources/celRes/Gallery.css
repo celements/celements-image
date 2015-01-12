@@ -20,6 +20,9 @@
   overflow: hidden;
 	margin: 0px 5px 5px 0px;
 }
+.presentationList ul > li div.cel_cm_gallery_list div.celanim_slideshow_wrapper {
+  display: block;
+}
 
 .presentationList ul .cel_cm_gallery .text,
 .presentationList ul .cel_cm_gallery_view .text,
