@@ -19,11 +19,7 @@
   };
 
   var observeImgs = function(event) {
-	  
-	  
-	  //TODO load tag list and observe tag list change triggering image list reload
-	  
-	  
+    loadTagList();
     var loaderimg = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif' });
     $$('.bilder').each(function(imgContainer) {
       imgContainer.update(loaderimg);
@@ -41,6 +37,10 @@
     });
   //  var aGal = undefined;
     
+    loadImages();
+  };
+
+  var loadImages = function() {
     var fileBaseLink = $('filebaseLink').value;
     var allActiveGalleries = [fileBaseLink];
     var loadingCallbackFN = function(theGallery) {
@@ -54,6 +54,36 @@
         fileBaseLink, loadingCallbackFN, false,
         (fileBaseLink.split('.').size() < 2), 'NameAsc'));
     addToGalleriesList(fileBaseLink);
+  };
+
+  var loadTagList = function() {
+    if($('tagPicker_list')) {
+      $('tagPicker_list').observe('change', tagSelectedLoadAttachmentList);
+      new Ajax.Request(getCelHost(), {
+        method: 'post',
+        parameters: {
+           'xpage' : 'celements_ajax',
+           'ajax_mode' : 'imageFilterList'
+        },
+        onComplete: function(response) {
+          if(response.responseText.isJSON()) {
+            var json = response.responseText.evalJSON();
+            var select = $('tagPicker_list');
+            for(var i = 0; i < json.tagList.length; i++) {
+              var option = new Element('option', { 'value' : json.tagList[i].value });
+              option.update(json.tagList[i].label);
+              select.insert(option);
+            }
+          } else if((typeof console != 'undefined') && (typeof console.warn != 'undefined')) {
+            console.warn('loadTagList: noJSON!!! ', response.responseText);
+          }
+        }
+      });
+    }
+  };
+
+  var tagSelectedLoadAttachmentList = function() {
+    loadImages();
   };
   
   var mouseIsOver = function(event) {

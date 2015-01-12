@@ -88,6 +88,9 @@ CiG.prototype = {
     if(spaceImgs) {
       params['spaceImgs'] = _me._collDocRef;
     }
+    if($('tagPicker_list')) {
+      params['tagList'] = $('tagPicker_list').value;
+    }
     new Ajax.Request(_me._getGalleryURL(spaceImgs), {
       method : "POST",
       parameters: params,
