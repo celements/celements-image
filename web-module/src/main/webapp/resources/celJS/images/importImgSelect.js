@@ -37,6 +37,10 @@
     });
   //  var aGal = undefined;
     
+    loadImages();
+  };
+
+  var loadImages = function() {
     var fileBaseLink = $('filebaseLink').value;
     var allActiveGalleries = [fileBaseLink];
     var loadingCallbackFN = function(theGallery) {
@@ -79,13 +83,7 @@
   };
 
   var tagSelectedLoadAttachmentList = function() {
-    
-    
-    console.log(activeGalleries, loadedGalleries);
-    
-    //TODO reload images with new tag
-    
-    
+    loadImages();
   };
   
   var mouseIsOver = function(event) {
