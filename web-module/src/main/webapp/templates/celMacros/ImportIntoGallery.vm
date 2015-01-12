@@ -11,12 +11,6 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
 <form action="" method="post">
   <input type="hidden" id="xredirect" name="xredirect" value="$!request.xredirect" />
   <input type="hidden" id="filebaseLink" name="filebaseLink" value="$!wiki_filbase_path" />
-  <div id="tagPicker" style="height:20px;width:auto;overflow:auto;">
-    <label for="tagPicker_list">$msg.get('cel_ml_tag')</label>
-    <select id="tagPicker_list" name="tagPicker">
-      <option value="">---</option>
-    </select>
-  </div>
 #if("$!doc.getObject('XWiki.PhotoAlbumClass')" == '')
   <div style="border: 1px dotted grey; padding-bottom: 20px;">
     #foreach($gal in $services.query.xwql("from doc.object(XWiki.PhotoAlbumClass) as obj").execute())
@@ -42,6 +36,12 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   <h1>Bilder zur Galerie "$gName" hinzuf&uuml;gen</h1>
   <input type="hidden" class="galleries" name="galleries" value="$doc.getURL()" />
 #end
+<div id="tagPicker" style="height:20px;width:auto;overflow:auto;">
+  <label for="tagPicker_list">$msg.get('cel_ml_tag')</label>
+  <select id="tagPicker_list" name="tagPicker">
+    <option value="">---</option>
+  </select>
+</div>
 <div class="text relative imagePicker">
     <div class="height29"><p class="size13 mtop5">Bild Info: <span class="infoName"></span></p></div>
     <input class="absolute right25 top2 motiveSubmit" type="submit" value="Auswahl Importieren">
