@@ -81,6 +81,8 @@
   var tagSelectedLoadAttachmentList = function() {
     
     
+    console.log(activeGalleries, loadedGalleries);
+    
     //TODO reload images with new tag
     
     
