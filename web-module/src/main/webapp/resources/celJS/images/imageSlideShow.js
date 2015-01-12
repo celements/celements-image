@@ -702,11 +702,15 @@ window.CELEMENTS.image.SlideShow = function(config) {
 
       _getCelSlideShowObj : function() {
         var _me = this;
-        var overwriteLayout = _me._configReader.getLayoutName() || 'SimpleLayout';
+        var overwriteLayout = _me._configReader.getLayoutName() || '';
         if (!_me._celSlideShowObj) {
           _me._celSlideShowObj = new CELEMENTS.presentation.SlideShow(
               _me._getContainerElemId());
           _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
+          _me._celSlideShowObj.setPreloadSlideAjaxMode('ImageSlideWithLayout');
+          _me._celSlideShowObj.addPreloadSlideParam({
+            'galleryFN' : _me._configReader.getGalleryFN()
+          });
         } else if (overwriteLayout) {
           _me._celSlideShowObj.setOverwritePageLayout(overwriteLayout);
         }
@@ -762,6 +766,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
                 navObj._preloadFunc(allSlides[navObj._nextIndex],
                     navObj._updateNextContent.bind(navObj));
               });
+//        } else if () {
+//          //TODO randomstart!
         } else {
           _me._getCelSlideShowObj().loadMainSlides(_me._configReader.getGallerySpace(),
               _me._configReader.getStartSlideNum());
@@ -915,6 +921,11 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         return (_me._htmlElemClasses.indexOf(className) > -1);
       },
 
+      getGalleryFN : function() {
+        var _me = this;
+        return _me._galleryFN;
+      },
+
       isAutoResize : function() {
         var _me = this;
         return _me._autoresize;
@@ -1031,6 +1042,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         if (_me._startSlideNum) {
           return _me._startSlideNum;
         }
+        //TODO random start!!!
         return parseInt(_me._getPart(6, 1)) - 1;
       },
 
@@ -1077,11 +1089,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
 
       getLayoutName : function() {
         var _me = this;
-        var layoutName = _me._layoutName;
-        if (typeof(_me._layoutName) === 'undefined') {
-          layoutName = 'SimpleLayout';
-        }
-        return layoutName;
+        return _me._layoutName;
       }
 
   };

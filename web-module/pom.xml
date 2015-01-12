@@ -32,7 +32,7 @@
   <artifactId>image-web</artifactId>
   <packaging>war</packaging>
   <name>Celements Image Web-Module</name>
-  <version>1.33-SNAPSHOT</version>
+  <version>1.35-SNAPSHOT</version>
   <description>	</description>
   <licenses>
     <license>
