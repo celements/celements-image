@@ -140,6 +140,9 @@ CiG.prototype = {
     if(getNumImages) {
       params['getNumImages'] = getNumImages;
     }
+    if($('tagPicker_list')) {
+      params['tagList'] = $('tagPicker_list').value;
+    }
     new Ajax.Request(_me._getGalleryURL(''), {
       method : "POST",
       parameters: params,
