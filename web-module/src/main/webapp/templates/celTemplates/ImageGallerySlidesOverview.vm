@@ -62,7 +62,7 @@
   ##IMPORTANT first id part MUST be the galleryFN otherwise the Gallery Layout will not
   ##IMPOETNAT be loaded correctly in overlay 
   <div id="ImgGallerySlide$!{imgGalSlidecount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:$!{slidenum}:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
-   class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;">
+   class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;" title="$!{slidenum}:$!{slidedoc.documentReference.name}">
   #*
       zoom: 2; /* all browsers */
      -moz-transform: scale(2);  /* Firefox */
