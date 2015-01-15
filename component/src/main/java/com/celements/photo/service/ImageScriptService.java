@@ -304,7 +304,7 @@ public class ImageScriptService implements ScriptService {
   }
   
   public List<Attachment> getRandomImages(String fullName,
-      int num) throws ClassNotFoundException{
+      int num) {
     return WebUtils.getInstance().getRandomImages(fullName, num, getContext());
   }
   
