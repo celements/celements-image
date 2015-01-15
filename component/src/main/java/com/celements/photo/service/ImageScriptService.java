@@ -43,6 +43,7 @@ import com.celements.photo.utilities.ImportFileObject;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -300,6 +301,16 @@ public class ImageScriptService implements ScriptService {
 
   public String fixMaxImageSizes(String pageContent, int maxWidth, int maxHeight) {
     return maxImageSizeService.fixMaxImageSizes(pageContent, maxWidth, maxHeight);
+  }
+  
+  public List<Attachment> getRandomImages(String fullName,
+      int num) {
+    return WebUtils.getInstance().getRandomImages(fullName, num, getContext());
+  }
+  
+  public boolean useImageAnimations() {
+    return "1".equals(getContext().getWiki().getSpacePreference("celImageAnimation",
+        "celements.celImageAnimation", "0", getContext()));
   }
 
 }
