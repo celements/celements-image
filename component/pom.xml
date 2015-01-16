@@ -19,9 +19,9 @@
     <!-- Add here all your dependencies -->
     <dependency>
       <groupId>com.celements</groupId>
-  	  <artifactId>celements-core</artifactId>
-  	  <version>1.107</version>
-  	  <scope>provided</scope>
+    <artifactId>celements-core</artifactId>
+    <version>1.108</version>
+    <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.drewnoakes</groupId>
@@ -49,8 +49,8 @@
       <version>2.1</version>
       <exclusions>
         <exclusion>  <!-- declare the exclusion here -->
-				  <groupId>commons-lang</groupId>
-				  <artifactId>commons-lang</artifactId>
+  <groupId>commons-lang</groupId>
+  <artifactId>commons-lang</artifactId>
         </exclusion>
       </exclusions> 
     </dependency>
