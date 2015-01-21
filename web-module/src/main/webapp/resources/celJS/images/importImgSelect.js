@@ -492,11 +492,13 @@
   };
   
   var selectAll = function(event) {
-    resetSelection();
-    $$('.bild').each(function(ele) {
-      selectImgEle(ele);
-    });
     event.stop();
+    $$('.bild').each(function(ele) {
+      ele.addClassName('selected');
+    });
+    setImgName('', true);
+    setImgInfo('', true);
+    $(document.body).fire('celimage:imageSelectionChanged');
   };
   
   var resetSelection = function(event) {
