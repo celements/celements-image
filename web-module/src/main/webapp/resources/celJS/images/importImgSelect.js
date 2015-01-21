@@ -26,6 +26,9 @@
     });
     isMotivePicker = (typeof($('productConfigForm')) != 'undefined') && ($('productConfigForm') != null);
     document.observe('keydown', navigateImages);
+    $$('.selectAll').each(function(ele) {
+      ele.observe('click', selectAll);
+    });
     $$('.resetSelection').each(function(ele) {
       ele.observe('click', resetSelection);
     });
@@ -83,6 +86,7 @@
   };
 
   var tagSelectedLoadAttachmentList = function() {
+    resetSelection();
     loadImages();
   };
   
@@ -485,6 +489,14 @@
     } else {
       alert('Galerie auswaehlen.');
     }
+  };
+  
+  var selectAll = function(event) {
+    resetSelection(event);
+    $$('.bild').each(function(ele) {
+      selectImgEle(ele);
+    });
+    event.stop();
   };
   
   var resetSelection = function(event) {
