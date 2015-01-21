@@ -44,6 +44,8 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
 </div>
 <div class="text relative imagePicker">
     <div class="height29"><p class="size13 mtop5">Bild Info: <span class="infoName"></span></p></div>
+    <a href="#" class="selectAll" >$msg.get('cel_photo_all')</a>
+    <a href="#" class="resetSelection" >$msg.get('cel_photo_none')</a>
     <input class="absolute right25 top2 motiveSubmit" type="submit" value="Auswahl Importieren">
     <input type="hidden" name="xpage" value="celements_ajax" />
     <input type="hidden" name="ajax_mode" value="generateImageSlides" />
