@@ -492,7 +492,7 @@
   };
   
   var selectAll = function(event) {
-    resetSelection(event);
+    resetSelection();
     $$('.bild').each(function(ele) {
       selectImgEle(ele);
     });
@@ -500,6 +500,9 @@
   };
   
   var resetSelection = function(event) {
+    if(event) {
+      event.stop();
+    }
     $$('.bild.selected').each(function(ele) {
       ele.removeClassName('selected');
     });
@@ -509,7 +512,6 @@
     setImgName('', true);
     setImgInfo('', true);
     $(document.body).fire('celimage:imageSelectionChanged');
-    event.stop();
   };
   
   var isProductConfig = function(ele) {
