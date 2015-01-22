@@ -156,7 +156,7 @@ var setCropImage = function() {
 
 var cropPreviewLoaded = function(event) {
   $('crop_image_loader').remove();
-  $('previewImg').show();
+  $('cropImage').show();
   var prevSrc = $('previewImg').src;
   var params = prevSrc.replace(/.*\?/g, '');
   $('cropZoom').src = prevSrc;
