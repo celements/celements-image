@@ -140,7 +140,7 @@ var setCropImage = function() {
         'src' : '/skin/resources/celRes/ajax-loader.gif',
         'id' : 'crop_image_loader'
       });
-      $('cropImage').up('fieldset').insert({ after : loaderimg });
+      $('cropImage').up('table').insert({ before : loaderimg });
 //FIXME hide / show does not work since it messes up sizes
 //      $('cropImage').up('fieldset').hide();
       $('cropImage').src = '';
