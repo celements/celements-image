@@ -134,7 +134,6 @@ var registerCrop = function() {
 var setCropImage = function() {
   var prevSrc = $('previewImg').src;
   if(typeof(prevSrc) != 'undefined') {
-    var params = prevSrc.replace(/.*\?/g, '');
     prevSrc = prevSrc.replace(/\?.*/g, '');
     if(prevSrc != $('cropImage').src) {
       $('cropImage').stopObserving('load', cropPreviewLoaded);
@@ -150,16 +149,19 @@ var setCropImage = function() {
 
 var cropPreviewLoaded = function(event) {
   var prevSrc = $('previewImg').src;
+  var params = prevSrc.replace(/.*\?/g, '');
   $('cropZoom').src = prevSrc;
   $('cropPreview').src = prevSrc;
   $('crop_fixRatio').checked = false;
   mainImgW = undefined;
   mainImgH = undefined;
   setZoomSize();
-  $('cropX').value = params.replace(/((^|(.*[\?&]))cropX=(\d*)\D?.*)|.*/g, '$4');
-  $('cropY').value = params.replace(/((^|(.*[\?&]))cropY=(\d*)\D?.*)|.*/g, '$4');
-  $('cropWidth').value = params.replace(/((^|(.*[\?&]))cropW=(\d*)\D?.*)|.*/g, '$4');
-  $('cropHeight').value = params.replace(/((^|(.*[\?&]))cropH=(\d*)\D?.*)|.*/g, '$4');
+  if(params) {
+    $('cropX').value = params.replace(/((^|(.*[\?&]))cropX=(\d*)\D?.*)|.*/g, '$4');
+    $('cropY').value = params.replace(/((^|(.*[\?&]))cropY=(\d*)\D?.*)|.*/g, '$4');
+    $('cropWidth').value = params.replace(/((^|(.*[\?&]))cropW=(\d*)\D?.*)|.*/g, '$4');
+    $('cropHeight').value = params.replace(/((^|(.*[\?&]))cropH=(\d*)\D?.*)|.*/g, '$4');
+  }
   manualSelectDelayed(false);$('cropZoom').src = prevSrc;
   $('cropPreview').src = prevSrc;
   $('crop_fixRatio').checked = false;
