@@ -141,7 +141,8 @@ var setCropImage = function() {
         'id' : 'crop_image_loader'
       });
       $('cropImage').up('fieldset').insert({ after : loaderimg });
-      $('cropImage').up('fieldset').hide();
+//FIXME hide / show does not work since it messes up sizes
+//      $('cropImage').up('fieldset').hide();
       $('cropImage').src = '';
       $('cropImage').stopObserving('load', cropPreviewLoaded);
       $('cropImage').observe('load', cropPreviewLoaded);
@@ -158,7 +159,7 @@ var cropPreviewLoaded = function(event) {
   $('crop_image_loader').remove();
   var prevSrc = $('previewImg').src;
   var params = prevSrc.replace(/.*\?/g, '');
-  $('cropImage').up('fieldset').show();
+//  $('cropImage').up('fieldset').show();
   $('cropZoom').src = prevSrc;
   $('cropPreview').src = prevSrc;
   $('crop_fixRatio').checked = false;
