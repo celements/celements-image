@@ -136,6 +136,12 @@ var setCropImage = function() {
   if(typeof(prevSrc) != 'undefined') {
     prevSrc = prevSrc.replace(/\?.*/g, '');
     if(prevSrc != $('cropImage').src) {
+      var loaderimg = new Element('img', { 
+        'src' : '/skin/resources/celRes/ajax-loader.gif',
+        'id' : 'crop_image_loader'
+      });
+      $('cropImage').insert({ before : loaderimg });
+      $('cropImage').src = '';
       $('cropImage').stopObserving('load', cropPreviewLoaded);
       $('cropImage').observe('load', cropPreviewLoaded);
       releaseSelection(true);
@@ -148,6 +154,7 @@ var setCropImage = function() {
 };
 
 var cropPreviewLoaded = function(event) {
+  $('crop_image_loader').remove();
   var prevSrc = $('previewImg').src;
   var params = prevSrc.replace(/.*\?/g, '');
   $('cropZoom').src = prevSrc;
