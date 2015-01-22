@@ -142,6 +142,7 @@ var setCropImage = function() {
       });
       $('cropImage').insert({ before : loaderimg });
       $('cropImage').src = '';
+      $('cropImage').hide();
       $('cropImage').stopObserving('load', cropPreviewLoaded);
       $('cropImage').observe('load', cropPreviewLoaded);
       releaseSelection(true);
@@ -155,6 +156,7 @@ var setCropImage = function() {
 
 var cropPreviewLoaded = function(event) {
   $('crop_image_loader').remove();
+  $('previewImg').show();
   var prevSrc = $('previewImg').src;
   var params = prevSrc.replace(/.*\?/g, '');
   $('cropZoom').src = prevSrc;
