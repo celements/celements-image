@@ -137,6 +137,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       _replaceNotifyHandlerBind : undefined,
       _openInOverlayClickHandlerBind : undefined,
       _imageSlideShowLoadFirstContentBind : undefined,
+      _removeIsImageSlideShowOverlayBind : undefined,
+      _checkIsImageSlideShowOverlayBind : undefined,
       _openInOverlayBind : undefined,
       _imageSlideShowObj : undefined,
       _isOverlayRegistered : undefined,
@@ -168,6 +170,10 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         _me._openInOverlayBind = _me.openInOverlay.bind(_me);
         _me._imageSlideShowLoadFirstContentBind =
           _me._imageSlideShowLoadFirstContent.bind(_me);
+        _me._removeIsImageSlideShowOverlayBind = _me._removeIsImageSlideShowOverlay.bind(
+            _me);
+        _me._checkIsImageSlideShowOverlayBind = _me._checkIsImageSlideShowOverlay.bind(
+            _me);
         $(document.body).observe('celimage_slideshow:replaceNotify',
             _me._replaceNotifyHandlerBind);
         $(document.body).observe('celimage_slideshowstarter:afterReplace',
@@ -207,9 +213,9 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         if (!_me._isOverlayRegistered) {
           _me._isOverlayRegistered = true;
           $(document.body).observe('cel_slideShow:shouldRegister',
-              _me._checkIsImageSlideShowOverlay.bind(_me));
+              _me._checkIsImageSlideShowOverlayBind);
           $(document.body).observe('cel_yuiOverlay:hideEvent',
-              _me._removeIsImageSlideShowOverlay.bind(_me));
+              _me._removeIsImageSlideShowOverlayBind);
           Event.observe(window, "resize", _me._resizeOverlayBind);
           Event.observe(window, "orientationchange", _me._resizeOverlayBind);
         }
@@ -279,8 +285,16 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       },
 
       _removeIsImageSlideShowOverlay : function() {
+        var _me = this;
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         openDialog.updateOpenConfig({ 'slideShowElem' : null });
+        $(document.body).stopObserving('cel_slideShow:shouldRegister',
+            _me._checkIsImageSlideShowOverlayBind);
+        $(document.body).stopObserving('cel_yuiOverlay:hideEvent',
+            _me._removeIsImageSlideShowOverlayBind);
+        Event.stopObserving(window, "resize", _me._resizeOverlayBind);
+        Event.stopObserving(window, "orientationchange", _me._resizeOverlayBind);
+        _me._isOverlayRegistered = false;
       },
 
       _checkIsImageSlideShowOverlay : function(event) {
