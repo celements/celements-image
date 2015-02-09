@@ -273,6 +273,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
             }
           }
           openDialog._overlayDialog.center();
+        } else {
+          console.log('skip ResizeOverlay in imageSlideShow.');
         }
       },
 
@@ -297,6 +299,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         } else {
           zoomFactor = zoomWidthFactor;
         }
+        console.log('imageSlideShow: _computeZoomFactor ', zoomFactor, newWidth,
+            newHeight, _me._mobileDim._getInnerWidth(), _me._mobileDim._getInnerHeight());
         return zoomFactor;
       },
 
@@ -896,7 +900,8 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
           'randomStart' : 'celimage_slideshowRandomStart',
           'customStart' : 'celimage_customStartSlide',
           'addCloseButton' : 'celimage_overlay_addCloseButton',
-          'addCounterZeros' : 'celimage_addCounterZeros'
+          'addCounterZeros' : 'celimage_addCounterZeros',
+          'forceAutoResize' : 'celimage_forceAutoResize'
          }).update(configDef).toObject();
         _me._galleryFN = _me._getPart(1, null);
         _me._overlayWidth = _me._getPart(4, _me._overlayWidthDefault);
@@ -928,7 +933,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
 
       isAutoResize : function() {
         var _me = this;
-        return _me._autoresize;
+        return _me._autoresize || _me._hasClassName(_me._configDef.forceAutoResize);
       },
 
       isCenterSplashImage : function() {
