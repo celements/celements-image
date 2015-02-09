@@ -1076,14 +1076,14 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         var oldWidth = parseInt(openDialog.getWidth());
         var newWidth = oldWidth;
-        if (oldWidth > _me._mobileDim._getInnerWidth()) {
-          newWidth = _me._mobileDim._getInnerWidth() - 20; // take care of close button
+        if (oldWidth > _me._mobileDim.getInnerWidth()) {
+          newWidth = _me._mobileDim.getInnerWidth() - 20; // take care of close button
         }
         var zoomWidthFactor = newWidth / oldWidth;
         var oldHeight = parseInt(openDialog.getHeight());
         var newHeight = oldHeight;
-        if (oldHeight > _me._mobileDim._getInnerHeight()) {
-          newHeight = _me._mobileDim._getInnerHeight() - 20; // take care of close button
+        if (oldHeight > _me._mobileDim.getInnerHeight()) {
+          newHeight = _me._mobileDim.getInnerHeight() - 20; // take care of close button
         }
         var zoomHeightFactor = newHeight / oldHeight;
         var zoomFactor;
@@ -1093,7 +1093,7 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
           zoomFactor = zoomWidthFactor;
         }
         console.log('imageSlideShow: computeZoomFactor ', zoomFactor, newWidth,
-            newHeight, _me._mobileDim._getInnerWidth(), _me._mobileDim._getInnerHeight());
+            newHeight, _me._mobileDim.getInnerWidth(), _me._mobileDim.getInnerHeight());
         return zoomFactor;
       }
 
