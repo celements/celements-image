@@ -232,7 +232,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         var _me = this;
         if (_me._configReader.isAutoResize()) {
           var openDialog = CELEMENTS.presentation.getOverlayObj();
-          var zoomFactor = _me._computeZoomFactor();
+          var zoomFactor = _me._configReader.computeZoomFactor();
           if (zoomFactor <= 1) {
             var oldWidth = parseInt(openDialog.getWidth());
             var oldHeight = parseInt(openDialog.getHeight());
@@ -276,32 +276,6 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         } else {
           console.log('skip ResizeOverlay in imageSlideShow.');
         }
-      },
-
-      _computeZoomFactor : function() {
-        var _me = this;
-        var openDialog = CELEMENTS.presentation.getOverlayObj();
-        var oldWidth = parseInt(openDialog.getWidth());
-        var newWidth = oldWidth;
-        if (oldWidth > _me._mobileDim._getInnerWidth()) {
-          newWidth = _me._mobileDim._getInnerWidth() - 20; // take care of close button
-        }
-        var zoomWidthFactor = newWidth / oldWidth;
-        var oldHeight = parseInt(openDialog.getHeight());
-        var newHeight = oldHeight;
-        if (oldHeight > _me._mobileDim._getInnerHeight()) {
-          newHeight = _me._mobileDim._getInnerHeight() - 20; // take care of close button
-        }
-        var zoomHeightFactor = newHeight / oldHeight;
-        var zoomFactor;
-        if (zoomHeightFactor < zoomWidthFactor) {
-          zoomFactor = zoomHeightFactor;
-        } else {
-          zoomFactor = zoomWidthFactor;
-        }
-        console.log('imageSlideShow: _computeZoomFactor ', zoomFactor, newWidth,
-            newHeight, _me._mobileDim._getInnerWidth(), _me._mobileDim._getInnerHeight());
-        return zoomFactor;
       },
 
       _removeIsImageSlideShowOverlay : function() {
@@ -1095,6 +1069,32 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       getLayoutName : function() {
         var _me = this;
         return _me._layoutName;
+      },
+
+      computeZoomFactor : function() {
+        var _me = this;
+        var openDialog = CELEMENTS.presentation.getOverlayObj();
+        var oldWidth = parseInt(openDialog.getWidth());
+        var newWidth = oldWidth;
+        if (oldWidth > _me._mobileDim._getInnerWidth()) {
+          newWidth = _me._mobileDim._getInnerWidth() - 20; // take care of close button
+        }
+        var zoomWidthFactor = newWidth / oldWidth;
+        var oldHeight = parseInt(openDialog.getHeight());
+        var newHeight = oldHeight;
+        if (oldHeight > _me._mobileDim._getInnerHeight()) {
+          newHeight = _me._mobileDim._getInnerHeight() - 20; // take care of close button
+        }
+        var zoomHeightFactor = newHeight / oldHeight;
+        var zoomFactor;
+        if (zoomHeightFactor < zoomWidthFactor) {
+          zoomFactor = zoomHeightFactor;
+        } else {
+          zoomFactor = zoomWidthFactor;
+        }
+        console.log('imageSlideShow: computeZoomFactor ', zoomFactor, newWidth,
+            newHeight, _me._mobileDim._getInnerWidth(), _me._mobileDim._getInnerHeight());
+        return zoomFactor;
       }
 
   };
