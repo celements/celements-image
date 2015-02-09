@@ -236,8 +236,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           if (zoomFactor <= 1) {
             var oldWidth = parseInt(openDialog.getWidth());
             var oldHeight = parseInt(openDialog.getHeight());
-            newHeight = oldHeight * zoomFactor;
-            newWidth = oldWidth * zoomFactor;
+            var newHeight = oldHeight * zoomFactor;
+            var newWidth = oldWidth * zoomFactor;
             var eventMemo = {
                 'fullWidth' : oldWidth,
                 'fullHeight' : oldHeight,
