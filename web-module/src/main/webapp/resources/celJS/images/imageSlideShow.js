@@ -264,13 +264,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
             var resizeEvent = $('yuiOverlayContainer').fire(
                 'cel_imageSlideShow:resizeDialogContent', eventMemo);
             if (!resizeEvent.stopped) {
-              $('yuiOverlayContainer').setStyle({
-                'zoom' : zoomFactor,
-                'transform' : 'scale(' + zoomFactor + ')',
-                'transformOrigin' : '0 0 0',
-                'height' : oldHeight + 'px',  // important for FF
-                'width' : oldWidth + 'px' // important for FF
-              });
+              $('yuiOverlayContainer').setStyle(_me._configReader.getZoomStyles(
+                  zoomFactor, oldWidth, oldHeight));
             }
           } else {
             if (_me._debug && (typeof console != 'undefined')
@@ -624,7 +619,9 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
           _me._origStyleValues = null;
           var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
-          var zoomFactor = slideWrapperStyles.get('zoom') || 1.0;
+          var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
+              'transform') || '1.0';
+          zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
           if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
             //FF has problem in getting the right width for slideWrapper if slideWrapper
             // is in position: relative
@@ -637,14 +634,10 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
               'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
               'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
             });
-            slideWrapper.setStyle({
-              'position' : 'relative',
-              'zoom' : zoomFactor,
-              'transform' : 'scale(' + zoomFactor + ')',
-              'transformOrigin' : '0 0 0',
-              'height' : slideWrapper.getHeight(),
-              'width' : slideWrapper.getWidth()
-             });
+            var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
+                slideWrapper.getWidth(), slideWrapper.getHeight());
+            stylesProp['position'] = 'relative';
+            slideWrapper.setStyle(stylesProp);
           }
           _me._centerCurrentSlide(_me._containerHtmlElem);
         }
@@ -1083,6 +1076,11 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       getLayoutName : function() {
         var _me = this;
         return _me._layoutName;
+      },
+
+      getZoomStyles : function(zoomFactor, fullWidth, fullHeight) {
+        var _me = this;
+        return _me._mobileDim.getZoomStyles(zoomFactor, fullWidth, fullHeight);
       },
 
       computeZoomFactor : function() {
