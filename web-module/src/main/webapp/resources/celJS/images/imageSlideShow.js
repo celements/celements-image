@@ -751,13 +751,15 @@ window.CELEMENTS.image.SlideShow = function(config) {
                 navObj._preloadFunc(allSlides[navObj._nextIndex],
                     navObj._updateNextContent.bind(navObj));
               });
-        } else if (_me._configReader.hasRandomStart()) {
-          console.log('TODO randomStart');
-          _me._getCelSlideShowObj().loadMainSlides(_me._configReader.getGallerySpace(),
-              '!RANDOM!');
         } else {
+          var startIndex = 0;
+          if (_me._configReader.hasRandomStart()) {
+            startIndex = '!RANDOM!';
+          } else if (!isNaN(_me._configReader.getStartSlideNum())) {
+            startIndex = _me._configReader.getStartSlideNum();
+          }
           _me._getCelSlideShowObj().loadMainSlides(_me._configReader.getGallerySpace(),
-              _me._configReader.getStartSlideNum());
+            startIndex);
         }
         _me._initAnimation();
       },
