@@ -751,8 +751,9 @@ window.CELEMENTS.image.SlideShow = function(config) {
                 navObj._preloadFunc(allSlides[navObj._nextIndex],
                     navObj._updateNextContent.bind(navObj));
               });
-//        } else if () {
-//          //TODO randomstart!
+        } else if (_me._configReader.hasRandomStart()) {
+          console.log('TODO randomStart');
+          //TODO randomstart!
         } else {
           _me._getCelSlideShowObj().loadMainSlides(_me._configReader.getGallerySpace(),
               _me._configReader.getStartSlideNum());
