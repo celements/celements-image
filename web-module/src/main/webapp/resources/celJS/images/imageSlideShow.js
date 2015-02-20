@@ -753,7 +753,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
               });
         } else if (_me._configReader.hasRandomStart()) {
           console.log('TODO randomStart');
-          //TODO randomstart!
+          _me._getCelSlideShowObj().loadMainSlides(_me._configReader.getGallerySpace(),
+              '!RANDOM!');
         } else {
           _me._getCelSlideShowObj().loadMainSlides(_me._configReader.getGallerySpace(),
               _me._configReader.getStartSlideNum());
@@ -1029,7 +1030,6 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
         if (_me._startSlideNum) {
           return _me._startSlideNum;
         }
-        //TODO random start!!!
         return parseInt(_me._getPart(6, 1)) - 1;
       },
 
