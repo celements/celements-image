@@ -337,9 +337,9 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           'slideShowElem' : _me,
           'link' : null,
           'suppressDimFromId' : true,
-          "width" : _me._configReader.getOverlayWidth() + 'px',
-          "height" : _me._configReader.getOverlayHeight() + 'px',
-          fixedcenter: !_me._configReader.isAutoResize()
+          'width' : _me._configReader.getOverlayWidth() + 'px',
+          'height' : _me._configReader.getOverlayHeight() + 'px',
+          'fixedcenter' : !_me._configReader.isAutoResize()
         });
         openDialog.intermediatOpenHandler();
       }
