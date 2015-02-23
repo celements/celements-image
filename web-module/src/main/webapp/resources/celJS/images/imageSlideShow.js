@@ -293,6 +293,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       _checkIsImageSlideShowOverlay : function(event) {
         var _me = this;
         var openDialog = CELEMENTS.presentation.getOverlayObj();
+        console.log('_checkIsImageSlideShowOverlay: ',
+            openDialog._dialogConfig.slideShowElem);
         if (openDialog._dialogConfig.slideShowElem
             && (event.memo.slideShow._htmlContainerId === openDialog.getContainerId())) {
           Event.observe(window, "resize", _me._resizeOverlayBind);
