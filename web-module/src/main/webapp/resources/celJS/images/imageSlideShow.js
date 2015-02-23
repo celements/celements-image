@@ -216,8 +216,6 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
               _me._checkIsImageSlideShowOverlayBind);
           $(document.body).observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlayBind);
-          Event.observe(window, "resize", _me._resizeOverlayBind);
-          Event.observe(window, "orientationchange", _me._resizeOverlayBind);
         }
         _me._getHtmlElem().observe('click', _me._openInOverlayClickHandlerBind);
         _me._getHtmlElem().observe('cel_ImageSlideShow:startSlideShow',
@@ -297,6 +295,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         if (openDialog._dialogConfig.slideShowElem
             && (event.memo.slideShow._htmlContainerId === openDialog.getContainerId())) {
+          Event.observe(window, "resize", _me._resizeOverlayBind);
+          Event.observe(window, "orientationchange", _me._resizeOverlayBind);
           event.stop();
         }
       },
