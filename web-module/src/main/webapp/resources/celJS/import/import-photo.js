@@ -58,7 +58,7 @@
     $('c3_import_button_div').stopObserving('click', nothingToImport);
     $('c3_import_button').stopObserving('click', overwriteOnImport);
     if(checkedFiles > 0){
-      consoleMsg('activate import button');
+      console.debug('activate import button');
       $('c3_import_button').disabled = false;
       if(doesOverwrite()){
         $('c3_import_button').observe('click', overwriteOnImport);
@@ -74,11 +74,11 @@
     var actionspan = chkboxspan.down('.c3_import_action', 0);
     var actionspanskip = chkboxspan.down('.c3_import_action', 1);
     if(elem.checked){
-      consoleMsg('show action, hide skip');
+      console.debug('show action, hide skip');
       actionspan.setStyle({display: ''});
       actionspanskip.setStyle({display: 'none'});
     } else {
-      consoleMsg('show skip, hide action');
+      console.debug('show skip, hide action');
       actionspan.setStyle({display: 'none'});
       actionspanskip.setStyle({display: ''});
     }
@@ -89,7 +89,7 @@
   };
   
   var changeAndCount = function(event){
-    consoleMsg('clicked check box');
+    console.debug('clicked check box');
     changeImportActionEvent(event);
     countChecked();
   };
@@ -119,11 +119,11 @@
   };
   
   var importNow = function(event) {
-    consoleMsg('start progress bar');
+    console.debug('start progress bar');
     getProgressBar($('c3_title_importing').value);
-    consoleMsg('start ajax');
-    consoleMsg('url is: "' + $('c3_import_url').value + '"');
-    consoleMsg('params are: "' + $('importForm').serialize(true) + '"');
+    console.debug('start ajax');
+    console.debug('url is: "' + $('c3_import_url').value + '"');
+    console.debug('params are: "' + $('importForm').serialize(true) + '"');
     new Ajax.Request($('c3_import_url').value, {
       parameters : $('importForm').serialize(true),
       onComplete : function(transport){
@@ -136,7 +136,7 @@
   };
 
   var preimportChanged = function() {
-    consoleMsg('import box content is ready');
+    console.debug('import box content is ready');
     $$('.c3_import_checkbox_element').each(function(chkbox){
       chkbox.observe('click', changeAndCount);
     });
