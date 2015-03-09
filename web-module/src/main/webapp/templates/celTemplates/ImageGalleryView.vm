@@ -5,6 +5,7 @@
 ## $xwiki.celementsweb.flushCache()
 #end
 *#
+#if(($context.action != 'edit') && ("$!request.xpage" != "overlay"))
 #if("$!celldoc" != '')
 #set($contentDoc = $celldoc)
 #else   
@@ -26,3 +27,6 @@ $galleryNav.loadConfigFromDoc($celldoc.documentReference)
 <div class="pfeil_rechts"></div>
 #parse('celTemplates/PresentationView.vm')
 <!-- GP$!{galleryPresentationCount}$!{contentDoc.getName()} --></div>
+#else
+Will not be loaded in edit.
+#end
