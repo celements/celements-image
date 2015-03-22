@@ -1,0 +1,19 @@
+#set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
+$jsonBuilder.openDictionary()
+#set($galleryFullName = "$!request.gallery")
+#if(("$!galleryFullName" != '') && $xwiki.exists("$!galleryFullName"))
+#set($galleryDoc = $xwiki.getDocument($galleryFullName))
+#set($attList = $util.getArrayList())
+#foreach($att in $galleryDoc.getAttachmentList())
+#set($attFullName = "${galleryFullName}@${att.getFilename()}")
+## expected attachment format "wiki:space.page@file"
+#set($devNull = $attList.add($services.model.resolveAttachment($attFullName)))
+#end
+$jsonBuilder.addStringProperty('gallery', "$galleryFullName")
+$jsonBuilder.openProperty('nrAttachmentsDeleted')
+$jsonBuilder.addInteger($services.filebase.deleteAttachmentList($attList))
+#else
+$jsonBuilder.addStringProperty('exception', "Failed to find gallery '$galleryFullName'")
+#end
+$jsonBuilder.closeDictionary()
+$jsonBuilder.getJSON()
