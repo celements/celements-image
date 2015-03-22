@@ -17,3 +17,7 @@ $jsonBuilder.addStringProperty('exception', "Failed to find gallery '$galleryFul
 #end
 $jsonBuilder.closeDictionary()
 $jsonBuilder.getJSON()
+#if("$!request.get('xredirect')" != '')
+#set($xredirect = "$!request.xredirect")
+$context.getResponse().sendRedirect($xredirect)
+#end
