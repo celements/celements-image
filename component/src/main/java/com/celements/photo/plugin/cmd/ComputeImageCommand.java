@@ -125,7 +125,7 @@ public class ComputeImageCommand {
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
           }
           //TODO prevent multiple de- and encoding
-          if(!"".equals(filterString)) {
+          if((filterString != null) && !"".equals(filterString)) {
             String[] filterParts = filterString.split("[,;| ]+");
             int kerWidth = Integer.parseInt(filterParts[0]);
             int kerHeight = Integer.parseInt(filterParts[1]);

@@ -164,8 +164,8 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       String attSpace = attachment.getDoc().getDocumentReference().getLastSpaceReference(
           ).getName();
       String filterString = context.getWiki().getWebPreference("imageDownloadFilter", 
-          attSpace, "", context);
-      if("".equals(filterString)) {
+          attSpace, context);
+      if((filterString == null) || "".equals(filterString)) {
         filterString = context.getRequest().getParameter("filter");
       }
       return getComputeImgCmd().computeImage(attachment, context, attachment, sheight,
