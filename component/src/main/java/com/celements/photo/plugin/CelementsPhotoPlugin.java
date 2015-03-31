@@ -163,8 +163,8 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       String defaultBgString = context.getRequest().getParameter("background");
       String attSpace = attachment.getDoc().getDocumentReference().getLastSpaceReference(
           ).getName();
-      String filterString = context.getWiki().getWebPreference("imageDownloadFilter", 
-          attSpace, context);
+      String filterString = context.getWiki().getSpacePreference("imageDownloadFilter", 
+          attSpace, "", context);
       if((filterString == null) || "".equals(filterString)) {
         filterString = context.getRequest().getParameter("filter");
       }
