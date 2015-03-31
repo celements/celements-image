@@ -127,22 +127,33 @@ public class ComputeImageCommand {
           //TODO prevent multiple de- and encoding
           if((filterString != null) && !"".equals(filterString)) {
             String[] filterParts = filterString.split("[,;| ]+");
-            int kerWidth = Integer.parseInt(filterParts[0]);
-            int kerHeight = Integer.parseInt(filterParts[1]);
-            float[] kerMatrix = new float[kerWidth*kerHeight];
-            for(int i = 0; i < kerWidth*kerHeight; i++) {
-              kerMatrix[i] = Float.parseFloat(filterParts[i+2]);
+            if(filterParts.length > 2) {
+              int kerWidth = Integer.parseInt(filterParts[0]);
+              int kerHeight = Integer.parseInt(filterParts[1]);
+              float[] kerMatrix = new float[kerWidth*kerHeight];
+              for(int i = 0; i < kerWidth*kerHeight; i++) {
+                float x;
+                if(filterParts.length <= 4) {
+                  x = Float.parseFloat(filterParts[2]);
+                  if((filterParts.length == 4) && (i == ((kerWidth*kerHeight)-1)/2)) {
+                    x = Float.parseFloat(filterParts[3]);
+                  }
+                } else {
+                  x = Float.parseFloat(filterParts[i+2]);
+                }
+                kerMatrix[i] = x;
+              }
+              img = decodeImageCommand.readImage(attachmentClone, context);
+              Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
+              BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
+              BufferedImage filteredImg = op.filter(img, null);
+              ByteArrayOutputStream out = new ByteArrayOutputStream();
+              thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
+                  context));
+              attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
+              timeLast = logRuntime(timeLast, "applied kernel filter [" + filterString 
+                  + "] after ");
             }
-            img = decodeImageCommand.readImage(attachmentClone, context);
-            Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
-            BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
-            BufferedImage filteredImg = op.filter(img, null);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
-                context));
-            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
-            timeLast = logRuntime(timeLast, "applied kernel filter [" + filterString 
-                + "] after ");
           }
         } else {
           LOGGER.info("Raw image! No alterations done.");
