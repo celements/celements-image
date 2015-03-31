@@ -153,7 +153,7 @@ public class ImageCacheCommand {
   String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension,
       String copyright, String watermark, int cropX, int cropY, int cropW, int cropH,
       boolean blackNwhite, Color defaultBg, boolean lowerBounds, Integer lowBoundPos, 
-      boolean raw) throws NoSuchAlgorithmException {
+      String filterString, boolean raw) throws NoSuchAlgorithmException {
     String key = attachment.getId() 
         + "-" + attachment.getVersion()
         + "-" + getType(attachment.getMimeType(getContext()))
@@ -161,13 +161,13 @@ public class ImageCacheCommand {
         + "-" + dimension.getWidth()
         + "-" + dimension.getHeight()
         + "-" + getAditionalInfoHash(copyright, watermark, cropX, cropY, cropW, cropH,
-            blackNwhite, defaultBg, lowerBounds, lowBoundPos, raw);
+            blackNwhite, defaultBg, lowerBounds, lowBoundPos, filterString, raw);
     return key;
   }
 
   String getAditionalInfoHash(String copyright, String watermark, int cropX, int cropY, 
       int cropW, int cropH, boolean blackNwhite, Color defaultBg, boolean lowerBounds, 
-      Integer lowBoundPos, boolean raw) throws NoSuchAlgorithmException {
+      Integer lowBoundPos, String filterString, boolean raw) throws NoSuchAlgorithmException {
     String hashValue = "";
     if(raw) {
       hashValue += "<:>raw image";
@@ -190,6 +190,9 @@ public class ImageCacheCommand {
         if(lowBoundPos != null) {
           hashValue += "<:>pos=" + lowBoundPos;
         }
+      }
+      if(!"".equals(filterString)) {
+        hashValue += "<:>kernel filter" + filterString;
       }
     }
     String hash = "";

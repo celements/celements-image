@@ -22,7 +22,10 @@ package com.celements.photo.plugin.cmd;
 import java.awt.Color;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorConvertOp;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -48,7 +51,7 @@ public class ComputeImageCommand {
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
-      String defaultBgStr) {
+      String defaultBgStr, String filterString) {
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -74,7 +77,7 @@ public class ComputeImageCommand {
 //          + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(
           width, height), copyright, watermark, cropX, cropY, cropW, cropH, blackAndWhite,
-          defaultBg, lowerBound, lowerBoundPositioning, raw);
+          defaultBg, lowerBound, lowerBoundPositioning, filterString, raw);
       LOGGER.debug("attachment key: '" + key + "'");
       InputStream data = getImageCacheCmd().getImageForKey(key);
       if (data != null) {
@@ -120,6 +123,26 @@ public class ComputeImageCommand {
             byte[] bNwImage = out.toByteArray();
             attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
+          }
+          //TODO prevent multiple de- and encoding
+          if(!"".equals(filterString)) {
+            String[] filterParts = filterString.split("[,;| ]+");
+            int kerWidth = Integer.parseInt(filterParts[0]);
+            int kerHeight = Integer.parseInt(filterParts[1]);
+            float[] kerMatrix = new float[kerWidth*kerHeight];
+            for(int i = 0; i < kerWidth*kerHeight; i++) {
+              kerMatrix[i] = Float.parseFloat(filterParts[i+2]);
+            }
+            img = decodeImageCommand.readImage(attachmentClone, context);
+            Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
+            BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
+            BufferedImage filteredImg = op.filter(img, null);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
+                context));
+            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
+            timeLast = logRuntime(timeLast, "applied kernel filter [" + filterString 
+                + "] after ");
           }
         } else {
           LOGGER.info("Raw image! No alterations done.");
