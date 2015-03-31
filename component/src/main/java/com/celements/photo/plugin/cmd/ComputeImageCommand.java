@@ -29,6 +29,7 @@ import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -149,7 +150,7 @@ public class ComputeImageCommand {
                 img = decodeImageCommand.readImage(attachmentClone, context);
                 Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
                 LOGGER.debug("Filtering with kernel configured as " + kerWidth + ", " 
-                    + kerHeight + ", " + kerMatrix);
+                    + kerHeight + ", " + Arrays.toString(kerMatrix));
                 BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
                 BufferedImage filteredImg = op.filter(img, null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
