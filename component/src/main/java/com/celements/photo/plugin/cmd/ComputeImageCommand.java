@@ -51,7 +51,7 @@ public class ComputeImageCommand {
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
-      String defaultBgStr, String filterString) {
+      String defaultBgStr, String filterStr) {
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -77,7 +77,7 @@ public class ComputeImageCommand {
 //          + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(
           width, height), copyright, watermark, cropX, cropY, cropW, cropH, blackAndWhite,
-          defaultBg, lowerBound, lowerBoundPositioning, filterString, raw);
+          defaultBg, lowerBound, lowerBoundPositioning, filterStr, raw);
       LOGGER.debug("attachment key: '" + key + "'");
       InputStream data = getImageCacheCmd().getImageForKey(key);
       if (data != null) {
@@ -125,34 +125,38 @@ public class ComputeImageCommand {
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
           }
           //TODO prevent multiple de- and encoding
-          if((filterString != null) && !"".equals(filterString)) {
-            String[] filterParts = filterString.split("[,;| ]+");
+          if((filterStr != null) && !"".equals(filterStr)) {
+            String[] filterParts = filterStr.split("[,;| ]+");
             if(filterParts.length > 2) {
-              int kerWidth = Integer.parseInt(filterParts[0]);
-              int kerHeight = Integer.parseInt(filterParts[1]);
-              float[] kerMatrix = new float[kerWidth*kerHeight];
-              for(int i = 0; i < kerWidth*kerHeight; i++) {
-                float x;
-                if(filterParts.length <= 4) {
-                  x = Float.parseFloat(filterParts[2]);
-                  if((filterParts.length == 4) && (i == ((kerWidth*kerHeight)-1)/2)) {
-                    x = Float.parseFloat(filterParts[3]);
+              try {
+                int kerWidth = Integer.parseInt(filterParts[0]);
+                int kerHeight = Integer.parseInt(filterParts[1]);
+                float[] kerMatrix = new float[kerWidth*kerHeight];
+                for(int i = 0; i < kerWidth*kerHeight; i++) {
+                  float x;
+                  if(filterParts.length <= 4) {
+                    x = Float.parseFloat(filterParts[2]);
+                    if((filterParts.length == 4) && (i == ((kerWidth*kerHeight)-1)/2)) {
+                      x = Float.parseFloat(filterParts[3]);
+                    }
+                  } else {
+                    x = Float.parseFloat(filterParts[i+2]);
                   }
-                } else {
-                  x = Float.parseFloat(filterParts[i+2]);
+                  kerMatrix[i] = x;
                 }
-                kerMatrix[i] = x;
+                img = decodeImageCommand.readImage(attachmentClone, context);
+                Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
+                BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
+                BufferedImage filteredImg = op.filter(img, null);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
+                    context));
+                attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
+                timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
+                    + "] after ");
+              } catch(NumberFormatException nfe) {
+                LOGGER.error("Exception parsing filter string [" + filterStr + "]", nfe);
               }
-              img = decodeImageCommand.readImage(attachmentClone, context);
-              Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
-              BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
-              BufferedImage filteredImg = op.filter(img, null);
-              ByteArrayOutputStream out = new ByteArrayOutputStream();
-              thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
-                  context));
-              attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
-              timeLast = logRuntime(timeLast, "applied kernel filter [" + filterString 
-                  + "] after ");
             }
           }
         } else {
