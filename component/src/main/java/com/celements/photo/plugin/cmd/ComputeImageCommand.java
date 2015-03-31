@@ -126,7 +126,9 @@ public class ComputeImageCommand {
           }
           //TODO prevent multiple de- and encoding
           if((filterStr != null) && !"".equals(filterStr)) {
+            LOGGER.debug("Filter found [" + filterStr + "]");
             String[] filterParts = filterStr.split("[,;| ]+");
+            LOGGER.debug("Filter definition has " + filterParts.length + " parts");
             if(filterParts.length > 2) {
               try {
                 int kerWidth = Integer.parseInt(filterParts[0]);
@@ -146,6 +148,8 @@ public class ComputeImageCommand {
                 }
                 img = decodeImageCommand.readImage(attachmentClone, context);
                 Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
+                LOGGER.debug("Filtering with kernel configured as " + kerWidth + ", " 
+                    + kerHeight + ", " + kerMatrix);
                 BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
                 BufferedImage filteredImg = op.filter(img, null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
