@@ -96,13 +96,15 @@ window.CELEMENTS.presentation.SlideShowAnimation = function(celSlideShowObj, tim
       },
 
       startAnimation : function(delayedStart) {
-        var _me = this;
-        _me._paused = false;
-        _me._cancelDelayedNext();
-        if (delayedStart) {
-          _me._restartDelay();
-        } else {
-          _me._delayedNext();
+        if(!window.location.search.match(/xpage=(overlay|import|filebase)/)) {
+          var _me = this;
+          _me._paused = false;
+          _me._cancelDelayedNext();
+          if (delayedStart) {
+            _me._restartDelay();
+          } else {
+            _me._delayedNext();
+          }
         }
       },
 
