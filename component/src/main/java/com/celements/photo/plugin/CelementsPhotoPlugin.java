@@ -153,7 +153,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       XWikiContext context) {
 
 //TODO check why in Debian resize of "problematic" images uses a lot more time than 
-//     resize AND crop
+//     resize AND crop -> cropping reduces image size which makes resize faster?
     if (this.isSupportedImageFormat(attachment.getMimeType(context))) {
       String sheight = context.getRequest().getParameter("celheight");
       String swidth = context.getRequest().getParameter("celwidth");
@@ -161,8 +161,15 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       String watermark = context.getRequest().getParameter("watermark");
       Color defaultBg = null;
       String defaultBgString = context.getRequest().getParameter("background");
+      String attSpace = attachment.getDoc().getDocumentReference().getLastSpaceReference(
+          ).getName();
+      String filterString = context.getWiki().getSpacePreference("imageDownloadFilter", 
+          attSpace, "", context);
+      if((filterString == null) || "".equals(filterString)) {
+        filterString = context.getRequest().getParameter("filter");
+      }
       return getComputeImgCmd().computeImage(attachment, context, attachment, sheight,
-          swidth, copyright, watermark, defaultBg, defaultBgString);
+          swidth, copyright, watermark, defaultBg, defaultBgString, filterString);
     }
     return attachment;
   }

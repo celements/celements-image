@@ -22,10 +22,14 @@ package com.celements.photo.plugin.cmd;
 import java.awt.Color;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorConvertOp;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,7 +52,7 @@ public class ComputeImageCommand {
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
-      String defaultBgStr) {
+      String defaultBgStr, String filterStr) {
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -74,7 +78,7 @@ public class ComputeImageCommand {
 //          + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(
           width, height), copyright, watermark, cropX, cropY, cropW, cropH, blackAndWhite,
-          defaultBg, lowerBound, lowerBoundPositioning, raw);
+          defaultBg, lowerBound, lowerBoundPositioning, filterStr, raw);
       LOGGER.debug("attachment key: '" + key + "'");
       InputStream data = getImageCacheCmd().getImageForKey(key);
       if (data != null) {
@@ -120,6 +124,45 @@ public class ComputeImageCommand {
             byte[] bNwImage = out.toByteArray();
             attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
+          }
+          //TODO prevent multiple de- and encoding
+          if((filterStr != null) && !"".equals(filterStr)) {
+            LOGGER.debug("Filter found [" + filterStr + "]");
+            String[] filterParts = filterStr.split("[,;| ]+");
+            LOGGER.debug("Filter definition has " + filterParts.length + " parts");
+            if(filterParts.length > 2) {
+              try {
+                int kerWidth = Integer.parseInt(filterParts[0]);
+                int kerHeight = Integer.parseInt(filterParts[1]);
+                float[] kerMatrix = new float[kerWidth*kerHeight];
+                for(int i = 0; i < kerWidth*kerHeight; i++) {
+                  float x;
+                  if(filterParts.length <= 4) {
+                    x = Float.parseFloat(filterParts[2]);
+                    if((filterParts.length == 4) && (i == ((kerWidth*kerHeight)-1)/2)) {
+                      x = Float.parseFloat(filterParts[3]);
+                    }
+                  } else {
+                    x = Float.parseFloat(filterParts[i+2]);
+                  }
+                  kerMatrix[i] = x;
+                }
+                img = decodeImageCommand.readImage(attachmentClone, context);
+                Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
+                LOGGER.debug("Filtering with kernel configured as " + kerWidth + ", " 
+                    + kerHeight + ", " + Arrays.toString(kerMatrix));
+                BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
+                BufferedImage filteredImg = op.filter(img, null);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
+                    context));
+                attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
+                timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
+                    + "] after ");
+              } catch(NumberFormatException nfe) {
+                LOGGER.error("Exception parsing filter string [" + filterStr + "]", nfe);
+              }
+            }
           }
         } else {
           LOGGER.info("Raw image! No alterations done.");
