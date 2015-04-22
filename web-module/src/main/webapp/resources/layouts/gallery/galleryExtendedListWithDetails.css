@@ -124,6 +124,9 @@ a.celements_gallery_link_slideshow {
   padding-top: 5px;
   padding-bottom: 10px;
 }
+.gallery .presentationList ul li.ImageGallery {
+  float: none;
+}
 
 /* Gallery Overlay fixes */
 .celanim_overlay_wrapper .highslide-html,
