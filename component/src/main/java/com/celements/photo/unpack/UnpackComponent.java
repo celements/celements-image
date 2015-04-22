@@ -1,8 +1,10 @@
 package com.celements.photo.unpack;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -50,31 +52,45 @@ public class UnpackComponent implements IUnpackComponentRole {
     if(zipSrcFile != null) {
       LOGGER.info("START unzip: zip='" + zipSrcFile.getFilename() + "' file='" + attName + 
           "'");
-      if(isZipFile(zipSrcFile)){
-        ByteArrayOutputStream newAttOutStream = null;
-        try {
+      ByteArrayOutputStream newAttOutStream = null;
+      ByteArrayInputStream imageIn = null;
+      try {
+        byte[] imageContent = null;
+        if(isZipFile(zipSrcFile)){
           newAttOutStream = getUnzip().getFile(attName, 
               zipSrcFile.getContentInputStream(getContext()));
-          cleanName = attName.replace(System.getProperty("file.separator"), ".");
-          cleanName = getContext().getWiki().clearName(cleanName, false, true, 
-              getContext());
-          XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
-              getContext());
-          XWikiAttachment att = getAddAttachmentToDoc().addAtachment(destDoc, 
-              newAttOutStream.toByteArray(), cleanName, getContext());
-          LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
-              ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
-        } catch (IOException ioe) {
-          LOGGER.error("Exception while unpacking zip", ioe);
-        } catch (XWikiException xwe) {
-          LOGGER.error("Exception while unpacking zip", xwe);
-        } finally {
-          if(newAttOutStream != null) {
-            try {
-              newAttOutStream.close();
-            } catch (IOException ioe) {
-              LOGGER.error("Could not close input stream.", ioe);
-            }
+          imageContent = newAttOutStream.toByteArray();
+        } else if(isImgFile(zipSrcFile)) {
+          imageIn = new ByteArrayInputStream((IOUtils.toByteArray(
+              zipSrcFile.getContentInputStream(getContext()))));
+          imageContent = IOUtils.toByteArray(imageIn);
+        }
+        cleanName = attName.replace(System.getProperty("file.separator"), ".");
+        cleanName = getContext().getWiki().clearName(cleanName, false, true, 
+            getContext());
+        XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
+            getContext());
+        XWikiAttachment att = getAddAttachmentToDoc().addAtachment(destDoc, 
+            imageContent, cleanName, getContext());
+        LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
+            ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
+      } catch (IOException ioe) {
+        LOGGER.error("Exception while unpacking zip", ioe);
+      } catch (XWikiException xwe) {
+        LOGGER.error("Exception while unpacking zip", xwe);
+      } finally {
+        if(newAttOutStream != null) {
+          try {
+            newAttOutStream.close();
+          } catch (IOException ioe) {
+            LOGGER.error("Could not close stream 'newAttOutStream'.", ioe);
+          }
+        }
+        if(imageIn != null) {
+          try {
+            imageIn.close();
+          } catch (IOException ioe) {
+            LOGGER.error("Could not close input stream 'imageIn'.", ioe);
           }
         }
       }
@@ -104,6 +120,10 @@ public class UnpackComponent implements IUnpackComponentRole {
     return (file != null) && (file.getMimeType(getContext()).equalsIgnoreCase(
         ImageLibStrings.MIME_ZIP) || file.getMimeType(getContext()).equalsIgnoreCase(
         ImageLibStrings.MIME_ZIP_MICROSOFT));
+  }
+  
+  boolean isImgFile(XWikiAttachment file) {
+    return (file != null) && isImgFile(file.getMimeType(getContext()));
   }
   
   boolean isImgFile(String fileName) {
