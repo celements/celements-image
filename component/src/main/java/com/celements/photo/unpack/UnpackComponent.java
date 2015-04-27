@@ -65,16 +65,22 @@ public class UnpackComponent implements IUnpackComponentRole {
           imageContent = IOUtils.toByteArray(zipSrcFile.getContentInputStream(
               getContext()));
           LOGGER.debug("single image import. array length '" + imageContent.length + "'");
+        } else {
+          LOGGER.error("Try to import non zip or image file to gallery: zip='" 
+              + zipSrcFile.getFilename() + "', file='" + attName + "', mime='" 
+              + zipSrcFile.getMimeType(getContext()) + "'");
         }
         cleanName = attName.replace(System.getProperty("file.separator"), ".");
         cleanName = getContext().getWiki().clearName(cleanName, false, true, 
             getContext());
-        XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
-            getContext());
-        XWikiAttachment att = getAddAttachmentToDoc().addAtachment(destDoc, 
-            imageContent, cleanName, getContext());
-        LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
-            ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
+        if(imageContent != null) {
+          XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
+              getContext());
+          XWikiAttachment att = getAddAttachmentToDoc().addAtachment(destDoc, 
+              imageContent, cleanName, getContext());
+          LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
+              ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
+        }
       } catch (IOException ioe) {
         LOGGER.error("Exception while unpacking zip", ioe);
       } catch (XWikiException xwe) {
