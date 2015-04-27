@@ -59,9 +59,12 @@ public class UnpackComponent implements IUnpackComponentRole {
           newAttOutStream = getUnzip().getFile(attName, 
               zipSrcFile.getContentInputStream(getContext()));
           imageContent = newAttOutStream.toByteArray();
+          LOGGER.debug("zip import. image content array length '" + imageContent.length 
+              + "'");
         } else if(isImgFile(zipSrcFile)) {
           imageContent = IOUtils.toByteArray(zipSrcFile.getContentInputStream(
               getContext()));
+          LOGGER.debug("single image import. array length '" + imageContent.length + "'");
         }
         cleanName = attName.replace(System.getProperty("file.separator"), ".");
         cleanName = getContext().getWiki().clearName(cleanName, false, true, 
