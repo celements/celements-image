@@ -53,7 +53,6 @@ public class UnpackComponent implements IUnpackComponentRole {
       LOGGER.info("START unzip: zip='" + zipSrcFile.getFilename() + "' file='" + attName + 
           "'");
       ByteArrayOutputStream newAttOutStream = null;
-      ByteArrayInputStream imageIn = null;
       try {
         byte[] imageContent = null;
         if(isZipFile(zipSrcFile)){
@@ -61,9 +60,8 @@ public class UnpackComponent implements IUnpackComponentRole {
               zipSrcFile.getContentInputStream(getContext()));
           imageContent = newAttOutStream.toByteArray();
         } else if(isImgFile(zipSrcFile)) {
-          imageIn = new ByteArrayInputStream((IOUtils.toByteArray(
-              zipSrcFile.getContentInputStream(getContext()))));
-          imageContent = IOUtils.toByteArray(imageIn);
+          imageContent = IOUtils.toByteArray(zipSrcFile.getContentInputStream(
+              getContext()));
         }
         cleanName = attName.replace(System.getProperty("file.separator"), ".");
         cleanName = getContext().getWiki().clearName(cleanName, false, true, 
@@ -84,13 +82,6 @@ public class UnpackComponent implements IUnpackComponentRole {
             newAttOutStream.close();
           } catch (IOException ioe) {
             LOGGER.error("Could not close stream 'newAttOutStream'.", ioe);
-          }
-        }
-        if(imageIn != null) {
-          try {
-            imageIn.close();
-          } catch (IOException ioe) {
-            LOGGER.error("Could not close input stream 'imageIn'.", ioe);
           }
         }
       }
