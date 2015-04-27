@@ -123,7 +123,12 @@ public class UnpackComponent implements IUnpackComponentRole {
   }
   
   boolean isImgFile(XWikiAttachment file) {
-    return (file != null) && isImgFile(file.getMimeType(getContext()));
+    String ending = file.getFilename();
+    String mimeType = file.getMimeType(getContext());
+    if((mimeType != null) && !"".equals(mimeType)) {
+      ending = mimeType.replaceAll("/", ".");
+    }
+    return (file != null) && isImgFile(ending);
   }
   
   boolean isImgFile(String fileName) {
