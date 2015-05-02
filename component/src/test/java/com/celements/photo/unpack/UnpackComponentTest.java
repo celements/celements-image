@@ -103,7 +103,8 @@ public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsImgFile_false() {
-    assertFalse(upc.isImgFile(null));
+    assertFalse(upc.isImgFile((XWikiAttachment)null));
+    assertFalse(upc.isImgFile((String)null));
     assertFalse(upc.isImgFile(""));
     assertFalse(upc.isImgFile("123.jzpg"));
     assertFalse(upc.isImgFile("jpg"));
