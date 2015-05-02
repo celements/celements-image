@@ -11,6 +11,8 @@
 #else   
 #set($contentDoc = $tdoc)
 #end
+##prevent problems with overwritten contentDoc variables
+#set($celGalleryDoc = $contentDoc)
 #set($overwritePresCmCssClass = ' ')
 #set($overwriteNavCMcssClass = 'cel_cm_gallery_view')
 #set($emptyDictKeySuffix = '_gallery_overview')

@@ -1,6 +1,8 @@
 ## #set($title = "$!slidedoc.getTitle()")
 #set($slideFN = $services.model.serialize($slidedoc.documentReference, 'local'))
-#if("$!contentDoc" != '') ## gets set in ImageGalleryView.vm
+#if("$!celGalleryDoc" != '') ## gets set in ImageGalleryView.vm
+#set($theGalleryDoc = $celGalleryDoc)
+#elseif("$!contentDoc" != '') ##OLD: gets set in ImageGalleryView.vm
 #set($theGalleryDoc = $contentDoc)
 #else
 #set($theGalleryDoc = $doc)
