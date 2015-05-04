@@ -59,9 +59,9 @@ $celementsweb.addExtJSfileOnce(':celJS/images/loadMetaTags.js')
   #if(("$!gObj" != '') && (("$!gObj.getProperty('photoWidth').getValue()" != '') || ("$!gObj.getProperty('height2').getValue()" != '')))
     Maximale Grösse (automatischer resize): $!gObj.getProperty("photoWidth").getValue() px x $!gObj.getProperty("height2").getValue() px<br />
   #end
+  #set($contentText = $services.celementsweb.renderInheritableDocument($services.model.resolveDocument('Templates.ImageSlideImportContentText')))
   Der Inhalt dieses Textfeldes wird jedem Slide hinzugef&uuml;gt.
-  <textarea id="slideContent" style="width: 550px; height: 100px;" name="slideContent">#*<h1 class="imageHeadline">{metatag:Headline}</h1>
-<p class="imageTitle">{metatag:Object Name}</p>*#</textarea>
+  <textarea id="slideContent" style="width: 550px; height: 100px;" name="slideContent">$contentText</textarea>
   <div style="display:none;">
     Verf&uuml;gbare MetaTags:
     <p id="metaTags"></p>
