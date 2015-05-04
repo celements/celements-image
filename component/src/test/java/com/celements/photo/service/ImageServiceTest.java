@@ -266,8 +266,11 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
     expect(xwiki.copyDocument(eq(localTemplateRef), eq(slideDocRef), eq(true),
         same(context))).andReturn(true).once();
-    String attFullName = "ContentAttachment.FileBaseDoc;myImg.png";
-    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/myImg.png";
+    String attFilename = "myImg.png";
+    String attFilenameNoExtension = "myImg";
+    String clearedAttFilename = "myImg";
+    String attFullName = "ContentAttachment.FileBaseDoc;" + attFilename;
+    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
         ).andReturn(imgAttURL).once();
     imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
@@ -304,8 +307,10 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
         context.getDatabase()));
-    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Slide")).andReturn(
-        slideDocRef);
+    expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide" 
+        + clearedAttFilename))).andReturn(slideDocRef);
+    expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), 
+        same(getContext()))).andReturn(clearedAttFilename).once();
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
@@ -352,8 +357,11 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
     expect(xwiki.copyDocument(eq(localTemplateRef), eq(slideDocRef), eq(true),
         same(context))).andReturn(true).once();
-    String attFullName = "ContentAttachment.FileBaseDoc;myImg.png";
-    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/myImg.png";
+    String attFilename = "myImg.png";
+    String attFilenameNoExtension = "myImg";
+    String clearedAttFilename = "myImg";
+    String attFullName = "ContentAttachment.FileBaseDoc;" + attFilename;
+    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
         ).andReturn(imgAttURL).once();
     imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
@@ -390,8 +398,10 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
         context.getDatabase()));
-    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Slide")).andReturn(
-        slideDocRef);
+    expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide" 
+        + clearedAttFilename))).andReturn(slideDocRef);
+    expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), 
+        same(getContext()))).andReturn(clearedAttFilename).once();
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));
@@ -438,8 +448,11 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
     expect(xwiki.copyDocument(eq(localTemplateRef), eq(slideDocRef), eq(true),
         same(context))).andReturn(true).once();
-    String attFullName = "ContentAttachment.FileBaseDoc;myImg.png";
-    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/myImg.png";
+    String attFilename = "myImg.png";
+    String attFilenameNoExtension = "myImg";
+    String clearedAttFilename = "myImg";
+    String attFullName = "ContentAttachment.FileBaseDoc;" + attFilename;
+    String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(context))
         ).andReturn(imgAttURL).once();
     imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
@@ -476,8 +489,10 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
         context.getDatabase()));
-    expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Slide")).andReturn(
+    expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide" + clearedAttFilename))).andReturn(
         slideDocRef);
+    expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), 
+        same(getContext()))).andReturn(clearedAttFilename).once();
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(
         galleryDocRef, "Slide", attFullName));

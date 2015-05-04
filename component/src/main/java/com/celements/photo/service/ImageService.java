@@ -269,8 +269,13 @@ public class ImageService implements IImageService {
     try {
       DocumentReference slideTemplateRef = getImageSlideTemplateRef();
       String gallerySpaceName = getPhotoAlbumSpaceRef(galleryDocRef).getName();
+      String filename = attFullName.replaceAll("^.*;(.*)$", "$1");
+      String clearedAttName = getContext().getWiki().clearName(filename.replaceAll(
+          "^(.*)\\.[a-zA-Z]{3,4}$", "$1"), true, true, 
+          getContext());
+      String slideDocName = slideBaseName + clearedAttName;
       DocumentReference newSlideDocRef = getNextFreeDocNameCmd().getNextTitledPageDocRef(
-          gallerySpaceName, slideBaseName, getContext());
+          gallerySpaceName, slideDocName, getContext());
       if (getContext().getWiki().copyDocument(slideTemplateRef, newSlideDocRef, true,
           getContext())) {
         XWikiDocument newSlideDoc = getContext().getWiki().getDocument(newSlideDocRef,
@@ -320,7 +325,6 @@ public class ImageService implements IImageService {
             }
           }
         } else if(attDocRef.equals(centralFBDocRef)) {
-          String filename = attFullName.replaceAll("^.*;(.*)$", "$1");
           LOGGER.debug("get meta tags for central file base image" + attDocRef);
           LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
           Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
