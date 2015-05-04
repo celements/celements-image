@@ -23,6 +23,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -35,6 +36,10 @@ import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.utilities.ImportFileObject;
 import com.celements.photo.utilities.Unzip;
+import com.celements.search.lucene.ILuceneSearchService;
+import com.celements.search.lucene.LuceneSearchException;
+import com.celements.search.lucene.LuceneSearchResult;
+import com.celements.search.lucene.query.LuceneQuery;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
@@ -70,6 +75,9 @@ public class ImageService implements IImageService {
   ITreeNodeService treeNodeService;
 
   NextFreeDocNameCommand nextFreeDocNameCmd;
+
+  @Requirement
+  private ILuceneSearchService searchService;
 
   @Requirement
   Execution execution;
@@ -299,7 +307,7 @@ public class ImageService implements IImageService {
         VelocityContext vcontext = (VelocityContext)getContext().get("vcontext");
         vcontext.put("imageURL", fullImgURL);
         vcontext.put("attFullName", attFullName);
-        Map<String, String> metaTagMap = new HashMap<String, String>();
+        Map<String, String> metaTagMap = Collections.emptyMap();
         DocumentReference attDocRef = webUtilsService.resolveDocumentReference(
             attFullName.replaceAll("^(.*);.*$", "$1"));
         DocumentReference centralFBDocRef = null;
@@ -313,23 +321,33 @@ public class ImageService implements IImageService {
           LOGGER.debug("get meta tags from attachment document " + attDocRef);
           XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext(
               ));
-          DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
-              "Classes.PhotoMetainfoClass");
-          List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
-          if(metaObjs != null) {
-            for(BaseObject tag : metaObjs) {
-              if(tag != null) {
-                metaTagMap.put(tag.getStringValue("name"), tag.getStringValue(
-                    "description"));
-              }
-            }
-          }
+          metaTagMap = getMetaTagObjectsFromDoc(attDoc);
         } else if(attDocRef.equals(centralFBDocRef)) {
           LOGGER.debug("get meta tags for central file base image" + attDocRef);
-          LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
-          Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
-          for(String key : map.keySet()) {
-            metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
+          LuceneQuery query = searchService.createQuery();
+          query.add(searchService.createRestriction("Celements2.PageType.page_type", 
+              "\"DMS-Document\""));
+          query.add(searchService.createRestriction("Classes.PhotoMetainfoClass.name", 
+              "\"cleared_filename\""));
+          query.add(searchService.createRestriction("Classes.PhotoMetainfoClass." + 
+              "description", filename));
+          LuceneSearchResult searchResult = searchService.search(query, null, null);
+          List<EntityReference> resultList = Collections.emptyList();
+          try {
+            resultList = searchResult.getResults();
+          } catch (LuceneSearchException lse) {
+            LOGGER.error("Exception searching for imported images", lse);
+          }
+          if(resultList.size() > 0) {
+            XWikiDocument separateDoc = getContext().getWiki().getDocument(
+                new DocumentReference(resultList.get(0)), getContext());
+            metaTagMap.putAll(getMetaTagObjectsFromDoc(separateDoc));
+          } else {
+            LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
+            Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
+            for(String key : map.keySet()) {
+              metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
+            }
           }
         } else {
           LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not" +
@@ -355,6 +373,22 @@ public class ImageService implements IImageService {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
     }
     return false;
+  }
+
+  Map<String, String> getMetaTagObjectsFromDoc(XWikiDocument attDoc) {
+    Map<String, String> metaTagMap = new HashMap<String, String>();
+    DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
+        "Classes.PhotoMetainfoClass");
+    List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
+    if(metaObjs != null) {
+      for(BaseObject tag : metaObjs) {
+        if(tag != null) {
+          metaTagMap.put(tag.getStringValue("name"), tag.getStringValue(
+              "description"));
+        }
+      }
+    }
+    return metaTagMap;
   }
 
   private boolean fixMenuItemPosition(XWikiDocument newSlideDoc) {
