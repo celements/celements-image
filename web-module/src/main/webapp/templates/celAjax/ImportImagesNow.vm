@@ -1,4 +1,4 @@
-#set($destSpace = "Images")
+#set($destSpace = "ZipImportImages")
 #if("$!request.imgDestSpace" != '')
   #set($destSpace = "$!request.imgDestSpace")
 #end
@@ -9,9 +9,11 @@
   #if(("$!param.indexOf('filename_')" == '0') && ("$!request.get($param)" != ''))
     <li>$request.get($param)</li>
     #set($attDocRef = $services.model.resolveDocument("$request.attDoc"))
-    #set($destDocRef = $celementsweb.getNextTitledPageDocRef($destSpace, "Img"))
+    #set($destDocName = $services.celementsphoto.fileNameToDocName("$!request.get($param)"))
+    #set($destDocRef = $celementsweb.getNextTitledPageDocRef($destSpace, $destDocName))
     #set($effectiveName = $services.celementsphoto.unzipFileToAttachment($attDocRef, "$!request.filename", "$!request.get($param)", $destDocRef))
     $services.celmetatags.extractMetadataToDocument($destDocRef, $effectiveName, $destDocRef)
+    $services.celmetatags.addTagToDocument($destDocRef, '[celements] original_filename', "$!request.filename")
     #if("$!request.gallery" != '')
       TODO For direct import add images to $request.gallery
       

@@ -22,7 +22,22 @@
 #foreach($param in $request.getParameterNames())
   #if(("$!param.indexOf('filename_')" == '0') && ("$!request.get($param)" != ''))
     <li>$request.get($param)</li>
-    #set($cleanedFilename = $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height))
+    #set($imageZipImport = $xwiki.getWebPreferenceAsInt("image_zip_import", 0))
+    #if($imageZipImport <= 1)
+      #set($cleanedFilename = $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height))
+    #end
+    #if($imageZipImport >= 1)
+      #set($destSpace = "ZipImportImages")
+      #if("$!request.imgDestSpace" != '')
+        #set($destSpace = "$!request.imgDestSpace")
+      #end
+      #set($attDocRef = $services.model.resolveDocument("$request.attDoc"))
+      #set($destDocName = $services.celementsphoto.fileNameToDocName("$!request.get($param)"))
+      #set($destDocRef = $celementsweb.getNextTitledPageDocRef($destSpace, $destDocName))
+      #set($cleanedFilename = $services.celementsphoto.unzipFileToAttachment($attDocRef, "$!request.filename", "$!request.get($param)", $destDocRef))
+      $services.celmetatags.extractMetadataToDocument($destDocRef, $cleanedFilename, $destDocRef)
+      $services.celmetatags.addTagToDocument($destDocRef, '[celements] original_filename', "$!request.filename")
+    #end
     #foreach($filter in $request.getParameterValues('uploadFilterItem'))
       #set($filterRef = $services.model.resolveDocument("$!filter"))
       #if(("$!filter" != '') && ($xwiki.exists($filterRef)))

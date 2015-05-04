@@ -20,10 +20,13 @@
 package com.celements.photo.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -45,6 +48,8 @@ import com.xpn.xwiki.web.Utils;
 
 @Component("celmetatags")
 public class MetaInfoScriptService implements ScriptService {
+  
+  private static Logger _LOGGER = LoggerFactory.getLogger(MetaInfoScriptService.class);
   
   @Requirement
   IMetadataDocumentRole metaDocComp;
@@ -147,6 +152,20 @@ public class MetaInfoScriptService implements ScriptService {
     }
     MetaInfoExtractor extractor = (MetaInfoExtractor)getContext().get("nInfoExtractor");
     return extractor.cleanCtrlChars(tag);
+  }
+  
+  public void addTagToDocument(DocumentReference docRef, String name, String value) {
+    XWikiDocument doc;
+    try {
+      doc = getContext().getWiki().getDocument(docRef, getContext());
+      Map<String, String> tags = new HashMap<String, String>();
+      tags.put(name, value);
+      if(metaDocComp.addTagsToDoc(tags, doc, false)) {
+        getContext().getWiki().saveDocument(doc, "added tag '" + name + "'", getContext());
+      }
+    } catch (XWikiException xwe) {
+      _LOGGER.error("Exception adding tag to document " + docRef.getName(), xwe);
+    }
   }
   
   private XWikiContext getContext() {

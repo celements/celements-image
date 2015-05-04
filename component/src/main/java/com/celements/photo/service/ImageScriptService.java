@@ -43,6 +43,7 @@ import com.celements.photo.utilities.ImportFileObject;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,6 +51,7 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component("celementsphoto")
@@ -311,6 +313,11 @@ public class ImageScriptService implements ScriptService {
   public boolean useImageAnimations() {
     return "1".equals(getContext().getWiki().getSpacePreference("celImageAnimation",
         "celements.celImageAnimation", "0", getContext()));
+  }
+  
+  public String fileNameToDocName(String filename) {
+    String cleaned = filename.replace(System.getProperty("file.separator"), ".");
+    return getContext().getWiki().clearName(cleaned, true, true, getContext());
   }
 
 }

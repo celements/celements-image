@@ -52,7 +52,7 @@ public class MetadataDocument implements IMetadataDocumentRole {
     }
   }
 
-  Boolean addTagsToDoc(Map<String, String> tags, XWikiDocument destinationDoc,
+  public Boolean addTagsToDoc(Map<String, String> tags, XWikiDocument destinationDoc,
       Boolean filteredImport) throws XWikiException {
     Boolean needsSave = false;
     for (String tag : tags.keySet()) {
