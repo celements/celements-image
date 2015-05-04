@@ -36,7 +36,7 @@
       #set($destDocRef = $celementsweb.getNextTitledPageDocRef($destSpace, $destDocName))
       #set($cleanedFilename = $services.celementsphoto.unzipFileToAttachment($attDocRef, "$!request.filename", "$!request.get($param)", $destDocRef))
       $services.celmetatags.extractMetadataToDocument($destDocRef, $cleanedFilename, $destDocRef)
-      $services.celmetatags.addTagToDocument($destDocRef, '[celements] original_filename', "$!request.filename")
+      $services.celmetatags.addTagToDocument($destDocRef, 'original_filename', "[celements] $!request.get($param)")
     #end
     #foreach($filter in $request.getParameterValues('uploadFilterItem'))
       #set($filterRef = $services.model.resolveDocument("$!filter"))
