@@ -22,11 +22,11 @@
 #foreach($param in $request.getParameterNames())
   #if(("$!param.indexOf('filename_')" == '0') && ("$!request.get($param)" != ''))
     <li>$request.get($param)</li>
-    #set($imageZipImport = $xwiki.getWebPreferenceAsInt("image_zip_import", 0))
-    #if($imageZipImport <= 1)
+    #set($imageZipImport = $xwiki.getWebPreference('image_zip_import', 'old'))
+    #if(($imageZipImport == 'old') || ($imageZipImport == 'both'))
       #set($cleanedFilename = $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height))
     #end
-    #if($imageZipImport >= 1)
+    #if(($imageZipImport == 'new') || ($imageZipImport == 'both'))
       #set($destSpace = "ZipImportImages")
       #if("$!request.imgDestSpace" != '')
         #set($destSpace = "$!request.imgDestSpace")
