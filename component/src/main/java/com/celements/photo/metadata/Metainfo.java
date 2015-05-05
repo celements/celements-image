@@ -174,7 +174,7 @@ public class Metainfo {
     }
   
     clearOutdatedMetadata(doc, id, context);
-    // TODO ugly, but otherwise updating files seems not to work properly
+    //FIXME ugly, but otherwise updating files seems not to work properly
     context.getWiki().flushCache(context);
     
     List<BaseObject> metadataObjs = celeMeta.getXObjects(
