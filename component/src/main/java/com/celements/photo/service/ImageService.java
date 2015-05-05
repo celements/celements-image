@@ -330,7 +330,7 @@ public class ImageService implements IImageService {
           query.add(searchService.createRestriction("Classes.PhotoMetainfoClass.name", 
               "\"cleared_filename\""));
           query.add(searchService.createRestriction("Classes.PhotoMetainfoClass." + 
-              "description", filename));
+              "description", "\"" + filename + "\""));
           LuceneSearchResult searchResult = searchService.search(query, null, null);
           List<EntityReference> resultList = Collections.emptyList();
           try {
