@@ -345,10 +345,7 @@ public class ImageService implements IImageService {
           if(resultList.size() > 0) {
             XWikiDocument separateDoc = getContext().getWiki().getDocument(
                 new DocumentReference(resultList.get(0)), getContext());
-            Map<String, String> tagMap = getMetaTagObjectsFromDoc(separateDoc);
-            for(String key : tagMap.keySet()) {
-              metaTagMap.put(key, tagMap.get(key));
-            }
+            metaTagMap = getMetaTagObjectsFromDoc(separateDoc);
           } else {
             LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
             Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
