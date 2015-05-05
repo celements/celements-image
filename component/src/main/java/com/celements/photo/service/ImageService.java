@@ -338,6 +338,7 @@ public class ImageService implements IImageService {
           } catch (LuceneSearchException lse) {
             LOGGER.error("Exception searching for imported images", lse);
           }
+          LOGGER.debug("DMS-Document for " + filename + "found: " + resultList.size());
           if(resultList.size() > 0) {
             XWikiDocument separateDoc = getContext().getWiki().getDocument(
                 new DocumentReference(resultList.get(0)), getContext());
