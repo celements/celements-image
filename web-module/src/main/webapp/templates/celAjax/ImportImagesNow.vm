@@ -13,7 +13,7 @@
     #set($destDocRef = $celementsweb.getNextTitledPageDocRef($destSpace, $destDocName))
     #set($effectiveName = $services.celementsphoto.unzipFileToAttachment($attDocRef, "$!request.filename", "$!request.get($param)", $destDocRef))
     $services.celmetatags.extractMetadataToDocument($destDocRef, $effectiveName, $destDocRef)
-    $services.celmetatags.addTagToDocument($destDocRef, 'original_name', "[celements] $!{request.get($param).replaceAll('^(.*)\.[a-zA-Z]{3,4}$', '$1')}")
+    $services.celmetatags.addTagToDocument($destDocRef, 'original_name', "[celements] $!{request.get($param).replaceAll('^.*/(.*)$', '$1').replaceAll('^(.*)\.[a-zA-Z]{3,4}$', '$1')}")
     $services.celmetatags.addTagToDocument($destDocRef, 'original_filename', "[celements] $!request.get($param)")
     $services.celmetatags.addTagToDocument($destDocRef, 'cleared_filename', "[celements] $!cleanedFilename")
     #if("$!request.gallery" != '')
