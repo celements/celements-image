@@ -30,9 +30,9 @@ $galleryNav.loadConfigFromDoc($celldoc.documentReference)
 #end
 #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
 #set($galleryPresentationCount = $galleryPresentationCount + 1)
-<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery_view galleryViewScrollContainer">
-<div class="pfeil_links"></div>
-<div class="pfeil_rechts"></div>
+<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery_view galleryViewScrollContainer swiper-container">
+<div class="pfeil_links swiper-button-prev"></div>
+<div class="pfeil_rechts swiper-button-next"></div>
 #parse('celTemplates/PresentationView.vm')
 <!-- GP$!{galleryPresentationCount}$!{contentDoc.getName()} --></div>
 #else

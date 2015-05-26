@@ -1,0 +1,16 @@
+#set($celldocRef = $services.model.resolveDocument("$!request.galleryNavConf"))
+#set($createdNav = $celementsweb.createNavigation())
+$createdNav.loadConfigFromDoc($celldocRef)
+#if("$!request.offset" != '')
+#set($offset = $xwiki.parseInt("$!request.offset"))
+#if("$!offset" != '')
+$createdNav.setOffset($offset)
+#end
+#end
+#if("$!request.overwriteItemsPerPage" != '')
+#set($overwriteItemsPerPage = $xwiki.parseInt("$!request.overwriteItemsPerPage"))
+#if("$!overwriteItemsPerPage" != '')
+$createdNav.setNumberOfItem($overwriteItemsPerPage)
+#end
+#end
+$createdNav.includeNavigation()
