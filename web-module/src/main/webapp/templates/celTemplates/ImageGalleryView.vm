@@ -8,7 +8,7 @@
 #if(($context.action != 'edit') && ("$!request.xpage" != "overlay"))
 #if("$!celldoc" != '')
 #set($contentDoc = $celldoc)
-#else   
+#else
 #set($contentDoc = $tdoc)
 #end
 ##prevent problems with overwritten contentDoc variables
