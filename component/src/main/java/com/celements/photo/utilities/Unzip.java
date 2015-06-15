@@ -129,6 +129,11 @@ public class Unzip {
   private ZipInputStream getZipInputStream(InputStream in) {
     //historically zip supported only IBM Code Page 437 encoding. Today others can occur,
     // like e.g. UTF-8 or OS defaults
-    return new ZipInputStream(new BufferedInputStream(in));//, Charset.forName("UTF-8"));//"Cp437"));
+    //FIXME try apache commons zip
+    //  Java zip fails with ...
+    //    ... "Cp437" in recognizing umlauts correctly 
+    //                e.g. linux & mac command line 'zip', mac right-click compress
+    //    ... "UTF-8" in Windows system default and WinRAR with a Java Exception
+    return new ZipInputStream(new BufferedInputStream(in), Charset.forName("Cp437"));
   }
 }
