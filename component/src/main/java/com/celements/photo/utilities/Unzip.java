@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -122,10 +123,12 @@ public class Unzip {
    */
   private ZipInputStream getZipInputStream(byte[] srcFile) {
     ByteArrayInputStream in = new ByteArrayInputStream(srcFile);
-    return new ZipInputStream(new BufferedInputStream(in));
+    return getZipInputStream(in);
   }
 
   private ZipInputStream getZipInputStream(InputStream in) {
-    return new ZipInputStream(new BufferedInputStream(in));
+    //historically zip supported only IBM Code Page 437 encoding. Today others can occur,
+    // like e.g. UTF-8 or OS defaults
+    return new ZipInputStream(new BufferedInputStream(in), Charset.forName("Cp437"));
   }
 }
