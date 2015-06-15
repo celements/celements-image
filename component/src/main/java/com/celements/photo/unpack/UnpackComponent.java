@@ -1,6 +1,5 @@
 package com.celements.photo.unpack;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -12,6 +11,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.Unzip;
@@ -24,6 +24,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class UnpackComponent implements IUnpackComponentRole {
   @Requirement
   Execution execution;
+  
+  @Requirement
+  IAttachmentServiceRole attService;
   
   XWikiContext inject_context = null;
   Unzip inject_unzip = null;
@@ -71,8 +74,7 @@ public class UnpackComponent implements IUnpackComponentRole {
               + zipSrcFile.getMimeType(getContext()) + "'");
         }
         cleanName = attName.replace(System.getProperty("file.separator"), ".");
-        cleanName = getContext().getWiki().clearName(cleanName, false, true, 
-            getContext());
+        cleanName = attService.clearFileName(cleanName);
         if(imageContent != null) {
           XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
               getContext());
