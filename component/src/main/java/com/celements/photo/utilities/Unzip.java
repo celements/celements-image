@@ -129,6 +129,6 @@ public class Unzip {
   private ZipInputStream getZipInputStream(InputStream in) {
     //historically zip supported only IBM Code Page 437 encoding. Today others can occur,
     // like e.g. UTF-8 or OS defaults
-    return new ZipInputStream(new BufferedInputStream(in), Charset.forName("UTF-8"));//"Cp437"));
+    return new ZipInputStream(new BufferedInputStream(in));//, Charset.forName("UTF-8"));//"Cp437"));
   }
 }
