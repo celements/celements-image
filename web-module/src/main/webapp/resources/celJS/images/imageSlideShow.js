@@ -296,17 +296,24 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         }
       },
 
+      _getImageSlideShowObj : function() {
+        var _me = this;
+        if (!_me._imageSlideShowObj) {
+          _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
+            'configReader' : _me._configReader,
+            'containerHtmlElem' : _me._containerHtmlElem
+          });
+        }
+        return _me._imageSlideShowObj;
+      },
+
       _imageSlideShowLoadFirstContent : function(event) {
         var _me = this;
         var dialogConfig = event.memo;
         if (dialogConfig.slideShowElem && (dialogConfig.slideShowElem === _me)) {
           _me._containerHtmlElem = $('yuiOverlayContainer');
-          _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
-            'configReader' : _me._configReader,
-            'containerHtmlElem' : _me._containerHtmlElem
-          });
           _me._configReader.loadOverlayLayoutName(function(galleryLayoutName) {
-            _me._imageSlideShowObj.start();
+            _me._getImageSlideShowObj().start();
           });
           event.stop();
         }
@@ -399,17 +406,25 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         }
       },
 
-      /** before: startNonOverlaySlideShow **/
-      install : function() {
+      _getImageSlideShowObj : function() {
         var _me = this;
-        _me._wrapSplashImage();
-        if (!_me._configReader.hasCustomStart() || _me._configReader.hasAnimation()
-            || _me._configReader.hasAddNavigation()) {
+        if (!_me._imageSlideShowObj) {
           _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
             'configReader' : _me._configReader,
             'containerHtmlElem' : _me._containerHtmlElem
           });
-          _me._imageSlideShowObj.start();
+        }
+        return _me._imageSlideShowObj;
+      },
+
+      /** before: startNonOverlaySlideShow **/
+      install : function() {
+        var _me = this;
+        console.log('start install image slideshow for: ', _Me._containerHtmlElem);
+        _me._wrapSplashImage();
+        if (!_me._configReader.hasCustomStart() || _me._configReader.hasAnimation()
+            || _me._configReader.hasAddNavigation()) {
+          _me._getImageSlideShowObj().start();
         } else if ((typeof console != 'undefined')
             && (typeof console.log != 'undefined')) {
             console.log('skipping init image slide show (no nav and anim) for ',
@@ -636,9 +651,9 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             slideWrapper.setStyle(stylesProp);
           }
           console.log('_centerSplashImage: before _centerCurrentSlide ',
-              _me._imageSlideShowObj);
-          if (_me._imageSlideShowObj) {
-            var celSlideShoObj = _me._imageSlideShowObj._getCelSlideShowObj();
+              _me._getImageSlideShowObj());
+          if (_me._getImageSlideShowObj()) {
+            var celSlideShoObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
             console.log('_centerSplashImage: before _centerCurrentSlide 2 ',
                 celSlideShoObj);
             if (celSlideShoObj) {
