@@ -409,6 +409,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       _getImageSlideShowObj : function() {
         var _me = this;
         if (!_me._imageSlideShowObj) {
+          console.log('_getImageSlideShowObj create imageSlideShowObj for: ',
+              _me._containerHtmlElem);
           _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
             'configReader' : _me._configReader,
             'containerHtmlElem' : _me._containerHtmlElem
@@ -420,7 +422,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       /** before: startNonOverlaySlideShow **/
       install : function() {
         var _me = this;
-        console.log('start install image slideshow for: ', _me._containerHtmlElem);
+        console.log('start install image slideshow ');
         _me._wrapSplashImage();
         if (!_me._configReader.hasCustomStart() || _me._configReader.hasAnimation()
             || _me._configReader.hasAddNavigation()) {
@@ -658,10 +660,15 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
                 celSlideShoObj);
             if (celSlideShoObj) {
               console.log('_centerSplashImage: before _centerCurrentSlide 3 ',
-                  celSlideShoObj._centerCurrentSlide);
+                  celSlideShoObj._preloadImagesAndResizeCenterSlide, slideWrapper);
+              celSlideShoObj._preloadImagesAndResizeCenterSlide(slideWrapper,
+                  function() {
+                console.log('finished center splash slide for ',
+                    _me._containerHtmlElem);
+              });
             }
           }
-          _me._centerCurrentSlide(_me._containerHtmlElem);
+//          _me._centerCurrentSlide(_me._containerHtmlElem);
         }
       }
 
