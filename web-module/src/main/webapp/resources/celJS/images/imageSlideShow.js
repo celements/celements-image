@@ -615,7 +615,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           _me._origStyleValues = null;
           var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
           var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
-              'transform') || '1.0';
+              '-ms-zoom') || slideWrapperStyles.get('transform') || '1.0';
           zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
           if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
             //FF has problem in getting the right width for slideWrapper if slideWrapper
