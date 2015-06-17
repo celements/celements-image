@@ -615,7 +615,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           _me._origStyleValues = null;
           var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
           var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
-              'transform') || '1.0';
+              'MsZoom') || slideWrapperStyles.get('transform') || '1.0';
           zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
           console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
           if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
