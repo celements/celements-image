@@ -655,13 +655,14 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           console.log('_centerSplashImage: before _centerCurrentSlide ',
               _me._getImageSlideShowObj());
           if (_me._getImageSlideShowObj()) {
-            var celSlideShoObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
+            var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
             console.log('_centerSplashImage: before _centerCurrentSlide 2 ',
-                celSlideShoObj);
-            if (celSlideShoObj) {
+                celSlideShowObj);
+            if (celSlideShowObj) {
               console.log('_centerSplashImage: before _centerCurrentSlide 3 ',
-                  celSlideShoObj._preloadImagesAndResizeCenterSlide, slideWrapper);
-              celSlideShoObj._preloadImagesAndResizeCenterSlide(slideWrapper,
+                  celSlideShowObj._preloadImagesAndResizeCenterSlide, slideWrapper);
+              celSlideShowObj.setResizeSlide(false);
+              celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
                   function() {
                 console.log('finished center splash slide for ',
                     _me._containerHtmlElem);
