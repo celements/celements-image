@@ -635,6 +635,17 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             stylesProp['position'] = 'relative';
             slideWrapper.setStyle(stylesProp);
           }
+          console.log('_centerSplashImage: before _centerCurrentSlide ',
+              _me._imageSlideShowObj);
+          if (_me._imageSlideShowObj) {
+            var celSlideShoObj = _me._imageSlideShowObj._getCelSlideShowObj();
+            console.log('_centerSplashImage: before _centerCurrentSlide 2 ',
+                celSlideShoObj);
+            if (celSlideShoObj) {
+              console.log('_centerSplashImage: before _centerCurrentSlide 3 ',
+                  celSlideShoObj._centerCurrentSlide);
+            }
+          }
           _me._centerCurrentSlide(_me._containerHtmlElem);
         }
       }
