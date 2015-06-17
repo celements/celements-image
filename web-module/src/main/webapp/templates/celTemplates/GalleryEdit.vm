@@ -52,7 +52,7 @@
 </table>
 </div> <!-- editGallery_table_box -->
 <div class="celements2_box_subtitle">$adminMsg.get('gallery_upload_picture')</div>
-<form action="$doc.getURL('import')" method="post">
+<form action="$doc.getURL('view', 'xpage=import')" method="post">
   <input type="hidden" name="xredirect" value="$doc.getURL('edit', $redirectStr)" />
   <input type="submit" value="$adminMsg.get('gallery_import_link')" />
 </form>
