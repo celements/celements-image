@@ -420,7 +420,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       /** before: startNonOverlaySlideShow **/
       install : function() {
         var _me = this;
-        console.log('start install image slideshow for: ', _Me._containerHtmlElem);
+        console.log('start install image slideshow for: ', _me._containerHtmlElem);
         _me._wrapSplashImage();
         if (!_me._configReader.hasCustomStart() || _me._configReader.hasAnimation()
             || _me._configReader.hasAddNavigation()) {
