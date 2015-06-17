@@ -32,7 +32,7 @@
   <artifactId>image-web</artifactId>
   <packaging>war</packaging>
   <name>Celements Image Web-Module</name>
-  <version>1.44-SNAPSHOT</version>
+  <version>1.45-SNAPSHOT</version>
   <description>	</description>
   <licenses>
     <license>
@@ -56,7 +56,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-photo</artifactId>
-      <version>1.39-SNAPSHOT</version>
+      <version>1.39</version>
     </dependency>
   </dependencies>
   <build>
