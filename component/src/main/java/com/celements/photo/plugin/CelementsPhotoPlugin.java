@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.photo.container.ImageDimensions;
@@ -58,7 +58,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       CelementsPhotoPlugin.class);
 
   /**
@@ -132,7 +132,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       generatePhotoImageClass(context);
     } catch(XWikiException xe){
       //no problem, class can be generated later or manually
-      LOGGER.error(xe);
+      LOGGER.error("virtualInit for celements photo plugin failed. ", xe);
     }
   }
   
@@ -157,6 +157,8 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
     long delayDownloadMillis = context.getWiki().getXWikiPreferenceAsLong(
         "debugDelayDownload", "cel.debug.delay.download", 0, context);
     if (delayDownloadMillis > 0) {
+      LOGGER.warn("downloadAttachment: debugging sleep activated for {}",
+          delayDownloadMillis);
       try {
         Thread.sleep(delayDownloadMillis);
       } catch (InterruptedException exp) {
@@ -459,8 +461,8 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
           out.toByteArray(), unzipFileName, context);
       LOGGER.info("attachment='" + att.getFilename() + "', gallery='" + att.getDoc(
           ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
-    } catch (IOException e) {
-      LOGGER.error(e);
+    } catch (IOException exp) {
+      LOGGER.error("unzipFileToAttachment failed.", exp);
     } finally {
       if(imgFullSize != null) {
         try {
