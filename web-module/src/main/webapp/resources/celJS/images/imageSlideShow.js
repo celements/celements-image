@@ -617,6 +617,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
               'transform') || '1.0';
           zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
+          console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
           if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
             //FF has problem in getting the right width for slideWrapper if slideWrapper
             // is in position: relative
