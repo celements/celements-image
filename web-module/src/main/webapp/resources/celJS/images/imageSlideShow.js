@@ -647,11 +647,13 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
               slideWrapper.getWidth(), slideWrapper.getHeight());
           stylesProp['position'] = 'relative';
           slideWrapper.setStyle(stylesProp);
-          thumbContainer.select('.celLoadingIndicator').each(function(loaderImg) {
-            loaderImg.remove();
-          });
-          slideRoot.show();
         }
+        slideRoot.setStyle({
+          'visibility' : ''
+        });
+        thumbContainer.select('.celLoadingIndicator').each(function(loaderImg) {
+          loaderImg.remove();
+        });
       },
 
       _centerSplashImage : function() {
@@ -670,8 +672,10 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           '.cel_slideShow_thumbContainer');
 //TODO          loadingImages.getSmallLoadingImg()
           var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
-          slideRoot.hide();
-          thumbContainer.insert({ 'bottom' : loadingImages.getSmallLoadingImg() });
+          slideRoot.setStyle({
+            'visibility' : 'hidden'
+          });
+          thumbContainer.insert({ 'top' : loadingImages.getSmallLoadingImg() });
           celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
               function() {
             console.log('finished center splash slide for ',
