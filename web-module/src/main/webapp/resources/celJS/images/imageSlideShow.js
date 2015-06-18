@@ -668,6 +668,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         if (_me._configReader.isCenterSplashImage()) {
           var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
           //image gallery overview slides have precomputed resize factor
+          var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
           var thumbContainer = _me._containerHtmlElem.down(
               '.cel_slideShow_thumbContainer');
