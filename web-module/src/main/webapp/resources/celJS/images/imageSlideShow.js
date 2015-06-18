@@ -360,6 +360,58 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
 (function() {
   "use strict";
 
+  var LoadingImagesClass = function() {
+    // constructor
+    this._init();
+  };
+
+  LoadingImagesClass.prototype = {
+      _loadingImg : undefined,
+      _loadingSmallImg : undefined,
+
+      _init : function() {
+        var _me = this;
+
+        _me._loadingImg = new Image();
+        _me._loadingImg.src = '/file/resources/celRes/ajax-loader.gif';
+        _me._loadingImg.height = 32;
+        _me._loadingImg.width = 32;
+        _me._loadingImg.addClassName('celLoadingIndicator');
+        _me._loadingImg.setStyle({
+          'display' : 'block',
+          'marginLeft' : 'auto',
+          'marginRight' : 'auto',
+          'position' : 'relative',
+          'top' : '48%'
+        });
+        
+        _me._loadingSmallImg = new Image();
+        _me._loadingSmallImg.src = '/file/resources/celRes/ajax-loader-small.gif';
+        _me._loadingSmallImg.height = 16;
+        _me._loadingSmallImg.width = 16;
+        _me._loadingSmallImg.addClassName('celLoadingIndicator');
+        _me._loadingSmallImg.setStyle({
+          'display' : 'block',
+          'marginLeft' : 'auto',
+          'marginRight' : 'auto',
+          'position' : 'relative',
+          'top' : '48%'
+        });
+      },
+
+      getLoadingImg : function() {
+        var _me = this;
+        return _me._loadingImg.cloneNode(true);
+      },
+
+      getSmallLoadingImg : function() {
+        var _me = this;
+        return _me._loadingSmallImg.cloneNode(true);
+      },
+  };
+
+  var loadingImages = new LoadingImagesClass();
+  
   CELEMENTS.image.InlineContainer.prototype = {
       _htmlElemId : undefined,
       _configReader : undefined,
@@ -488,17 +540,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         if (_me._configReader.hasCustomStart()) {
           return slideShowImg;
         } else {
-          var loadingImg = new Image();
-          loadingImg.src = '/file/resources/celRes/ajax-loader.gif';
-          loadingImg.height = 32;
-          loadingImg.width = 32;
-          loadingImg.setStyle({
-            'display' : 'block',
-            'marginLeft' : 'auto',
-            'marginRight' : 'auto',
-            'position' : 'relative',
-            'top' : '48%'
-          });
+          var loadingImg = loadingImages.getLoadingImg();
           slideShowImg.replace(loadingImg);
           return loadingImg;
         }
@@ -566,64 +608,6 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         }
       },
 
-      /**
-       * if the slide is scaled down to fit in the <code>htmlContainer</code> element then
-       * we need an additional div between the <code>.cel_slideShow_slideWrapper</code>
-       *  and the <code>htmlContainer</code> to get the reduced dimensions of the slide.
-       * This intermediate div must present the .cel_slideShow_slideRoot css class.
-       * 
-       * prerequisite: slideWrapper MUST have a height and width asigned (e.g. by resize)
-       * @TODO move to CelementsSlides js class and refactor CelementsSlideShow too.
-       */
-      _centerCurrentSlide : function(htmlContainerIn) {
-        var htmlContainer = htmlContainerIn.down('.cel_slideShow_centerContainer')
-            || htmlContainerIn;
-        var slideWrapper = htmlContainer.down('.cel_slideShow_slideWrapper');
-        var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
-        if (!slideWrapper || !slideRoot) {
-          if ((typeof console != 'undefined') && (typeof console.warn != 'undefined')) {
-            console.warn('incorrect usage of _centerCurrentSlide!');
-          }
-          return;
-        }
-        //we cannot read element dimension if any parent is hidden (display:none)
-        var hiddenParentElems = [];
-        slideWrapper.ancestors().each(function(parentElem) {
-          if (!parentElem.visible()) {
-            hiddenParentElems.push(parentElem);
-            parentElem.show();
-          }
-        });
-        //FF has problem in getting the right width for slideOuterWidth if slideRoot is
-        // in position: relative
-        slideRoot.setStyle({
-          'position' : 'absolute'
-        });
-        //use jquery to get dimensions, because it works correctly inside iframes.
-        var slideOuterHeight = $j(slideRoot).height();
-        var slideOuterWidth = $j(slideRoot).width();
-        var parentHeight = htmlContainer.getHeight();
-        var parentWidth = htmlContainer.getWidth();
-        //FIXED: why slideOuterHeight? !!! FP; 2/1/2014
-        //--> it must be slideOuterHeight to get correct size of scaled down slides.
-        //--> see method comment
-        var topPos = (parentHeight - slideOuterHeight) / 2;
-        var leftPos = (parentWidth - slideOuterWidth) / 2;
-        hiddenParentElems.each(Element.hide);
-        slideWrapper.setStyle({
-          'position' : 'relative',
-          'margin' : '0'
-        });
-        // horizontal centering with absolut left position needed, because FF gets
-        // conflict with transform-origin and margin auto
-        slideRoot.setStyle({
-          'position' : 'absolute',
-          'left' : leftPos + 'px',
-          'top' : topPos + 'px',
-          'margin' : '0'
-        });
-      },
-
       _prepareCenterSplashImage : function() {
         var _me = this;
         var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
@@ -663,6 +647,10 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
               slideWrapper.getWidth(), slideWrapper.getHeight());
           stylesProp['position'] = 'relative';
           slideWrapper.setStyle(stylesProp);
+          thumbContainer.select('.celLoadingIndicator').each(function(loaderImg) {
+            loaderImg.remove();
+          });
+          slideRoot.show();
         }
       },
 
@@ -671,18 +659,24 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         if (_me._configReader.isCenterSplashImage()) {
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
-          console.log('_centerSplashImage: before _centerCurrentSlide ',
+          console.log('_centerSplashImage: before  ',
               celSlideShowObj._preloadImagesAndResizeCenterSlide, slideWrapper);
           //image gallery overview slides have precomputed resize factor
           celSlideShowObj.setResizeSlide(false);
+          celSlideShowObj.setAutoresize(false);
           _me._containerHtmlElem.observe('cel_slideShow:centerSlide',
               _me._prepareCenterSplashImage.bind(_me));
+          var thumbContainer = _me._containerHtmlElem.down(
+          '.cel_slideShow_thumbContainer');
+//TODO          loadingImages.getSmallLoadingImg()
+          var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
+          slideRoot.hide();
+          thumbContainer.insert({ 'bottom' : loadingImages.getSmallLoadingImg() });
           celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
               function() {
             console.log('finished center splash slide for ',
                 _me._containerHtmlElem);
           });
-//          _me._centerCurrentSlide(_me._containerHtmlElem);
         }
       }
 
