@@ -624,64 +624,64 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         });
       },
 
+      _prepareCenterSplashImage : function() {
+        var _me = this;
+        var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+        var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
+        _me._origStyleValues = null;
+        var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
+        var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
+            'MsZoom') || slideWrapperStyles.get('transform') || '1.0';
+        zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
+        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
+        if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
+          //FF has problem in getting the right width for slideWrapper if slideWrapper
+          // is in position: relative
+          var thumbContainer = _me._containerHtmlElem.down(
+              '.cel_slideShow_thumbContainer');
+          if (thumbContainer) {
+            thumbContainer.setStyle({
+              'position' : '',
+              'zoom' : '',
+              'transform' : '',
+              'height' : '',
+              'width' : '',
+              'top' : '',
+              'left' : ''
+             });
+          }
+          slideWrapper.setStyle({
+            'position' : 'absolute',
+            'zoom' : '1',
+            'transform' : 'scale(1)'
+           });
+          slideRoot.setStyle({
+            'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
+            'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
+          });
+          var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
+              slideWrapper.getWidth(), slideWrapper.getHeight());
+          stylesProp['position'] = 'relative';
+          slideWrapper.setStyle(stylesProp);
+        }
+      },
+
       _centerSplashImage : function() {
         var _me = this;
         if (_me._configReader.isCenterSplashImage()) {
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
-          var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
-          _me._origStyleValues = null;
-          var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
-          var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
-              'MsZoom') || slideWrapperStyles.get('transform') || '1.0';
-          zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
-          console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
-          if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
-            //FF has problem in getting the right width for slideWrapper if slideWrapper
-            // is in position: relative
-            var thumbContainer = _me._containerHtmlElem.down(
-                '.cel_slideShow_thumbContainer');
-            if (thumbContainer) {
-              thumbContainer.setStyle({
-                'position' : '',
-                'zoom' : '',
-                'transform' : '',
-                'height' : '',
-                'width' : '',
-                'top' : '',
-                'left' : ''
-               });
-            }
-            slideWrapper.setStyle({
-              'position' : 'absolute',
-              'zoom' : '1',
-              'transform' : 'scale(1)'
-             });
-            slideRoot.setStyle({
-              'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
-              'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
-            });
-            var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
-                slideWrapper.getWidth(), slideWrapper.getHeight());
-            stylesProp['position'] = 'relative';
-            slideWrapper.setStyle(stylesProp);
-          }
+          var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
           console.log('_centerSplashImage: before _centerCurrentSlide ',
-              _me._getImageSlideShowObj());
-          if (_me._getImageSlideShowObj()) {
-            var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
-            console.log('_centerSplashImage: before _centerCurrentSlide 2 ',
-                celSlideShowObj);
-            if (celSlideShowObj) {
-              console.log('_centerSplashImage: before _centerCurrentSlide 3 ',
-                  celSlideShowObj._preloadImagesAndResizeCenterSlide, slideWrapper);
-              celSlideShowObj.setResizeSlide(false);
-              celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
-                  function() {
-                console.log('finished center splash slide for ',
-                    _me._containerHtmlElem);
-              });
-            }
-          }
+              celSlideShowObj._preloadImagesAndResizeCenterSlide, slideWrapper);
+          //image gallery overview slides have precomputed resize factor
+          celSlideShowObj.setResizeSlide(false);
+          _me._containerHtmlElem.observe('cel_slideShow:centerSlide',
+              _me._prepareCenterSplashImage.bind(_me));
+          celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
+              function() {
+            console.log('finished center splash slide for ',
+                _me._containerHtmlElem);
+          });
 //          _me._centerCurrentSlide(_me._containerHtmlElem);
         }
       }
