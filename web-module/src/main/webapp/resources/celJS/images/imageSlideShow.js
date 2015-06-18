@@ -603,15 +603,21 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         }
       },
 
-      _prepareCenterSplashImage : function() {
+      _getPrecomputedZoomFactor : function(slideWrapper) {
         var _me = this;
-        var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
-        var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
         _me._origStyleValues = null;
         var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
         var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
             'MsZoom') || slideWrapperStyles.get('transform') || '1.0';
         zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
+        return zoomFactor;
+      },
+
+      _prepareCenterSplashImage : function() {
+        var _me = this;
+        var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+        var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
+        var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
 //        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
         if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
           //FF has problem in getting the right width for slideWrapper if slideWrapper
@@ -656,7 +662,11 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         if (_me._configReader.isCenterSplashImage()) {
           var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
           //image gallery overview slides have precomputed resize factor
-          console.log('_centerSplashImage: before setResizeSlide false');
+          var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
+          var thumbContainer = _me._containerHtmlElem.down(
+              '.cel_slideShow_thumbContainer');
+          console.log('_centerSplashImage: before setResizeSlide false ', zoomFactor,
+              thumbContainer);
           celSlideShowObj.setResizeSlide(false);
           celSlideShowObj.setAutoresize(false);
           _me._containerHtmlElem.observe('cel_slideShow:centerSlide',
