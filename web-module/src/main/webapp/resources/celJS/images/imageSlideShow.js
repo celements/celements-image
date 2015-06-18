@@ -603,10 +603,13 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         }
       },
 
-      _getPrecomputedZoomFactor : function(slideWrapper) {
+      _getPrecomputedZoomFactor : function(slideWrapper, inSlideWrapperStyles) {
         var _me = this;
-        _me._origStyleValues = null;
-        var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
+        var slideWrapperStyles = inSlideWrapperStyles;
+        if (!slideWrapperStyles) {
+          _me._origStyleValues = null;
+          slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
+        }
         var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
             'MsZoom') || slideWrapperStyles.get('transform') || '1.0';
         zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
@@ -617,9 +620,12 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var _me = this;
         var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
         var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
-        var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
+        _me._origStyleValues = null;
+        var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
 //        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
         if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
+          var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper,
+              slideWrapperStyles);
           //FF has problem in getting the right width for slideWrapper if slideWrapper
           // is in position: relative
           var thumbContainer = _me._containerHtmlElem.down(
