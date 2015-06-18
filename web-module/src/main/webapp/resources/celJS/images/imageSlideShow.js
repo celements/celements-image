@@ -638,6 +638,19 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
             //FF has problem in getting the right width for slideWrapper if slideWrapper
             // is in position: relative
+            var thumbContainer = _me._containerHtmlElem.down(
+                '.cel_slideShow_thumbContainer');
+            if (thumbContainer) {
+              thumbContainer.setStyle({
+                'position' : '',
+                'zoom' : '',
+                'transform' : '',
+                'height' : '',
+                'width' : '',
+                'top' : '',
+                'left' : ''
+               });
+            }
             slideWrapper.setStyle({
               'position' : 'absolute',
               'zoom' : '1',
