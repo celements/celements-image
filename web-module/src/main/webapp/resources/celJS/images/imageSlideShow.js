@@ -656,6 +656,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         if (_me._configReader.isCenterSplashImage()) {
           var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
           //image gallery overview slides have precomputed resize factor
+          console.log('_centerSplashImage: before setResizeSlide false');
           celSlideShowObj.setResizeSlide(false);
           celSlideShowObj.setAutoresize(false);
           _me._containerHtmlElem.observe('cel_slideShow:centerSlide',
