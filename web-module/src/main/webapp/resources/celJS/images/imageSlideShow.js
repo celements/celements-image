@@ -249,8 +249,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
                 'newWidth' : newWidth,
                 'newHeight' : newHeight
             };
-            if (_me._debug && (typeof console != 'undefined')
-                && (typeof console.log != 'undefined')) {
+            if (_me._debug) {
               console.log('final resize factor: ', eventMemo);
             }
             $(document.body).fire('cel_imageSlideShow:beforeResizeDialog_General',
@@ -266,8 +265,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
                   zoomFactor, oldWidth, oldHeight));
             }
           } else {
-            if (_me._debug && (typeof console != 'undefined')
-                && (typeof console.log != 'undefined')) {
+            if (_me._debug) {
               console.log('no resize needed.', zoomFactor);
             }
           }
@@ -461,8 +459,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       _getImageSlideShowObj : function() {
         var _me = this;
         if (!_me._imageSlideShowObj) {
-          console.log('_getImageSlideShowObj create imageSlideShowObj for: ',
-              _me._containerHtmlElem);
+//          console.log('_getImageSlideShowObj create imageSlideShowObj for: ',
+//              _me._containerHtmlElem);
           _me._imageSlideShowObj = new CELEMENTS.image.SlideShow({
             'configReader' : _me._configReader,
             'containerHtmlElem' : _me._containerHtmlElem
@@ -474,13 +472,12 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       /** before: startNonOverlaySlideShow **/
       install : function() {
         var _me = this;
-        console.log('start install image slideshow ');
+//        console.log('start install image slideshow ');
         _me._wrapSplashImage();
         if (!_me._configReader.hasCustomStart() || _me._configReader.hasAnimation()
             || _me._configReader.hasAddNavigation()) {
           _me._getImageSlideShowObj().start();
-        } else if ((typeof console != 'undefined')
-            && (typeof console.log != 'undefined')) {
+        } else {
             console.log('skipping init image slide show (no nav and anim) for ',
                 _me._htmlElemId);
         }
@@ -601,10 +598,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           _me._containerHtmlElem = slideShowImg;
           slideShowImg.fire('celimage_slideshow:afterWrapSplashImage', _me);
         } else {
-          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
-            console.log('skipping creating wrapperHTMLElem because already exists.',
-                _me._containerHtmlElem);
-          }
+          console.log('skipping creating wrapperHTMLElem because already exists.',
+              _me._containerHtmlElem);
         }
       },
 
@@ -617,7 +612,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
             'MsZoom') || slideWrapperStyles.get('transform') || '1.0';
         zoomFactor = zoomFactor.replace(/[^.0-9]*/g,'');
-        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
+//        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
         if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
           //FF has problem in getting the right width for slideWrapper if slideWrapper
           // is in position: relative
@@ -659,27 +654,24 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       _centerSplashImage : function() {
         var _me = this;
         if (_me._configReader.isCenterSplashImage()) {
-          var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
-          console.log('_centerSplashImage: before  ',
-              celSlideShowObj._preloadImagesAndResizeCenterSlide, slideWrapper);
           //image gallery overview slides have precomputed resize factor
           celSlideShowObj.setResizeSlide(false);
           celSlideShowObj.setAutoresize(false);
           _me._containerHtmlElem.observe('cel_slideShow:centerSlide',
               _me._prepareCenterSplashImage.bind(_me));
-          var thumbContainer = _me._containerHtmlElem.down(
-          '.cel_slideShow_thumbContainer');
-//TODO          loadingImages.getSmallLoadingImg()
+          var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
           slideRoot.setStyle({
             'visibility' : 'hidden'
           });
+          var thumbContainer = _me._containerHtmlElem.down(
+              '.cel_slideShow_thumbContainer');
           thumbContainer.insert({ 'top' : loadingImages.getSmallLoadingImg() });
           celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
               function() {
-            console.log('finished center splash slide for ',
-                _me._containerHtmlElem);
+//            console.log('finished center splash slide for ',
+//                _me._containerHtmlElem);
           });
         }
       }
@@ -846,19 +838,15 @@ window.CELEMENTS.image.SlideShow = function(config) {
         }
         var slideShowButton = _me.getContainerElement().down('.slideshowButton');
         if (isStart) {
-          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
-            console.log('animation started for image slideshow',
-                _me._getContainerElemId());
-          }
+          console.log('animation started for image slideshow',
+              _me._getContainerElemId());
           _me._slideShowAnimation.startAnimation(delayedStart);
           if (slideShowButton) {
             Effect.Fade(slideShowButton, { duration : 1.0 });
           }
         } else {
-          if ((typeof console != 'undefined') && (typeof console.log != 'undefined')) {
-            console.log('animation stopped for image slideshow',
-                _me._getContainerElemId());
-          }
+          console.log('animation stopped for image slideshow',
+              _me._getContainerElemId());
           _me._slideShowAnimation.stopAnimation();
           if (slideShowButton) {
             Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
