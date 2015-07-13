@@ -45,7 +45,10 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
   window.celAddOnBeforeLoadListener(function() {
     window.celBeforeInitializeSlideShowHandler();
-    window.CELEMENTS.image.getBodySlideShowStarter().initializeSlideShow();
+    var initEvent = $(document.body).fire('celimage_slideshowstarter:beforeAutoInitSlideShow');
+    if (!initEvent.stopped) {
+      window.CELEMENTS.image.getBodySlideShowStarter().initializeSlideShow();
+    }
   });
 
 //////////////////////////////////////////////////////////////////////////////
