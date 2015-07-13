@@ -41,14 +41,14 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.sanselan.ImageReadException;
 import org.apache.sanselan.Sanselan;
 import org.apache.sanselan.common.byteSources.ByteSource;
 import org.apache.sanselan.common.byteSources.ByteSourceInputStream;
 import org.apache.sanselan.formats.jpeg.JpegImageParser;
 import org.apache.sanselan.formats.jpeg.segments.UnknownSegment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.media.jai.codec.FileCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
@@ -57,8 +57,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class DecodeImageCommand {
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      DecodeImageCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DecodeImageCommand.class);
   
   public static final int COLOR_TYPE_RGB = 1;
   public static final int COLOR_TYPE_CMYK = 2;
@@ -78,7 +77,7 @@ public class DecodeImageCommand {
     BufferedImage image = null;
     ByteArrayOutputStream createMarkStreamHelper = null;
     try {
-      if(imageStream.markSupported()) {
+      if (imageStream.markSupported()) {
         imageStream.mark(Integer.MAX_VALUE);
       } else {
         createMarkStreamHelper = new ByteArrayOutputStream();
@@ -126,8 +125,8 @@ public class DecodeImageCommand {
         }
       }
     } catch(IOException ioe) {
-      
-    }finally {
+      LOGGER.info("Failed to read image [" + filename + "].", ioe);
+    } finally {
       if(imageStream != null) {
         try {
           imageStream.close();
@@ -135,13 +134,16 @@ public class DecodeImageCommand {
           LOGGER.error("Exception cloasing in stream.", ioe);
         }
       }
-      if(createMarkStreamHelper != null) {
+      if (createMarkStreamHelper != null) {
         try {
           createMarkStreamHelper.close();
         } catch (IOException ioe) {
           LOGGER.error("Exception cloasing out stream.", ioe);
         }
       }
+    }
+    if (image == null) {
+      throw new ImageReadException("Failed to read image [" + filename + "].");
     }
     return image;
   }
