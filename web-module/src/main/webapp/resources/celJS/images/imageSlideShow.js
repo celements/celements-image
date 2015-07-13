@@ -73,8 +73,11 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
       initializeOverlayImageSlideShow : function() {
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
-          if (slideShowElem.hasClassName('celimage_overlay')) {
+          if (slideShowElem.hasClassName('celimage_overlay')
+              && ! slideShowElem.hasClassName('celimage_overlay_initalized')) {
             var overlayContainerObj = new CELEMENTS.image.OverlayContainer(slideShowElem);
+            overlayContainerObj._getHtmlElem().addClassName(
+                'celimage_overlay_initalized');
             CISS_SlideShowOverlayObjHash.set(slideShowElem.id, overlayContainerObj);
           }
         });
@@ -83,8 +86,11 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
       initializeImageSlideShow : function() {
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
-          var inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem);
-          CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
+          if (!slideShowElem.hasClassName('celimage_inline_initalized')) {
+            var inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem);
+            overlayContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
+            CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
+          }
         });
       },
       
