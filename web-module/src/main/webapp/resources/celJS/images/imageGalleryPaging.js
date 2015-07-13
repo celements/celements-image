@@ -1,6 +1,74 @@
 (function(window, undefined) {
   "use strict";
 
+  /**
+   * package CEL definition
+   */
+  if (typeof window.CEL == "undefined") { window.CEL={};};
+
+  /**
+   * Column constructor
+   */
+  CEL.Column = function(htmlElemId) {
+    // constructor
+    this._init(htmlElemId);
+  };
+
+  /**
+   * class CEL.Column definition
+   */
+  CEL.Column.prototype = {
+      
+    _initSwiperScrollbar : function(desableSimulateTouch) {
+      var _me = this;
+      if (!_me._isRooted) {
+        console.warn('_getSwiperScrollbarContainer: UNROOTED !!!', _me._columnHTMLElem);
+      }
+      _me._destroySwiper();
+      _me._getScrollSlideInner().addClassName('slide-inner');
+      _me._getScrollSlide().addClassName('swiper-slide');
+      _me._getScrollWrapper().addClassName('swiper-wrapper');
+      var swiperContainer = _me._getScrollContainer();
+      swiperContainer.addClassName('swiper-container');
+      var scrollbarContainerId = _me._getSwiperScrollbarContainer().id;
+      console.log('_initSwiperScrollbar before new Swiper ', _me.getColIdPrefix(),
+          _me._getScrollSlideInner(), _me._getScrollSlide(), _me._getScrollWrapper(),
+          swiperContainer);
+      var myDesableSimulateTouch = desableSimulateTouch
+      if(desableSimulateTouch == null) {
+        myDesableSimulateTouch = true;
+      }
+      _me._swiper = new Swiper(swiperContainer, {
+        scrollContainer : true,
+        mousewheelControl : true,
+        mode : 'vertical',
+        autoResize : false,
+        slidePerGroup : 1,
+        slidesPerView : 'auto',
+        updateTranslate : true,
+        simulateTouch : myDesableSimulateTouch,
+        //Enable Scrollbar
+        scrollbar: {
+          container : '#' + scrollbarContainerId,
+          hide : true,
+          draggable : true,
+          snapOnRelease : true //XXX does not work so far in swiper swipeReset()
+        }
+      });
+      _me._swiper.addCallback('SetWrapperTransform', _me._swiperScrollBind);
+      _me.getColumnElem().observe('proz:contentChanged',
+          _me._reInitScrollbarHandlerBind);
+      $(document.body).observe('proz:updateScrollbar',
+          _me._reInitScrollbarHandlerBind);
+      $(document.body).observe('proz:resize', _me._updateScrollbarBind);
+      console.log('_getScrollContainer: trigger resize');
+      $(document.body).fire('proz:forceResize');
+    }
+  };
+  
+})(window);
+
+/*  
   var swiper;
   
   var initScroller = function() {
@@ -68,5 +136,4 @@
       initScroller();
     }
   });
-
-})(window);
+ */

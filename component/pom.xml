@@ -3,11 +3,11 @@
   <parent>
       <groupId>com.celements</groupId>
       <artifactId>celements</artifactId>
-      <version>2.13</version>
+      <version>2.14</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>  
   <artifactId>celements-photo</artifactId>
-  <version>1.39-SNAPSHOT</version>
+  <version>1.40-SNAPSHOT</version>
   <description>Celements Photo</description> 
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
@@ -20,7 +20,7 @@
     <dependency>
       <groupId>com.celements</groupId>
     <artifactId>celements-core</artifactId>
-    <version>1.117</version>
+    <version>1.119</version>
     <scope>provided</scope>
     </dependency>
     <dependency>
