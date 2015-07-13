@@ -88,7 +88,7 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (!slideShowElem.hasClassName('celimage_inline_initalized')) {
             var inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem);
-            overlayContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
+            inlineContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
             CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
           }
         });
