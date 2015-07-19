@@ -710,6 +710,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'visibility' : 'hidden'
           });
           _me._containerHtmlElem.insert({ 'top' : loadingImages.getSmallLoadingImg() });
+          console.log('before _preloadImagesAndResizeCenterSlide for ',
+              _me._containerHtmlElem, slideWrapper);
           celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
               function() {
             console.log('finished center splash slide for ',
