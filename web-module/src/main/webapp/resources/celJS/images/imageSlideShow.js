@@ -583,7 +583,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
            }).setStyle({
              'position' : 'relative'
            });
-          console.log('_wrapSplashImage: set width, height ',
+          console.log('_wrapSplashImage: set width, height ', _me._htmlElemId,
               _me._configReader.getContainerAnimWidth(),
               _me._configReader.getContainerAnimHeight());
           divWrapper.setStyle({
@@ -669,7 +669,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'zoom' : '1',
             'transform' : 'scale(1)'
            });
-          console.log('_centerSplashImage: set width and height ',
+          console.log('_centerSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
           slideRoot.setStyle({
             'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
