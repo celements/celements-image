@@ -252,6 +252,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       _resizeOverlay : function() {
         var _me = this;
         if (_me._configReader.isAutoResize()) {
+          console.log('_resizeOverlay: start for ', _me._htmlElemId);
           var openDialog = CELEMENTS.presentation.getOverlayObj();
           var zoomFactor = _me._configReader.computeZoomFactor();
           if (zoomFactor <= 1) {
