@@ -639,7 +639,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
         _me._origStyleValues = null;
         var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
-        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
+        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor,
+            slideWrapper.getWidth(), slideWrapper.getHeight());
         if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
           var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper,
               slideWrapperStyles) || '1.0';
