@@ -75,6 +75,7 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (slideShowElem.hasClassName('celimage_overlay')
               && !slideShowElem.hasClassName('celimage_overlay_initalized')) {
+            console.log('overlay image initialization for ', slideShowElem.id);
             var overlayContainerObj = new CELEMENTS.image.OverlayContainer(slideShowElem);
             overlayContainerObj._getHtmlElem().addClassName(
                 'celimage_overlay_initalized');
@@ -89,6 +90,7 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (!slideShowElem.hasClassName('celimage_inline_initalized')) {
+            console.log('inline image initialization for ', slideShowElem.id);
             var inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem);
             inlineContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
             CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
