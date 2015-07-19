@@ -698,8 +698,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           //image gallery overview slides have precomputed resize factor
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var precomputedZoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
-//          console.log('_centerSplashImage: before setResizeSlide false ',
-//              precomputedZoomFactor);
+          console.log('_centerSplashImage: before setResizeSlide false ',
+              precomputedZoomFactor);
           if (precomputedZoomFactor) {
             celSlideShowObj.setResizeSlide(false);
             celSlideShowObj.setAutoresize(false);
