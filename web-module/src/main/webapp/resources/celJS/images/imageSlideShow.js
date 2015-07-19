@@ -645,12 +645,12 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
         _me._origStyleValues = null;
         var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
-        console.log('_prepareCenterSplashImage: precomputed zoomFactor ', zoomFactor,
-            slideWrapper.getWidth(), slideWrapper.getHeight(),
-            slideWrapperStyles.get('height'), slideWrapperStyles.get('width'));
         if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
           var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper,
               slideWrapperStyles) || '1.0';
+          console.log('_prepareCenterSplashImage: precomputed zoomFactor ', zoomFactor,
+              slideWrapper.getWidth(), slideWrapper.getHeight(),
+              slideWrapperStyles.get('height'), slideWrapperStyles.get('width'));
           //FF has problem in getting the right width for slideWrapper if slideWrapper
           // is in position: relative
           var thumbContainer = _me._containerHtmlElem.down(
