@@ -157,6 +157,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       _openInOverlayBind : undefined,
       _imageSlideShowObj : undefined,
       _isOverlayRegistered : undefined,
+      _debug : undefined,
 
       /**
        * Read all configuration information from the original element.
@@ -166,6 +167,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
        */
       _init : function(htmlElem) {
         var _me = this;
+        _me._debug = true;
         _me._htmlElemId = htmlElem.id;
         _me._configReader = new CELEMENTS.image.ConfigReader(htmlElem, {
           'manualstart' : 'celimage_overlaymanualstart',
@@ -581,6 +583,9 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
            }).setStyle({
              'position' : 'relative'
            });
+          console.log('_wrapSplashImage: set width, height ',
+              _me._configReader.getContainerAnimWidth(),
+              _me._configReader.getContainerAnimHeight());
           divWrapper.setStyle({
             'height' : _me._configReader.getContainerAnimHeight() + 'px',
             'width' : _me._configReader.getContainerAnimWidth() + 'px'
