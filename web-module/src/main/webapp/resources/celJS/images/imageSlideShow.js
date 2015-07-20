@@ -683,11 +683,6 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
             'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
           });
-          slideWrapper.select('img').each(function(imgElem) {
-            imgElem.setStyle({
-              'position' : ''
-            });
-          });
           var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
               slideWrapper.getWidth(), slideWrapper.getHeight());
           stylesProp['position'] = 'relative';
@@ -699,6 +694,12 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var _me = this;
         var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
         var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
+        slideWrapper.select('img').each(function(imgElem) {
+          //reset img elem position values
+          imgElem.setStyle({
+            'position' : ''
+          });
+        });
         slideRoot.setStyle({
           'visibility' : ''
         });
