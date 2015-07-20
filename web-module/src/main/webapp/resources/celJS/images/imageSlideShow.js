@@ -671,12 +671,6 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'zoom' : '1',
             'transform' : 'scale(1)'
            });
-          slideWrapper.select('img').each(function(imgElem) {
-            //reset possible image css 'possition' : absolute settings
-            imgElem.setStyle({
-              'position' : 'relative'
-            });
-          });
           console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
           slideRoot.setStyle({
@@ -694,12 +688,6 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var _me = this;
         var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
         var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
-        slideWrapper.select('img').each(function(imgElem) {
-          //reset img elem position values
-          imgElem.setStyle({
-            'position' : ''
-          });
-        });
         slideRoot.setStyle({
           'visibility' : ''
         });
