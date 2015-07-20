@@ -671,11 +671,21 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'zoom' : '1',
             'transform' : 'scale(1)'
            });
+          slideWrapper.select('img').each(function(imgElem) {
+            imgElem.setStyle({
+              'position' : 'relative'
+            });
+          });
           console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
-          slideRoot.setStyle({
-            'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
-            'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
+//          slideRoot.setStyle({
+//            'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
+//            'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
+//          });
+          slideWrapper.select('img').each(function(imgElem) {
+            imgElem.setStyle({
+              'position' : ''
+            });
           });
 //          var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
 //              slideWrapper.getWidth(), slideWrapper.getHeight());
