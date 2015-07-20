@@ -651,8 +651,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           console.log('_prepareCenterSplashImage: precomputed zoomFactor ', zoomFactor,
               slideWrapper.getWidth(), slideWrapper.getHeight(),
               slideWrapperStyles.get('height'), slideWrapperStyles.get('width'));
-          //FF has problem in getting the right width for slideWrapper if slideWrapper
-          // is in position: relative
+          //FF has problem in getting the right width for slideWrapper
+          // if slideWrapper is in position: relative
           var thumbContainer = _me._containerHtmlElem.down(
               '.cel_slideShow_thumbContainer');
           if (thumbContainer) {
@@ -677,18 +677,18 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
             'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
           });
-          var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
-              slideWrapper.getWidth(), slideWrapper.getHeight());
-          stylesProp['position'] = 'relative';
-          slideWrapper.setStyle(stylesProp);
+//          var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
+//              slideWrapper.getWidth(), slideWrapper.getHeight());
+//          stylesProp['position'] = 'relative';
+//          slideWrapper.setStyle(stylesProp);
         }
-        slideRoot.setStyle({
-          'visibility' : ''
-        });
-        _me._containerHtmlElem.select('.celLoadingIndicator').each(function(loaderImg) {
-          console.log('_prepareCenterSplashImage: remove loader image ', loaderImg.up());
-          loaderImg.remove();
-        });
+//        slideRoot.setStyle({
+//          'visibility' : ''
+//        });
+//        _me._containerHtmlElem.select('.celLoadingIndicator').each(function(loaderImg) {
+//          console.log('_prepareCenterSplashImage: remove loader image ', loaderImg.up());
+//          loaderImg.remove();
+//        });
       },
 
       _centerSplashImage : function() {
