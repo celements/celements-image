@@ -341,6 +341,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           _me._containerHtmlElem = $('yuiOverlayContainer');
           console.log('_imageSlideShowLoadFirstContent: start ', _me._htmlElemId,
               $(dialogConfig.containerId), _me._containerHtmlElem);
+          //updateContainerElement -> important on reopening overlay.
+          _me._getImageSlideShowObj().updateContainerElement(_me._containerHtmlElem);
           _me._configReader.loadOverlayLayoutName(function(galleryLayoutName) {
             _me._getImageSlideShowObj().start();
           });
@@ -800,6 +802,11 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _getContainerElemId : function() {
         var _me = this;
         return _me._config.containerHtmlElem.id;
+      },
+
+      updateContainerElement : function(newContainerElement) {
+        _me._config.containerHtmlElem = newContainerElement;
+        _me._getCelSlideShowObj()._htmlContainer = _me.getContainerElement();
       },
 
       getContainerElement : function() {
