@@ -805,6 +805,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       },
 
       updateContainerElement : function(newContainerElement) {
+        var _me = this;
         _me._config.containerHtmlElem = newContainerElement;
         _me._getCelSlideShowObj()._htmlContainer = _me.getContainerElement();
       },
