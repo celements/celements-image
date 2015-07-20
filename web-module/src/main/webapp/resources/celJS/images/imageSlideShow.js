@@ -704,10 +704,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             celSlideShowObj.setResizeSlide(false);
             celSlideShowObj.setAutoresize(false);
           }
-//          _me._containerHtmlElem.observe('cel_slideShow:centerSlide',
-//              _me._prepareCenterSplashImage.bind(_me));
-//          _me._containerHtmlElem.observe('cel_slideShow:resizeSlide',
-//              _me._prepareCenterSplashImage.bind(_me));
+          _me._containerHtmlElem.observe('cel_slideShow:beforeResizeAndCenterSlide',
+              _me._prepareCenterSplashImage.bind(_me));
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
           slideRoot.setStyle({
