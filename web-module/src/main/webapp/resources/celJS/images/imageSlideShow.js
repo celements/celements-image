@@ -333,6 +333,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         var _me = this;
         var dialogConfig = event.memo;
         if (dialogConfig.slideShowElem && (dialogConfig.slideShowElem === _me)) {
+          console.log('_imageSlideShowLoadFirstContent: start ', _me._htmlElemId);
           _me._containerHtmlElem = $('yuiOverlayContainer');
           _me._configReader.loadOverlayLayoutName(function(galleryLayoutName) {
             _me._getImageSlideShowObj().start();
