@@ -672,33 +672,40 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'transform' : 'scale(1)'
            });
           slideWrapper.select('img').each(function(imgElem) {
+            //reset possible image css 'possition' : absolute settings
             imgElem.setStyle({
               'position' : 'relative'
             });
           });
           console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
-//          slideRoot.setStyle({
-//            'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
-//            'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
-//          });
+          slideRoot.setStyle({
+            'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
+            'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
+          });
           slideWrapper.select('img').each(function(imgElem) {
             imgElem.setStyle({
               'position' : ''
             });
           });
-//          var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
-//              slideWrapper.getWidth(), slideWrapper.getHeight());
-//          stylesProp['position'] = 'relative';
-//          slideWrapper.setStyle(stylesProp);
+          var stylesProp = _me._configReader.getZoomStyles(zoomFactor,
+              slideWrapper.getWidth(), slideWrapper.getHeight());
+          stylesProp['position'] = 'relative';
+          slideWrapper.setStyle(stylesProp);
         }
-//        slideRoot.setStyle({
-//          'visibility' : ''
-//        });
-//        _me._containerHtmlElem.select('.celLoadingIndicator').each(function(loaderImg) {
-//          console.log('_prepareCenterSplashImage: remove loader image ', loaderImg.up());
-//          loaderImg.remove();
-//        });
+      },
+
+      _showSplashImage : function() {
+        var _me = this;
+        var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+        var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
+        slideRoot.setStyle({
+          'visibility' : ''
+        });
+        _me._containerHtmlElem.select('.celLoadingIndicator').each(function(loaderImg) {
+          console.log('_showSplashImage: remove loader image ', loaderImg.up());
+          loaderImg.remove();
+        });
       },
 
       _centerSplashImage : function() {
@@ -716,6 +723,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           }
           _me._containerHtmlElem.observe('cel_slideShow:beforeResizeAndCenterSlide',
               _me._prepareCenterSplashImage.bind(_me));
+          _me._containerHtmlElem.observe('cel_slideShow:afterResizeAndCenterSlide',
+              _me._showSplashImage.bind(_me));
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
           slideRoot.setStyle({
