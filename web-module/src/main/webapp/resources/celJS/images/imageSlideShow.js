@@ -857,6 +857,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
 
       _imageSlideShowLoadFirstContent_internal : function() {
         var _me = this;
+        console.log('_imageSlideShowLoadFirstContent_internal: register addNav'
+            + ' and addSlideCounter');
         _me.getContainerElement().stopObserving(
             'cel_yuiOverlay:beforeSlideInsert', _me._addNavigationButtonsBind);
         _me.getContainerElement().observe(
