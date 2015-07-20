@@ -64,6 +64,7 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
   CELEMENTS.image.SlideShowStarter.prototype = {
       _parentElem: undefined,
+      _debug : undefined,
   
       _init : function(htmlElem) {
         var _me = this;
@@ -75,12 +76,15 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (slideShowElem.hasClassName('celimage_overlay')
               && !slideShowElem.hasClassName('celimage_overlay_initalized')) {
-            console.log('overlay image initialization for ', slideShowElem.id);
+            if (_me._debug) {
+              console.log('overlay image initialization for ', slideShowElem.id);
+            }
             var overlayContainerObj = new CELEMENTS.image.OverlayContainer(slideShowElem);
             overlayContainerObj._getHtmlElem().addClassName(
                 'celimage_overlay_initalized');
             CISS_SlideShowOverlayObjHash.set(slideShowElem.id, overlayContainerObj);
-          } else if (slideShowElem.hasClassName('celimage_overlay_initalized')) {
+          } else if (_me._debug
+              && slideShowElem.hasClassName('celimage_overlay_initalized')) {
             console.log('skip double initialization for ', slideShowElem.id);
           }
         });
@@ -90,11 +94,14 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (!slideShowElem.hasClassName('celimage_inline_initalized')) {
-            console.log('inline image initialization for ', slideShowElem.id);
+            if (_me._debug) {
+              console.log('inline image initialization for ', slideShowElem.id);
+            }
             var inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem);
             inlineContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
             CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
-          } else if (slideShowElem.hasClassName('celimage_inline_initalized')) {
+          } else if (_me._debug
+              && slideShowElem.hasClassName('celimage_inline_initalized')) {
             console.log('skip double initialization for ', slideShowElem.id);
           }
         });
@@ -167,7 +174,6 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
        */
       _init : function(htmlElem) {
         var _me = this;
-        _me._debug = true;
         _me._htmlElemId = htmlElem.id;
         _me._configReader = new CELEMENTS.image.ConfigReader(htmlElem, {
           'manualstart' : 'celimage_overlaymanualstart',
@@ -436,6 +442,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       _centerSplashImageBind : undefined,
       _imageSlideShowObj : undefined,
       _origStyleValues : undefined,
+      _debug : undefined,
 
       /**
        * Read all configuration information from the original element.
@@ -584,9 +591,11 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
            }).setStyle({
              'position' : 'relative'
            });
-          console.log('_wrapSplashImage: set width, height ', _me._htmlElemId,
-              _me._configReader.getContainerAnimWidth(),
-              _me._configReader.getContainerAnimHeight());
+          if (_me._debug) {
+            console.log('_wrapSplashImage: set width, height ', _me._htmlElemId,
+                _me._configReader.getContainerAnimWidth(),
+                _me._configReader.getContainerAnimHeight());
+          }
           divWrapper.setStyle({
             'height' : _me._configReader.getContainerAnimHeight() + 'px',
             'width' : _me._configReader.getContainerAnimWidth() + 'px'
@@ -648,9 +657,11 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
           var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper,
               slideWrapperStyles) || '1.0';
+          if (_me._debug) {
           console.log('_prepareCenterSplashImage: precomputed zoomFactor ', zoomFactor,
               slideWrapper.getWidth(), slideWrapper.getHeight(),
               slideWrapperStyles.get('height'), slideWrapperStyles.get('width'));
+          }
           //FF has problem in getting the right width for slideWrapper
           // if slideWrapper is in position: relative
           var thumbContainer = _me._containerHtmlElem.down(
@@ -671,8 +682,10 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'zoom' : '1',
             'transform' : 'scale(1)'
            });
-          console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
-              slideWrapper.getWidth(), slideWrapper.getHeight());
+          if (_me._debug) {
+            console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
+                slideWrapper.getWidth(), slideWrapper.getHeight());
+          }
           slideRoot.setStyle({
             'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
             'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
@@ -692,7 +705,9 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           'visibility' : ''
         });
         _me._containerHtmlElem.select('.celLoadingIndicator').each(function(loaderImg) {
-          console.log('_showSplashImage: remove loader image ', loaderImg.up());
+          if (_me._debug) {
+            console.log('_showSplashImage: remove loader image ', loaderImg.up());
+          }
           loaderImg.remove();
         });
       },
@@ -704,8 +719,10 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           //image gallery overview slides have precomputed resize factor
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var precomputedZoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
-          console.log('_centerSplashImage: before setResizeSlide false ',
-              precomputedZoomFactor);
+          if (_me._debug) {
+            console.log('_centerSplashImage: before setResizeSlide false ',
+                precomputedZoomFactor);
+          }
           if (precomputedZoomFactor) {
             celSlideShowObj.setResizeSlide(false);
             celSlideShowObj.setAutoresize(false);
@@ -720,12 +737,16 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'visibility' : 'hidden'
           });
           _me._containerHtmlElem.insert({ 'top' : loadingImages.getSmallLoadingImg() });
-          console.log('before _preloadImagesAndResizeCenterSlide for ',
-              _me._containerHtmlElem, slideWrapper);
+          if (_me._debug) {
+            console.log('before _preloadImagesAndResizeCenterSlide for ',
+                _me._containerHtmlElem, slideWrapper);
+          }
           celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
               function() {
-            console.log('finished center splash slide for ',
-                _me._containerHtmlElem);
+            if (_me._debug) {
+              console.log('finished center splash slide for ',
+                  _me._containerHtmlElem);
+            }
           });
         }
       },
@@ -757,6 +778,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _startStopClickHandlerBind : undefined,
       _addNavigationButtonsBind : undefined,
       _addSlideShowCounterBind : undefined,
+      _debug : undefined,
 
       _init : function(config) {
         var _me = this;
