@@ -240,13 +240,18 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           $(document.body).observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlayBind);
         }
+        _me._getHtmlElem().stopObserving('click', _me._openInOverlayClickHandlerBind);
         _me._getHtmlElem().observe('click', _me._openInOverlayClickHandlerBind);
+        _me._getHtmlElem().stopObserving('cel_ImageSlideShow:startSlideShow',
+            _me._openInOverlayBind);
         _me._getHtmlElem().observe('cel_ImageSlideShow:startSlideShow',
             _me._openInOverlayBind);
         $(document.body).stopObserving('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
+        $(document.body).stopObserving('cel_yuiOverlay:afterShowDialog_General',
+            _me._resizeOverlayBind);
         $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
             _me._resizeOverlayBind);
         $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
