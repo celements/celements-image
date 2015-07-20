@@ -825,6 +825,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _addSlideShowCounter : function(event) {
         var _me = this;
 //        var slideWrapperElem = event.memo.newSlideWrapperElem;
+        console.log('_addSlideShowCounter: ', !_me._configReader.hasAddCounterNone());
         if (!_me._configReader.hasAddCounterNone()) {
           if (!_me.getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
             var countSlideNumElem = new Element('div').addClassName(
@@ -841,6 +842,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
 
       _addNavigationButtons : function(event) {
         var _me = this;
+        console.log('_addNavigationButtons: ', _me._configReader.hasAddNavigation());
         if (_me._configReader.hasAddNavigation()) {
           if (!_me.getContainerElement().down('> div.celPresSlideShow_next')) {
             var nextButton = new Element('div').addClassName('celPresSlideShow_next');
