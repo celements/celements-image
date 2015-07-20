@@ -1189,8 +1189,8 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       loadOverlayLayoutName : function(callbackFN) {
         var _me = this;
         _me._getGalleryObj(function(galleryObj) {
+          _me._layoutName = galleryObj.getLayoutName(); 
           if (callbackFN) {
-            _me._layoutName = galleryObj.getLayoutName(); 
             callbackFN(_me._layoutName);
           }
         });
