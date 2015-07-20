@@ -857,8 +857,12 @@ window.CELEMENTS.image.SlideShow = function(config) {
 
       _imageSlideShowLoadFirstContent_internal : function() {
         var _me = this;
+        _me.getContainerElement().stopObserving(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addNavigationButtonsBind);
         _me.getContainerElement().observe(
             'cel_yuiOverlay:beforeSlideInsert', _me._addNavigationButtonsBind);
+        _me.getContainerElement().stopObserving(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
         _me.getContainerElement().observe(
             'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
         if (_me._configReader.hasCustomStart()) {
