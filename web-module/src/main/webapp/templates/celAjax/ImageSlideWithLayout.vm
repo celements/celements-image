@@ -3,7 +3,7 @@
 #set($pageLayoutMainDocRef = $services.model.createDocumentReference('', "$!request.overwriteLayout", ''))
 #set($overwriteLayoutRef = $pageLayoutMainDocRef.getLastSpaceReference())
 #end
-#set($galleryLayoutRef = '')
+#set($galleryLayout = '')
 #if("$!request.galleryFN" != '')
   #set($pageLayoutMainDocRef = $services.model.resolveDocument("$!request.galleryFN"))
   #set($galleryDoc = $xwiki.getDocument($pageLayoutMainDocRef))
@@ -11,7 +11,7 @@
   #set($galleryLayout = "$!albumObj.getProperty('galleryLayout').getValue()")
 #end
 #if("$!galleryLayout" == '')
-  #set($galleryLayoutRef = 'SimpleLayout')
+  #set($galleryLayout = 'SimpleLayout')
 #end
 #set($galleryLayoutWebHomeRef = $services.model.createDocumentReference('', "$!galleryLayout", ''))
 #set($galleryLayoutRef = $galleryLayoutWebHomeRef.getLastSpaceReference())
