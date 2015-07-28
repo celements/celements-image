@@ -1,7 +1,8 @@
 /** yui overlay **/
 body div.mask.cel-YuiOverlay {
   background-color: black;
-  position: absolute;
+  /** please do not change to absolute. It must be fixed to prevent scroll away. **/
+  position: fixed;
   height: 100%;
   width: 100%;
   opacity: 0.85;

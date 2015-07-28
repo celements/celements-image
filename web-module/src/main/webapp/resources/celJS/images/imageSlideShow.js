@@ -64,6 +64,7 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
 
   CELEMENTS.image.SlideShowStarter.prototype = {
       _parentElem: undefined,
+      _debug : undefined,
   
       _init : function(htmlElem) {
         var _me = this;
@@ -74,11 +75,17 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (slideShowElem.hasClassName('celimage_overlay')
-              && ! slideShowElem.hasClassName('celimage_overlay_initalized')) {
+              && !slideShowElem.hasClassName('celimage_overlay_initalized')) {
+            if (_me._debug) {
+              console.log('overlay image initialization for ', slideShowElem.id);
+            }
             var overlayContainerObj = new CELEMENTS.image.OverlayContainer(slideShowElem);
             overlayContainerObj._getHtmlElem().addClassName(
                 'celimage_overlay_initalized');
             CISS_SlideShowOverlayObjHash.set(slideShowElem.id, overlayContainerObj);
+          } else if (_me._debug
+              && slideShowElem.hasClassName('celimage_overlay_initalized')) {
+            console.log('skip double initialization for ', slideShowElem.id);
           }
         });
       },
@@ -87,9 +94,15 @@ if(typeof CELEMENTS.image=="undefined"){CELEMENTS.image={};};
         var _me = this;
         _me._parentElem.select('.celimage_slideshow').each(function(slideShowElem) {
           if (!slideShowElem.hasClassName('celimage_inline_initalized')) {
+            if (_me._debug) {
+              console.log('inline image initialization for ', slideShowElem.id);
+            }
             var inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem);
             inlineContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
             CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
+          } else if (_me._debug
+              && slideShowElem.hasClassName('celimage_inline_initalized')) {
+            console.log('skip double initialization for ', slideShowElem.id);
           }
         });
       },
@@ -151,6 +164,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       _openInOverlayBind : undefined,
       _imageSlideShowObj : undefined,
       _isOverlayRegistered : undefined,
+      _debug : undefined,
 
       /**
        * Read all configuration information from the original element.
@@ -226,13 +240,18 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           $(document.body).observe('cel_yuiOverlay:hideEvent',
               _me._removeIsImageSlideShowOverlayBind);
         }
+        _me._getHtmlElem().stopObserving('click', _me._openInOverlayClickHandlerBind);
         _me._getHtmlElem().observe('click', _me._openInOverlayClickHandlerBind);
+        _me._getHtmlElem().stopObserving('cel_ImageSlideShow:startSlideShow',
+            _me._openInOverlayBind);
         _me._getHtmlElem().observe('cel_ImageSlideShow:startSlideShow',
             _me._openInOverlayBind);
         $(document.body).stopObserving('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
         $(document.body).observe('cel_yuiOverlay:loadFirstContent',
             _me._imageSlideShowLoadFirstContentBind);
+        $(document.body).stopObserving('cel_yuiOverlay:afterShowDialog_General',
+            _me._resizeOverlayBind);
         $(document.body).observe('cel_yuiOverlay:afterShowDialog_General',
             _me._resizeOverlayBind);
         $(document.body).fire('cel_ImageSlideShow:finishedRegister', _me);
@@ -244,6 +263,7 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       _resizeOverlay : function() {
         var _me = this;
         if (_me._configReader.isAutoResize()) {
+          console.log('_resizeOverlay: start for ', _me._htmlElemId);
           var openDialog = CELEMENTS.presentation.getOverlayObj();
           var zoomFactor = _me._configReader.computeZoomFactor();
           if (zoomFactor <= 1) {
@@ -319,6 +339,10 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         var dialogConfig = event.memo;
         if (dialogConfig.slideShowElem && (dialogConfig.slideShowElem === _me)) {
           _me._containerHtmlElem = $('yuiOverlayContainer');
+          console.log('_imageSlideShowLoadFirstContent: start ', _me._htmlElemId,
+              $(dialogConfig.containerId), _me._containerHtmlElem);
+          //updateContainerElement -> important on reopening overlay.
+          _me._getImageSlideShowObj().updateContainerElement(_me._containerHtmlElem);
           _me._configReader.loadOverlayLayoutName(function(galleryLayoutName) {
             _me._getImageSlideShowObj().start();
           });
@@ -427,6 +451,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
       _centerSplashImageBind : undefined,
       _imageSlideShowObj : undefined,
       _origStyleValues : undefined,
+      _debug : undefined,
 
       /**
        * Read all configuration information from the original element.
@@ -575,6 +600,11 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
            }).setStyle({
              'position' : 'relative'
            });
+          if (_me._debug) {
+            console.log('_wrapSplashImage: set width, height ', _me._htmlElemId,
+                _me._configReader.getContainerAnimWidth(),
+                _me._configReader.getContainerAnimHeight());
+          }
           divWrapper.setStyle({
             'height' : _me._configReader.getContainerAnimHeight() + 'px',
             'width' : _me._configReader.getContainerAnimWidth() + 'px'
@@ -633,12 +663,16 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
         _me._origStyleValues = null;
         var slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
-//        console.log('_centerSplashImage: precomputed zoomFactor ', zoomFactor);
         if (!slideWrapperStyles.get('height') || !slideWrapperStyles.get('width')) {
           var zoomFactor = _me._getPrecomputedZoomFactor(slideWrapper,
               slideWrapperStyles) || '1.0';
-          //FF has problem in getting the right width for slideWrapper if slideWrapper
-          // is in position: relative
+          if (_me._debug) {
+          console.log('_prepareCenterSplashImage: precomputed zoomFactor ', zoomFactor,
+              slideWrapper.getWidth(), slideWrapper.getHeight(),
+              slideWrapperStyles.get('height'), slideWrapperStyles.get('width'));
+          }
+          //FF has problem in getting the right width for slideWrapper
+          // if slideWrapper is in position: relative
           var thumbContainer = _me._containerHtmlElem.down(
               '.cel_slideShow_thumbContainer');
           if (thumbContainer) {
@@ -657,6 +691,10 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
             'zoom' : '1',
             'transform' : 'scale(1)'
            });
+          if (_me._debug) {
+            console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
+                slideWrapper.getWidth(), slideWrapper.getHeight());
+          }
           slideRoot.setStyle({
             'height' : (zoomFactor * slideWrapper.getHeight()) + 'px',
             'width' : (zoomFactor * slideWrapper.getWidth()) + 'px'
@@ -666,10 +704,19 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           stylesProp['position'] = 'relative';
           slideWrapper.setStyle(stylesProp);
         }
+      },
+
+      _showSplashImage : function() {
+        var _me = this;
+        var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+        var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
         slideRoot.setStyle({
           'visibility' : ''
         });
         _me._containerHtmlElem.select('.celLoadingIndicator').each(function(loaderImg) {
+          if (_me._debug) {
+            console.log('_showSplashImage: remove loader image ', loaderImg.up());
+          }
           loaderImg.remove();
         });
       },
@@ -681,24 +728,34 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
           //image gallery overview slides have precomputed resize factor
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var precomputedZoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
-//          console.log('_centerSplashImage: before setResizeSlide false ',
-//              precomputedZoomFactor);
+          if (_me._debug) {
+            console.log('_centerSplashImage: before setResizeSlide false ',
+                precomputedZoomFactor);
+          }
           if (precomputedZoomFactor) {
             celSlideShowObj.setResizeSlide(false);
             celSlideShowObj.setAutoresize(false);
           }
-          _me._containerHtmlElem.observe('cel_slideShow:centerSlide',
+          _me._containerHtmlElem.observe('cel_slideShow:beforeResizeAndCenterSlide',
               _me._prepareCenterSplashImage.bind(_me));
+          _me._containerHtmlElem.observe('cel_slideShow:afterResizeAndCenterSlide',
+              _me._showSplashImage.bind(_me));
           var slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
           var slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
           slideRoot.setStyle({
             'visibility' : 'hidden'
           });
           _me._containerHtmlElem.insert({ 'top' : loadingImages.getSmallLoadingImg() });
+          if (_me._debug) {
+            console.log('before _preloadImagesAndResizeCenterSlide for ',
+                _me._containerHtmlElem, slideWrapper);
+          }
           celSlideShowObj._preloadImagesAndResizeCenterSlide(slideWrapper,
               function() {
-//            console.log('finished center splash slide for ',
-//                _me._containerHtmlElem);
+            if (_me._debug) {
+              console.log('finished center splash slide for ',
+                  _me._containerHtmlElem);
+            }
           });
         }
       },
@@ -730,6 +787,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _startStopClickHandlerBind : undefined,
       _addNavigationButtonsBind : undefined,
       _addSlideShowCounterBind : undefined,
+      _debug : undefined,
 
       _init : function(config) {
         var _me = this;
@@ -744,6 +802,12 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _getContainerElemId : function() {
         var _me = this;
         return _me._config.containerHtmlElem.id;
+      },
+
+      updateContainerElement : function(newContainerElement) {
+        var _me = this;
+        _me._config.containerHtmlElem = newContainerElement;
+        _me._getCelSlideShowObj()._htmlContainer = _me.getContainerElement();
       },
 
       getContainerElement : function() {
@@ -775,6 +839,9 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _addSlideShowCounter : function(event) {
         var _me = this;
 //        var slideWrapperElem = event.memo.newSlideWrapperElem;
+        if (_me._debug) {
+          console.log('_addSlideShowCounter: ', !_me._configReader.hasAddCounterNone());
+        }
         if (!_me._configReader.hasAddCounterNone()) {
           if (!_me.getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
             var countSlideNumElem = new Element('div').addClassName(
@@ -791,6 +858,9 @@ window.CELEMENTS.image.SlideShow = function(config) {
 
       _addNavigationButtons : function(event) {
         var _me = this;
+        if (_me._debug) {
+          console.log('_addNavigationButtons: ', _me._configReader.hasAddNavigation());
+        }
         if (_me._configReader.hasAddNavigation()) {
           if (!_me.getContainerElement().down('> div.celPresSlideShow_next')) {
             var nextButton = new Element('div').addClassName('celPresSlideShow_next');
@@ -805,8 +875,16 @@ window.CELEMENTS.image.SlideShow = function(config) {
 
       _imageSlideShowLoadFirstContent_internal : function() {
         var _me = this;
+        if (_me._debug) {
+          console.log('_imageSlideShowLoadFirstContent_internal: register addNav'
+              + ' and addSlideCounter ', _me.getContainerElement());
+        }
+        _me.getContainerElement().stopObserving(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addNavigationButtonsBind);
         _me.getContainerElement().observe(
             'cel_yuiOverlay:beforeSlideInsert', _me._addNavigationButtonsBind);
+        _me.getContainerElement().stopObserving(
+            'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
         _me.getContainerElement().observe(
             'cel_yuiOverlay:beforeSlideInsert', _me._addSlideShowCounterBind);
         if (_me._configReader.hasCustomStart()) {
@@ -1131,8 +1209,8 @@ window.CELEMENTS.image.ConfigReader = function(htmlElem, configDef) {
       loadOverlayLayoutName : function(callbackFN) {
         var _me = this;
         _me._getGalleryObj(function(galleryObj) {
+          _me._layoutName = galleryObj.getLayoutName(); 
           if (callbackFN) {
-            _me._layoutName = galleryObj.getLayoutName(); 
             callbackFN(_me._layoutName);
           }
         });

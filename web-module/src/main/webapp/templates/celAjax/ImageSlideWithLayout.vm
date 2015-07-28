@@ -3,14 +3,18 @@
 #set($pageLayoutMainDocRef = $services.model.createDocumentReference('', "$!request.overwriteLayout", ''))
 #set($overwriteLayoutRef = $pageLayoutMainDocRef.getLastSpaceReference())
 #end
+#set($galleryLayout = '')
 #if("$!request.galleryFN" != '')
   #set($pageLayoutMainDocRef = $services.model.resolveDocument("$!request.galleryFN"))
   #set($galleryDoc = $xwiki.getDocument($pageLayoutMainDocRef))
   #set($albumObj = $!galleryDoc.getObject("XWiki.PhotoAlbumClass"))
-  #set($galleryLayout = $albumObj.getProperty('galleryLayout').getValue())
-  #set($galleryLayoutWebHomeRef = $services.model.createDocumentReference('', "$!galleryLayout", ''))
-  #set($galleryLayoutRef = $galleryLayoutWebHomeRef.getLastSpaceReference())
+  #set($galleryLayout = "$!albumObj.getProperty('galleryLayout').getValue()")
 #end
+#if("$!galleryLayout" == '')
+  #set($galleryLayout = 'SimpleLayout')
+#end
+#set($galleryLayoutWebHomeRef = $services.model.createDocumentReference('', "$!galleryLayout", ''))
+#set($galleryLayoutRef = $galleryLayoutWebHomeRef.getLastSpaceReference())
 ##only include if legacy celements2web.xar is installed
 #if($xwiki.exists($services.model.resolveDocument('celements2web:Macros.initCelements')))
 $xwiki.includeForm("celements2web:Macros.initCelements", false)
