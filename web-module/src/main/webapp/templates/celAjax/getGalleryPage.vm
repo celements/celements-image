@@ -15,6 +15,7 @@ $createdNav.setOffset($offset)
 $createdNav.setNumberOfItem($overwriteItemsPerPage)
 #end
 #end
+$createdNav.setPresentationType("gallerySlidesOverview")
 $jsonBuilder.addStringProperty('content', $createdNav.includeNavigation())
 #set($numberOfItem = $createdNav.getNumberOfItem())
 $jsonBuilder.openProperty('itemsPerPage')

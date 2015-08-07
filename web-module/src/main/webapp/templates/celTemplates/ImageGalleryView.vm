@@ -22,14 +22,16 @@
 #end
 #set($galleryNav = $celementsweb.createNavigation())
 $galleryNav.loadConfigFromDoc($contentDoc.documentReference)
-<h1>Number of Items: $galleryNav.getNumberOfItem()</h1>
 #if($galleryNav.getNumberOfItem() > 0)
+  
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-2.7/idangerous.swiper.css', 'file')" type="text/css" media="screen" />
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.css', 'file')" type="text/css" media="screen" />
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/swiper-scrollbar.css', 'file')" type="text/css" media="screen" />
+  
   $!celementsweb.addExtJSfileOnce(':celJS/endlessScroll/endlessScroller.js')
   $!celementsweb.addExtJSfileOnce(':celJS/swiper-2.7/idangerous.swiper.min.js')
   $!celementsweb.addExtJSfileOnce(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.min.js')
-  $!celementsweb.addExtJSfileOnce(':celJS/images/imageGalleryPaging.js')
-  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-2.7/idangerous.swiper.css', 'file')" type="text/css" media="screen" />
-  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.css', 'file')" type="text/css" media="screen" />
+  $!celementsweb.addExtJSfileOnce('BellisLayout.WebHome;imageGalleryPaging.js')
 #end
 #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
 #set($galleryPresentationCount = $galleryPresentationCount + 1)
