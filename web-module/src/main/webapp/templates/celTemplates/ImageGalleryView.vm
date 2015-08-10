@@ -31,7 +31,7 @@ $galleryNav.loadConfigFromDoc($contentDoc.documentReference)
   $!celementsweb.addExtJSfileOnce(':celJS/endlessScroll/endlessScroller.js')
   $!celementsweb.addExtJSfileOnce(':celJS/swiper-2.7/idangerous.swiper.min.js')
   $!celementsweb.addExtJSfileOnce(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.min.js')
-  $!celementsweb.addExtJSfileOnce('BellisLayout.WebHome;imageGalleryPaging.js')
+  $!celementsweb.addExtJSfileOnce(':celJS/images/imageGalleryPaging.js')
 #end
 #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
 #set($galleryPresentationCount = $galleryPresentationCount + 1)
