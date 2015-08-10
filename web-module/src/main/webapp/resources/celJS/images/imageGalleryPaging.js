@@ -165,11 +165,11 @@
       var _me = this;
       var scrollContainer = _me.getColumnInnerElem().up('.scrollcontainer');
       if (!scrollContainer) {
-        scrollContainer = new Element('div', {
-          'style' : "height: 625px"
-        });
+        scrollContainer = new Element('div');
         scrollContainer.addClassName('scrollcontainer');
         _me._getScrollWrapper().wrap(scrollContainer);
+        scrollContainer.fire('cel:scrollContainerCreated', {
+          'scrollContainer' : scrollContainer});
       }
       
       return scrollContainer;
