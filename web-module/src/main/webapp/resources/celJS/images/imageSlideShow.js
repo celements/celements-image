@@ -309,7 +309,10 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
         var openDialog = CELEMENTS.presentation.getOverlayObj();
         Event.stopObserving(window, "resize", _me._resizeOverlayBind);
         Event.stopObserving(window, "orientationchange", _me._resizeOverlayBind);
-        openDialog.updateOpenConfig({ 'slideShowElem' : null });
+        openDialog.updateOpenConfig({
+          'slideShowElem' : null,
+          'additionalCssClass' : ''
+        });
       },
 
       _checkIsImageSlideShowOverlay : function(event) {
@@ -372,7 +375,8 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
           'suppressDimFromId' : true,
           'width' : _me._configReader.getOverlayWidth() + 'px',
           'height' : _me._configReader.getOverlayHeight() + 'px',
-          'fixedcenter' : !_me._configReader.isAutoResize()
+          'fixedcenter' : !_me._configReader.isAutoResize(),
+          'additionalCssClass' : 'celImageGalleryOverlay'
         });
         openDialog.intermediatOpenHandler();
       }
