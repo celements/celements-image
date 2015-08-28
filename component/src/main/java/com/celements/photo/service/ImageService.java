@@ -323,6 +323,7 @@ public class ImageService implements IImageService {
         } else {
           LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
           Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
+          metaTagMap = new HashMap<String, String>();
           for(String key : map.keySet()) {
             metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
           }

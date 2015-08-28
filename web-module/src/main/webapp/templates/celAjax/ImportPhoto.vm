@@ -1,4 +1,6 @@
 ## @deprecated -> import to gallery / central filebase and to be replaced by ImportImages
+<link rel="stylesheet" media="all" type="text/css" href="$xwiki.getSkinFile('celRes/import/ImportPhoto.css', true)" />
+
 #if("$!attDoc" == '')
   #set($attDoc = $xwiki.getDocument("$!request.get('attDoc')"))
 #end
@@ -31,19 +33,10 @@
   <input type="hidden" name="attDoc" value="$!request.get('attDoc')" />
   <input type="hidden" name="filename" value="$!request.get('filename')" />
   
-  <style>
-    #importForm .c3_fb_upload_filter {
-      display: inline;
-      padding-right: 20px;
-    }
-    #importForm .c3_import_checkbox_all_none {
-      padding-top: 12px;
-    }
-  </style>
   #if("$!doc.getObject('Classes.ImportClass')" == '')
     #set($fbDoc = "$!xwiki.getWebPreference('cel_centralfilebase')")
     #set($menuSpace = "$!fbDoc.substring(0, $fbDoc.indexOf('.'))")
-    <div>
+    <div class="c3_fb_upload_filter_wrapper">
       <p>$adminMsg.get('cel_photo_import_add_tags')</p>
     #set($helpNav = $xwiki.celementsweb.createNavigation())
     #set($menuSpaceRef = $services.model.createDocumentReference('', $menuSpace, '').lastSpaceReference)

@@ -42,9 +42,9 @@ import javax.imageio.ImageIO;
 import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.sanselan.ImageReadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
@@ -58,7 +58,7 @@ import com.xpn.xwiki.XWikiException;
  */
 public class GenerateThumbnail {
   
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(GenerateThumbnail.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GenerateThumbnail.class);
 
   /**
    * saveTypes : image types which can be preserved resizing the image
@@ -603,8 +603,8 @@ public class GenerateThumbnail {
     String hash = "";
     try {
       hash = new Util().hashToHex(getHashOfImage(img));
-    } catch (NoSuchAlgorithmException e) {
-      LOGGER.error(e);
+    } catch (NoSuchAlgorithmException exp) {
+      LOGGER.error("failed to compute image hash.", exp);
     }
     
     return hash;
