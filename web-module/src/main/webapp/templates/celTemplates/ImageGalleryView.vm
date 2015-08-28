@@ -21,8 +21,13 @@
 #set($galleryPresentationCount = 0)
 #end
 #set($galleryNav = $celementsweb.createNavigation())
-$galleryNav.loadConfigFromDoc($celldoc.documentReference)
+$galleryNav.loadConfigFromDoc($contentDoc.documentReference)
 #if($galleryNav.getNumberOfItem() > 0)
+  
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-2.7/idangerous.swiper.css', 'file')" type="text/css" media="screen" />
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.css', 'file')" type="text/css" media="screen" />
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/swiper-scrollbar.css', 'file')" type="text/css" media="screen" />
+  
   $!celementsweb.addExtJSfileOnce(':celJS/endlessScroll/endlessScroller.js')
   $!celementsweb.addExtJSfileOnce(':celJS/swiper-2.7/idangerous.swiper.min.js')
   $!celementsweb.addExtJSfileOnce(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.min.js')
