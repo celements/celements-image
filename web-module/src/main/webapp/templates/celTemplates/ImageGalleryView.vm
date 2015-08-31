@@ -8,7 +8,7 @@
 #if(($context.action != 'edit') && ("$!request.xpage" != "overlay"))
 #if("$!celldoc" != '')
 #set($contentDoc = $celldoc)
-#else   
+#else
 #set($contentDoc = $tdoc)
 #end
 ##prevent problems with overwritten contentDoc variables
@@ -21,12 +21,23 @@
 #set($galleryPresentationCount = 0)
 #end
 #set($galleryNav = $celementsweb.createNavigation())
-$galleryNav.loadConfigFromDoc($celldoc.documentReference)
+$galleryNav.loadConfigFromDoc($contentDoc.documentReference)
+#if($galleryNav.getNumberOfItem() > 0)
+  
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-2.7/idangerous.swiper.css', 'file')" type="text/css" media="screen" />
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.css', 'file')" type="text/css" media="screen" />
+  <link rel="stylesheet" href="$celementsweb.getSkinFile(':celRes/swiper-scrollbar.css', 'file')" type="text/css" media="screen" />
+  
+  $!celementsweb.addExtJSfileOnce(':celJS/endlessScroll/endlessScroller.js', 'file')
+  $!celementsweb.addExtJSfileOnce(':celJS/swiper-2.7/idangerous.swiper.min.js', 'file')
+  $!celementsweb.addExtJSfileOnce(':celJS/swiper-scrollbar-2.4/idangerous.swiper.scrollbar.min.js', 'file')
+  $!celementsweb.addExtJSfileOnce(':celJS/images/imageGalleryPaging.js', 'file')
+#end
 #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
 #set($galleryPresentationCount = $galleryPresentationCount + 1)
-<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery_view">
-<div class="pfeil_links"></div>
-<div class="pfeil_rechts"></div>
+<div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery_view galleryViewScrollContainer swiper-container">
+<div class="pfeil_links swiper-button-prev"></div>
+<div class="pfeil_rechts swiper-button-next"></div>
 #parse('celTemplates/PresentationView.vm')
 <!-- GP$!{galleryPresentationCount}$!{contentDoc.getName()} --></div>
 #else
