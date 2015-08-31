@@ -1,5 +1,5 @@
 ## @deprecated -> import to gallery / central filebase and to be replaced by ImportImages
-<link rel="stylesheet" media="all" type="text/css" href="$xwiki.getSkinFile('celRes/import/ImportPhoto.css', true)" />
+<link rel="stylesheet" media="all" type="text/css" href="$xwiki.getSkinFile('celRes/ImportPhoto.css', true)" />
 
 #if("$!attDoc" == '')
   #set($attDoc = $xwiki.getDocument("$!request.get('attDoc')"))
