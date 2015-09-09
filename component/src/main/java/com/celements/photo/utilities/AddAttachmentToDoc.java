@@ -69,7 +69,7 @@ public class AddAttachmentToDoc {
    * @throws XWikiException
    * 
    * TODO move to celementsWeb AttachmentService and check that AttachmentEvents
-   *      are fired for lucene!
+   *      are fired for lucene! (JIRA: CELDEV-130)
    */
   public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename, 
       XWikiContext context) throws XWikiException{
