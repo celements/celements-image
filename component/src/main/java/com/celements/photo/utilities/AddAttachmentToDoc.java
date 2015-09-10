@@ -78,11 +78,11 @@ public class AddAttachmentToDoc {
   @Deprecated
   public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename, 
       XWikiContext context) throws XWikiException {
-    ByteArrayInputStream in = null;
+    ByteArrayInputStream dataStream = null;
     try {
-      in = new ByteArrayInputStream(data);
+      dataStream = new ByteArrayInputStream(data);
       return ((AttachmentService) Utils.getComponent(IAttachmentServiceRole.class)
-          ).addAttachment(doc, in, filename, context.getUser(), null);
+          ).addAttachment(doc, dataStream, filename, context.getUser(), null);
     } catch (DocumentSaveException dse) {
       LOGGER.error("Exception saving document with added attachment '" + filename + "'", 
           dse);
@@ -91,9 +91,9 @@ public class AddAttachmentToDoc {
     } catch (AddingAttachmentContentFailedException aacfe) {
       LOGGER.error("Faild to add attachment content for '" + filename + "'", aacfe);
     } finally {
-      if(in != null) {
+      if(dataStream != null) {
         try {
-          in.close();
+          dataStream.close();
         } catch (IOException ioe) {
           LOGGER.error("Exception closing ByteArrayInputStream", ioe);
         }
