@@ -86,10 +86,8 @@ public class UnpackComponent implements IUnpackComponentRole {
           LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
               ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
         }
-      } catch (IOException ioe) {
-        LOGGER.error("Exception while unpacking zip", ioe);
-      } catch (XWikiException xwe) {
-        LOGGER.error("Exception while unpacking zip", xwe);
+      } catch (XWikiException|IOException exeption) {
+        LOGGER.error("Exception while unpacking zip", exeption);
       } catch (DocumentSaveException dse) {
         LOGGER.error("Exception saving unpacked file to destination document.", dse);
       } catch (AttachmentToBigException atbe) {
@@ -97,13 +95,7 @@ public class UnpackComponent implements IUnpackComponentRole {
       } catch (AddingAttachmentContentFailedException aacfe) {
         LOGGER.error("Exception adding unpacked content to new attachment.", aacfe);
       } finally {
-        if(newAttOutStream != null) {
-          try {
-            newAttOutStream.close();
-          } catch (IOException ioe) {
-            LOGGER.error("Could not close stream 'newAttOutStream'.", ioe);
-          }
-        }
+        IOUtils.closeQuietly(newAttOutStream);
       }
     } else {
       LOGGER.error("Source document which should contain zip file is null: [" 
@@ -111,13 +103,6 @@ public class UnpackComponent implements IUnpackComponentRole {
     }
     LOGGER.info("END unzip: file='" + attName + "', cleaned name is '" + cleanName + "'");
     return cleanName;
-  }
-  
-  private AddAttachmentToDoc getAddAttachmentToDoc() {
-    if(inject_addAttachmentToDoc != null) {
-      return inject_addAttachmentToDoc;
-    }
-    return new AddAttachmentToDoc();
   }
 
   private Unzip getUnzip() {

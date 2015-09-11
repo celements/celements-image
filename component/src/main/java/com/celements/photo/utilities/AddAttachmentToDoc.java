@@ -19,9 +19,7 @@
  */
 package com.celements.photo.utilities;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -78,11 +76,9 @@ public class AddAttachmentToDoc {
   @Deprecated
   public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename, 
       XWikiContext context) throws XWikiException {
-    ByteArrayInputStream dataStream = null;
     try {
-      dataStream = new ByteArrayInputStream(data);
       return ((AttachmentService) Utils.getComponent(IAttachmentServiceRole.class)
-          ).addAttachment(doc, dataStream, filename, context.getUser(), null);
+          ).addAttachment(doc, data, filename, context.getUser(), null);
     } catch (DocumentSaveException dse) {
       LOGGER.error("Exception saving document with added attachment '" + filename + "'", 
           dse);
@@ -90,14 +86,6 @@ public class AddAttachmentToDoc {
       LOGGER.error("Attachment '" + filename + "' is to big", atbe);
     } catch (AddingAttachmentContentFailedException aacfe) {
       LOGGER.error("Faild to add attachment content for '" + filename + "'", aacfe);
-    } finally {
-      if(dataStream != null) {
-        try {
-          dataStream.close();
-        } catch (IOException ioe) {
-          LOGGER.error("Exception closing ByteArrayInputStream", ioe);
-        }
-      }
     }
     return null;
   }
