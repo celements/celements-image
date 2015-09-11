@@ -38,6 +38,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Used to add data as a new XWikiAttachment to an XWikiDocument.
  */
+@Deprecated
 public class AddAttachmentToDoc {
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       AddAttachmentToDoc.class);
@@ -53,7 +54,11 @@ public class AddAttachmentToDoc {
    *           attachment.
    * @return The attachment containing the given data.
    * @throws XWikiException
+   * 
+   * @deprecated since 1.42 instead use {@link IAttachmentServiceRole.addAttachment(
+   *    XWikiDocument, InputStream, String, String, String)}
    */
+  @Deprecated
   public XWikiAttachment addAtachment(XWikiDocument doc, ByteArrayOutputStream data, 
       String filename, XWikiContext context) throws XWikiException{
     return addAtachment(doc, data.toByteArray(), filename, context);
