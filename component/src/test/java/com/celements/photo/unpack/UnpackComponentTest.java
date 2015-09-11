@@ -15,7 +15,10 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.filebase.AddingAttachmentContentFailedException;
+import com.celements.filebase.AttachmentToBigException;
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.Unzip;
@@ -37,7 +40,7 @@ public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testUnzipFileToAttachment_parameterPromotion() throws XWikiException, IOException {
+  public void testUnzipFileToAttachment_parameterPromotion() throws XWikiException, IOException, DocumentSaveException, AttachmentToBigException, AddingAttachmentContentFailedException {
     String filename = "file.zip";
     String imgName = "file 1.png";
     String cleanImgName = "file1.png";
@@ -64,23 +67,21 @@ public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
     ByteArrayOutputStream bais = new ByteArrayOutputStream();
     bais.write(inArray);
     expect(unzip.getFile(eq(imgName), (InputStream)anyObject())).andReturn(bais);
-    AddAttachmentToDoc addAtt = createMock(AddAttachmentToDoc.class);
-    upc.inject_addAttachmentToDoc = addAtt;
     XWikiAttachment newAtt = new XWikiAttachment();
     newAtt.setFilename(cleanImgName);
     newAtt.setFilesize(123);
     newAtt.setDoc(destDoc);
-    expect(addAtt.addAtachment(same(destDoc), /*eq(inArray)*/(byte[])anyObject(), eq(cleanImgName), same(getContext())
-        )).andReturn(newAtt);
     IAttachmentServiceRole attService = createMock(IAttachmentServiceRole.class);
     upc.attService = attService;
+    expect(attService.addAttachment(same(destDoc), (byte[])anyObject(), eq(cleanImgName),
+        eq(getContext().getUser()), eq((String)null))).andReturn(newAtt);
     expect(attService.clearFileName(eq(imgName))).andReturn(cleanImgName);
     expect(xwiki.getDocument(same(zipSrcDocRef), same(getContext()))).andReturn(srcDoc);
     expect(xwiki.getDocument(same(imgDestDocRef), same(getContext()))).andReturn(destDoc);
-    replay(addAtt, att, attService, unzip, xwiki);
+    replay(att, attService, unzip, xwiki);
     String resultImgName = upc.unzipFileToAttachment(zipSrcDocRef, filename, imgName, 
         imgDestDocRef);
-    verify(addAtt, att, attService, unzip, xwiki);
+    verify(att, attService, unzip, xwiki);
     assertEquals(cleanImgName, resultImgName);
   }
   

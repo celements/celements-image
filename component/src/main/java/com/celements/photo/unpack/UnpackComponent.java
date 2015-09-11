@@ -16,7 +16,6 @@ import com.celements.filebase.AttachmentToBigException;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.photo.container.ImageLibStrings;
-import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.Unzip;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -33,7 +32,6 @@ public class UnpackComponent implements IUnpackComponentRole {
   
   XWikiContext inject_context = null;
   Unzip inject_unzip = null;
-  AddAttachmentToDoc inject_addAttachmentToDoc = null;
   
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       UnpackComponent.class);
