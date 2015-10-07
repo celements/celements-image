@@ -20,6 +20,7 @@
 package com.celements.photo.plugin.cmd;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -148,13 +149,23 @@ public class ComputeImageCommand {
                   kerMatrix[i] = x;
                 }
                 img = decodeImageCommand.readImage(attachmentClone, context);
+                BufferedImage newSource = new BufferedImage(img.getWidth() 
+                    + (kerWidth - 1), img.getHeight() + (kerHeight - 1), 
+                    BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2 = newSource.createGraphics();
+                int xOffset = (kerWidth - 1) / 2;
+                int yOffset = (kerHeight - 1) / 2;
+//TODO transparent border ok or need colours be extended?
+                g2.drawImage(img, xOffset, yOffset, null);
+                g2.dispose();
                 Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
                 LOGGER.debug("Filtering with kernel configured as " + kerWidth + ", " 
                     + kerHeight + ", " + Arrays.toString(kerMatrix));
                 BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
-                BufferedImage filteredImg = op.filter(img, null);
+                BufferedImage filteredImg = op.filter(newSource, null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
+//TODO probably needs to be cropped again
+                thumbGen.encodeImage(out, filteredImg, newSource, attachmentClone.getMimeType(
                     context));
                 attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
                 timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
