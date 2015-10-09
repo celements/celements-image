@@ -155,7 +155,7 @@ public class ComputeImageCommand {
                 Graphics2D g2 = newSource.createGraphics();
                 int xOffset = (kerWidth - 1) / 2;
                 int yOffset = (kerHeight - 1) / 2;
-//TODO transparent border ok or need colours be extended?
+                setBorderPixelsBeforeNeededForKernel(xOffset, yOffset, newSource, img);
                 g2.drawImage(img, xOffset, yOffset, null);
                 g2.dispose();
                 Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
@@ -186,6 +186,56 @@ public class ComputeImageCommand {
       attachmentClone = attachment;
     }
     return attachmentClone;
+  }
+
+  void setBorderPixelsBeforeNeededForKernel(int xOffset, int yOffset,
+      BufferedImage newSource, BufferedImage img) {
+    //set top left corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(i, k, img.getRGB(0, 0));
+      }
+    }
+    //set top and bottom border
+    for(int i = 0; i < img.getWidth(); i++) {
+      int x = i + xOffset;
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(x, k, img.getRGB(i, 0));
+        newSource.setRGB(x, (newSource.getHeight() - 1) - k, 
+            img.getRGB(i, (img.getHeight() - 1)));
+      }
+    }
+    //set top right corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB((newSource.getWidth() - 1) - i, k, 
+            img.getRGB((img.getWidth() - 1), 0));
+      }
+    }
+    //set bottom left corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(i, (newSource.getHeight() - 1) - k, 
+            img.getRGB(0, (img.getHeight() - 1)));
+      }
+    }
+    //set left and right border
+    for(int i = 0; i < img.getHeight(); i++) {
+      int y = i + yOffset;
+      for(int k = 0; k < xOffset; k++) {
+        newSource.setRGB(k, y, img.getRGB(0, i));
+        newSource.setRGB((newSource.getWidth() - 1) - k, y, 
+            img.getRGB((img.getWidth() - 1), i));
+      }
+    }
+    //set bottom right corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB((newSource.getWidth() - 1) - i, 
+            (newSource.getHeight() - 1) - k, 
+            img.getRGB((img.getWidth() - 1), (img.getHeight() - 1)));
+      }
+    }
   }
 
   Color getBackgroundColour(Color defaultBg, String defaultBgStr) {
