@@ -12,14 +12,15 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.photo.container.ImageDimensions;
 
-public class GenerateThumbnailTest {
+public class GenerateThumbnailTest extends AbstractBridgedComponentTestCase{
 
   private GenerateThumbnail genThum;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp_GenerateThumbnailTest() throws Exception {
     genThum = new GenerateThumbnail();
   }
 
