@@ -164,9 +164,9 @@ public class ComputeImageCommand {
                 BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
                 BufferedImage filteredImg = op.filter(newSource, null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-//TODO probably needs to be cropped again
-                thumbGen.encodeImage(out, filteredImg, newSource, attachmentClone.getMimeType(
-                    context));
+                ICropImage cropComp = Utils.getComponent(ICropImage.class);
+                cropComp.crop(filteredImg, xOffset, yOffset, img.getWidth(), 
+                    img.getHeight(), attachmentClone.getMimeType(context), out);
                 attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
                 timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
                     + "] after ");
