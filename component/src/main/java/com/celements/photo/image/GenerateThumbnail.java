@@ -345,11 +345,23 @@ public class GenerateThumbnail {
     } else {
       if((img.getWidth() > (int)imgSize.getWidth()) 
           || (img.getHeight() > (int)imgSize.getHeight())) {
+        LOGGER.trace("widthratio: {}, heightratio: {}", 
+            (img.getWidth() / imgSize.getWidth()), 
+            (img.getHeight() / imgSize.getHeight()));
+        // width ratio > height ratio is done to prevent images getting 1 px to large due
+        //    to rounding errors "0.03 pixels"
         // The "-1" is used to resize maintaining the aspect ratio.
-        thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
+        if((img.getWidth() / imgSize.getWidth()) 
+            > (img.getHeight() / imgSize.getHeight())) {
+          thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, 
+              Image.SCALE_SMOOTH);
+        } else {
+          thumbImg = img.getScaledInstance(-1, (int)imgSize.getHeight(), 
+              Image.SCALE_SMOOTH);
+        }
       }
     }
-    LOGGER.debug("width ziel: " + imgSize.getWidth() + ", height ziel: " + 
+    LOGGER.debug("width target: " + imgSize.getWidth() + ", height target: " + 
         imgSize.getHeight() + "; width: " + thumbImg.getWidth(null) + ", height: " + 
         thumbImg.getHeight(null));
     BufferedImage buffThumb = convertImageToBufferedImage(thumbImg, watermark, copyright,

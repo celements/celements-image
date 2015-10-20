@@ -20,6 +20,7 @@
 package com.celements.photo.plugin.cmd;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -148,14 +149,24 @@ public class ComputeImageCommand {
                   kerMatrix[i] = x;
                 }
                 img = decodeImageCommand.readImage(attachmentClone, context);
+                BufferedImage newSource = new BufferedImage(img.getWidth() 
+                    + (kerWidth - 1), img.getHeight() + (kerHeight - 1), 
+                    BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2 = newSource.createGraphics();
+                int xOffset = (kerWidth - 1) / 2;
+                int yOffset = (kerHeight - 1) / 2;
+                setBorderPixelsBeforeNeededForKernel(xOffset, yOffset, newSource, img);
+                g2.drawImage(img, xOffset, yOffset, null);
+                g2.dispose();
                 Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
                 LOGGER.debug("Filtering with kernel configured as " + kerWidth + ", " 
                     + kerHeight + ", " + Arrays.toString(kerMatrix));
                 BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
-                BufferedImage filteredImg = op.filter(img, null);
+                BufferedImage filteredImg = op.filter(newSource, null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
-                    context));
+                ICropImage cropComp = Utils.getComponent(ICropImage.class);
+                cropComp.crop(filteredImg, xOffset, yOffset, img.getWidth(), 
+                    img.getHeight(), attachmentClone.getMimeType(context), out);
                 attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
                 timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
                     + "] after ");
@@ -175,6 +186,56 @@ public class ComputeImageCommand {
       attachmentClone = attachment;
     }
     return attachmentClone;
+  }
+
+  void setBorderPixelsBeforeNeededForKernel(int xOffset, int yOffset,
+      BufferedImage newSource, BufferedImage img) {
+    //set top left corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(i, k, img.getRGB(0, 0));
+      }
+    }
+    //set top and bottom border
+    for(int i = 0; i < img.getWidth(); i++) {
+      int x = i + xOffset;
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(x, k, img.getRGB(i, 0));
+        newSource.setRGB(x, (newSource.getHeight() - 1) - k, 
+            img.getRGB(i, (img.getHeight() - 1)));
+      }
+    }
+    //set top right corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB((newSource.getWidth() - 1) - i, k, 
+            img.getRGB((img.getWidth() - 1), 0));
+      }
+    }
+    //set bottom left corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(i, (newSource.getHeight() - 1) - k, 
+            img.getRGB(0, (img.getHeight() - 1)));
+      }
+    }
+    //set left and right border
+    for(int i = 0; i < img.getHeight(); i++) {
+      int y = i + yOffset;
+      for(int k = 0; k < xOffset; k++) {
+        newSource.setRGB(k, y, img.getRGB(0, i));
+        newSource.setRGB((newSource.getWidth() - 1) - k, y, 
+            img.getRGB((img.getWidth() - 1), i));
+      }
+    }
+    //set bottom right corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB((newSource.getWidth() - 1) - i, 
+            (newSource.getHeight() - 1) - k, 
+            img.getRGB((img.getWidth() - 1), (img.getHeight() - 1)));
+      }
+    }
   }
 
   Color getBackgroundColour(Color defaultBg, String defaultBgStr) {

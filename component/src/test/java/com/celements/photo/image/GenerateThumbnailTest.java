@@ -12,14 +12,15 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.photo.container.ImageDimensions;
 
-public class GenerateThumbnailTest {
+public class GenerateThumbnailTest extends AbstractBridgedComponentTestCase{
 
   private GenerateThumbnail genThum;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp_GenerateThumbnailTest() throws Exception {
     genThum = new GenerateThumbnail();
   }
 
@@ -96,12 +97,12 @@ public class GenerateThumbnailTest {
     BufferedImage img = genThum.decodeInputStream(in);
     in.close();
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    genThum.createThumbnail(img, out, new ImageDimensions(497, 247), null, null, "PNG",
+    genThum.createThumbnail(img, out, new ImageDimensions(500, 247), null, null, "PNG",
         null, false, null);
     BufferedImage outImg = genThum.decodeInputStream(new ByteArrayInputStream(
         out.toByteArray()));
     out.close();
-    assertEquals(497, outImg.getWidth(null));
+    assertEquals(495, outImg.getWidth(null));
     assertEquals(247, outImg.getHeight(null));
   }
 
