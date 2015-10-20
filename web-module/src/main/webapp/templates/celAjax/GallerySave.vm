@@ -41,6 +41,9 @@
  $album_obj.set('hasOverview',$!request.get('XWiki.PhotoAlbumClass_0_hasOverview'))
  $album_obj.set('thumbDescription',$!request.get('thumbDescription'))
  $album_obj.set('theme',$!request.get('XWiki.PhotoAlbumClass_0_theme'))
+ #if("$!doc.content" == '')
+   $doc.setContent("$!doc.name : $!doc.title")
+ #end
  $doc.save()
  ## redirect to edit album
  $context.getResponse().sendRedirect($xredirect)
