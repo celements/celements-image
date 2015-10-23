@@ -235,16 +235,7 @@
         clearTimeout(_me._reInitScrollbarDelayedCall);
       }
     },
-    
-    _startReInitScrollbarDelayed : function(delayed) {
-      var _me = this;
-      var newDelayed = delayed || 0.1;
-      newDelayed *= 2;
-      _me._clearReInitScrollbarDelayedCall();
-      _me._reInitScrollbarDelayedCall = _me._reInitScrollbarDelayedBind.delay(
-          newDelayed, newDelayed);
-    },
-    
+        
     _updateScrollbar : function() {
       var _me = this;
       _me._swiper.resizeFix();
@@ -346,8 +337,9 @@
     }
   };
   
-  
+  console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<< IN imageGalleryPaging');
   celAddOnBeforeLoadListener(function() {
+    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageGalleryPaging IN celAddOnBeforeLoadListener');
     var column = new CEL.Column('content');
     column._initSwiperScrollbar();
   });
