@@ -20,7 +20,9 @@
 
   var observeImgs = function(event) {
     loadTagList();
-    var loaderimg = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif' });
+    var loaderimg = new Element('img', {
+      'src': CELEMENTS.getPathPrefix() + '/file/resources/celRes/ajax-loader.gif'
+    });
     $$('.bilder').each(function(imgContainer) {
       imgContainer.update(loaderimg);
     });
@@ -432,8 +434,10 @@
     event.stop();
     $$('.motiveSubmit').each(function(ele) {
       ele.hide();
-      var loader = new Element('img', { 'src': '/skin/resources/celRes/ajax-loader.gif', 
-          'class': 'importLoader'});
+      var loader = new Element('img', {
+        'src': CELEMENTS.getPathPrefix() + '/file/resources/celRes/ajax-loader.gif', 
+        'class': 'importLoader'
+      });
       ele.insert({ after : loader });
     });
     var url = null;
@@ -450,7 +454,7 @@
         console.log('galleryId: ', galleryId);
         var gallery = loadedGalleries.get(galleryId);
         var image = gallery.getImageForId(bild.id);
-        var imageDocFN = image.getURL().replace(/^\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2');
+        var imageDocFN = image.getURL().replace(/^.*\/download\/(.*?)\/(.*?)\/.*$/g, '$1.$2');
         imageFNs.push(imageDocFN + ';' + image.getFilename());
       });
       var slideContent = $('slideContent').value.strip();
