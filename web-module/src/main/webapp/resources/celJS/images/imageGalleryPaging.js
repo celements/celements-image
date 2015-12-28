@@ -63,7 +63,7 @@
       var _me = this;
       _me._loadingImg = new Image();
       _me._loadingImg.alt = 'loading...';
-      _me._loadingImg.src = '/file/resources/celRes/ajax-loader.gif';
+      _me._loadingImg.src = CELEMENTS.getPathPrefix() + '/file/resources/celRes/ajax-loader.gif';
       _me._loadingIndicator = new Element('div').addClassName('attListLoading');
       _me._loadingIndicator.setStyle({'padding-top': '10px'})
       _me._loadingIndicator.update(_me._loadingImg);

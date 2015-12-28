@@ -137,7 +137,7 @@ var setCropImage = function() {
     prevSrc = prevSrc.replace(/\?.*/g, '');
     if(prevSrc != $('cropImage').src) {
       var loaderimg = new Element('img', { 
-        'src' : '/skin/resources/celRes/ajax-loader.gif',
+        'src' : CELEMENTS.getPathPrefix() + '/file/resources/celRes/ajax-loader.gif',
         'id' : 'crop_image_loader'
       });
       $('cropImage').up('table').insert({ before : loaderimg });

@@ -59,18 +59,12 @@ CiG.prototype = {
 
   _getGalleryURL : function(spaceImgs) {
     var _me = this;
-    var port = '';
-    if (window.location.port != '80') {
-      port = window.location.port;
-    }
     if (!spaceImgs) {
       //1.12.2013 FP; image picker does not use spaceImgs but calls galleryClass with callDocRef equals gallery FN
       var colDocRefSplit = _me._collDocRef.split('.');
-      return window.location.protocol + '//' + window.location.host + '/'
-        + colDocRefSplit[0] + '/' + colDocRefSplit[1];
+      return CELEMENTS.getPathPrefix() + '/' + colDocRefSplit[0] + '/' + colDocRefSplit[1];
     } else {
-      return window.location.protocol + '//' + window.location.host + '/'
-        + _me._collDocRef + '/WebHome';
+      return CELEMENTS.getPathPrefix() + '/' + _me._collDocRef + '/WebHome';
     }
   },
 

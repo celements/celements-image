@@ -408,7 +408,7 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         var _me = this;
 
         _me._loadingImg = new Image();
-        _me._loadingImg.src = '/file/resources/celRes/ajax-loader.gif';
+        _me._loadingImg.src = CELEMENTS.getPathPrefix() + '/file/resources/celRes/ajax-loader.gif';
         _me._loadingImg.height = 32;
         _me._loadingImg.width = 32;
         _me._loadingImg.addClassName('celLoadingIndicator');
@@ -421,7 +421,8 @@ window.CELEMENTS.image.InlineContainer = function(htmlElem) {
         });
         
         _me._loadingSmallImg = new Image();
-        _me._loadingSmallImg.src = '/file/resources/celRes/ajax-loader-small.gif';
+        _me._loadingSmallImg.src = CELEMENTS.getPathPrefix()
+                                   + '/file/resources/celRes/ajax-loader-small.gif';
         _me._loadingSmallImg.height = 16;
         _me._loadingSmallImg.width = 16;
         _me._loadingSmallImg.addClassName('celLoadingIndicator');
