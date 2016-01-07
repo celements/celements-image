@@ -43,7 +43,7 @@
     <span class="c3_import_action">$adminMsg.get('cel_photo_action')</span>
   </div>
   <div class="c3_import_list c3_import_scrollable">
-  #foreach($file in $xwiki.celementsphoto.getAttachmentFileListWithActions($attDoc, "$!filename", $galleryDoc))
+  #foreach($file in $services.celementsphoto.getAttachmentFileListWithActions($attDoc, "$!filename", $galleryDoc))
     <div class="c3_import_row">
       <span class="c3_import_checkbox">
         #if($file.getAction() == -1)
