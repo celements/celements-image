@@ -543,18 +543,17 @@ public class ImageService implements IImageService {
    * @param galleryDoc Document of the gallery to check if the file already exists.
    * @return action when importing: -1 skip, 0 overwrite, 1 add
    */
-  private short getActionForFile(String fileName, XWikiDocument galleryDoc) {
+  short getActionForFile(String fileName, XWikiDocument galleryDoc) {
     short action = ImportFileObject.ACTION_SKIP;
-    DocumentReference importClassRef = webUtilsService.resolveDocumentReference(
-        "Classes.ImportClass");
-    boolean isImportToFilebase = getContext().getDoc().getXObjectSize(importClassRef) == 0;
+    boolean isImportToFilebase = getContext().getDoc(
+        ).getXObjectSize(getImportClassRef()) == 0;
     LOGGER.debug("getActionForFile [" + fileName + "] on gallery doc [" + galleryDoc 
         + "], isImportToFilebase [" + isImportToFilebase + "]");
     if(isImgFile(fileName) || isImportToFilebase){
       fileName = fileName.replace(System.getProperty("file.separator"), ".");
       fileName = getContext().getWiki().clearName(fileName, false, true, getContext());
       XWikiAttachment attachment = galleryDoc.getAttachment(fileName);
-      if(attachment == null){
+      if((attachment == null) || !fileName.equals(attachment.getFilename())) {
         action = ImportFileObject.ACTION_ADD;
       } else{
         action = ImportFileObject.ACTION_OVERWRITE;
@@ -562,6 +561,11 @@ public class ImageService implements IImageService {
     }
     
     return action;
+  }
+
+  DocumentReference getImportClassRef() {
+    return webUtilsService.resolveDocumentReference(
+        "Classes.ImportClass");
   }
 
   private boolean isZipFile(XWikiAttachment file) {
