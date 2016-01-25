@@ -36,8 +36,7 @@
     _reInitScrollbarDelayedCall : undefined,
     _endlessLoadCallbackBind : undefined,
     _scrollButtonClickBind : undefined,
-    _scrollButtonMouseUpBind : undefined,
-    _scrollButtonMouseDownBind : undefined,
+    _scrollButtonMouseClickedBind :undefined,
     _setTranslationNumberBind : undefined,
     _loadingImg : undefined,
     _loadingIndicator :undefined,
@@ -59,8 +58,7 @@
       _me._endlessLoadActionBind = _me._endlessLoadAction.bind(_me);
       _me._getSwiperScrollOverflowBind = _me._getSwiperScrollOverflow.bind(_me);
       _me._scrollButtonClickBind = _me._scrollButtonClick.bind(_me);
-      _me._scrollButtonMouseUpBind = _me._scrollButtonMouseUp.bind(_me);
-      _me._scrollButtonMouseDownBind = _me._scrollButtonMouseDown.bind(_me);
+      _me._scrollButtonMouseClickedBind = _me._scrollButtonMouseClicked.bind(_me);
       _me._setTranslationNumberBind = _me._setTranslationNumber.bind(_me);
       _me._offset = 0;
       _me._translateNumber = 0;
@@ -131,15 +129,14 @@
       _me._swiper.setWrapperTranslate(_me._translateNumber);
     },
         
-    _scrollButtonMouseDown : function(event) {
+    _scrollButtonMouseClicked : function(event) {
       var _me = this;
-      _me._periodicalExecuter = new PeriodicalExecuter(
-          _me._scrollButtonClickBind.curry(event), 0.1);
-    },
-    
-    _scrollButtonMouseUp : function(event) {
-      var _me = this;
-      _me._periodicalExecuter.stop()
+      if(event.type == 'mousedown'){
+        _me._periodicalExecuter = new PeriodicalExecuter(
+            _me._scrollButtonClickBind.curry(event), 0.1);
+      } else {
+        _me._periodicalExecuter.stop();
+      }
     },
     
     _setTranslationNumber : function(swiper) {
@@ -209,13 +206,13 @@
           _me._getSwiperScrollOverflowBind);
       $$('.swiper-button-prev').each(function(element) {
         element.observe('click', _me._scrollButtonClickBind);
-        element.observe('mouseup', _me._scrollButtonMouseUpBind);
-        element.observe('mousedown', _me._scrollButtonMouseDownBind);
+        element.observe('mouseup', _me._scrollButtonMouseClickedBind);
+        element.observe('mousedown', _me._scrollButtonMouseClickedBind);
       });
       $$('.swiper-button-next').each(function(element) {
         element.observe('click', _me._scrollButtonClickBind);
-        element.observe('mouseup', _me._scrollButtonMouseUpBind);
-        element.observe('mousedown', _me._scrollButtonMouseDownBind);
+        element.observe('mouseup', _me._scrollButtonMouseClickedBind);
+        element.observe('mousedown', _me._scrollButtonMouseClickedBind);
       });
     },
     
