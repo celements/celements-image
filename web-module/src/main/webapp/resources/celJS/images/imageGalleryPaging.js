@@ -35,11 +35,18 @@
     _reInitScrollbarDelayedBind : undefined,
     _reInitScrollbarDelayedCall : undefined,
     _endlessLoadCallbackBind : undefined,
+    _scrollButtonClickBind : undefined,
+    _scrollButtonMouseUpBind : undefined,
+    _scrollButtonMouseDownBind : undefined,
+    _setTranslationNumberBind : undefined,
     _loadingImg : undefined,
     _loadingIndicator :undefined,
     _loaderCallbackFN : undefined,
     _loadedImagesOnPageLoad :undefined,
     _hasMore : undefined,
+    _translateNumber : undefined,
+    _periodicalExecuter : undefined,
+    _scrollHeight : undefined, 
     
     _init : function(htmlElemId) {
       var _me = this;
@@ -51,7 +58,13 @@
       _me._updateScrollbarBind = _me._updateScrollbar.bind(_me);
       _me._endlessLoadActionBind = _me._endlessLoadAction.bind(_me);
       _me._getSwiperScrollOverflowBind = _me._getSwiperScrollOverflow.bind(_me);
+      _me._scrollButtonClickBind = _me._scrollButtonClick.bind(_me);
+      _me._scrollButtonMouseUpBind = _me._scrollButtonMouseUp.bind(_me);
+      _me._scrollButtonMouseDownBind = _me._scrollButtonMouseDown.bind(_me);
+      _me._setTranslationNumberBind = _me._setTranslationNumber.bind(_me);
       _me._offset = 0;
+      _me._translateNumber = 0;
+      _me._scrollHeight = 0;
       _me._pageLoadCallbackFuncBind = _me._pageLoadCallbackFunc.bind(_me);
       _me._reInitScrollbarDelayedBind = _me._reInitScrollbarDelayed.bind(_me);
       _me._endlessLoadCallbackBind = _me._endlessLoadCallback.bind(_me);
@@ -100,11 +113,48 @@
       return swiperScrollbarContainer;
     },
     
+    _scrollButtonClick : function(event) {
+      var _me = this;
+      var element = event.findElement();
+      _me._swiper.setWrapperTransition(300);
+      if(element.className.contains('swiper-button-next')) {
+        _me._translateNumber = _me._translateNumber - _me._scrollHeight;
+        if(_me._translateNumber < _me._swiper.snapGrid[1] * -1) {
+          _me._translateNumber = _me._swiper.snapGrid[1] * -1;
+        }
+      } else {
+        _me._translateNumber = _me._translateNumber + _me._scrollHeight;
+        if(_me._translateNumber > _me._swiper.snapGrid[0]) {
+          _me._translateNumber = 0;
+        }
+      }
+      _me._swiper.setWrapperTranslate(_me._translateNumber);
+    },
+        
+    _scrollButtonMouseDown : function(event) {
+      var _me = this;
+      _me._periodicalExecuter = new PeriodicalExecuter(
+          _me._scrollButtonClickBind.curry(event), 0.1);
+    },
+    
+    _scrollButtonMouseUp : function(event) {
+      var _me = this;
+      _me._periodicalExecuter.stop()
+    },
+    
+    _setTranslationNumber : function(swiper) {
+      var _me = this;
+      _me._translateNumber = swiper.getWrapperTranslate();
+    },
+    
     _initSwiperScrollbar : function(desableSimulateTouch) {
       var _me = this;
       _me._getScrollSlideInner().addClassName('slide-inner');
       _me._getScrollSlide().addClassName('swiper-slide');
       _me._getScrollWrapper().addClassName('swiper-wrapper');
+      _me._getScrollSlideInner().select('li.ImageSlide').each(function(element) {
+        element.addClassName('swiper-slide');
+      });
       var scrollContainer = _me._getScrollContainer();
       var swiperContainer = scrollContainer;
       swiperContainer.addClassName('swiper-container');
@@ -125,6 +175,7 @@
         slidesPerView : 'auto',
         updateTranslate : true,
         simulateTouch : myDesableSimulateTouch,
+        onSetWrapperTransition : _me._setTranslationNumberBind,
         //Enable Scrollbar
         scrollbar: {
           container : '#' + scrollbarContainerId,
@@ -133,6 +184,7 @@
           snapOnRelease : true //XXX does not work so far in swiper swipeReset()
         }
       });
+      _me._swiper.setWrapperTransition(300);
       _me._swiper.addCallback('SetWrapperTransform', _me._swiperScrollBind);
       _me.getColumnElem().observe('cel:contentChanged',
           _me._reInitScrollbarHandlerBind);
@@ -147,8 +199,24 @@
         'scrollEventName' : 'cel:scroll',
         'overlap' : 200
       });
+      if(($$('#sitecontainer .scrollcontainer').size() > 0) && 
+          ($$('#sitecontainer .scrollcontainer')[0].getHeight() > 0)) {
+        _me._scrollHeight = $$('#sitecontainer .scrollcontainer')[0].getHeight() * 0.8;
+      } else {
+        _me._scrollHeight = 200;
+      }
       scrollContainer.observe('celEndlessScroll:ScrollPosEvent',
           _me._getSwiperScrollOverflowBind);
+      $$('.swiper-button-prev').each(function(element) {
+        element.observe('click', _me._scrollButtonClickBind);
+        element.observe('mouseup', _me._scrollButtonMouseUpBind);
+        element.observe('mousedown', _me._scrollButtonMouseDownBind);
+      });
+      $$('.swiper-button-next').each(function(element) {
+        element.observe('click', _me._scrollButtonClickBind);
+        element.observe('mouseup', _me._scrollButtonMouseUpBind);
+        element.observe('mousedown', _me._scrollButtonMouseDownBind);
+      });
     },
     
     getColumnElem : function() {
@@ -339,8 +407,10 @@
   
   
   celAddOnBeforeLoadListener(function() {
-    var column = new CEL.Column('content');
-    column._initSwiperScrollbar();
+    if($$('.presentationList').size() > 0) {
+      var column = new CEL.Column('content');
+      column._initSwiperScrollbar();
+    }
   });
   
 })(window);
