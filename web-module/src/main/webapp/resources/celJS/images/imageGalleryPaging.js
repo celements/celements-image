@@ -113,14 +113,15 @@
     
     _scrollButtonClick : function(event) {
       var _me = this;
-      var element = event.findElement();
       _me._swiper.setWrapperTransition(300);
-      if(element.className.contains('swiper-button-next')) {
+      var element = event.findElement('.swiper-button-next, .swiper-button-prev');
+      if(element.hasClassName('swiper-button-next')) {
         _me._translateNumber = _me._translateNumber - _me._scrollHeight;
         if(_me._translateNumber < _me._swiper.snapGrid[1] * -1) {
           _me._translateNumber = _me._swiper.snapGrid[1] * -1;
         }
       } else {
+        element = event.findElement('.swiper-button-prev');
         _me._translateNumber = _me._translateNumber + _me._scrollHeight;
         if(_me._translateNumber > _me._swiper.snapGrid[0]) {
           _me._translateNumber = 0;
