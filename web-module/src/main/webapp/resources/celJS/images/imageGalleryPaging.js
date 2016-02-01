@@ -132,10 +132,18 @@
         
     _scrollButtonMouseClicked : function(event) {
       var _me = this;
-      if(event.type == 'mousedown'){
+      var elem = event.findElement();
+      if ((event.type == 'mouseout') && (elem.tagName.toLowerCase() !== 'body')) {
+        return;
+      }
+      if (event.type == 'mousedown'){
+        document.body.observe('mouseout', _me._scrollButtonMouseClickedBind);
+        document.body.observe('mouseup', _me._scrollButtonMouseClickedBind);
         _me._periodicalExecuter = new PeriodicalExecuter(
             _me._scrollButtonClickBind.curry(event), 0.1);
       } else if (_me._periodicalExecuter){
+        document.body.stopObserving('mouseout', _me._scrollButtonMouseClickedBind);
+        document.body.stopObserving('mouseup', _me._scrollButtonMouseClickedBind);
         _me._periodicalExecuter.stop();
         _me._periodicalExecuter = null;
       }
@@ -210,8 +218,6 @@
         element.observe('click', _me._scrollButtonClickBind);
         element.observe('mousedown', _me._scrollButtonMouseClickedBind);
       });
-      document.body.observe('mouseup', _me._scrollButtonMouseClickedBind);
-      document.body.observe('mouseout', _me._scrollButtonMouseClickedBind);
     },
     
     getColumnElem : function() {
