@@ -367,6 +367,7 @@
         }
         var slideShowStarter = new CELEMENTS.image.SlideShowStarter(_me._getScrollSlideInner());
         slideShowStarter.initializeSlideShow();
+        initContextMenuAsync();
         _me.getColumnElem().fire('cel:imageGalleryChanged');
       } else {
         console.error('data provider issued callback with undefined content!');
