@@ -135,8 +135,9 @@
       if(event.type == 'mousedown'){
         _me._periodicalExecuter = new PeriodicalExecuter(
             _me._scrollButtonClickBind.curry(event), 0.1);
-      } else {
+      } else if (_me._periodicalExecuter){
         _me._periodicalExecuter.stop();
+        _me._periodicalExecuter = null;
       }
     },
     
@@ -205,16 +206,12 @@
       }
       scrollContainer.observe('celEndlessScroll:ScrollPosEvent',
           _me._getSwiperScrollOverflowBind);
-      $$('.swiper-button-prev').each(function(element) {
+      $$('.swiper-button-prev, .swiper-button-next').each(function(element) {
         element.observe('click', _me._scrollButtonClickBind);
-        element.observe('mouseup', _me._scrollButtonMouseClickedBind);
         element.observe('mousedown', _me._scrollButtonMouseClickedBind);
       });
-      $$('.swiper-button-next').each(function(element) {
-        element.observe('click', _me._scrollButtonClickBind);
-        element.observe('mouseup', _me._scrollButtonMouseClickedBind);
-        element.observe('mousedown', _me._scrollButtonMouseClickedBind);
-      });
+      document.body.observe('mouseup', _me._scrollButtonMouseClickedBind);
+      document.body.observe('mouseout', _me._scrollButtonMouseClickedBind);
     },
     
     getColumnElem : function() {
