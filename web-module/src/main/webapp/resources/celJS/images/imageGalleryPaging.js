@@ -372,7 +372,9 @@
       scrollerCallbackFN(_me._hasMore);
       _me._startReInitScrollbarDelayed();
       _me._swiper.resizeFix();
-      initContextMenuAsync();
+      if (typeof initContextMenuAsync !== 'undefined') {
+        initContextMenuAsync();
+      }
     },
     
     loadNextData : function(callbackFN) {
