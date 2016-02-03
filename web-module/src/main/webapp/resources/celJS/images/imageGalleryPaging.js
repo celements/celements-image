@@ -133,7 +133,11 @@
     _scrollButtonMouseClicked : function(event) {
       var _me = this;
       if (event.type == 'mousedown'){
+        event.stop();
         document.observe('mouseup', _me._scrollButtonMouseClickedBind);
+        if(_me._periodicalExecuter) {
+          _me._periodicalExecuter.stop();
+        }
         _me._periodicalExecuter = new PeriodicalExecuter(
             _me._scrollButtonClickBind.curry(event), 0.1);
       } else if (_me._periodicalExecuter){
