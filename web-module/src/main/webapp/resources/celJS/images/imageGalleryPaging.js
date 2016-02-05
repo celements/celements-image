@@ -113,12 +113,15 @@
     
     _scrollButtonClick : function(event) {
       var _me = this;
+      event.stop();
       _me._swiper.setWrapperTransition(300);
       var element = event.findElement('.swiper-button-next, .swiper-button-prev');
       if(element.hasClassName('swiper-button-next')) {
         _me._translateNumber = _me._translateNumber - _me._scrollHeight;
-        if(_me._translateNumber < _me._swiper.snapGrid[1] * -1) {
+        if(_me._translateNumber <= _me._swiper.snapGrid[1] * -1) {
           _me._translateNumber = _me._swiper.snapGrid[1] * -1;
+        } else if(!_me._swiper.snapGrid[1]) {
+          _me._translateNumber = 0;
         }
       } else {
         element = event.findElement('.swiper-button-prev');
@@ -344,12 +347,15 @@
       var _me = this;
       _me._curContentObj = curContentObj;
       var htmlElems = _me._curContentObj.content;
-      var listElements = new Element('div').update(htmlElems).down('ul').children;
-      var listElementsArr = Array.prototype.slice.call(listElements);
+      var listElementsArr = null;
+      if ((htmlElems != '') && (htmlElems != null)) {
+        var listElements = new Element('div').update(htmlElems).down('ul').children;
+        var listElementsArr = Array.prototype.slice.call(listElements);
+      }
       if (curContentObj.hasMore != null) {
-        _me._hasMore = curContentObj.hasMore;        
+        _me._hasMore = curContentObj.hasMore;
       } else {
-        _me._hadMore = false;
+        _me._hasMore = false;
       }
       _me._loaderCallbackFN(listElementsArr);
     },
@@ -371,7 +377,7 @@
         slideShowStarter.initializeSlideShow();
         _me.getColumnElem().fire('cel:imageGalleryChanged');
       } else {
-        console.error('data provider issued callback with undefined content!');
+        console.info('data provider issued callback with undefined content!');
       }
       scrollerCallbackFN(_me._hasMore);
       _me._startReInitScrollbarDelayed();
