@@ -118,10 +118,9 @@
       var element = event.findElement('.swiper-button-next, .swiper-button-prev');
       if(element.hasClassName('swiper-button-next')) {
         _me._translateNumber = _me._translateNumber - _me._scrollHeight;
-        if(_me._translateNumber <= _me._swiper.snapGrid[1] * -1) {
-          _me._translateNumber = _me._swiper.snapGrid[1] * -1;
-        } else if(!_me._swiper.snapGrid[1]) {
-          _me._translateNumber = 0;
+        var snapGridHeight = _me._swiper.snapGrid[1] || 0;
+        if(_me._translateNumber <= snapGridHeight * -1) {
+          _me._translateNumber = snapGridHeight * -1;
         }
       } else {
         element = event.findElement('.swiper-button-prev');
