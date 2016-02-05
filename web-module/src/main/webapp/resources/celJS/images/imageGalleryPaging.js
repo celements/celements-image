@@ -215,8 +215,12 @@
       scrollContainer.observe('celEndlessScroll:ScrollPosEvent',
           _me._getSwiperScrollOverflowBind);
       $$('.swiper-button-prev, .swiper-button-next').each(function(element) {
-        element.observe('click', _me._scrollButtonClickBind);
-        element.observe('mousedown', _me._scrollButtonMouseClickedBind);
+        if(_me._swiper.snapGrid[1]) {
+          element.observe('click', _me._scrollButtonClickBind);
+          element.observe('mousedown', _me._scrollButtonMouseClickedBind);
+        } else {
+          element.addClassName("inactive");
+        }
       });
     },
     
