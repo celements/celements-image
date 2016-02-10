@@ -352,8 +352,12 @@
       var htmlElems = _me._curContentObj.content;
       var listElementsArr = null;
       if ((htmlElems != '') && (htmlElems != null)) {
-        var listElements = new Element('div').update(htmlElems).down('ul').children;
-        var listElementsArr = Array.prototype.slice.call(listElements);
+        var elem = new Element('div').update(htmlElems).down('ul');
+        var listElements = new Array();
+        if(!elem.hasClassName('cel_nav_empty')) {
+          var listElements = new Element('div').update(htmlElems).down('ul').children;
+        }
+        var listElementsArr = Array.prototype.slice.call(listElements);          
       }
       if (curContentObj.hasMore != null) {
         _me._hasMore = curContentObj.hasMore;
