@@ -93,6 +93,9 @@
 }
 
 #sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot p,
+#sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot li,
+#sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot td,
+#sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot th,
 #sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h1,
 #sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h2,
 #sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h3,
@@ -100,6 +103,9 @@
 #sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h5,
 #sitecontainer .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h6,
 .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot p,
+.presentationList ul .celimage_slideshow .cel_slideShow_slideRoot li,
+.presentationList ul .celimage_slideshow .cel_slideShow_slideRoot td,
+.presentationList ul .celimage_slideshow .cel_slideShow_slideRoot th,
 .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h1,
 .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h2,
 .presentationList ul .celimage_slideshow .cel_slideShow_slideRoot h3,
