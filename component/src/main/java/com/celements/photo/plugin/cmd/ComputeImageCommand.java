@@ -80,7 +80,8 @@ public class ComputeImageCommand {
 //          + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(
           width, height), copyright, watermark, cropX, cropY, cropW, cropH, blackAndWhite,
-          defaultBg, lowerBound, lowerBoundPositioning, filterStr, raw);
+          defaultBg, lowerBound, lowerBoundPositioning, filterStr, overwriteOutputFormat,
+          raw);
       LOGGER.debug("attachment key: '" + key + "'");
       InputStream data = getImageCacheCmd().getImageForKey(key);
       if (data != null) {
