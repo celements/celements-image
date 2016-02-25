@@ -46,6 +46,7 @@ import com.celements.photo.service.IImageService;
 import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.ImportFileObject;
 import com.celements.photo.utilities.Unzip;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -179,8 +180,22 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       if((filterString == null) || "".equals(filterString)) {
         filterString = context.getRequest().getParameter("filter");
       }
+      SupportedFormat mimeType = null;
+      String mimeTypeStr = context.getRequest().getParameter("mimeType");
+      if(!Strings.isNullOrEmpty(mimeTypeStr)) {
+        if("jpg".equals(mimeTypeStr.toLowerCase())) {
+          mimeType = SupportedFormat.JPG;
+        } else if("jpeg".equals(mimeTypeStr.toLowerCase())) {
+          mimeType = SupportedFormat.JPEG;
+        } else if("png".equals(mimeTypeStr.toLowerCase())) {
+          mimeType = SupportedFormat.PNG;
+        } else if("gif".equals(mimeTypeStr.toLowerCase())) {
+          mimeType = SupportedFormat.GIF;
+        }
+      }
       return getComputeImgCmd().computeImage(attachment, context, attachment, sheight,
-          swidth, copyright, watermark, defaultBg, defaultBgString, filterString);
+          swidth, copyright, watermark, defaultBg, defaultBgString, filterString, 
+          mimeType);
     }
     return attachment;
   }

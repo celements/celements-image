@@ -24,7 +24,7 @@
     <li>$request.get($param)</li>
     #set($imageZipImport = $xwiki.getWebPreference('image_zip_import', 'old'))
     #if(($imageZipImport == 'old') || ($imageZipImport == 'both'))
-      #set($cleanedFilename = $xwiki.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height))
+      #set($cleanedFilename = $services.celementsphoto.unzipFileToAttachment($attDoc, "$!request.get('filename')", "$!request.get($param)", $galleryDoc, $width, $height))
     #end
     #if(($imageZipImport == 'new') || ($imageZipImport == 'both'))
       #set($destSpace = "ZipImportImages")

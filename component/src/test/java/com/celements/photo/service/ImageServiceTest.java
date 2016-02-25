@@ -3,6 +3,8 @@ package com.celements.photo.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
@@ -20,11 +22,14 @@ import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.photo.container.ImageDimensions;
+import com.celements.photo.utilities.ImportFileObject;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -677,5 +682,91 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     String key = "[Jpeg] Compression Type";
     String value = "8 bits";
     assertEquals(value, imageService.cleanMetaTagValue(key, key + " - " + value));
+  }
+  
+  @Test
+  public void testGetActionForFile_noAtts() {
+    String fileName = "test.jpg";
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "S", "D"));
+    getContext().setDoc(doc);
+    BaseObject importClassObj = new BaseObject();
+    importClassObj.setXClassReference(imageService.getImportClassRef());
+    doc.addXObject(importClassObj);
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))
+        ).andReturn(fileName);
+    replayDefault();
+    assertEquals(ImportFileObject.ACTION_ADD, imageService.getActionForFile(fileName,
+        doc));
+    verifyDefault();
+  }
+  
+  @Test
+  public void testGetActionForFile_otherAtts() throws XWikiException {
+    String fileName = "test.jpg";
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "S", "D"));
+    getContext().setDoc(doc);
+    BaseObject importClassObj = new BaseObject();
+    importClassObj.setXClassReference(imageService.getImportClassRef());
+    doc.addXObject(importClassObj);
+    XWikiAttachment att = new XWikiAttachment();
+    att.setFilename("otherFile.jpg");
+    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    attList.add(att);
+    doc.setAttachmentList(attList);
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))
+        ).andReturn(fileName);
+    replayDefault();
+    assertEquals(ImportFileObject.ACTION_ADD, imageService.getActionForFile(fileName, 
+        doc));
+    verifyDefault();
+  }
+  
+  @Test
+  public void testGetActionForFile_hasAtt() throws XWikiException {
+    String fileName = "test.jpg";
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "S", "D"));
+    getContext().setDoc(doc);
+    BaseObject importClassObj = new BaseObject();
+    importClassObj.setXClassReference(imageService.getImportClassRef());
+    doc.addXObject(importClassObj);
+    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    XWikiAttachment att = new XWikiAttachment();
+    att.setFilename("otherFile.jpg");
+    attList.add(att);
+    att = new XWikiAttachment();
+    att.setFilename(fileName);
+    attList.add(att);
+    doc.setAttachmentList(attList);
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))
+        ).andReturn(fileName);
+    replayDefault();
+    assertEquals(ImportFileObject.ACTION_OVERWRITE, imageService.getActionForFile(
+        fileName, doc));
+    verifyDefault();
+  }
+  
+  @Test
+  public void testGetActionForFile_hasAttZip() throws XWikiException {
+    String fileName = "test.jpg";
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "S", "D"));
+    getContext().setDoc(doc);
+    BaseObject importClassObj = new BaseObject();
+    importClassObj.setXClassReference(imageService.getImportClassRef());
+    doc.addXObject(importClassObj);
+    XWikiAttachment att = new XWikiAttachment();
+    att.setFilename(fileName + ".zip");
+    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    attList.add(att);
+    doc.setAttachmentList(attList);
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))
+        ).andReturn(fileName);
+    replayDefault();
+    assertEquals(ImportFileObject.ACTION_ADD, imageService.getActionForFile(fileName, 
+        doc));
+    verifyDefault();
   }
 }
