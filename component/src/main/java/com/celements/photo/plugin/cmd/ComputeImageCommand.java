@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.image.ICropImage;
+import com.celements.photo.plugin.CelementsPhotoPlugin.SupportedFormat;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.web.Utils;
@@ -53,7 +54,7 @@ public class ComputeImageCommand {
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
-      String defaultBgStr, String filterStr) {
+      String defaultBgStr, String filterStr, SupportedFormat overwriteOutputFormat) {
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -89,6 +90,10 @@ public class ComputeImageCommand {
         LOGGER.info("No cached image.");
         long timeLast = System.currentTimeMillis();
         if(!raw) {
+          String mimeType = attachmentClone.getMimeType(context);
+          if(overwriteOutputFormat != null) {
+            mimeType = overwriteOutputFormat.getMimeType();
+          }
           GenerateThumbnail thumbGen = new GenerateThumbnail();
           LOGGER.info("start loading image " + timeLast);
           DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
@@ -108,9 +113,8 @@ public class ComputeImageCommand {
             ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, 
                 height, lowerBound, defaultBg);
             timeLast = logRuntime(timeLast, "got image dimensions after ");
-            byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
-                attachmentClone.getMimeType(context), watermark, copyright, defaultBg,
-                lowerBound, lowerBoundPositioning);
+            byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, mimeType,
+                watermark, copyright, defaultBg, lowerBound, lowerBoundPositioning);
             timeLast = logRuntime(timeLast, "resize done after ");
             attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
             timeLast = logRuntime(timeLast, "new attachment content set after ");
@@ -121,7 +125,7 @@ public class ComputeImageCommand {
             ColorConvertOp op = new ColorConvertOp(cs, null);
             BufferedImage bNwImg = op.filter(img, null);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            thumbGen.encodeImage(out, bNwImg, img, attachmentClone.getMimeType(context));
+            thumbGen.encodeImage(out, bNwImg, img, mimeType);
             byte[] bNwImage = out.toByteArray();
             attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
@@ -166,7 +170,7 @@ public class ComputeImageCommand {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 ICropImage cropComp = Utils.getComponent(ICropImage.class);
                 cropComp.crop(filteredImg, xOffset, yOffset, img.getWidth(), 
-                    img.getHeight(), attachmentClone.getMimeType(context), out);
+                    img.getHeight(), mimeType, out);
                 attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
                 timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
                     + "] after ");
