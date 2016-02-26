@@ -29,6 +29,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.photo.container.ImageDimensions;
@@ -78,6 +79,9 @@ public class ImageService implements IImageService {
 
   @Requirement
   private ILuceneSearchService searchService;
+  
+  @Requirement
+  IAttachmentServiceRole attService;
 
   @Requirement
   Execution execution;
@@ -552,14 +556,12 @@ public class ImageService implements IImageService {
     if(isImgFile(fileName) || isImportToFilebase){
       fileName = fileName.replace(System.getProperty("file.separator"), ".");
       fileName = getContext().getWiki().clearName(fileName, false, true, getContext());
-      XWikiAttachment attachment = galleryDoc.getAttachment(fileName);
-      if((attachment == null) || !fileName.equals(attachment.getFilename())) {
+      if(!attService.existsAttachmentNameEqual(galleryDoc, fileName)) {
         action = ImportFileObject.ACTION_ADD;
       } else{
         action = ImportFileObject.ACTION_OVERWRITE;
       }
     }
-    
     return action;
   }
 
