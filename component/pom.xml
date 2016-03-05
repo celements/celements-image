@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>  
   <artifactId>celements-photo</artifactId>
-  <version>1.44-SNAPSHOT</version>
+  <version>1.45-SNAPSHOT</version>
   <description>Celements Photo</description> 
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
