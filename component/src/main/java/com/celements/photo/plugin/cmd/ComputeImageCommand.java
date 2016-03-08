@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.image.ICropImage;
-import com.celements.photo.plugin.CelementsPhotoPlugin.SupportedFormat;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.web.Utils;
@@ -53,7 +53,7 @@ public class ComputeImageCommand {
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
-      String defaultBgStr, String filterStr, SupportedFormat overwriteOutputFormat) {
+      String defaultBgStr, String filterStr, String overwriteOutputFormat) {
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -92,10 +92,10 @@ public class ComputeImageCommand {
         if(!raw) {
           boolean contentChanged = false;
           String mimeType = attachmentClone.getMimeType(context);
-          boolean outFormatChange = (overwriteOutputFormat != null) && (!mimeType.equals(
-              overwriteOutputFormat.getMimeType()));
+          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
+              !overwriteOutputFormat.equals(mimeType);
           if(outFormatChange) {
-            mimeType = overwriteOutputFormat.getMimeType();
+            mimeType = overwriteOutputFormat;
           }
           GenerateThumbnail thumbGen = new GenerateThumbnail();
           LOGGER.info("start loading image " + timeLast);

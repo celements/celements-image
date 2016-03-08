@@ -153,7 +153,7 @@ public class ImageCacheCommand {
   String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension,
       String copyright, String watermark, int cropX, int cropY, int cropW, int cropH,
       boolean blackNwhite, Color defaultBg, boolean lowerBounds, Integer lowBoundPos, 
-      String filterString, SupportedFormat overwriteOutputFormat, boolean raw
+      String filterString, String overwriteOutputFormat, boolean raw
       ) throws NoSuchAlgorithmException {
     String key = attachment.getId() 
         + "-" + attachment.getVersion()
@@ -169,7 +169,7 @@ public class ImageCacheCommand {
 
   String getAditionalInfoHash(String copyright, String watermark, int cropX, int cropY, 
       int cropW, int cropH, boolean blackNwhite, Color defaultBg, boolean lowerBounds, 
-      Integer lowBoundPos, String filterString, SupportedFormat overwriteOutputFormat, 
+      Integer lowBoundPos, String filterString, String overwriteOutputFormat, 
       boolean raw) throws NoSuchAlgorithmException {
     String hashValue = "";
     if(raw) {
@@ -198,7 +198,7 @@ public class ImageCacheCommand {
         hashValue += "<:>kernel filter" + filterString;
       }
       if(overwriteOutputFormat != null) {
-        hashValue += "<:>mimeType" + overwriteOutputFormat.getMimeType();
+        hashValue += "<:>mimeType" + overwriteOutputFormat;
       }
     }
     String hash = "";
