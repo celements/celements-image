@@ -32,8 +32,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.GenerateThumbnail;
@@ -45,8 +45,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class ComputeImageCommand {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      ComputeImageCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ComputeImageCommand.class);
 
   private ImageCacheCommand imgCacheCmd;
   
@@ -192,7 +191,7 @@ public class ComputeImageCommand {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             (new GenerateThumbnail()).encodeImage(out, typeChangeImg, img, mimeType);
             attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
-            LOGGER.debug("Rewritten output image type to mimeType");
+            LOGGER.debug("Rewritten output image type to mimeType [{}]", mimeType);
           }
         } else {
           LOGGER.info("Raw image! No alterations done.");
