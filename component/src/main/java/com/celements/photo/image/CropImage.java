@@ -31,37 +31,42 @@ public class CropImage implements ICropImage {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
   
+  @Override
   public void crop(BufferedImage img, int x, int y, int w, int h, String type, 
-      OutputStream out)  {
+      String overwriteType, OutputStream out)  {
     BufferedImage buffCropped = img;
     w = Math.min(w, (img.getWidth()-x));
     h = Math.min(h, (img.getHeight()-y));
     if((x < img.getWidth()) && (y < img.getHeight())) {
       buffCropped = img.getSubimage(x, y, w, h);
     }
-    (new GenerateThumbnail()).encodeImage(out, buffCropped, img, type);
+    (new GenerateThumbnail()).encodeImage(out, buffCropped, img, type, overwriteType);
   }
-
-  public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h) {
+  
+  @Override
+  public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h, 
+      String overwriteType) {
     OutputStream out = new ByteArrayOutputStream();
-    crop(xAtt, x, y, w, h, out);
+    crop(xAtt, x, y, w, h, overwriteType, out);
     return out;
   }
-
+  
+  @Override
   public OutputStream crop(Document doc, String filename, int x, int y, int w, int h,
-      OutputStream out) {
+      String overwriteType, OutputStream out) {
     XWikiAttachment xAtt = getAttachment(doc, filename);
     if(xAtt != null){
-      return crop((XWikiAttachment)xAtt.clone(), x, y, w, h, out);
+      return crop((XWikiAttachment)xAtt.clone(), x, y, w, h, overwriteType, out);
     }
     return null;
   }
-
-    public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h,
-        OutputStream out) {
+  
+  @Override
+  public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h,
+      String overwriteType, OutputStream out) {
     try {
       BufferedImage img = (new DecodeImageCommand()).readImage(xAtt, getContext());
-      crop(img, x, y, w, h, xAtt.getMimeType(getContext()), out);
+      crop(img, x, y, w, h, xAtt.getMimeType(getContext()), overwriteType, out);
     } catch (XWikiException xwe) {
       LOGGER.error("Error getting attachment content and decoding it into an " +
           "BufferedImage", xwe);
@@ -84,15 +89,16 @@ public class CropImage implements ICropImage {
     }
     return xAtt;
   }
-
+  
+  @Override
   public void outputCroppedImage(Document srcDoc, String srcFilename, int x, int y,
-      int w, int h) {
+      int w, int h, String overwriteType) {
     XWikiAttachment xAtt = getAttachment(srcDoc, srcFilename);
     if(xAtt != null){
       try {
         getContext().getResponse().setContentType("image/png");//output is always png
-        crop((XWikiAttachment)xAtt.clone(), x, y, w, h, getContext().getResponse(
-            ).getOutputStream());
+        crop((XWikiAttachment)xAtt.clone(), x, y, w, h, overwriteType, getContext(
+            ).getResponse().getOutputStream());
       } catch (IOException e) {
         LOGGER.error("Error writing cropped image to response stream.", e);
       }

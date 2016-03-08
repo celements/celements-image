@@ -43,6 +43,7 @@ import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
 import org.apache.sanselan.ImageReadException;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,11 +68,11 @@ public class GenerateThumbnail {
 
   static Map<String, String> getSaveTypes() {
     HashMap<String, String> map = new HashMap<String, String>();
-//    map.put("gif", "GIF");
-//    map.put("image/gif", "GIF");
-//    map.put("jpg", "JPEG");
-//    map.put("jpeg", "JPEG");
-//    map.put("image/jpeg", "JPEG");
+    map.put("gif", "GIF");
+    map.put("image/gif", "GIF");
+    map.put("jpg", "JPEG");
+    map.put("jpeg", "JPEG");
+    map.put("image/jpeg", "JPEG");
     map.put("png", "PNG");
     map.put("image/png", "PNG");
     return map;
@@ -227,10 +228,10 @@ public class GenerateThumbnail {
    */
   public ImageDimensions createThumbnail(InputStream in, OutputStream out, int width, 
       int height, String watermark, String copyright, String type, Color defaultBg, 
-      boolean lowerBound, Integer lowerBoundPositioning
+      boolean lowerBound, Integer lowerBoundPositioning, String overwriteType
       ) throws IOException, XWikiException {
     return createThumbnail(decodeInputStream(in), out, width, height, watermark, 
-        copyright, type, defaultBg, lowerBound, lowerBoundPositioning);
+        copyright, type, defaultBg, lowerBound, lowerBoundPositioning, overwriteType);
   }
   
   /**
@@ -248,10 +249,10 @@ public class GenerateThumbnail {
    */
   public void createThumbnail(InputStream in, OutputStream out, 
       ImageDimensions dimensions, String watermark, String copyright, String type, 
-      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning
-      ) throws IOException, XWikiException {
+      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning,
+      String overwriteType) throws IOException, XWikiException {
     createThumbnail(decodeInputStream(in), out, dimensions, watermark, copyright, type,
-        defaultBg, lowerBound, lowerBoundPositioning);
+        defaultBg, lowerBound, lowerBoundPositioning, overwriteType);
   }
   
   /**
@@ -269,17 +270,19 @@ public class GenerateThumbnail {
    */
   public ImageDimensions createThumbnail(BufferedImage img, OutputStream out, int width, 
       int height, String watermark, String copyright, String type, Color defaultBg, 
-      boolean lowerBound, Integer lowerBoundPositioning) throws IOException {
+      boolean lowerBound, Integer lowerBoundPositioning, String overwriteType
+      ) throws IOException {
     ImageDimensions imgSize = getThumbnailDimensions(img, width, height, lowerBound, 
         defaultBg);
     createThumbnail(img, out, imgSize, watermark, copyright, type, defaultBg, lowerBound, 
-        lowerBoundPositioning);
+        lowerBoundPositioning, overwriteType);
     return imgSize;
   }
 
   public BufferedImage createThumbnail(BufferedImage img, OutputStream out, 
       ImageDimensions imgSize, String watermark, String copyright, String type, 
-      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning) {
+      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning, 
+      String overwriteType) {
     Image thumbImg = img; 
     // Only generates a thumbnail if the image is larger than the desired thumbnail.
     LOGGER.debug("img: " + img + " - imgSize: " + imgSize);
@@ -366,7 +369,7 @@ public class GenerateThumbnail {
         thumbImg.getHeight(null));
     BufferedImage buffThumb = convertImageToBufferedImage(thumbImg, watermark, copyright,
         defaultBg);
-    encodeImage(out, buffThumb, img, type);
+    encodeImage(out, buffThumb, img, type, overwriteType);
     return buffThumb;
   }
   
@@ -392,8 +395,9 @@ public class GenerateThumbnail {
    * @throws IOException
    */
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
-      String type) {
-    if(!saveTypes.containsKey(type.toLowerCase())) {
+      String type, String overrideType) {
+    boolean forcePng = (Strings.isNullOrEmpty(overrideType) && !"png".equals(type));
+    if(forcePng || !saveTypes.containsKey(type.toLowerCase())) {
       LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
       type = "png"; //default for all not jpeg or gif files
     }

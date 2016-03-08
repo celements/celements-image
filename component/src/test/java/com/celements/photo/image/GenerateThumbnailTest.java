@@ -98,7 +98,7 @@ public class GenerateThumbnailTest extends AbstractBridgedComponentTestCase{
     in.close();
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     genThum.createThumbnail(img, out, new ImageDimensions(500, 247), null, null, "PNG",
-        null, false, null);
+        null, false, null, null);
     BufferedImage outImg = genThum.decodeInputStream(new ByteArrayInputStream(
         out.toByteArray()));
     out.close();
