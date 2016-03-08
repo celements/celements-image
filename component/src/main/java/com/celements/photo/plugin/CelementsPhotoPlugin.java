@@ -152,9 +152,6 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   @Override
   public XWikiAttachment downloadAttachment(XWikiAttachment attachment, 
       XWikiContext context) {
-
-//TODO check why in Debian resize of "problematic" images uses a lot more time than 
-//     resize AND crop -> cropping reduces image size which makes resize faster?
     long delayDownloadMillis = context.getWiki().getXWikiPreferenceAsLong(
         "debugDelayDownload", "cel.debug.delay.download", 0, context);
     if (delayDownloadMillis > 0) {
