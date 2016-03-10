@@ -182,18 +182,19 @@ public class ComputeImageCommand {
               }
             }
           }
-          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
-              !overwriteOutputFormat.equals(mimeType);
-          if(outFormatChange) {
-            mimeType = overwriteOutputFormat;
-            BufferedImage typeChangeImg = decodeImageCommand.readImage(attachmentClone, 
-                context);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            (new GenerateThumbnail()).encodeImage(out, typeChangeImg, img, mimeType,
-                overwriteOutputFormat);
-            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
-            LOGGER.debug("Rewritten output image type to mimeType [{}]", mimeType);
-          }
+          //TODO fix in its own branch to avoid colour shift problems in dev branch
+//          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
+//              !overwriteOutputFormat.equals(mimeType);
+//          if(outFormatChange) {
+//            mimeType = overwriteOutputFormat;
+//            BufferedImage typeChangeImg = decodeImageCommand.readImage(attachmentClone, 
+//                context);
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            (new GenerateThumbnail()).encodeImage(out, typeChangeImg, img, mimeType,
+//                overwriteOutputFormat);
+//            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
+//            LOGGER.debug("Rewritten output image type to mimeType [{}]", mimeType);
+//          }
         } else {
           LOGGER.info("Raw image! No alterations done.");
         }
