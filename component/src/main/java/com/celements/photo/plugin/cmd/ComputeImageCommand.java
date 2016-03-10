@@ -92,11 +92,6 @@ public class ComputeImageCommand {
         if(!raw) {
           boolean contentChanged = false;
           String mimeType = attachmentClone.getMimeType(context);
-          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
-              !overwriteOutputFormat.equals(mimeType);
-          if(outFormatChange) {
-            mimeType = overwriteOutputFormat;
-          }
           GenerateThumbnail thumbGen = new GenerateThumbnail();
           LOGGER.info("start loading image " + timeLast);
           DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
@@ -187,7 +182,10 @@ public class ComputeImageCommand {
               }
             }
           }
-          if(outFormatChange && !contentChanged) {
+          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
+              !overwriteOutputFormat.equals(mimeType);
+          if(outFormatChange) {
+            mimeType = overwriteOutputFormat;
             BufferedImage typeChangeImg = decodeImageCommand.readImage(attachmentClone, 
                 context);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
