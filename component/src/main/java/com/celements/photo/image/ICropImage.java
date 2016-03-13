@@ -11,16 +11,17 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 @ComponentRole
 public interface ICropImage {
   public OutputStream crop(Document doc, String filename, int x, int y, int w, int h,
-      OutputStream out);
+      String overwriteType, OutputStream out);
   
   public void crop(BufferedImage img, int x, int y, int w, int h, String type, 
-      OutputStream out); 
+      String overwriteType, OutputStream out); 
   
-  public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h);
+  public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h,
+      String overwriteType);
   
   public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h, 
-      OutputStream out);
+      String overwriteType, OutputStream out);
 
   public void outputCroppedImage(Document srcDoc, String srcFilename, int x, int y,
-      int w, int h);
+      int w, int h, String overwriteType);
 }

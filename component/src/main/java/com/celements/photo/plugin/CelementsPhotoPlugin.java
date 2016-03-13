@@ -151,9 +151,6 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
   @Override
   public XWikiAttachment downloadAttachment(XWikiAttachment attachment, 
       XWikiContext context) {
-
-//TODO check why in Debian resize of "problematic" images uses a lot more time than 
-//     resize AND crop -> cropping reduces image size which makes resize faster?
     long delayDownloadMillis = context.getWiki().getXWikiPreferenceAsLong(
         "debugDelayDownload", "cel.debug.delay.download", 0, context);
     if (delayDownloadMillis > 0) {
@@ -179,8 +176,10 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       if((filterString == null) || "".equals(filterString)) {
         filterString = context.getRequest().getParameter("filter");
       }
+      String mimeType = context.getRequest().getParameter("mimeType");
       return getComputeImgCmd().computeImage(attachment, context, attachment, sheight,
-          swidth, copyright, watermark, defaultBg, defaultBgString, filterString);
+          swidth, copyright, watermark, defaultBg, defaultBgString, filterString, 
+          mimeType);
     }
     return attachment;
   }
@@ -452,7 +451,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
       LOGGER.debug("unzip mimetype is " + mimeType);
       out = new ByteArrayOutputStream();
       ImageDimensions id = (new GenerateThumbnail()).createThumbnail(imgFullSize, out, 
-          width, height, null, null, mimeType, null, false, null);
+          width, height, null, null, mimeType, null, false, null, null);
       LOGGER.info("width='" + id.width + "' height='" + id.height + "'");
       LOGGER.info("output stream size: " + out.size());
       unzipFileName = unzipFileName.replace(System.getProperty("file.separator"), ".");
