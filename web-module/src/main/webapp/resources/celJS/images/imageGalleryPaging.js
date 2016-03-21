@@ -388,6 +388,17 @@
       if (typeof initContextMenuAsync !== 'undefined') {
         initContextMenuAsync();
       }
+      $$('.swiper-button-prev, .swiper-button-next').each(function(element) {
+        if(_me._swiper.snapGrid[1]) {
+          element.stopObserving('click', _me._scrollButtonClickBind);
+          element.observe('click', _me._scrollButtonClickBind);
+          element.stopObserving('mousedown', _me._scrollButtonMouseClickedBind);
+          element.observe('mousedown', _me._scrollButtonMouseClickedBind);
+          element.removeClassName('inactive');
+        } else {
+          element.addClassName('inactive');
+        }
+      });
     },
     
     loadNextData : function(callbackFN) {
