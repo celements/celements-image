@@ -54,6 +54,8 @@ public class ComputeImageCommand {
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
       String defaultBgStr, String filterStr, String overwriteOutputFormat) {
+    //TODO fix in its own branch to avoid colour shift problems in dev branch
+    overwriteOutputFormat = "";
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
