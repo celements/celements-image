@@ -399,10 +399,15 @@ public class GenerateThumbnail {
    */
   public void encodeImage(OutputStream out, CelImage image, CelImage fallback, 
       String type, String overrideType) {
-    boolean forcePng = (Strings.isNullOrEmpty(overrideType) && !"png".equals(type));
-    if(forcePng || !saveTypes.containsKey(type.toLowerCase())) {
-      LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
-      type = "png"; //default for all not jpeg or gif files
+    LOGGER.info("endoceImage: type [{}], override type [{}], override in allowed types " +
+        "[{}]", type, overrideType, saveTypes.containsKey(
+            Strings.isNullOrEmpty(overrideType) ? "" : overrideType.toLowerCase()));
+    boolean forcePng = Strings.isNullOrEmpty(overrideType);
+    if(forcePng || !saveTypes.containsKey(overrideType.toLowerCase())) {
+      LOGGER.info("encodeImage: forcing png, because [" + type + "] is no saveType.");
+      overrideType = "png";
+    } else {
+      overrideType = overrideType.replaceAll("^.*/", "");
     }
     ImageWriter writer = ImageIO.getImageWritersByFormatName(saveTypes.get(
         type.toLowerCase())).next();
@@ -439,7 +444,8 @@ public class GenerateThumbnail {
     boolean forcePng = Strings.isNullOrEmpty(overrideType) && !"png".equals(
         type.toLowerCase());
     if(forcePng || !saveTypes.containsKey(type.toLowerCase())) {
-      LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
+      LOGGER.info("encodeImage (deprecated): convert to png, because [" + type + "] is " +
+          "no saveType.");
       type = "png"; //default for all not jpeg or gif files
     }
     try {
