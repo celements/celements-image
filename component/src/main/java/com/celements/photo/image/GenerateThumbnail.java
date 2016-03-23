@@ -41,6 +41,7 @@ import java.util.Map;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
@@ -414,23 +415,38 @@ public class GenerateThumbnail {
         type.toLowerCase())).next();
     LOGGER.info("encodeImage: get ImageWriter for format name [{}], writer [{}]", 
         saveTypes.get(type.toLowerCase()), writer);
-    writer.setOutput(out);
-    IIOImage outImage = new IIOImage(image.getFirstImage(), null, image.getFirstMetadata(
-        ));
+    ImageOutputStream imgOut = null;
     try {
-      writer.write(null, outImage, writer.getDefaultWriteParam());
+      imgOut = ImageIO.createImageOutputStream(out);
     } catch (IOException ioe) {
-      LOGGER.error("Could not save image as [" + type + "]! " + ioe);
+      LOGGER.error("Exception creating ImageOutputStream", ioe);
+    }
+    if(imgOut != null) {
+      writer.setOutput(imgOut);
+      IIOImage outImage = new IIOImage(image.getFirstImage(), null, image.getFirstMetadata(
+          ));
       try {
-        outImage = new IIOImage(fallback.getFirstImage(), null, 
-            fallback.getFirstMetadata());
         writer.write(null, outImage, writer.getDefaultWriteParam());
-      } catch (IOException e) {
-        LOGGER.error("Could not save fallback image as [" + type + "]! " + e);
+      } catch (IOException ioe) {
+        LOGGER.error("Could not save image as [" + type + "]! " + ioe);
+        try {
+          outImage = new IIOImage(fallback.getFirstImage(), null, 
+              fallback.getFirstMetadata());
+          writer.write(null, outImage, writer.getDefaultWriteParam());
+        } catch (IOException e) {
+          LOGGER.error("Could not save fallback image as [" + type + "]! " + e);
+        }
+      } finally {
+        IOUtils.closeQuietly(out);
+        if(imgOut != null) {
+          try {
+            imgOut.close();
+          } catch (IOException ioe) {
+            LOGGER.error("Exception closing ImageOutputStream", ioe);
+          }
+        }
+        writer.dispose();
       }
-    } finally {
-      IOUtils.closeQuietly(out);
-      writer.dispose();
     }
   }
   
