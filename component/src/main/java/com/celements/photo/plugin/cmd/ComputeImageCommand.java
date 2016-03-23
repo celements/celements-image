@@ -102,7 +102,7 @@ public class ComputeImageCommand {
             ICropImage cropComp = Utils.getComponent(ICropImage.class);
             //TODO accept CelImage instead of bufferedImage
             cropComp.crop(img.getFirstImage(), cropX, cropY, cropW, cropH, mimeType, 
-                mimeType, out);
+                null, out);
             attachmentClone.setContent(new ByteArrayInputStream(
                 ((ByteArrayOutputStream)out).toByteArray()));
             img = decodeImageCommand.readImage(attachmentClone, context);
@@ -115,7 +115,7 @@ public class ComputeImageCommand {
             timeLast = logRuntime(timeLast, "got image dimensions after ");
             //TODO accept CelImage instead of bufferedImage
             byte[] thumbImageData = getThumbAttachment(img.getFirstImage(), dimension, 
-                thumbGen, mimeType, mimeType, watermark, copyright, defaultBg, lowerBound,
+                thumbGen, mimeType, null, watermark, copyright, defaultBg, lowerBound,
                 lowerBoundPositioning);
             timeLast = logRuntime(timeLast, "resize done after ");
             attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
@@ -129,7 +129,7 @@ public class ComputeImageCommand {
             BufferedImage bNwImg = op.filter(img.getFirstImage(), null);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             //TODO accept CelImage instead of bufferedImage
-            thumbGen.encodeImage(out, bNwImg, img.getFirstImage(), mimeType, mimeType);
+            thumbGen.encodeImage(out, bNwImg, img.getFirstImage(), mimeType, null);
             byte[] bNwImage = out.toByteArray();
             attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
@@ -179,8 +179,7 @@ public class ComputeImageCommand {
                 ICropImage cropComp = Utils.getComponent(ICropImage.class);
                 //TODO accept CelImage instead of bufferedImage
                 cropComp.crop(filteredImg, xOffset, yOffset, img.getFirstImage().getWidth(
-                    ), img.getFirstImage().getHeight(), mimeType, mimeType,
-                    out);
+                    ), img.getFirstImage().getHeight(), mimeType, null, out);
                 attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
                 timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
                     + "] after ");

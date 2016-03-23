@@ -436,7 +436,8 @@ public class GenerateThumbnail {
   @Deprecated
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
       String type, String overrideType) {
-    boolean forcePng = (Strings.isNullOrEmpty(overrideType) && !"png".equals(type));
+    boolean forcePng = Strings.isNullOrEmpty(overrideType) && !"png".equals(
+        type.toLowerCase());
     if(forcePng || !saveTypes.containsKey(type.toLowerCase())) {
       LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
       type = "png"; //default for all not jpeg or gif files
