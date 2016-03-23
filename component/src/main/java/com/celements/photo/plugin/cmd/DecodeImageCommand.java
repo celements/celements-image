@@ -133,7 +133,6 @@ public class DecodeImageCommand {
       LOGGER.info("Failed to read image [" + filename + "].", ioe);
     } finally {
       IOUtils.closeQuietly(imageStream);
-      IOUtils.closeQuietly(createMarkStreamHelper);
     }
     if (celImage.isEmpty()) {
       throw new ImageReadException("Failed to read image [" + filename + "].");
