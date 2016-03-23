@@ -188,7 +188,6 @@ public class ComputeImageCommand {
               }
             }
           }
-          //TODO fix in its own branch to avoid colour shift problems in dev branch
           boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
               !overwriteOutputFormat.equals(mimeType);
           if(outFormatChange) {
