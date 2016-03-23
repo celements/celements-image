@@ -390,14 +390,16 @@ public class GenerateThumbnail {
       return -pos;
     }
   }
-  
+
   /**
-   * Encodes a BufferedImage to jpeg format and writes it to the specified
-   * OutputStream.
+   * Encodes a BufferedImage to png format (default, override for other formats) and 
+   * writes it to the specified OutputStream.
    * 
    * @param out OutputStream to write the image to.
    * @param image BufferedImage of the image to encode.
-   * @throws IOException
+   * @param fallback BufferedImage to fall back if encoding of image fails.
+   * @param type Mime type of the input image.
+   * @param overrideType Mime type of the output image.
    */
   public void encodeImage(OutputStream out, CelImage image, CelImage fallback, 
       String type, String overrideType) {
@@ -451,12 +453,14 @@ public class GenerateThumbnail {
   }
   
   /**
-   * Encodes a BufferedImage to jpeg format and writes it to the specified
-   * OutputStream.
+   * Encodes a BufferedImage to png format (default, override for other formats) and 
+   * writes it to the specified OutputStream.
    * 
    * @param out OutputStream to write the image to.
    * @param image BufferedImage of the image to encode.
-   * @throws IOException
+   * @param fallback BufferedImage to fall back if encoding of image fails.
+   * @param type Mime type of the input image.
+   * @param overrideType Mime type of the output image.
    */
   @Deprecated
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
