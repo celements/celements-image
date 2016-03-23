@@ -193,7 +193,6 @@ public class ComputeImageCommand {
               !overwriteOutputFormat.equals(mimeType);
           if(outFormatChange) {
             img = decodeImageCommand.readImage(attachmentClone, context);
-            //TODO accept CelImage instead of bufferedImage
             mimeType = overwriteOutputFormat;
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             (new GenerateThumbnail()).encodeImage(out, img, img, mimeType, 
