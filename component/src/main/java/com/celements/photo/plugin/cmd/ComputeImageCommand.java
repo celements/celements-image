@@ -35,6 +35,7 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.celements.photo.container.CelImage;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.image.ICropImage;
@@ -54,8 +55,6 @@ public class ComputeImageCommand {
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
       String defaultBgStr, String filterStr, String overwriteOutputFormat) {
-    //TODO fix in its own branch to avoid colour shift problems in dev branch
-    overwriteOutputFormat = "";
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -92,33 +91,33 @@ public class ComputeImageCommand {
         LOGGER.info("No cached image.");
         long timeLast = System.currentTimeMillis();
         if(!raw) {
-          boolean contentChanged = false;
           String mimeType = attachmentClone.getMimeType(context);
           GenerateThumbnail thumbGen = new GenerateThumbnail();
           LOGGER.info("start loading image " + timeLast);
           DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
-          BufferedImage img = decodeImageCommand.readImage(attachmentClone, context);
+          CelImage img = decodeImageCommand.readImage(attachmentClone, context);
           timeLast = logRuntime(timeLast, "image decoded after ");
           if(needsCropping) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ICropImage cropComp = Utils.getComponent(ICropImage.class);
-            cropComp.crop(img, cropX, cropY, cropW, cropH, mimeType, 
-                overwriteOutputFormat, out);
-            contentChanged = true;
+            //TODO accept CelImage instead of bufferedImage
+            cropComp.crop(img.getFirstImage(), cropX, cropY, cropW, cropH, mimeType, 
+                null, out);
             attachmentClone.setContent(new ByteArrayInputStream(
                 ((ByteArrayOutputStream)out).toByteArray()));
             img = decodeImageCommand.readImage(attachmentClone, context);
           }
           timeLast = logRuntime(timeLast, "image cropped after ");
           if ((height > 0) || (width > 0)) {
-            ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, 
-                height, lowerBound, defaultBg);
+            //TODO accept CelImage instead of bufferedImage
+            ImageDimensions dimension = thumbGen.getThumbnailDimensions(img.getFirstImage(
+                ), width, height, lowerBound, defaultBg);
             timeLast = logRuntime(timeLast, "got image dimensions after ");
-            byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, mimeType,
-                overwriteOutputFormat, watermark, copyright, defaultBg, lowerBound, 
+            //TODO accept CelImage instead of bufferedImage
+            byte[] thumbImageData = getThumbAttachment(img.getFirstImage(), dimension, 
+                thumbGen, mimeType, null, watermark, copyright, defaultBg, lowerBound,
                 lowerBoundPositioning);
             timeLast = logRuntime(timeLast, "resize done after ");
-            contentChanged = true;
             attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
             timeLast = logRuntime(timeLast, "new attachment content set after ");
           }
@@ -126,11 +125,12 @@ public class ComputeImageCommand {
             img = decodeImageCommand.readImage(attachmentClone, context);
             ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);  
             ColorConvertOp op = new ColorConvertOp(cs, null);
-            BufferedImage bNwImg = op.filter(img, null);
+            //TODO accept CelImage instead of bufferedImage
+            BufferedImage bNwImg = op.filter(img.getFirstImage(), null);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            thumbGen.encodeImage(out, bNwImg, img, mimeType, overwriteOutputFormat);
+            //TODO accept CelImage instead of bufferedImage
+            thumbGen.encodeImage(out, bNwImg, img.getFirstImage(), mimeType, null);
             byte[] bNwImage = out.toByteArray();
-            contentChanged = true;
             attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
           }
@@ -157,14 +157,18 @@ public class ComputeImageCommand {
                   kerMatrix[i] = x;
                 }
                 img = decodeImageCommand.readImage(attachmentClone, context);
-                BufferedImage newSource = new BufferedImage(img.getWidth() 
-                    + (kerWidth - 1), img.getHeight() + (kerHeight - 1), 
+                //TODO accept CelImage instead of bufferedImage
+                BufferedImage newSource = new BufferedImage(img.getFirstImage().getWidth() 
+                    + (kerWidth - 1), img.getFirstImage().getHeight() + (kerHeight - 1), 
                     BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g2 = newSource.createGraphics();
                 int xOffset = (kerWidth - 1) / 2;
                 int yOffset = (kerHeight - 1) / 2;
-                setBorderPixelsBeforeNeededForKernel(xOffset, yOffset, newSource, img);
-                g2.drawImage(img, xOffset, yOffset, null);
+                //TODO accept CelImage instead of bufferedImage
+                setBorderPixelsBeforeNeededForKernel(xOffset, yOffset, newSource, 
+                    img.getFirstImage());
+                //TODO loop for animated gif
+                g2.drawImage(img.getFirstImage(), xOffset, yOffset, null);
                 g2.dispose();
                 Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
                 LOGGER.debug("Filtering with kernel configured as " + kerWidth + ", " 
@@ -173,9 +177,9 @@ public class ComputeImageCommand {
                 BufferedImage filteredImg = op.filter(newSource, null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 ICropImage cropComp = Utils.getComponent(ICropImage.class);
-                cropComp.crop(filteredImg, xOffset, yOffset, img.getWidth(), 
-                    img.getHeight(), mimeType, overwriteOutputFormat, out);
-                contentChanged = true;
+                //TODO accept CelImage instead of bufferedImage
+                cropComp.crop(filteredImg, xOffset, yOffset, img.getFirstImage().getWidth(
+                    ), img.getFirstImage().getHeight(), mimeType, null, out);
                 attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
                 timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
                     + "] after ");
@@ -184,19 +188,17 @@ public class ComputeImageCommand {
               }
             }
           }
-          //TODO fix in its own branch to avoid colour shift problems in dev branch
-//          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
-//              !overwriteOutputFormat.equals(mimeType);
-//          if(outFormatChange) {
-//            mimeType = overwriteOutputFormat;
-//            BufferedImage typeChangeImg = decodeImageCommand.readImage(attachmentClone, 
-//                context);
-//            ByteArrayOutputStream out = new ByteArrayOutputStream();
-//            (new GenerateThumbnail()).encodeImage(out, typeChangeImg, img, mimeType,
-//                overwriteOutputFormat);
-//            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
-//            LOGGER.debug("Rewritten output image type to mimeType [{}]", mimeType);
-//          }
+          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
+              !overwriteOutputFormat.equals(mimeType);
+          if(outFormatChange) {
+            img = decodeImageCommand.readImage(attachmentClone, context);
+            mimeType = overwriteOutputFormat;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            (new GenerateThumbnail()).encodeImage(out, img, img, mimeType, 
+                overwriteOutputFormat);
+            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
+            LOGGER.debug("Rewritten output image type to mimeType [{}]", mimeType);
+          }
         } else {
           LOGGER.info("Raw image! No alterations done.");
         }

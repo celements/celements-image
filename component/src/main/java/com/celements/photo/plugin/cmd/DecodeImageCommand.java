@@ -50,11 +50,14 @@ import org.apache.sanselan.formats.jpeg.segments.UnknownSegment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.celements.photo.container.CelImage;
 import com.sun.media.jai.codec.FileCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+
+import edu.emory.mathcs.util.io.IOUtils;
 
 public class DecodeImageCommand {
   private static final Logger LOGGER = LoggerFactory.getLogger(DecodeImageCommand.class);
@@ -66,14 +69,15 @@ public class DecodeImageCommand {
   private int colorType = COLOR_TYPE_RGB;
   private String cmykProfile = "ECI_Offset_2009/ISOcoated_v2_300_eci.icc";
   
-  public BufferedImage readImage(XWikiAttachment att, XWikiContext context
+  public CelImage readImage(XWikiAttachment att, XWikiContext context
       ) throws ImageReadException, XWikiException {
     return readImage(att.getContentInputStream(context), att.getFilename(), 
         att.getMimeType(context));
   }
   
-  public BufferedImage readImage(InputStream imageStream, String filename, 
+  public CelImage readImage(InputStream imageStream, String filename, 
       String mimeType) throws ImageReadException, XWikiException {
+    CelImage celImage = new CelImage();
     BufferedImage image = null;
     ByteArrayOutputStream createMarkStreamHelper = null;
     try {
@@ -121,31 +125,19 @@ public class DecodeImageCommand {
           image = convertCmykToRgb(raster, profile);
         }
         if(image != null) {
+          celImage.addImage(image, reader.getImageMetadata(0));
           break;
         }
       }
     } catch(IOException ioe) {
       LOGGER.info("Failed to read image [" + filename + "].", ioe);
     } finally {
-      if(imageStream != null) {
-        try {
-          imageStream.close();
-        } catch (IOException ioe) {
-          LOGGER.error("Exception cloasing in stream.", ioe);
-        }
-      }
-      if (createMarkStreamHelper != null) {
-        try {
-          createMarkStreamHelper.close();
-        } catch (IOException ioe) {
-          LOGGER.error("Exception cloasing out stream.", ioe);
-        }
-      }
+      IOUtils.closeQuietly(imageStream);
     }
-    if (image == null) {
+    if (celImage.isEmpty()) {
       throw new ImageReadException("Failed to read image [" + filename + "].");
     }
-    return image;
+    return celImage;
   }
 
   // Requires Java Advanced Imaging - used as fallback for certain jpeg files containing 

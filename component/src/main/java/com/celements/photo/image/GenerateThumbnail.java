@@ -38,15 +38,20 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
 import org.apache.sanselan.ImageReadException;
+import org.apache.tika.io.IOUtils;
 import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.celements.photo.container.CelImage;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.plugin.cmd.DecodeImageCommand;
@@ -385,20 +390,86 @@ public class GenerateThumbnail {
       return -pos;
     }
   }
-  
+
   /**
-   * Encodes a BufferedImage to jpeg format and writes it to the specified
-   * OutputStream.
+   * Encodes a BufferedImage to png format (default, override for other formats) and 
+   * writes it to the specified OutputStream.
    * 
    * @param out OutputStream to write the image to.
    * @param image BufferedImage of the image to encode.
-   * @throws IOException
+   * @param fallback BufferedImage to fall back if encoding of image fails.
+   * @param type Mime type of the input image.
+   * @param overrideType Mime type of the output image.
    */
+  public void encodeImage(OutputStream out, CelImage image, CelImage fallback, 
+      String type, String overrideType) {
+    LOGGER.info("endoceImage: type [{}], override type [{}], override in allowed types " +
+        "[{}]", type, overrideType, saveTypes.containsKey(
+            Strings.isNullOrEmpty(overrideType) ? "" : overrideType.toLowerCase()));
+    boolean forcePng = Strings.isNullOrEmpty(overrideType);
+    if(forcePng || !saveTypes.containsKey(overrideType.toLowerCase())) {
+      LOGGER.info("encodeImage: forcing png, because [" + type + "] is no saveType.");
+      overrideType = "png";
+    } else {
+      overrideType = overrideType.replaceAll("^.*/", "");
+    }
+    ImageWriter writer = ImageIO.getImageWritersByFormatName(saveTypes.get(
+        type.toLowerCase())).next();
+    LOGGER.info("encodeImage: get ImageWriter for format name [{}], writer [{}]", 
+        saveTypes.get(type.toLowerCase()), writer);
+    ImageOutputStream imgOut = null;
+    try {
+      imgOut = ImageIO.createImageOutputStream(out);
+    } catch (IOException ioe) {
+      LOGGER.error("Exception creating ImageOutputStream", ioe);
+    }
+    if(imgOut != null) {
+      writer.setOutput(imgOut);
+      IIOImage outImage = new IIOImage(image.getFirstImage(), null, image.getFirstMetadata(
+          ));
+      try {
+        writer.write(null, outImage, writer.getDefaultWriteParam());
+      } catch (IOException ioe) {
+        LOGGER.error("Could not save image as [" + type + "]! " + ioe);
+        try {
+          outImage = new IIOImage(fallback.getFirstImage(), null, 
+              fallback.getFirstMetadata());
+          writer.write(null, outImage, writer.getDefaultWriteParam());
+        } catch (IOException e) {
+          LOGGER.error("Could not save fallback image as [" + type + "]! " + e);
+        }
+      } finally {
+        IOUtils.closeQuietly(out);
+        if(imgOut != null) {
+          try {
+            imgOut.close();
+          } catch (IOException ioe) {
+            LOGGER.error("Exception closing ImageOutputStream", ioe);
+          }
+        }
+        writer.dispose();
+      }
+    }
+  }
+  
+  /**
+   * Encodes a BufferedImage to png format (default, override for other formats) and 
+   * writes it to the specified OutputStream.
+   * 
+   * @param out OutputStream to write the image to.
+   * @param image BufferedImage of the image to encode.
+   * @param fallback BufferedImage to fall back if encoding of image fails.
+   * @param type Mime type of the input image.
+   * @param overrideType Mime type of the output image.
+   */
+  @Deprecated
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
       String type, String overrideType) {
-    boolean forcePng = (Strings.isNullOrEmpty(overrideType) && !"png".equals(type));
+    boolean forcePng = Strings.isNullOrEmpty(overrideType) && !"png".equals(
+        type.toLowerCase());
     if(forcePng || !saveTypes.containsKey(type.toLowerCase())) {
-      LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
+      LOGGER.info("encodeImage (deprecated): convert to png, because [" + type + "] is " +
+          "no saveType.");
       type = "png"; //default for all not jpeg or gif files
     }
     try {
@@ -554,7 +625,7 @@ public class GenerateThumbnail {
    */
   @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
-    BufferedImage bufferedImage = null;
+    CelImage celImage = null;
     ByteArrayOutputStream convertOut = null;
     boolean markSupported = in.markSupported();
     try {
@@ -571,7 +642,7 @@ public class GenerateThumbnail {
         in = new ByteArrayInputStream(convertOut.toByteArray()); 
       }
       DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
-      bufferedImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
+      celImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
     } catch (ImageReadException e) {
       LOGGER.error("Could not read image!", e);
     } catch (IOException e) {
@@ -594,7 +665,7 @@ public class GenerateThumbnail {
         }
       }
     }
-    return bufferedImage;
+    return celImage.getFirstImage();
   }
   
   /**

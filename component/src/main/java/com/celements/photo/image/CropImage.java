@@ -12,6 +12,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
+import com.celements.photo.container.CelImage;
 import com.celements.photo.plugin.cmd.DecodeImageCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -65,8 +66,9 @@ public class CropImage implements ICropImage {
   public OutputStream crop(XWikiAttachment xAtt, int x, int y, int w, int h,
       String overwriteType, OutputStream out) {
     try {
-      BufferedImage img = (new DecodeImageCommand()).readImage(xAtt, getContext());
-      crop(img, x, y, w, h, xAtt.getMimeType(getContext()), overwriteType, out);
+      CelImage img = (new DecodeImageCommand()).readImage(xAtt, getContext());
+      crop(img.getFirstImage(), x, y, w, h, xAtt.getMimeType(getContext()), overwriteType,
+          out);
     } catch (XWikiException xwe) {
       LOGGER.error("Error getting attachment content and decoding it into an " +
           "BufferedImage", xwe);
