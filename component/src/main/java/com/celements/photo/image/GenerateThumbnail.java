@@ -38,7 +38,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
 import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
@@ -47,6 +49,7 @@ import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.celements.photo.container.CelImage;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.plugin.cmd.DecodeImageCommand;
@@ -394,6 +397,43 @@ public class GenerateThumbnail {
    * @param image BufferedImage of the image to encode.
    * @throws IOException
    */
+  public void encodeImage(OutputStream out, CelImage image, CelImage fallback, 
+      String type, String overrideType) {
+    boolean forcePng = (Strings.isNullOrEmpty(overrideType) && !"png".equals(type));
+    if(forcePng || !saveTypes.containsKey(type.toLowerCase())) {
+      LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
+      type = "png"; //default for all not jpeg or gif files
+    }
+    ImageWriter writer = ImageIO.getImageWritersByFormatName(saveTypes.get(
+        type.toLowerCase())).next();
+    writer.setOutput(out);
+    IIOImage outImage = new IIOImage(image.getFirstImage(), null, image.getFirstMetadata(
+        ));
+    try {
+      writer.write(null, outImage, writer.getDefaultWriteParam());
+    } catch (IOException ioe) {
+      LOGGER.error("Could not save image as [" + type + "]! " + ioe);
+      try {
+        outImage = new IIOImage(fallback.getFirstImage(), null, 
+            fallback.getFirstMetadata());
+        writer.write(null, outImage, writer.getDefaultWriteParam());
+      } catch (IOException e) {
+        LOGGER.error("Could not save fallback image as [" + type + "]! " + e);
+      }
+    } finally {
+      writer.dispose();
+    }
+  }
+  
+  /**
+   * Encodes a BufferedImage to jpeg format and writes it to the specified
+   * OutputStream.
+   * 
+   * @param out OutputStream to write the image to.
+   * @param image BufferedImage of the image to encode.
+   * @throws IOException
+   */
+  @Deprecated
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
       String type, String overrideType) {
     boolean forcePng = (Strings.isNullOrEmpty(overrideType) && !"png".equals(type));
@@ -554,7 +594,7 @@ public class GenerateThumbnail {
    */
   @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
-    BufferedImage bufferedImage = null;
+    CelImage celImage = null;
     ByteArrayOutputStream convertOut = null;
     boolean markSupported = in.markSupported();
     try {
@@ -571,7 +611,7 @@ public class GenerateThumbnail {
         in = new ByteArrayInputStream(convertOut.toByteArray()); 
       }
       DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
-      bufferedImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
+      celImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
     } catch (ImageReadException e) {
       LOGGER.error("Could not read image!", e);
     } catch (IOException e) {
@@ -594,7 +634,7 @@ public class GenerateThumbnail {
         }
       }
     }
-    return bufferedImage;
+    return celImage.getFirstImage();
   }
   
   /**
