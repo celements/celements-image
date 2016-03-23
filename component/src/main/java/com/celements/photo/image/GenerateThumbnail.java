@@ -45,6 +45,7 @@ import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
 import org.apache.sanselan.ImageReadException;
+import org.apache.tika.io.IOUtils;
 import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -411,6 +412,8 @@ public class GenerateThumbnail {
     }
     ImageWriter writer = ImageIO.getImageWritersByFormatName(saveTypes.get(
         type.toLowerCase())).next();
+    LOGGER.info("encodeImage: get ImageWriter for format name [{}], writer [{}]", 
+        saveTypes.get(type.toLowerCase()), writer);
     writer.setOutput(out);
     IIOImage outImage = new IIOImage(image.getFirstImage(), null, image.getFirstMetadata(
         ));
@@ -426,6 +429,7 @@ public class GenerateThumbnail {
         LOGGER.error("Could not save fallback image as [" + type + "]! " + e);
       }
     } finally {
+      IOUtils.closeQuietly(out);
       writer.dispose();
     }
   }
