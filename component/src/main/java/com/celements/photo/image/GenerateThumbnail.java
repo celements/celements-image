@@ -425,8 +425,8 @@ public class GenerateThumbnail {
     }
     if(imgOut != null) {
       writer.setOutput(imgOut);
-      IIOImage outImage = new IIOImage(image.getFirstImage(), null, image.getFirstMetadata(
-          ));
+      IIOImage outImage = new IIOImage(image.getFirstImage(), null, 
+          image.getFirstMetadata());
       try {
         writer.write(null, outImage, writer.getDefaultWriteParam());
       } catch (IOException ioe) {
