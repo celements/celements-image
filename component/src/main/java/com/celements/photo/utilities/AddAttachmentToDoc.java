@@ -19,22 +19,26 @@
  */
 package com.celements.photo.utilities;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
+import com.celements.filebase.AddingAttachmentContentFailedException;
+import com.celements.filebase.AttachmentService;
+import com.celements.filebase.AttachmentToBigException;
+import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Used to add data as a new XWikiAttachment to an XWikiDocument.
  */
+@Deprecated
 public class AddAttachmentToDoc {
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       AddAttachmentToDoc.class);
@@ -50,7 +54,11 @@ public class AddAttachmentToDoc {
    *           attachment.
    * @return The attachment containing the given data.
    * @throws XWikiException
+   * 
+   * @deprecated since 1.42 instead use {@link IAttachmentServiceRole.addAttachment(
+   *    XWikiDocument, InputStream, String, String, String)}
    */
+  @Deprecated
   public XWikiAttachment addAtachment(XWikiDocument doc, ByteArrayOutputStream data, 
       String filename, XWikiContext context) throws XWikiException{
     return addAtachment(doc, data.toByteArray(), filename, context);
@@ -66,44 +74,24 @@ public class AddAttachmentToDoc {
    * @param context XWikiContext. Needed to get the author and to save the
    *           attachment.
    * @return The attachment containing the given data.
-   * @throws XWikiException
    * 
-   * TODO move to celementsWeb AttachmentService and check that AttachmentEvents
-   *      are fired for lucene!
+   * @deprecated since 1.42 instead use {@link IAttachmentServiceRole.addAttachment(
+   *    XWikiDocument, InputStream, String, String, String)}
    */
+  @Deprecated
   public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename, 
-      XWikiContext context) throws XWikiException{
-    XWikiDocument olddoc = (XWikiDocument) doc.clone();
-    if(olddoc.isNew()) {
-      olddoc = new CreateDocumentCommand().createDocument(olddoc.getDocumentReference(), 
-          "DMS-Document");
-    }
-    XWikiAttachment attachment = olddoc.getAttachment(filename);
-    if (attachment == null) {
-        attachment = new XWikiAttachment();
-        attachment.setDoc(olddoc);
-        attachment.setFilename(filename);
-        olddoc.getAttachmentList().add(attachment);
-    }
-    LOGGER.info("filename='" + filename + "' contentsize='" + data.length + "'");
-    ByteArrayInputStream dataStream = null;
+      XWikiContext context) throws XWikiException {
     try {
-      dataStream = new ByteArrayInputStream(data);
-      attachment.setContent(dataStream);
-    } catch (IOException ioe) {
-      LOGGER.error("Error setting Attachment content", ioe);
-    } finally {
-      if(dataStream != null) {
-        try {
-          dataStream.close();
-        } catch (IOException ioe) {
-          LOGGER.error("Exception cloasing stream.", ioe);
-        }
-      }
+      return ((AttachmentService) Utils.getComponent(IAttachmentServiceRole.class)
+          ).addAttachment(doc, data, filename, context.getUser(), null);
+    } catch (DocumentSaveException dse) {
+      LOGGER.error("Exception saving document with added attachment '" + filename + "'", 
+          dse);
+    } catch (AttachmentToBigException atbe) {
+      LOGGER.error("Attachment '" + filename + "' is to big", atbe);
+    } catch (AddingAttachmentContentFailedException aacfe) {
+      LOGGER.error("Faild to add attachment content for '" + filename + "'", aacfe);
     }
-    attachment.setAuthor(context.getUser());
-    olddoc.setAuthor(context.getUser());
-    olddoc.saveAttachmentContent(attachment, context);
-    return attachment;
+    return null;
   }
 }

@@ -104,7 +104,7 @@ public class Thumbnail {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       thumbGenerator.createThumbnail(original, out, width, height, getWatermark(doc, 
           context), getCopyright(doc, context), zipAttachment.getMimeType(context), null, 
-          false, null);
+          false, null, null);
       thumbnail = (new AddAttachmentToDoc()).addAtachment(celeMetaDoc, out, 
           thumbImageName, context);
     }

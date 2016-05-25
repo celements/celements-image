@@ -38,14 +38,20 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
 import org.apache.sanselan.ImageReadException;
+import org.apache.tika.io.IOUtils;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.celements.photo.container.CelImage;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.plugin.cmd.DecodeImageCommand;
@@ -67,11 +73,11 @@ public class GenerateThumbnail {
 
   static Map<String, String> getSaveTypes() {
     HashMap<String, String> map = new HashMap<String, String>();
-//    map.put("gif", "GIF");
-//    map.put("image/gif", "GIF");
-//    map.put("jpg", "JPEG");
-//    map.put("jpeg", "JPEG");
-//    map.put("image/jpeg", "JPEG");
+    map.put("gif", "GIF");
+    map.put("image/gif", "GIF");
+    map.put("jpg", "JPEG");
+    map.put("jpeg", "JPEG");
+    map.put("image/jpeg", "JPEG");
     map.put("png", "PNG");
     map.put("image/png", "PNG");
     return map;
@@ -227,10 +233,10 @@ public class GenerateThumbnail {
    */
   public ImageDimensions createThumbnail(InputStream in, OutputStream out, int width, 
       int height, String watermark, String copyright, String type, Color defaultBg, 
-      boolean lowerBound, Integer lowerBoundPositioning
+      boolean lowerBound, Integer lowerBoundPositioning, String overwriteType
       ) throws IOException, XWikiException {
     return createThumbnail(decodeInputStream(in), out, width, height, watermark, 
-        copyright, type, defaultBg, lowerBound, lowerBoundPositioning);
+        copyright, type, defaultBg, lowerBound, lowerBoundPositioning, overwriteType);
   }
   
   /**
@@ -248,10 +254,10 @@ public class GenerateThumbnail {
    */
   public void createThumbnail(InputStream in, OutputStream out, 
       ImageDimensions dimensions, String watermark, String copyright, String type, 
-      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning
-      ) throws IOException, XWikiException {
+      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning,
+      String overwriteType) throws IOException, XWikiException {
     createThumbnail(decodeInputStream(in), out, dimensions, watermark, copyright, type,
-        defaultBg, lowerBound, lowerBoundPositioning);
+        defaultBg, lowerBound, lowerBoundPositioning, overwriteType);
   }
   
   /**
@@ -269,17 +275,19 @@ public class GenerateThumbnail {
    */
   public ImageDimensions createThumbnail(BufferedImage img, OutputStream out, int width, 
       int height, String watermark, String copyright, String type, Color defaultBg, 
-      boolean lowerBound, Integer lowerBoundPositioning) throws IOException {
+      boolean lowerBound, Integer lowerBoundPositioning, String overwriteType
+      ) throws IOException {
     ImageDimensions imgSize = getThumbnailDimensions(img, width, height, lowerBound, 
         defaultBg);
     createThumbnail(img, out, imgSize, watermark, copyright, type, defaultBg, lowerBound, 
-        lowerBoundPositioning);
+        lowerBoundPositioning, overwriteType);
     return imgSize;
   }
 
   public BufferedImage createThumbnail(BufferedImage img, OutputStream out, 
       ImageDimensions imgSize, String watermark, String copyright, String type, 
-      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning) {
+      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning, 
+      String overwriteType) {
     Image thumbImg = img; 
     // Only generates a thumbnail if the image is larger than the desired thumbnail.
     LOGGER.debug("img: " + img + " - imgSize: " + imgSize);
@@ -345,16 +353,28 @@ public class GenerateThumbnail {
     } else {
       if((img.getWidth() > (int)imgSize.getWidth()) 
           || (img.getHeight() > (int)imgSize.getHeight())) {
+        LOGGER.trace("widthratio: {}, heightratio: {}", 
+            (img.getWidth() / imgSize.getWidth()), 
+            (img.getHeight() / imgSize.getHeight()));
+        // width ratio > height ratio is done to prevent images getting 1 px to large due
+        //    to rounding errors "0.03 pixels"
         // The "-1" is used to resize maintaining the aspect ratio.
-        thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, Image.SCALE_SMOOTH);
+        if((img.getWidth() / imgSize.getWidth()) 
+            > (img.getHeight() / imgSize.getHeight())) {
+          thumbImg = img.getScaledInstance((int)imgSize.getWidth(), -1, 
+              Image.SCALE_SMOOTH);
+        } else {
+          thumbImg = img.getScaledInstance(-1, (int)imgSize.getHeight(), 
+              Image.SCALE_SMOOTH);
+        }
       }
     }
-    LOGGER.debug("width ziel: " + imgSize.getWidth() + ", height ziel: " + 
+    LOGGER.debug("width target: " + imgSize.getWidth() + ", height target: " + 
         imgSize.getHeight() + "; width: " + thumbImg.getWidth(null) + ", height: " + 
         thumbImg.getHeight(null));
     BufferedImage buffThumb = convertImageToBufferedImage(thumbImg, watermark, copyright,
         defaultBg);
-    encodeImage(out, buffThumb, img, type);
+    encodeImage(out, buffThumb, img, type, overwriteType);
     return buffThumb;
   }
   
@@ -370,19 +390,86 @@ public class GenerateThumbnail {
       return -pos;
     }
   }
-  
+
   /**
-   * Encodes a BufferedImage to jpeg format and writes it to the specified
-   * OutputStream.
+   * Encodes a BufferedImage to png format (default, override for other formats) and 
+   * writes it to the specified OutputStream.
    * 
    * @param out OutputStream to write the image to.
    * @param image BufferedImage of the image to encode.
-   * @throws IOException
+   * @param fallback BufferedImage to fall back if encoding of image fails.
+   * @param type Mime type of the input image.
+   * @param overrideType Mime type of the output image.
    */
+  public void encodeImage(OutputStream out, CelImage image, CelImage fallback, 
+      String type, String overrideType) {
+    LOGGER.info("endoceImage: type [{}], override type [{}], override in allowed types " +
+        "[{}]", type, overrideType, saveTypes.containsKey(
+            Strings.isNullOrEmpty(overrideType) ? "" : overrideType.toLowerCase()));
+    boolean forcePng = Strings.isNullOrEmpty(overrideType);
+    if(forcePng || !saveTypes.containsKey(overrideType.toLowerCase())) {
+      LOGGER.info("encodeImage: forcing png, because [" + type + "] is no saveType.");
+      overrideType = "png";
+    } else {
+      overrideType = overrideType.replaceAll("^.*/", "");
+    }
+    ImageWriter writer = ImageIO.getImageWritersByFormatName(saveTypes.get(
+        type.toLowerCase())).next();
+    LOGGER.info("encodeImage: get ImageWriter for format name [{}], writer [{}]", 
+        saveTypes.get(type.toLowerCase()), writer);
+    ImageOutputStream imgOut = null;
+    try {
+      imgOut = ImageIO.createImageOutputStream(out);
+    } catch (IOException ioe) {
+      LOGGER.error("Exception creating ImageOutputStream", ioe);
+    }
+    if(imgOut != null) {
+      writer.setOutput(imgOut);
+      IIOImage outImage = new IIOImage(image.getFirstImage(), null, 
+          image.getFirstMetadata());
+      try {
+        writer.write(null, outImage, writer.getDefaultWriteParam());
+      } catch (IOException ioe) {
+        LOGGER.error("Could not save image as [" + type + "]! " + ioe);
+        try {
+          outImage = new IIOImage(fallback.getFirstImage(), null, 
+              fallback.getFirstMetadata());
+          writer.write(null, outImage, writer.getDefaultWriteParam());
+        } catch (IOException e) {
+          LOGGER.error("Could not save fallback image as [" + type + "]! " + e);
+        }
+      } finally {
+        IOUtils.closeQuietly(out);
+        if(imgOut != null) {
+          try {
+            imgOut.close();
+          } catch (IOException ioe) {
+            LOGGER.error("Exception closing ImageOutputStream", ioe);
+          }
+        }
+        writer.dispose();
+      }
+    }
+  }
+  
+  /**
+   * Encodes a BufferedImage to png format (default, override for other formats) and 
+   * writes it to the specified OutputStream.
+   * 
+   * @param out OutputStream to write the image to.
+   * @param image BufferedImage of the image to encode.
+   * @param fallback BufferedImage to fall back if encoding of image fails.
+   * @param type Mime type of the input image.
+   * @param overrideType Mime type of the output image.
+   */
+  @Deprecated
   public void encodeImage(OutputStream out, BufferedImage image, BufferedImage fallback, 
-      String type) {
-    if(!saveTypes.containsKey(type.toLowerCase())) {
-      LOGGER.info("encodeImage: convert to png, because [" + type + "] is no saveType.");
+      String type, String overrideType) {
+    boolean forcePng = Strings.isNullOrEmpty(overrideType) && !"png".equals(
+        type.toLowerCase());
+    if(forcePng || !saveTypes.containsKey(type.toLowerCase())) {
+      LOGGER.info("encodeImage (deprecated): convert to png, because [" + type + "] is " +
+          "no saveType.");
       type = "png"; //default for all not jpeg or gif files
     }
     try {
@@ -538,7 +625,7 @@ public class GenerateThumbnail {
    */
   @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
-    BufferedImage bufferedImage = null;
+    CelImage celImage = null;
     ByteArrayOutputStream convertOut = null;
     boolean markSupported = in.markSupported();
     try {
@@ -555,7 +642,7 @@ public class GenerateThumbnail {
         in = new ByteArrayInputStream(convertOut.toByteArray()); 
       }
       DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
-      bufferedImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
+      celImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
     } catch (ImageReadException e) {
       LOGGER.error("Could not read image!", e);
     } catch (IOException e) {
@@ -578,7 +665,7 @@ public class GenerateThumbnail {
         }
       }
     }
-    return bufferedImage;
+    return celImage.getFirstImage();
   }
   
   /**

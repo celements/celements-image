@@ -20,6 +20,7 @@
 package com.celements.photo.plugin.cmd;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -31,20 +32,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.celements.photo.container.CelImage;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.image.ICropImage;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.web.Utils;
 
 public class ComputeImageCommand {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      ComputeImageCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ComputeImageCommand.class);
 
   private ImageCacheCommand imgCacheCmd;
   
@@ -52,7 +54,7 @@ public class ComputeImageCommand {
   public XWikiAttachment computeImage(XWikiAttachment attachment,
       XWikiContext context, XWikiAttachment attachmentClone, String sheight,
       String swidth, String copyright, String watermark, Color defaultBg,
-      String defaultBgStr, String filterStr) {
+      String defaultBgStr, String filterStr, String overwriteOutputFormat) {
     // crop params
     int cropX = parseIntWithDefault(context.getRequest().get("cropX"), -1);
     int cropY = parseIntWithDefault(context.getRequest().get("cropY"), -1);
@@ -78,7 +80,8 @@ public class ComputeImageCommand {
 //          + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(
           width, height), copyright, watermark, cropX, cropY, cropW, cropH, blackAndWhite,
-          defaultBg, lowerBound, lowerBoundPositioning, filterStr, raw);
+          defaultBg, lowerBound, lowerBoundPositioning, filterStr, overwriteOutputFormat,
+          raw);
       LOGGER.debug("attachment key: '" + key + "'");
       InputStream data = getImageCacheCmd().getImageForKey(key);
       if (data != null) {
@@ -88,28 +91,32 @@ public class ComputeImageCommand {
         LOGGER.info("No cached image.");
         long timeLast = System.currentTimeMillis();
         if(!raw) {
+          String mimeType = attachmentClone.getMimeType(context);
           GenerateThumbnail thumbGen = new GenerateThumbnail();
           LOGGER.info("start loading image " + timeLast);
           DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
-          BufferedImage img = decodeImageCommand.readImage(attachmentClone, context);
+          CelImage img = decodeImageCommand.readImage(attachmentClone, context);
           timeLast = logRuntime(timeLast, "image decoded after ");
           if(needsCropping) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ICropImage cropComp = Utils.getComponent(ICropImage.class);
-            cropComp.crop(img, cropX, cropY, cropW, cropH, attachmentClone.getMimeType(
-                context), out);
+            //TODO accept CelImage instead of bufferedImage
+            cropComp.crop(img.getFirstImage(), cropX, cropY, cropW, cropH, mimeType, 
+                null, out);
             attachmentClone.setContent(new ByteArrayInputStream(
                 ((ByteArrayOutputStream)out).toByteArray()));
             img = decodeImageCommand.readImage(attachmentClone, context);
           }
           timeLast = logRuntime(timeLast, "image cropped after ");
           if ((height > 0) || (width > 0)) {
-            ImageDimensions dimension = thumbGen.getThumbnailDimensions(img, width, 
-                height, lowerBound, defaultBg);
+            //TODO accept CelImage instead of bufferedImage
+            ImageDimensions dimension = thumbGen.getThumbnailDimensions(img.getFirstImage(
+                ), width, height, lowerBound, defaultBg);
             timeLast = logRuntime(timeLast, "got image dimensions after ");
-            byte[] thumbImageData = getThumbAttachment(img, dimension, thumbGen, 
-                attachmentClone.getMimeType(context), watermark, copyright, defaultBg,
-                lowerBound, lowerBoundPositioning);
+            //TODO accept CelImage instead of bufferedImage
+            byte[] thumbImageData = getThumbAttachment(img.getFirstImage(), dimension, 
+                thumbGen, mimeType, null, watermark, copyright, defaultBg, lowerBound,
+                lowerBoundPositioning);
             timeLast = logRuntime(timeLast, "resize done after ");
             attachmentClone.setContent(new ByteArrayInputStream(thumbImageData));
             timeLast = logRuntime(timeLast, "new attachment content set after ");
@@ -118,9 +125,11 @@ public class ComputeImageCommand {
             img = decodeImageCommand.readImage(attachmentClone, context);
             ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);  
             ColorConvertOp op = new ColorConvertOp(cs, null);
-            BufferedImage bNwImg = op.filter(img, null);
+            //TODO accept CelImage instead of bufferedImage
+            BufferedImage bNwImg = op.filter(img.getFirstImage(), null);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            thumbGen.encodeImage(out, bNwImg, img, attachmentClone.getMimeType(context));
+            //TODO accept CelImage instead of bufferedImage
+            thumbGen.encodeImage(out, bNwImg, img.getFirstImage(), mimeType, null);
             byte[] bNwImage = out.toByteArray();
             attachmentClone.setContent(new ByteArrayInputStream(bNwImage));
             timeLast = logRuntime(timeLast, "image changed to black & white after ");
@@ -148,14 +157,29 @@ public class ComputeImageCommand {
                   kerMatrix[i] = x;
                 }
                 img = decodeImageCommand.readImage(attachmentClone, context);
+                //TODO accept CelImage instead of bufferedImage
+                BufferedImage newSource = new BufferedImage(img.getFirstImage().getWidth() 
+                    + (kerWidth - 1), img.getFirstImage().getHeight() + (kerHeight - 1), 
+                    BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2 = newSource.createGraphics();
+                int xOffset = (kerWidth - 1) / 2;
+                int yOffset = (kerHeight - 1) / 2;
+                //TODO accept CelImage instead of bufferedImage
+                setBorderPixelsBeforeNeededForKernel(xOffset, yOffset, newSource, 
+                    img.getFirstImage());
+                //TODO loop for animated gif
+                g2.drawImage(img.getFirstImage(), xOffset, yOffset, null);
+                g2.dispose();
                 Kernel kernel = new Kernel(kerWidth, kerHeight, kerMatrix);
                 LOGGER.debug("Filtering with kernel configured as " + kerWidth + ", " 
                     + kerHeight + ", " + Arrays.toString(kerMatrix));
                 BufferedImageOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null); 
-                BufferedImage filteredImg = op.filter(img, null);
+                BufferedImage filteredImg = op.filter(newSource, null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                thumbGen.encodeImage(out, filteredImg, img, attachmentClone.getMimeType(
-                    context));
+                ICropImage cropComp = Utils.getComponent(ICropImage.class);
+                //TODO accept CelImage instead of bufferedImage
+                cropComp.crop(filteredImg, xOffset, yOffset, img.getFirstImage().getWidth(
+                    ), img.getFirstImage().getHeight(), mimeType, null, out);
                 attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
                 timeLast = logRuntime(timeLast, "applied kernel filter [" + filterStr 
                     + "] after ");
@@ -163,6 +187,17 @@ public class ComputeImageCommand {
                 LOGGER.error("Exception parsing filter string [" + filterStr + "]", nfe);
               }
             }
+          }
+          boolean outFormatChange = !Strings.isNullOrEmpty(overwriteOutputFormat) && 
+              !overwriteOutputFormat.equals(mimeType);
+          if(outFormatChange) {
+            img = decodeImageCommand.readImage(attachmentClone, context);
+            mimeType = overwriteOutputFormat;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            (new GenerateThumbnail()).encodeImage(out, img, img, mimeType, 
+                overwriteOutputFormat);
+            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
+            LOGGER.debug("Rewritten output image type to mimeType [{}]", mimeType);
           }
         } else {
           LOGGER.info("Raw image! No alterations done.");
@@ -175,6 +210,56 @@ public class ComputeImageCommand {
       attachmentClone = attachment;
     }
     return attachmentClone;
+  }
+
+  void setBorderPixelsBeforeNeededForKernel(int xOffset, int yOffset,
+      BufferedImage newSource, BufferedImage img) {
+    //set top left corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(i, k, img.getRGB(0, 0));
+      }
+    }
+    //set top and bottom border
+    for(int i = 0; i < img.getWidth(); i++) {
+      int x = i + xOffset;
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(x, k, img.getRGB(i, 0));
+        newSource.setRGB(x, (newSource.getHeight() - 1) - k, 
+            img.getRGB(i, (img.getHeight() - 1)));
+      }
+    }
+    //set top right corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB((newSource.getWidth() - 1) - i, k, 
+            img.getRGB((img.getWidth() - 1), 0));
+      }
+    }
+    //set bottom left corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB(i, (newSource.getHeight() - 1) - k, 
+            img.getRGB(0, (img.getHeight() - 1)));
+      }
+    }
+    //set left and right border
+    for(int i = 0; i < img.getHeight(); i++) {
+      int y = i + yOffset;
+      for(int k = 0; k < xOffset; k++) {
+        newSource.setRGB(k, y, img.getRGB(0, i));
+        newSource.setRGB((newSource.getWidth() - 1) - k, y, 
+            img.getRGB((img.getWidth() - 1), i));
+      }
+    }
+    //set bottom right corner
+    for(int i = 0; i < xOffset; i++) {
+      for(int k = 0; k < yOffset; k++) {
+        newSource.setRGB((newSource.getWidth() - 1) - i, 
+            (newSource.getHeight() - 1) - k, 
+            img.getRGB((img.getWidth() - 1), (img.getHeight() - 1)));
+      }
+    }
   }
 
   Color getBackgroundColour(Color defaultBg, String defaultBgStr) {
@@ -234,11 +319,12 @@ public class ComputeImageCommand {
   }
 
   private byte[] getThumbAttachment(BufferedImage img, ImageDimensions dim, 
-      GenerateThumbnail thumbGen, String mimeType, String watermark, String copyright,
-      Color defaultBg, boolean lowerBound, Integer lowerBoundPositioning) {
+      GenerateThumbnail thumbGen, String mimeType, String overwriteOutputFormat, 
+      String watermark, String copyright, Color defaultBg, boolean lowerBound, 
+      Integer lowerBoundPositioning) {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    thumbGen.createThumbnail(img, out, dim, watermark, copyright, mimeType, defaultBg, 
-        lowerBound, lowerBoundPositioning);
+    thumbGen.createThumbnail(img, out, dim, watermark, copyright, mimeType, 
+        defaultBg, lowerBound, lowerBoundPositioning, overwriteOutputFormat);
     return out.toByteArray();
   }
 

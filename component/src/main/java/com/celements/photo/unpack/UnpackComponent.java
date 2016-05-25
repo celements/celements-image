@@ -11,9 +11,11 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.filebase.AddingAttachmentContentFailedException;
+import com.celements.filebase.AttachmentToBigException;
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.photo.container.ImageLibStrings;
-import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.Unzip;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -30,7 +32,6 @@ public class UnpackComponent implements IUnpackComponentRole {
   
   XWikiContext inject_context = null;
   Unzip inject_unzip = null;
-  AddAttachmentToDoc inject_addAttachmentToDoc = null;
   
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       UnpackComponent.class);
@@ -78,23 +79,21 @@ public class UnpackComponent implements IUnpackComponentRole {
         if(imageContent != null) {
           XWikiDocument destDoc = getContext().getWiki().getDocument(destDocRef, 
               getContext());
-          XWikiAttachment att = getAddAttachmentToDoc().addAtachment(destDoc, 
-              imageContent, cleanName, getContext());
+          XWikiAttachment att = attService.addAttachment(destDoc, imageContent, cleanName,
+                getContext().getUser(), null);
           LOGGER.info("attachment='" + att.getFilename() + "', doc='" + att.getDoc(
               ).getDocumentReference() + "' size='" + att.getFilesize() + "'");
         }
-      } catch (IOException ioe) {
-        LOGGER.error("Exception while unpacking zip", ioe);
-      } catch (XWikiException xwe) {
-        LOGGER.error("Exception while unpacking zip", xwe);
+      } catch (XWikiException|IOException exeption) {
+        LOGGER.error("Exception while unpacking zip", exeption);
+      } catch (DocumentSaveException dse) {
+        LOGGER.error("Exception saving unpacked file to destination document.", dse);
+      } catch (AttachmentToBigException atbe) {
+        LOGGER.error("Unpacked file to big.", atbe);
+      } catch (AddingAttachmentContentFailedException aacfe) {
+        LOGGER.error("Exception adding unpacked content to new attachment.", aacfe);
       } finally {
-        if(newAttOutStream != null) {
-          try {
-            newAttOutStream.close();
-          } catch (IOException ioe) {
-            LOGGER.error("Could not close stream 'newAttOutStream'.", ioe);
-          }
-        }
+        IOUtils.closeQuietly(newAttOutStream);
       }
     } else {
       LOGGER.error("Source document which should contain zip file is null: [" 
@@ -102,13 +101,6 @@ public class UnpackComponent implements IUnpackComponentRole {
     }
     LOGGER.info("END unzip: file='" + attName + "', cleaned name is '" + cleanName + "'");
     return cleanName;
-  }
-  
-  private AddAttachmentToDoc getAddAttachmentToDoc() {
-    if(inject_addAttachmentToDoc != null) {
-      return inject_addAttachmentToDoc;
-    }
-    return new AddAttachmentToDoc();
   }
 
   private Unzip getUnzip() {

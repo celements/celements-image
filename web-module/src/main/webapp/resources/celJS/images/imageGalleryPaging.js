@@ -35,11 +35,17 @@
     _reInitScrollbarDelayedBind : undefined,
     _reInitScrollbarDelayedCall : undefined,
     _endlessLoadCallbackBind : undefined,
+    _scrollButtonClickBind : undefined,
+    _scrollButtonMouseClickedBind :undefined,
+    _setTranslationNumberBind : undefined,
     _loadingImg : undefined,
     _loadingIndicator :undefined,
     _loaderCallbackFN : undefined,
     _loadedImagesOnPageLoad :undefined,
     _hasMore : undefined,
+    _translateNumber : undefined,
+    _periodicalExecuter : undefined,
+    _scrollHeight : undefined, 
     
     _init : function(htmlElemId) {
       var _me = this;
@@ -51,7 +57,12 @@
       _me._updateScrollbarBind = _me._updateScrollbar.bind(_me);
       _me._endlessLoadActionBind = _me._endlessLoadAction.bind(_me);
       _me._getSwiperScrollOverflowBind = _me._getSwiperScrollOverflow.bind(_me);
+      _me._scrollButtonClickBind = _me._scrollButtonClick.bind(_me);
+      _me._scrollButtonMouseClickedBind = _me._scrollButtonMouseClicked.bind(_me);
+      _me._setTranslationNumberBind = _me._setTranslationNumber.bind(_me);
       _me._offset = 0;
+      _me._translateNumber = 0;
+      _me._scrollHeight = 0;
       _me._pageLoadCallbackFuncBind = _me._pageLoadCallbackFunc.bind(_me);
       _me._reInitScrollbarDelayedBind = _me._reInitScrollbarDelayed.bind(_me);
       _me._endlessLoadCallbackBind = _me._endlessLoadCallback.bind(_me);
@@ -63,7 +74,7 @@
       var _me = this;
       _me._loadingImg = new Image();
       _me._loadingImg.alt = 'loading...';
-      _me._loadingImg.src = '/file/resources/celRes/ajax-loader.gif';
+      _me._loadingImg.src = CELEMENTS.getPathPrefix() + '/file/resources/celRes/ajax-loader.gif';
       _me._loadingIndicator = new Element('div').addClassName('attListLoading');
       _me._loadingIndicator.setStyle({'padding-top': '10px'})
       _me._loadingIndicator.update(_me._loadingImg);
@@ -100,11 +111,57 @@
       return swiperScrollbarContainer;
     },
     
+    _scrollButtonClick : function(event) {
+      var _me = this;
+      event.stop();
+      _me._swiper.setWrapperTransition(300);
+      var element = event.findElement('.swiper-button-next, .swiper-button-prev');
+      if(element.hasClassName('swiper-button-next')) {
+        _me._translateNumber = _me._translateNumber - _me._scrollHeight;
+        var snapGridHeight = _me._swiper.snapGrid[1] || 0;
+        if(_me._translateNumber <= snapGridHeight * -1) {
+          _me._translateNumber = snapGridHeight * -1;
+        }
+      } else {
+        element = event.findElement('.swiper-button-prev');
+        _me._translateNumber = _me._translateNumber + _me._scrollHeight;
+        if(_me._translateNumber > _me._swiper.snapGrid[0]) {
+          _me._translateNumber = 0;
+        }
+      }
+      _me._swiper.setWrapperTranslate(_me._translateNumber);
+    },
+        
+    _scrollButtonMouseClicked : function(event) {
+      var _me = this;
+      if (event.type == 'mousedown'){
+        event.stop();
+        document.observe('mouseup', _me._scrollButtonMouseClickedBind);
+        if(_me._periodicalExecuter) {
+          _me._periodicalExecuter.stop();
+        }
+        _me._periodicalExecuter = new PeriodicalExecuter(
+            _me._scrollButtonClickBind.curry(event), 0.1);
+      } else if (_me._periodicalExecuter){
+        document.stopObserving('mouseup', _me._scrollButtonMouseClickedBind);
+        _me._periodicalExecuter.stop();
+        _me._periodicalExecuter = null;
+      }
+    },
+    
+    _setTranslationNumber : function(swiper) {
+      var _me = this;
+      _me._translateNumber = swiper.getWrapperTranslate();
+    },
+    
     _initSwiperScrollbar : function(desableSimulateTouch) {
       var _me = this;
       _me._getScrollSlideInner().addClassName('slide-inner');
       _me._getScrollSlide().addClassName('swiper-slide');
       _me._getScrollWrapper().addClassName('swiper-wrapper');
+      _me._getScrollSlideInner().select('li.ImageSlide').each(function(element) {
+        element.addClassName('swiper-slide');
+      });
       var scrollContainer = _me._getScrollContainer();
       var swiperContainer = scrollContainer;
       swiperContainer.addClassName('swiper-container');
@@ -125,6 +182,7 @@
         slidesPerView : 'auto',
         updateTranslate : true,
         simulateTouch : myDesableSimulateTouch,
+        onSetWrapperTransition : _me._setTranslationNumberBind,
         //Enable Scrollbar
         scrollbar: {
           container : '#' + scrollbarContainerId,
@@ -133,6 +191,7 @@
           snapOnRelease : true //XXX does not work so far in swiper swipeReset()
         }
       });
+      _me._swiper.setWrapperTransition(300);
       _me._swiper.addCallback('SetWrapperTransform', _me._swiperScrollBind);
       _me.getColumnElem().observe('cel:contentChanged',
           _me._reInitScrollbarHandlerBind);
@@ -147,8 +206,22 @@
         'scrollEventName' : 'cel:scroll',
         'overlap' : 200
       });
+      if(($$('#sitecontainer .scrollcontainer').size() > 0) && 
+          ($$('#sitecontainer .scrollcontainer')[0].getHeight() > 0)) {
+        _me._scrollHeight = $$('#sitecontainer .scrollcontainer')[0].getHeight() * 0.8;
+      } else {
+        _me._scrollHeight = 200;
+      }
       scrollContainer.observe('celEndlessScroll:ScrollPosEvent',
           _me._getSwiperScrollOverflowBind);
+      $$('.swiper-button-prev, .swiper-button-next').each(function(element) {
+        if(_me._swiper.snapGrid[1]) {
+          element.observe('click', _me._scrollButtonClickBind);
+          element.observe('mousedown', _me._scrollButtonMouseClickedBind);
+        } else {
+          element.addClassName("inactive");
+        }
+      });
     },
     
     getColumnElem : function() {
@@ -277,12 +350,15 @@
       var _me = this;
       _me._curContentObj = curContentObj;
       var htmlElems = _me._curContentObj.content;
-      var listElements = new Element('div').update(htmlElems).down('ul').children;
-      var listElementsArr = Array.prototype.slice.call(listElements);
+      var listElementsArr = null;
+      if ((htmlElems != '') && (htmlElems != null)) {
+        var listElements = new Element('div').update(htmlElems).down('ul').children;
+        var listElementsArr = Array.prototype.slice.call(listElements);
+      }
       if (curContentObj.hasMore != null) {
-        _me._hasMore = curContentObj.hasMore;        
+        _me._hasMore = curContentObj.hasMore;
       } else {
-        _me._hadMore = false;
+        _me._hasMore = false;
       }
       _me._loaderCallbackFN(listElementsArr);
     },
@@ -304,11 +380,25 @@
         slideShowStarter.initializeSlideShow();
         _me.getColumnElem().fire('cel:imageGalleryChanged');
       } else {
-        console.error('data provider issued callback with undefined content!');
+        console.info('data provider issued callback with undefined content!');
       }
       scrollerCallbackFN(_me._hasMore);
       _me._startReInitScrollbarDelayed();
       _me._swiper.resizeFix();
+      if (typeof initContextMenuAsync !== 'undefined') {
+        initContextMenuAsync();
+      }
+      $$('.swiper-button-prev, .swiper-button-next').each(function(element) {
+        if(_me._swiper.snapGrid[1]) {
+          element.stopObserving('click', _me._scrollButtonClickBind);
+          element.observe('click', _me._scrollButtonClickBind);
+          element.stopObserving('mousedown', _me._scrollButtonMouseClickedBind);
+          element.observe('mousedown', _me._scrollButtonMouseClickedBind);
+          element.removeClassName('inactive');
+        } else {
+          element.addClassName('inactive');
+        }
+      });
     },
     
     loadNextData : function(callbackFN) {
@@ -337,11 +427,11 @@
     }
   };
   
-  console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<< IN imageGalleryPaging');
   celAddOnBeforeLoadListener(function() {
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageGalleryPaging IN celAddOnBeforeLoadListener');
-    var column = new CEL.Column('content');
-    column._initSwiperScrollbar();
+    if($$('.presentationList').size() > 0) {
+      var column = new CEL.Column('content');
+      column._initSwiperScrollbar();
+    }
   });
   
 })(window);

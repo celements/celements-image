@@ -43,7 +43,6 @@ import com.celements.photo.utilities.ImportFileObject;
 import com.celements.sajson.Builder;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -51,7 +50,6 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component("celementsphoto")
@@ -166,7 +164,8 @@ public class ImageScriptService implements ScriptService {
     return null;
   }
   
-  public void crop(Document srcDoc, String srcFilename, OutputStream out) {
+  public void crop(Document srcDoc, String srcFilename, String overwriteOutputFormat,
+      OutputStream out) {
     int x = Integer.parseInt(getContext().getRequest().get("cropX"));
     if(x < 0) { x = 0; }
     int y = Integer.parseInt(getContext().getRequest().get("cropY"));
@@ -176,15 +175,16 @@ public class ImageScriptService implements ScriptService {
     int h = Integer.parseInt(getContext().getRequest().get("cropH"));
     if(h <= 0) { h = 1; }
     LOGGER.debug("Cropping to " + x + ":" + y + " " + w + "x" + h);
-    cropImage.crop(srcDoc, srcFilename, x, y, w, h, out);
+    cropImage.crop(srcDoc, srcFilename, x, y, w, h, overwriteOutputFormat, out);
   }
   
   public void crop(Document srcDoc, String srcFilename, int x, int y, int w, int h,
-      OutputStream out) {
-    cropImage.crop(srcDoc, srcFilename, x, y, w, h, out);
+      String overwriteOutputFormat, OutputStream out) {
+    cropImage.crop(srcDoc, srcFilename, x, y, w, h, overwriteOutputFormat, out);
   }
   
-  public void outputCroppedImage(Document srcDoc, String srcFilename) {
+  public void outputCroppedImage(Document srcDoc, String srcFilename, 
+      String overwriteOutputFormat) {
     int x = Integer.parseInt(getContext().getRequest().get("cropX"));
     if(x < 0) { x = 0; }
     int y = Integer.parseInt(getContext().getRequest().get("cropY"));
@@ -193,7 +193,7 @@ public class ImageScriptService implements ScriptService {
     if(w <= 0) { w = 1; }
     int h = Integer.parseInt(getContext().getRequest().get("cropH"));
     if(h <= 0) { h = 1; }
-    cropImage.outputCroppedImage(srcDoc, srcFilename, x, y, w, h);
+    cropImage.outputCroppedImage(srcDoc, srcFilename, x, y, w, h, overwriteOutputFormat);
   }
 
   /**

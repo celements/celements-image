@@ -31,13 +31,13 @@ body div.mask.cel-ImageGalleryOverlay {
   right: -15px;
   width: 30px;
   height: 30px;
-  background-image:url('/file/resources/celRes/close.png');
+  background-image:url('close.png');
   background-repeat: no-repeat;
   background-position: top right;
   cursor: pointer;
 }
 .cel-ImageGalleryOverlay .container-close:hover {
-  background-image:url('/file/resources/celRes/close-hover.png');
+  background-image:url('close-hover.png');
 }
 .cel-ImageGalleryOverlay .container-close:focus {
   border: 0px solid black;
@@ -86,11 +86,11 @@ body div.mask.cel-ImageGalleryOverlay {
 }
 .cel-ImageGalleryOverlay .celPresSlideShow_next {
   right: 0px;
-  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayRightArrowWhite.png');
+  background-image: url('layouts/gallery/newimg/galleryOverlayRightArrowWhite.png');
 }
 .cel-ImageGalleryOverlay .celPresSlideShow_prev {
   left: 0px;
-  background-image: url('/file/resources/celRes/layouts/gallery/newimg/galleryOverlayLeftArrowWhite.png');
+  background-image: url('gallery/newimg/galleryOverlayLeftArrowWhite.png');
 }
 .cel-ImageGalleryOverlay .celimage_overlay {
   cursor: pointer;
