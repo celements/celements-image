@@ -64,7 +64,6 @@
   ##IMPORTANT first id part MUST be the galleryFN otherwise the Gallery Layout will not
   ##IMPOETNAT be loaded correctly in overlay 
   
-  Hasedit: $hasedit
   #if($hasedit)
     #set($elemTitle = "$!{slidenum}:$!{slidedoc.documentReference.name}")
   #end
