@@ -55,6 +55,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 @Component("celementsphoto")
 public class ImageScriptService implements ScriptService {
 
+  public static final String SPACEPREF_IMAGE_ANIMATION = "celImageAnimation";
+  public static final String CFG_IMAGE_ANIMATION = "celements.celImageAnimation";
   public static final String IMAGE_FILE_SIZE = "fileSize";
   public static final String IMAGE_HEIGHT = "maxHeight";
   public static final String IMAGE_WIDTH = "maxWidth";
@@ -209,9 +211,9 @@ public class ImageScriptService implements ScriptService {
   }
 
   /**
-   * Get a specified image file in a zip archive, extract it, change it to the
-   * desired size and save it as an attachment to the given page.
-   * 
+   * Get a specified image file in a zip archive, extract it, change it to the desired
+   * size and save it as an attachment to the given page.
+   *
    * @param zipSourceDoc
    *          D
    * @param attachmentName
@@ -267,9 +269,9 @@ public class ImageScriptService implements ScriptService {
 
   /**
    * Returns a map containing the external URLs to a specified image attachment in
-   * different aspect ratios (crops)
-   * "all" aspect ratios as of now meaning 1:1, 3:4, 4:3, 16:9, 16:10
-   * 
+   * different aspect ratios (crops) "all" aspect ratios as of now meaning 1:1, 3:4, 4:3,
+   * 16:9, 16:10
+   *
    * @return Map containing external URLs to the specified image.
    */
   public Map<String, String> getImageURLinAllAspectRatios(Attachment image) {
@@ -290,9 +292,9 @@ public class ImageScriptService implements ScriptService {
   }
 
   /**
-   * Get a List of all attachments in the specified archive and the suggested
-   * action when importing.
-   * 
+   * Get a List of all attachments in the specified archive and the suggested action when
+   * importing.
+   *
    * @param attachmentDoc
    *          Zip archive to check the files for the existence in the gallery.
    * @param attachmentName
@@ -321,13 +323,19 @@ public class ImageScriptService implements ScriptService {
     return maxImageSizeService.fixMaxImageSizes(pageContent, maxWidth, maxHeight);
   }
 
+  @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num) {
     return WebUtils.getInstance().getRandomImages(fullName, num, getContext());
   }
 
+  public List<Attachment> getRandomImages(DocumentReference docRef, int num) {
+    return imageService.getRandomImages(docRef, num);
+  }
+
   public boolean useImageAnimations() {
-    return "1".equals(getContext().getWiki().getSpacePreference("celImageAnimation",
-        "celements.celImageAnimation", "0", getContext()));
+    String defaultValue = getContext().getWiki().Param(CFG_IMAGE_ANIMATION, "0");
+    return "1".equals(getContext().getWiki().getSpacePreference(SPACEPREF_IMAGE_ANIMATION,
+        defaultValue, getContext()));
   }
 
   public String fileNameToDocName(String filename) {
