@@ -25,8 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ImageDimensionsTest {
+
   public final float epsilon = 0.00001f;
-  
+
   @Before
   public void setUp() throws Exception {
   }

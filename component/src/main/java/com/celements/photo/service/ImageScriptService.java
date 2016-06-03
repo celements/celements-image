@@ -126,8 +126,8 @@ public class ImageScriptService implements ScriptService {
       jsonBuilder.addStringProperty(IMAGE_CHANGED_BY, getContext().getWiki().getLocalUserName(
           imgAttachment.getAuthor(), null, false, getContext()));
       if (includeImgDimensions) {
-        AttachmentReference imgRef = new AttachmentReference(imgAttachment.getFilename(), theDoc
-            .getDocumentReference());
+        AttachmentReference imgRef = new AttachmentReference(imgAttachment.getFilename(),
+            theDoc.getDocumentReference());
         try {
           ImageDimensions imgDim = imageService.getDimension(imgRef);
           if (imgDim != null) {
@@ -275,8 +275,8 @@ public class ImageScriptService implements ScriptService {
   public Map<String, String> getImageURLinAllAspectRatios(Attachment image) {
     Map<String, String> urls = Collections.emptyMap();
     try {
-      XWikiDocument doc = getContext().getWiki().getDocument(image.getDocument()
-          .getDocumentReference(), getContext());
+      XWikiDocument doc = getContext().getWiki().getDocument(
+          image.getDocument().getDocumentReference(), getContext());
       XWikiAttachment xatt = doc.getAttachment(image.getFilename());
       urls = imageService.getImageURLinAllAspectRatios(xatt);
     } catch (Exception ex) {

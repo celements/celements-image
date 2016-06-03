@@ -46,8 +46,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class ImageCacheCommand {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      ImageCacheCommand.class);
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(ImageCacheCommand.class);
 
   /**
    * Cache for already served images.
@@ -82,9 +81,9 @@ public class ImageCacheCommand {
   /* Copy, Paste & Customize from com.xpn.xwiki.plugin.image */
   synchronized void initCache() {
     CacheConfiguration configuration = new CacheConfiguration();
-    
+
     configuration.setConfigurationId("celements.photo");
-    
+
     // Set folder o store cache
     File tempDir = getContext().getWiki().getTempDirectory(getContext());
     File imgTempDir = new File(tempDir, configuration.getConfigurationId());
@@ -94,16 +93,15 @@ public class ImageCacheCommand {
       LOGGER.warn("Cannot create temporary files", ex);
     }
     configuration.put("cache.path", imgTempDir.getAbsolutePath());
-    
+
     // Set cache constraints
     LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
     capacity = readIntegerValue("xwiki.plugin.image.cache.capacity", capacity);
     lru.setMaxEntries(capacity);
     ttlConfig = readIntegerValue("xwiki.plugin.image.cache.ttl", ttlConfig);
     lru.setTimeToLive(ttlConfig);
-    LOGGER.debug("creating an image cache with capacity [" + lru.getMaxEntries()
-        + "] and ttl [" + lru.getTimeToLive() + "] and cache.path ["
-        + lru.get("cache.path") + "].");
+    LOGGER.debug("creating an image cache with capacity [" + lru.getMaxEntries() + "] and ttl ["
+        + lru.getTimeToLive() + "] and cache.path [" + lru.get("cache.path") + "].");
     configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
     try {
@@ -150,65 +148,60 @@ public class ImageCacheCommand {
     return null;
   }
 
-  String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension,
-      String copyright, String watermark, int cropX, int cropY, int cropW, int cropH,
-      boolean blackNwhite, Color defaultBg, boolean lowerBounds, Integer lowBoundPos, 
-      String filterString, String overwriteOutputFormat, boolean raw
-      ) throws NoSuchAlgorithmException {
-    String key = attachment.getId() 
-        + "-" + attachment.getVersion()
-        + "-" + getType(attachment.getMimeType(getContext()))
-        + "-" + attachment.getDate().getTime()
-        + "-" + dimension.getWidth()
-        + "-" + dimension.getHeight()
-        + "-" + getAditionalInfoHash(copyright, watermark, cropX, cropY, cropW, cropH,
-            blackNwhite, defaultBg, lowerBounds, lowBoundPos, filterString, 
-            overwriteOutputFormat, raw);
+  String getCacheKey(XWikiAttachment attachment, ImageDimensions dimension, String copyright,
+      String watermark, int cropX, int cropY, int cropW, int cropH, boolean blackNwhite,
+      Color defaultBg, boolean lowerBounds, Integer lowBoundPos, String filterString,
+      String overwriteOutputFormat, boolean raw) throws NoSuchAlgorithmException {
+    String key = attachment.getId() + "-" + attachment.getVersion() + "-" + getType(
+        attachment.getMimeType(getContext())) + "-" + attachment.getDate().getTime() + "-"
+        + dimension.getWidth() + "-" + dimension.getHeight() + "-" + getAditionalInfoHash(copyright,
+            watermark, cropX, cropY, cropW, cropH, blackNwhite, defaultBg, lowerBounds, lowBoundPos,
+            filterString, overwriteOutputFormat, raw);
     return key;
   }
 
-  String getAditionalInfoHash(String copyright, String watermark, int cropX, int cropY, 
-      int cropW, int cropH, boolean blackNwhite, Color defaultBg, boolean lowerBounds, 
-      Integer lowBoundPos, String filterString, String overwriteOutputFormat, 
-      boolean raw) throws NoSuchAlgorithmException {
+  String getAditionalInfoHash(String copyright, String watermark, int cropX, int cropY, int cropW,
+      int cropH, boolean blackNwhite, Color defaultBg, boolean lowerBounds, Integer lowBoundPos,
+      String filterString, String overwriteOutputFormat, boolean raw)
+      throws NoSuchAlgorithmException {
     String hashValue = "";
-    if(raw) {
+    if (raw) {
       hashValue += "<:>raw image";
     } else {
-      if(((watermark != null) && (watermark.length() > 0))
-          || ((copyright != null) && (copyright.length() > 0))){
+      if (((watermark != null) && (watermark.length() > 0)) || ((copyright != null)
+          && (copyright.length() > 0))) {
         hashValue += "<:>" + watermark + "<:>" + copyright;
       }
-      if((cropX >= 0) && (cropY >= 0) && (cropW > 0) && (cropH > 0)){
+      if ((cropX >= 0) && (cropY >= 0) && (cropW > 0) && (cropH > 0)) {
         hashValue += "<:>" + cropX + ":" + cropY + "_" + cropW + "x" + cropH;
       }
-      if(blackNwhite) {
+      if (blackNwhite) {
         hashValue += "<:>Black and White";
       }
-      if(defaultBg != null) {
+      if (defaultBg != null) {
         hashValue += "<:>col" + defaultBg.getRGB() + ":" + defaultBg.getAlpha();
       }
-      if(lowerBounds) {
+      if (lowerBounds) {
         hashValue += "<:>lower bounds";
-        if(lowBoundPos != null) {
+        if (lowBoundPos != null) {
           hashValue += "<:>pos=" + lowBoundPos;
         }
       }
-      if(!"".equals(filterString)) {
+      if (!"".equals(filterString)) {
         hashValue += "<:>kernel filter" + filterString;
       }
-      if(overwriteOutputFormat != null) {
+      if (overwriteOutputFormat != null) {
         hashValue += "<:>mimeType" + overwriteOutputFormat;
       }
     }
     String hash = "";
-    if(!"".equals(hashValue)) {
+    if (!"".equals(hashValue)) {
       LOGGER.debug("Hash key: [" + hashValue + "]");
       MessageDigest md = MessageDigest.getInstance("MD5");
       md.update(hashValue.getBytes());
       byte[] digest = md.digest();
-      for(int i = 0; i < digest.length; i++){
-        hash += Integer.toHexString(Math.abs((int)digest[i]));
+      for (int i = 0; i < digest.length; i++) {
+        hash += Integer.toHexString(Math.abs((int) digest[i]));
       }
     }
     return hash;
@@ -216,10 +209,9 @@ public class ImageCacheCommand {
 
   /**
    * @return the type of the image, as an integer code, used in the generation
-   *  of the key of the image cache
+   *         of the key of the image cache
    */
-  public static int getType(String mimeType)
-  {
+  public static int getType(String mimeType) {
     for (SupportedFormat f : SupportedFormat.values()) {
       if (f.getMimeType().equals(mimeType)) {
         return f.getCode();
@@ -236,7 +228,7 @@ public class ImageCacheCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
   }
 

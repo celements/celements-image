@@ -26,21 +26,21 @@ import com.xpn.xwiki.web.Utils;
 
 @Component("barcode")
 public class BarcodeScriptService implements ScriptService {
+
   private String MODULE_WIDTH = "0.33mm";
   private String MODULE_HEIGHT = "15mm";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      BarcodeScriptService.class);
-  
+  private static Log LOGGER = LogFactory.getFactory().getInstance(BarcodeScriptService.class);
+
   @Requirement
   Execution execution;
-  
+
   public int getEAN8Checksum(int number) {
     String nrStr = Integer.toString(number);
-    while(nrStr.length() < 7) {
+    while (nrStr.length() < 7) {
       nrStr = "0" + nrStr;
     }
-    if(nrStr.length() > 7) {
+    if (nrStr.length() > 7) {
       nrStr = nrStr.substring(0, 7);
     }
     byte[] nr = nrStr.getBytes();
@@ -48,23 +48,22 @@ public class BarcodeScriptService implements ScriptService {
     int s2 = 3 * (nr[0] + nr[2] + nr[4] + nr[6]);
     return (10 - ((s1 + s2) % 10)) % 10;
   }
-  
+
   public void generate(String number, OutputStream out) {
     String moduleHeight = getContext().getRequest().get("moduleHeight");
-    if((moduleHeight == null) || "".equals(moduleHeight.trim())) {
+    if ((moduleHeight == null) || "".equals(moduleHeight.trim())) {
       moduleHeight = MODULE_HEIGHT;
     }
     String moduleWidth = getContext().getRequest().get("moduleWidth");
-    if((moduleWidth == null) || "".equals(moduleWidth.trim())) {
+    if ((moduleWidth == null) || "".equals(moduleWidth.trim())) {
       moduleWidth = MODULE_WIDTH;
     }
-    BitmapCanvasProvider provider = new BitmapCanvasProvider(
-        out, "image/png", 150, BufferedImage.TYPE_BYTE_GRAY, true, 0);
+    BitmapCanvasProvider provider = new BitmapCanvasProvider(out, "image/png", 150,
+        BufferedImage.TYPE_BYTE_GRAY, true, 0);
     DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
-    String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" +
-      "<height>" + moduleHeight + "</height>" +
-      "<module-width>" + moduleWidth + "</module-width>" +
-      "</ean8></barcode>";
+    String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" + "<height>"
+        + moduleHeight + "</height>" + "<module-width>" + moduleWidth + "</module-width>"
+        + "</ean8></barcode>";
     InputStream in = new ByteArrayInputStream(xmlConf.getBytes());
     try {
       Configuration cfg = builder.build(in);
@@ -82,9 +81,9 @@ public class BarcodeScriptService implements ScriptService {
       LOGGER.error("Exception in barcode module.", e);
     }
   }
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
   }
 }

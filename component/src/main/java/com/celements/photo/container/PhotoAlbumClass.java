@@ -32,11 +32,13 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * and copyright.
  */
 public class PhotoAlbumClass {
+
   /**
-   * Generates the PhotoAlbumClass with fields for the data space, 
+   * Generates the PhotoAlbumClass with fields for the data space,
    * watermark and copyright.
    * 
-   * @param context The XWikiContext used to get the xwiki and save.
+   * @param context
+   *          The XWikiContext used to get the xwiki and save.
    * @return A BaseObject of the PhotoAlbumClass
    * @throws XWikiException
    */
@@ -44,31 +46,34 @@ public class PhotoAlbumClass {
     XWikiDocument doc;
     XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
-    DocumentReference classDocRef = new DocumentReference(context.getDatabase(), 
+    DocumentReference classDocRef = new DocumentReference(context.getDatabase(),
         ImageLibStrings.PHOTO_ALBUM_CLASS_SPACE, ImageLibStrings.PHOTO_ALBUM_CLASS_NAME);
-    
+
     try {
       doc = xwiki.getDocument(classDocRef, context);
     } catch (XWikiException e) {
       doc = new XWikiDocument(classDocRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(classDocRef);
-    needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_SPACE_NAME, ImageLibStrings.PHOTO_ALBUM_SPACE_NAME_PRETTY, 50);
-    needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_COPYRIGHT, ImageLibStrings.PHOTO_ALBUM_COPYRIGHT_PRETTY, 50);
-    needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_WATERMARK, ImageLibStrings.PHOTO_ALBUM_WATERMARK_PRETTY, 50);
+    needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_SPACE_NAME,
+        ImageLibStrings.PHOTO_ALBUM_SPACE_NAME_PRETTY, 50);
+    needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_COPYRIGHT,
+        ImageLibStrings.PHOTO_ALBUM_COPYRIGHT_PRETTY, 50);
+    needsUpdate |= bclass.addTextField(ImageLibStrings.PHOTO_ALBUM_WATERMARK,
+        ImageLibStrings.PHOTO_ALBUM_WATERMARK_PRETTY, 50);
 
-    if(!"internal".equals(bclass.getCustomMapping())){
+    if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
       bclass.setCustomMapping("internal");
     }
-    
-    if (needsUpdate){
+
+    if (needsUpdate) {
       xwiki.saveDocument(doc, context);
     }
-    
+
     return bclass;
   }
 }

@@ -39,59 +39,63 @@ import com.drew.metadata.MetadataException;
 import com.drew.metadata.Tag;
 
 /**
- * This class provides the metadata saved in a specified image. There are 
+ * This class provides the metadata saved in a specified image. There are
  * several methods to get certain parts of the data.
  */
 public class MetaInfoExtractor {
-  private static Log LOGGER = LogFactory.getFactory().getInstance(MetaInfoExtractor.class
-      );
-  
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(MetaInfoExtractor.class);
+
   /**
    * Returns an array of Tag elements representing the metainformation,
    * contained in the specified directory of the given file.
    * 
-   * @param imageFile The file to extract the data from.
-   * @param directory The desired directory's Class.
+   * @param imageFile
+   *          The file to extract the data from.
+   * @param directory
+   *          The desired directory's Class.
    * @return An arry of Tags.
    * @throws MetadataException
    */
-  public List<Tag> getDirectoryTagsAsTagList(InputStream imageFile, 
-      Class<Directory> directory) throws MetadataException{
+  public List<Tag> getDirectoryTagsAsTagList(InputStream imageFile, Class<Directory> directory)
+      throws MetadataException {
     Metadata metadata = getMetadata(imageFile);
     Directory dir = metadata.getDirectory(directory);
     List<Tag> data = new ArrayList<Tag>();
-    for(Tag tag : dir.getTags()) {
+    for (Tag tag : dir.getTags()) {
       data.add(tag);
     }
     return data;
   }
-    
+
   /**
    * To get all meta tags possibly contained in an image.
    * 
-   * @param imageFile File to extract the Metadata from.
+   * @param imageFile
+   *          File to extract the Metadata from.
    * @return Hashtable containing the directorys data.
    * @throws MetadataException
    */
-  public Map<String, String> getAllTags(InputStream imageFile) throws MetadataException{
+  public Map<String, String> getAllTags(InputStream imageFile) throws MetadataException {
     Metadata data = getMetadata(imageFile);
     Map<String, String> tags = new HashMap<String, String>();
-    if(data != null) {
+    if (data != null) {
       Iterable<Directory> dirs = data.getDirectories();
-      for(Directory dir : dirs) {
+      for (Directory dir : dirs) {
         tags.putAll(getDirsTags(dir));
       }
     }
     return tags;
   }
-  
+
   /*
    * Extracts the metadata from the image file represented by an InputStream
    * 
    * @param imageFile InputStream of an image file.
+   * 
    * @return Metadata containied in the specified image.
    */
-  Metadata getMetadata(InputStream imageFile){
+  Metadata getMetadata(InputStream imageFile) {
     Metadata metadata = null;
     try {
       metadata = JpegMetadataReader.readMetadata(imageFile);
@@ -100,33 +104,35 @@ public class MetaInfoExtractor {
     }
     return metadata;
   }
-  
+
   /*
-   * Saves all tags contained in the specified directory to a Hashtable and 
+   * Saves all tags contained in the specified directory to a Hashtable and
    * returnes them.
    * 
    * @param dir Directory to extract the tags from.
+   * 
    * @return Hashtable containing th metatags from the Directory.
+   * 
    * @throws MetadataException
    */
-  Hashtable<String, String> getDirsTags(Directory dir) throws MetadataException{
+  Hashtable<String, String> getDirsTags(Directory dir) throws MetadataException {
     Hashtable<String, String> metadata = new Hashtable<String, String>();
     for (Tag tag : dir.getTags()) {
       metadata.put(cleanCtrlChars(tag.getTagName()), cleanCtrlChars(tag.toString()));
     }
     return metadata;
   }
-  
+
   public String cleanCtrlChars(String tag) {
     String cleanTag = tag;
     Pattern p = Pattern.compile("\\p{C}");
     Matcher m = p.matcher(tag);
-    while(m.find()) {
+    while (m.find()) {
       String dirtyChar = m.group();
-      if(!"\t".equals(dirtyChar) && !"\r".equals(dirtyChar) && !"\n".equals(dirtyChar)) {
+      if (!"\t".equals(dirtyChar) && !"\r".equals(dirtyChar) && !"\n".equals(dirtyChar)) {
         String cleanTagTmp = cleanTag;
         cleanTag = "";
-        for(String part : cleanTagTmp.split(dirtyChar)) {
+        for (String part : cleanTagTmp.split(dirtyChar)) {
           cleanTag += part;
         }
       }

@@ -23,8 +23,7 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       GalleryOverviewPresentationType.class);
 
-  private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS =
-    "cel_cm_presentation_treenode";
+  private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
   RenderCommand renderCmd;
 
@@ -35,40 +34,36 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
-      INavigation nav) {
+  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
     LOGGER.debug("writeNodeContent for [" + docRef + "].");
     outStream.append("<div ");
-    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
-        numItem) + " ");
+    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
+        + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     outStream.append(getRenderGalleryOverviewScript(docRef));
     outStream.append("</div>\n");
   }
 
   private String getRenderGalleryOverviewScript(DocumentReference docRef) {
-    String templatePath = webUtilsService.getInheritedTemplatedPath(
-        getImageGalleryOverviewRef());
+    String templatePath = webUtilsService.getInheritedTemplatedPath(getImageGalleryOverviewRef());
     try {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       XWikiDocument galleryDoc = getContext().getWiki().getDocument(docRef, getContext());
       vcontext.put("gallerydoc", galleryDoc.newDocument(getContext()));
-      return getRenderCommand().renderTemplatePath(templatePath, getContext(
-          ).getLanguage());
+      return getRenderCommand().renderTemplatePath(templatePath, getContext().getLanguage());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to render template path [" + templatePath + "] for ["
-          + docRef + "].", exp);
+      LOGGER.error("Failed to render template path [" + templatePath + "] for [" + docRef + "].",
+          exp);
     }
     return "";
   }
 
   private DocumentReference getImageGalleryOverviewRef() {
-    return new DocumentReference(getContext().getDatabase(), "Templates",
-        "ImageGalleryOverview");
+    return new DocumentReference(getContext().getDatabase(), "Templates", "ImageGalleryOverview");
   }
 
   RenderCommand getRenderCommand() {

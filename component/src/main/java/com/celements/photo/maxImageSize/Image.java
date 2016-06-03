@@ -22,10 +22,11 @@ package com.celements.photo.maxImageSize;
 import com.celements.sajson.Builder;
 
 /**
- * Container used to simplify the velocity access. Contains the name of the 
+ * Container used to simplify the velocity access. Contains the name of the
  * image, its URL and the URL to its thumbnail.
  */
 public class Image {
+
   private String id;
   private String name;
   private String thumb;
@@ -37,43 +38,54 @@ public class Image {
 
   /**
    * Initialises image's id, name, URL.
-   * @param id Id of the image. 
-   * @param name Name of the image.
-   * @param origURL URL to the image.
+   * 
+   * @param id
+   *          Id of the image.
+   * @param name
+   *          Name of the image.
+   * @param origURL
+   *          URL to the image.
    */
-  public Image(String id, String name, String origURL){
+  public Image(String id, String name, String origURL) {
     this.id = id;
     this.name = name;
     this.origURL = origURL;
     this.imgURL = origURL;
   }
-  
+
   /**
    * Initialises image's id, name, URL and thumbnail URL.
-   * @param id Id of the image. 
-   * @param name Name of the image.
-   * @param url URL to the image.
-   * @param thumb URL to the thumbnail of the image.
+   * 
+   * @param id
+   *          Id of the image.
+   * @param name
+   *          Name of the image.
+   * @param url
+   *          URL to the image.
+   * @param thumb
+   *          URL to the thumbnail of the image.
    */
-  public Image(String id, String name, String url, String thumb){
+  public Image(String id, String name, String url, String thumb) {
     this.id = id;
     this.name = name;
     this.origURL = url;
     this.imgURL = url;
     this.thumb = thumb;
   }
-  
+
   /**
    * Get the id of the image. The id is a unique identifier String with a
    * length of 64 character.
+   * 
    * @return id of the image.
    */
-  public String getId(){
+  public String getId() {
     return id;
   }
 
   /**
    * Get the name of the image.
+   * 
    * @return Name of the image.
    */
   public String getName() {
@@ -82,6 +94,7 @@ public class Image {
 
   /**
    * Get the URL to the thumbnail.
+   * 
    * @return URL to the thumbnail.
    */
   public String getThumbURL() {
@@ -90,6 +103,7 @@ public class Image {
 
   /**
    * Get the URL to the image.
+   * 
    * @return URL to the image.
    */
   public String getURL() {
@@ -98,7 +112,9 @@ public class Image {
 
   /**
    * Set the URL to the thumbnail
-   * @param thumb URL to the thumbnail
+   * 
+   * @param thumb
+   *          URL to the thumbnail
    */
   public void setThumbURL(String thumb) {
     this.thumb = thumb;
@@ -112,9 +128,9 @@ public class Image {
         imgURL = imgURL.replaceAll("celwidth=(\\d*)", newMaxWidthStr);
       } else {
         if (imgURL.indexOf("?") < 0) {
-          imgURL = imgURL + "?"; 
+          imgURL = imgURL + "?";
         } else {
-          imgURL = imgURL + "&"; 
+          imgURL = imgURL + "&";
         }
         imgURL = imgURL + newMaxWidthStr;
       }
@@ -143,9 +159,9 @@ public class Image {
         imgURL = imgURL.replaceAll("celheight=(\\d*)", newMaxHeightStr);
       } else {
         if (imgURL.indexOf("?") < 0) {
-          imgURL = imgURL + "?"; 
+          imgURL = imgURL + "?";
         } else {
-          imgURL = imgURL + "&"; 
+          imgURL = imgURL + "&";
         }
         imgURL = imgURL + newMaxHeightStr;
       }
@@ -168,6 +184,7 @@ public class Image {
 
   /**
    * Get the JSON for the image
+   * 
    * @return URL to the image.
    */
   public String getJSON() {

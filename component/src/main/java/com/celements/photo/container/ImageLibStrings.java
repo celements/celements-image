@@ -32,10 +32,11 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class ImageLibStrings {
-  //Spaces
+
+  // Spaces
   public static final String XWIKI_CLASS_SPACE = "Classes";
 
-  //Filetype recognition
+  // Filetype recognition
   public static final String MIME_ZIP = "application/zip";
   public static final String MIME_ZIP_MICROSOFT = "application/x-zip-compressed";
   public static final String MIME_BMP = "bmp";
@@ -44,11 +45,11 @@ public class ImageLibStrings {
   public static final String MIME_JPG = "jpg";
   public static final String MIME_JPEG = "jpeg";
   public static final String MIME_PNG = "png";
-  
-  //Hashing
+
+  // Hashing
   public static final String HASHING_ALGORITHM = "SHA-256";
-  
-  //Classes
+
+  // Classes
   private static final String METAINFO_CLASS = XWIKI_CLASS_SPACE + "." + "PhotoMetainfoClass";
   public static final String METAINFO_CLASS_NAME = "name";
   public static final String METAINFO_CLASS_NAME_PRETTY = "Name";
@@ -56,8 +57,8 @@ public class ImageLibStrings {
   public static final String METAINFO_CLASS_DESCRIPTION_PRETTY = "Description";
   public static final String PHOTO_ALBUM_CLASS_SPACE = XWIKI_CLASS_SPACE;
   public static final String PHOTO_ALBUM_CLASS_NAME = "PhotoAlbumClass";
-  private static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "." + 
-      PHOTO_ALBUM_CLASS_NAME;
+  private static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "."
+      + PHOTO_ALBUM_CLASS_NAME;
   public static final String PHOTO_ALBUM_COPYRIGHT = "copyright";
   public static final String PHOTO_ALBUM_COPYRIGHT_PRETTY = "Copyright";
   public static final String PHOTO_ALBUM_SPACE_NAME = "space_name";
@@ -81,42 +82,43 @@ public class ImageLibStrings {
   public static final String PHOTO_IMAGE_WIDTH_PRETTY = "Original image's width";
   public static final String PHOTO_IMAGE_HEIGHT = "height";
   public static final String PHOTO_IMAGE_HEIGHT_PRETTY = "Original image's height";
-  
-  //Metatag names
+
+  // Metatag names
   public static final String METATAG_UNKNOWN_TAG = "Unknown tag";
   public static final String METATAG_ZIP_FILENAME = "Zip Filename";
   public static final String METATAG_IMAGE_HASH = "Image Hash";
-  
-  public static String getPhotoSpace(String space, String album, XWikiContext context) throws XWikiException {
-    XWikiDocument doc = context.getWiki().getDocument(getWebUtils(
-        ).resolveDocumentReference(space + "." + album), context);
+
+  public static String getPhotoSpace(String space, String album, XWikiContext context)
+      throws XWikiException {
+    XWikiDocument doc = context.getWiki().getDocument(getWebUtils().resolveDocumentReference(space
+        + "." + album), context);
     return getPhotoSpace(doc);
   }
-  
+
   public static DocumentReference getMetainfoClassDocRef() {
-    return getWebUtils().resolveDocumentReference(METAINFO_CLASS); 
+    return getWebUtils().resolveDocumentReference(METAINFO_CLASS);
   }
-  
+
   public static DocumentReference getAlbumClassDocRef() {
-    return getWebUtils().resolveDocumentReference(PHOTO_ALBUM_CLASS); 
+    return getWebUtils().resolveDocumentReference(PHOTO_ALBUM_CLASS);
   }
-  
+
   public static DocumentReference getImageClassDocRef() {
-    return getWebUtils().resolveDocumentReference(PHOTO_IMAGE_CLASS); 
+    return getWebUtils().resolveDocumentReference(PHOTO_IMAGE_CLASS);
   }
-  
+
   public static String getPhotoSpace(XWikiDocument doc) {
-    List<BaseObject> objList = doc.getXObjects(getWebUtils(
-        ).resolveDocumentReference(PHOTO_ALBUM_CLASS));
+    List<BaseObject> objList = doc.getXObjects(getWebUtils().resolveDocumentReference(
+        PHOTO_ALBUM_CLASS));
     for (Iterator<BaseObject> iter = objList.iterator(); iter.hasNext();) {
       BaseObject element = (BaseObject) iter.next();
-      if(element != null){
+      if (element != null) {
         return element.getStringValue(PHOTO_ALBUM_SPACE_NAME);
       }
     }
     return "";
   }
-  
+
   static IWebUtilsService getWebUtils() {
     return Utils.getComponent(IWebUtilsService.class);
   }

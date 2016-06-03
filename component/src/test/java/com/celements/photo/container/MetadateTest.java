@@ -19,8 +19,8 @@
  */
 package com.celements.photo.container;
 
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
-import static org.easymock.classextension.EasyMock.*;
 
 import org.junit.Before;
 import org.junit.Test;

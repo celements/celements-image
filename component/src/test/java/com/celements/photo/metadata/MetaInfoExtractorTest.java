@@ -5,8 +5,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.photo.metadata.MetaInfoExtractor;
-
 public class MetaInfoExtractorTest {
 
   @Before
@@ -30,11 +28,11 @@ public class MetaInfoExtractorTest {
     assertEquals(text, new MetaInfoExtractor().cleanCtrlChars(text));
   }
 
-  //-> problem: tab und zeilenumbruch werden gefiltert
+  // -> problem: tab und zeilenumbruch werden gefiltert
   @Test
   public void testCleanCtrlChars_noFilterComplex() {
-    String text = "lkdjhfsaadsf;\'][{}23934!@#$%^&*()))_+±§}|\":{}<?>/.,÷≥≤`«æ…“‘œ∑´®†" +
-        "¥¨ˆøπ“åß∂ƒ©˙ ∆˚¬…æ§¡™\r\n£¢∞§¶•ªº–≠\t";
+    String text = "lkdjhfsaadsf;\'][{}23934!@#$%^&*()))_+±§}|\":{}<?>/.,÷≥≤`«æ…“‘œ∑´®†"
+        + "¥¨ˆøπ“åß∂ƒ©˙ ∆˚¬…æ§¡™\r\n£¢∞§¶•ªº–≠\t";
     assertEquals(text, new MetaInfoExtractor().cleanCtrlChars(text));
   }
 
