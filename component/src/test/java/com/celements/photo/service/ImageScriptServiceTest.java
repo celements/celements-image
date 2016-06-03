@@ -161,6 +161,46 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault(imgAttachment);
   }
 
+  @Test
+  public void test_useImageAnimations_cfg_true() {
+    expect(getWikiMock().Param(eq(ImageScriptService.CFG_IMAGE_ANIMATION), eq("0"))).andReturn("1");
+    expect(getWikiMock().getSpacePreference(eq(ImageScriptService.SPACEPREF_IMAGE_ANIMATION), eq(
+        "1"), same(context))).andReturn("1");
+    replayDefault();
+    assertTrue(imageScriptService.useImageAnimations());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_useImageAnimations_cfg_false() {
+    expect(getWikiMock().Param(eq(ImageScriptService.CFG_IMAGE_ANIMATION), eq("0"))).andReturn("0");
+    expect(getWikiMock().getSpacePreference(eq(ImageScriptService.SPACEPREF_IMAGE_ANIMATION), eq(
+        "0"), same(context))).andReturn("0");
+    replayDefault();
+    assertFalse(imageScriptService.useImageAnimations());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_useImageAnimations_wikiOrSpace_true() {
+    expect(getWikiMock().Param(eq(ImageScriptService.CFG_IMAGE_ANIMATION), eq("0"))).andReturn("0");
+    expect(getWikiMock().getSpacePreference(eq(ImageScriptService.SPACEPREF_IMAGE_ANIMATION), eq(
+        "0"), same(context))).andReturn("1");
+    replayDefault();
+    assertTrue(imageScriptService.useImageAnimations());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_useImageAnimations_wikiOrSpace_false() {
+    expect(getWikiMock().Param(eq(ImageScriptService.CFG_IMAGE_ANIMATION), eq("0"))).andReturn("1");
+    expect(getWikiMock().getSpacePreference(eq(ImageScriptService.SPACEPREF_IMAGE_ANIMATION), eq(
+        "1"), same(context))).andReturn("0");
+    replayDefault();
+    assertFalse(imageScriptService.useImageAnimations());
+    verifyDefault();
+  }
+
   // *****************************************************************
   // * H E L P E R - M E T H O D S *
   // *****************************************************************/

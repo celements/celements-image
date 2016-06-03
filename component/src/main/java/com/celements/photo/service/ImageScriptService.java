@@ -55,6 +55,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 @Component("celementsphoto")
 public class ImageScriptService implements ScriptService {
 
+  public static final String SPACEPREF_IMAGE_ANIMATION = "celImageAnimation";
+  public static final String CFG_IMAGE_ANIMATION = "celements.celImageAnimation";
   public static final String IMAGE_FILE_SIZE = "fileSize";
   public static final String IMAGE_HEIGHT = "maxHeight";
   public static final String IMAGE_WIDTH = "maxWidth";
@@ -321,14 +323,19 @@ public class ImageScriptService implements ScriptService {
     return maxImageSizeService.fixMaxImageSizes(pageContent, maxWidth, maxHeight);
   }
 
+  @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num) {
     return WebUtils.getInstance().getRandomImages(fullName, num, getContext());
   }
 
+  public List<Attachment> getRandomImages(DocumentReference docRef, int num) {
+    return imageService.getRandomImages(docRef, num);
+  }
+
   public boolean useImageAnimations() {
-    String defaultValue = getContext().getWiki().Param("celements.celImageAnimation", "0");
-    return "1".equals(getContext().getWiki().getSpacePreference("celImageAnimation", defaultValue,
-        getContext()));
+    String defaultValue = getContext().getWiki().Param(CFG_IMAGE_ANIMATION, "0");
+    return "1".equals(getContext().getWiki().getSpacePreference(SPACEPREF_IMAGE_ANIMATION,
+        defaultValue, getContext()));
   }
 
   public String fileNameToDocName(String filename) {
