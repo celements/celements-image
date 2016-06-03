@@ -22,42 +22,46 @@ package com.celements.photo.container;
 import com.drew.metadata.Tag;
 
 /**
- * Container used to simplify the velocity access. Represents a metatag, 
+ * Container used to simplify the velocity access. Represents a metatag,
  * containing the tag's name and description.
  */
 public class Metadate {
+
   private String name;
   private String description;
-  
+
   /**
    * Initialises an empty metatag.
    */
-  public Metadate(){
+  public Metadate() {
     name = null;
     description = "";
   }
-  
+
   /**
    * Set the name and description of the metatag.
    * 
-   * @param Tag to initialize with
+   * @param Tag
+   *          to initialize with
    */
-  public Metadate(Tag tag){
+  public Metadate(Tag tag) {
     name = tag.getTagName();
     description = tag.getDescription();
   }
-  
+
   /**
    * Set the name and description of the metatag.
    * 
-   * @param name Name of the tag.
-   * @param description Description (or value) of the tag.
+   * @param name
+   *          Name of the tag.
+   * @param description
+   *          Description (or value) of the tag.
    */
   public Metadate(String name, String description) {
     this.name = name;
     this.description = description;
   }
-  
+
   /**
    * Get the description of the metatag.
    * 
@@ -75,9 +79,9 @@ public class Metadate {
   public String getName() {
     return (name == null) ? "" : name;
   }
-  
+
   /**
-   * Check wether the Metadate is empty (used if the user asks for a non 
+   * Check wether the Metadate is empty (used if the user asks for a non
    * existing metatag).
    * 
    * @return true if this is an empty Metadate.

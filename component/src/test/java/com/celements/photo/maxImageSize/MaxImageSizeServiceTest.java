@@ -41,14 +41,12 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_MaxImageSizeServiceTest() throws Exception {
-    maxImageSizeService = (MaxImageSizeService) Utils.getComponent(
-        IMaxImageSizeServiceRole.class);
+    maxImageSizeService = (MaxImageSizeService) Utils.getComponent(IMaxImageSizeServiceRole.class);
   }
 
   @Test
   public void testGetImgMatcher_noImages() {
-    String pageContent = "<div><p>the content</p>\n"
-        + "<p>second paragraph</p></div>";
+    String pageContent = "<div><p>the content</p>\n" + "<p>second paragraph</p></div>";
     replayDefault();
     Matcher imgMatcher = maxImageSizeService.getImgMatcher(pageContent);
     assertFalse("Expect first match", imgMatcher.find());
@@ -57,11 +55,9 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetImgMatcher_oneImage() {
-    String imgUrl = "/download/testSpace/test/fileName.jpg"
-            + "?celwidth=600&celheight=500";
+    String imgUrl = "/download/testSpace/test/fileName.jpg" + "?celwidth=600&celheight=500";
     String imgPart = "<img id=\"firstImage\" src=\"" + imgUrl + "\" />";
-    String pageContent = "<div><p>the content</p>\n" + imgPart
-        + "<p>second paragraph</p></div>";
+    String pageContent = "<div><p>the content</p>\n" + imgPart + "<p>second paragraph</p></div>";
     replayDefault();
     Matcher imgMatcher = maxImageSizeService.getImgMatcher(pageContent);
     assertTrue("Expect first match", imgMatcher.find());
@@ -72,14 +68,12 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetImgMatcher_twoImages() {
-    String img1Url = "/download/testSpace/test/fileName1.jpg"
-            + "?celwidth=600&celheight=500";
+    String img1Url = "/download/testSpace/test/fileName1.jpg" + "?celwidth=600&celheight=500";
     String img1Part = "<img id=\"firstImage\" src=\"" + img1Url + "\" />";
-    String img2Url = "/download/testSpace/test/fileName2.jpg"
-        + "?celwidth=600&celheight=500";
+    String img2Url = "/download/testSpace/test/fileName2.jpg" + "?celwidth=600&celheight=500";
     String img2Part = "<img id=\"secondImage\" src=\"" + img2Url + "\" />";
-    String pageContent = "<div><p>the content</p>\n" + img1Part
-        + "<p>second paragraph</p>" + img2Part + "</div>";
+    String pageContent = "<div><p>the content</p>\n" + img1Part + "<p>second paragraph</p>"
+        + img2Part + "</div>";
     replayDefault();
     Matcher imgMatcher = maxImageSizeService.getImgMatcher(pageContent);
     assertTrue("Expect first match", imgMatcher.find());
@@ -92,14 +86,12 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetImgMatcher_multiline() {
-    String img1Url = "/download/testSpace/test/fileName1.jpg"
-            + "?celwidth=600&celheight=500";
+    String img1Url = "/download/testSpace/test/fileName1.jpg" + "?celwidth=600&celheight=500";
     String img1Part = "<img id=\"firstImage\" src=\"" + img1Url + "\" />";
-    String img2Url = "/download/testSpace/test/fileName2.jpg"
-        + "?celwidth=600&celheight=500";
+    String img2Url = "/download/testSpace/test/fileName2.jpg" + "?celwidth=600&celheight=500";
     String img2Part = "<img id=\"secondImage\" src=\"" + img2Url + "\" />";
-    String pageContent = "<div>\n<p>the content</p>\n" + img1Part
-        + "<p>second paragraph</p>\n" + img2Part + "\n</div>";
+    String pageContent = "<div>\n<p>the content</p>\n" + img1Part + "<p>second paragraph</p>\n"
+        + img2Part + "\n</div>";
     replayDefault();
     Matcher imgMatcher = maxImageSizeService.getImgMatcher(pageContent);
     assertTrue("Expect first match", imgMatcher.find());
@@ -112,8 +104,7 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetImgAttrMatcher_twoAttr() {
-    String imgUrl = "/download/testSpace/test/fileName.jpg"
-            + "?celwidth=600&celheight=500";
+    String imgUrl = "/download/testSpace/test/fileName.jpg" + "?celwidth=600&celheight=500";
     String imgAttrPart = "id=\"firstImage\" src=\"" + imgUrl + "\"";
     replayDefault();
     Matcher imgMatcher = maxImageSizeService.getImgAttrMatcher(imgAttrPart);
@@ -122,11 +113,9 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
     for (int i = 0; i <= imgMatcher.groupCount(); i++) {
       allGroups.add(imgMatcher.group(i));
     }
-    String logStr = " (all groups: " + Arrays.deepToString(
-            allGroups.toArray()) + ")";
+    String logStr = " (all groups: " + Arrays.deepToString(allGroups.toArray()) + ")";
     assertEquals("Expect first attribut name" + logStr, "id", imgMatcher.group(1));
-    assertEquals("Expect first attribut value" + logStr, "firstImage",
-        imgMatcher.group(2));
+    assertEquals("Expect first attribut value" + logStr, "firstImage", imgMatcher.group(2));
     assertEquals("Expect group count of 2", 2, imgMatcher.groupCount());
     assertTrue("Expect second match", imgMatcher.find());
     allGroups = new ArrayList<String>();
@@ -143,8 +132,7 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetImageAttrMap_twoAttr() {
-    String imgUrl = "/download/testSpace/test/fileName.jpg"
-            + "?celwidth=600&celheight=500";
+    String imgUrl = "/download/testSpace/test/fileName.jpg" + "?celwidth=600&celheight=500";
     String imgAttrPart = "id=\"firstImage\" src=\"" + imgUrl + "\"";
     replayDefault();
     Map<String, String> imgAttrMap = maxImageSizeService.getImageAttrMap(imgAttrPart);
@@ -158,11 +146,9 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAllImagesInSource_noImages() {
-    String pageContent = "<div><p>the content</p>\n"
-        + "<p>second paragraph</p></div>";
+    String pageContent = "<div><p>the content</p>\n" + "<p>second paragraph</p></div>";
     replayDefault();
-    assertEquals(Collections.emptyList(), maxImageSizeService.getAllImagesInSource(
-        pageContent));
+    assertEquals(Collections.emptyList(), maxImageSizeService.getAllImagesInSource(pageContent));
     verifyDefault();
   }
 
@@ -171,8 +157,8 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
     String basisURL = "/download/testSpace/test/fileName.jpg";
     String urlQueryPart = "?celwidth=600&celheight=500";
     String imgURL = basisURL + urlQueryPart;
-    String pageContent = "<div><p>the content</p>\n" + "<img id=\"firstImage\" src=\""
-        + imgURL + "\" />" + "<p>second paragraph</p></div>";
+    String pageContent = "<div><p>the content</p>\n" + "<img id=\"firstImage\" src=\"" + imgURL
+        + "\" />" + "<p>second paragraph</p></div>";
     Map<String, Image> expImages = new HashMap<String, Image>();
     Image firstImage = new Image("firstImage", "firstImage", imgURL);
     expImages.put(firstImage.getId(), firstImage);
@@ -193,9 +179,8 @@ public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetAllImagesInSource_oneImage_noParamsInSrc() {
     String basisURL = "/download/testSpace/test/fileName.jpg";
-    String pageContent = "<div><p>the content</p>\n"
-        + "<img id=\"firstImage\" src=\"" + basisURL + "\" />"
-        + "<p>second paragraph</p></div>";
+    String pageContent = "<div><p>the content</p>\n" + "<img id=\"firstImage\" src=\"" + basisURL
+        + "\" />" + "<p>second paragraph</p></div>";
     Map<String, Image> expImages = new HashMap<String, Image>();
     Image firstImage = new Image("firstImage", "firstImage",
         "/download/testSpace/test/fileName.jpg");

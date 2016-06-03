@@ -14,9 +14,9 @@ import org.w3c.dom.Node;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 
 public class CelImageTest extends AbstractBridgedComponentTestCase {
-  
+
   CelImage image;
-  
+
   @Before
   public void setUp_CelImageTest() throws Exception {
     image = new CelImage();
@@ -25,8 +25,7 @@ public class CelImageTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIsEmpty() {
     assertTrue(image.isEmpty());
-    image.addImage(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), 
-        getNewIIOMetadata());
+    image.addImage(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), getNewIIOMetadata());
     assertFalse(image.isEmpty());
   }
 
@@ -88,20 +87,20 @@ public class CelImageTest extends AbstractBridgedComponentTestCase {
 
   private IIOMetadata getNewIIOMetadata() {
     return new IIOMetadata() {
-      
+
       @Override
       public void reset() {
       }
-      
+
       @Override
       public void mergeTree(String formatName, Node root) throws IIOInvalidTreeException {
       }
-      
+
       @Override
       public boolean isReadOnly() {
         return true;
       }
-      
+
       @Override
       public Node getAsTree(String formatName) {
         return null;

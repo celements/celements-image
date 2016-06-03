@@ -40,53 +40,58 @@ import com.xpn.xwiki.web.Utils;
  */
 @Deprecated
 public class AddAttachmentToDoc {
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      AddAttachmentToDoc.class);
-  
+
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(AddAttachmentToDoc.class);
+
   /**
    * Converts the given ByteArrayOutputStream to an XWikiAttachment and adds
    * it to the specified XWikiDocument.
    * 
-   * @param doc XWikiDocument to attach the attachment to.
-   * @param data The attachment data.
-   * @param filename The name for the attachment.
-   * @param context XWikiContext. Needed to get the author and to save the
-   *           attachment.
+   * @param doc
+   *          XWikiDocument to attach the attachment to.
+   * @param data
+   *          The attachment data.
+   * @param filename
+   *          The name for the attachment.
+   * @param context
+   *          XWikiContext. Needed to get the author and to save the
+   *          attachment.
    * @return The attachment containing the given data.
    * @throws XWikiException
-   * 
    * @deprecated since 1.42 instead use {@link IAttachmentServiceRole.addAttachment(
-   *    XWikiDocument, InputStream, String, String, String)}
+   *             XWikiDocument, InputStream, String, String, String)}
    */
   @Deprecated
-  public XWikiAttachment addAtachment(XWikiDocument doc, ByteArrayOutputStream data, 
-      String filename, XWikiContext context) throws XWikiException{
+  public XWikiAttachment addAtachment(XWikiDocument doc, ByteArrayOutputStream data,
+      String filename, XWikiContext context) throws XWikiException {
     return addAtachment(doc, data.toByteArray(), filename, context);
   }
-  
+
   /**
    * Converts the given byte array to an XWikiAttachment and adds
    * it to the specified XWikiDocument.
    * 
-   * @param doc XWikiDocument to attach the attachment to.
-   * @param data The attachment data.
-   * @param filename The name for the attachment.
-   * @param context XWikiContext. Needed to get the author and to save the
-   *           attachment.
+   * @param doc
+   *          XWikiDocument to attach the attachment to.
+   * @param data
+   *          The attachment data.
+   * @param filename
+   *          The name for the attachment.
+   * @param context
+   *          XWikiContext. Needed to get the author and to save the
+   *          attachment.
    * @return The attachment containing the given data.
-   * 
    * @deprecated since 1.42 instead use {@link IAttachmentServiceRole.addAttachment(
-   *    XWikiDocument, InputStream, String, String, String)}
+   *             XWikiDocument, InputStream, String, String, String)}
    */
   @Deprecated
-  public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename, 
+  public XWikiAttachment addAtachment(XWikiDocument doc, byte[] data, String filename,
       XWikiContext context) throws XWikiException {
     try {
-      return ((AttachmentService) Utils.getComponent(IAttachmentServiceRole.class)
-          ).addAttachment(doc, data, filename, context.getUser(), null);
+      return ((AttachmentService) Utils.getComponent(IAttachmentServiceRole.class)).addAttachment(
+          doc, data, filename, context.getUser(), null);
     } catch (DocumentSaveException dse) {
-      LOGGER.error("Exception saving document with added attachment '" + filename + "'", 
-          dse);
+      LOGGER.error("Exception saving document with added attachment '" + filename + "'", dse);
     } catch (AttachmentToBigException atbe) {
       LOGGER.error("Attachment '" + filename + "' is to big", atbe);
     } catch (AddingAttachmentContentFailedException aacfe) {

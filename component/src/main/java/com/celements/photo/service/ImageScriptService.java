@@ -64,8 +64,7 @@ public class ImageScriptService implements ScriptService {
   public static final String IMAGE_CHANGED_BY = "lastChangedBy";
   public static final String IMAGE_MIME_TYPE = "mimeType";
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      ImageScriptService.class);
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(ImageScriptService.class);
 
   @Requirement
   IImageService imageService;
@@ -75,7 +74,7 @@ public class ImageScriptService implements ScriptService {
 
   @Requirement
   ICropImage cropImage;
-  
+
   @Requirement
   IUnpackComponentRole unpack;
 
@@ -103,14 +102,12 @@ public class ImageScriptService implements ScriptService {
   public Attachment getImageAttachment(AttachmentReference imageRef) {
     Attachment imageAttachment = null;
     try {
-      XWikiDocument imageDoc = getContext().getWiki().getDocument(
-          imageRef.getDocumentReference(), getContext());
-      XWikiAttachment imageAtt = imageDoc.getAttachment(imageRef.getName());
-      imageAttachment = new Attachment(imageDoc.newDocument(getContext()), imageAtt,
+      XWikiDocument imageDoc = getContext().getWiki().getDocument(imageRef.getDocumentReference(),
           getContext());
+      XWikiAttachment imageAtt = imageDoc.getAttachment(imageRef.getName());
+      imageAttachment = new Attachment(imageDoc.newDocument(getContext()), imageAtt, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get image for attachment reference [" + imageRef + "]",
-          exp);
+      LOGGER.error("Failed to get image for attachment reference [" + imageRef + "]", exp);
     }
     return imageAttachment;
   }
@@ -119,15 +116,15 @@ public class ImageScriptService implements ScriptService {
       boolean includeImgDimensions) {
     Document theDoc = imgAttachment.getDocument();
     XWikiURLFactory urlFactory = getContext().getURLFactory();
-    URL theAttUrl = urlFactory.createAttachmentURL(imgAttachment.getFilename(),
-        theDoc.getSpace(), theDoc.getName(), "download", "", getContext());
+    URL theAttUrl = urlFactory.createAttachmentURL(imgAttachment.getFilename(), theDoc.getSpace(),
+        theDoc.getName(), "download", "", getContext());
     jsonBuilder.openDictionary();
     try {
       jsonBuilder.addStringProperty(IMAGE_SRC, urlFactory.getURL(theAttUrl, getContext()));
       jsonBuilder.addStringProperty(IMAGE_FILENAME, imgAttachment.getFilename());
       jsonBuilder.addStringProperty(IMAGE_ATT_VERSION, imgAttachment.getVersion());
-      jsonBuilder.addStringProperty(IMAGE_CHANGED_BY, getContext().getWiki(
-          ).getLocalUserName(imgAttachment.getAuthor(), null, false, getContext()));
+      jsonBuilder.addStringProperty(IMAGE_CHANGED_BY, getContext().getWiki().getLocalUserName(
+          imgAttachment.getAuthor(), null, false, getContext()));
       if (includeImgDimensions) {
         AttachmentReference imgRef = new AttachmentReference(imgAttachment.getFilename(),
             theDoc.getDocumentReference());
@@ -135,9 +132,9 @@ public class ImageScriptService implements ScriptService {
           ImageDimensions imgDim = imageService.getDimension(imgRef);
           if (imgDim != null) {
             jsonBuilder.openProperty(IMAGE_HEIGHT);
-            jsonBuilder.addInteger((int)Math.floor(imgDim.getHeight()));
+            jsonBuilder.addInteger((int) Math.floor(imgDim.getHeight()));
             jsonBuilder.openProperty(IMAGE_WIDTH);
-            jsonBuilder.addInteger((int)Math.floor(imgDim.getWidth()));
+            jsonBuilder.addInteger((int) Math.floor(imgDim.getWidth()));
           } else {
             LOGGER.error("unable to read dimension for image [" + imgRef + "].");
           }
@@ -145,12 +142,11 @@ public class ImageScriptService implements ScriptService {
           LOGGER.error("Failed to get image dimensions for image [" + imgRef + "].", exp);
         }
       }
-      jsonBuilder.addStringProperty(IMAGE_FILE_SIZE, getCelWebService(
-          ).getHumanReadableSize(imgAttachment.getFilesize(), true));
+      jsonBuilder.addStringProperty(IMAGE_FILE_SIZE, getCelWebService().getHumanReadableSize(
+          imgAttachment.getFilesize(), true));
       jsonBuilder.addStringProperty(IMAGE_MIME_TYPE, imgAttachment.getMimeType());
     } catch (Exception exp) {
-      LOGGER.error("Failed to addImage [" + imgAttachment.getFilename() + "] to json.",
-          exp);
+      LOGGER.error("Failed to addImage [" + imgAttachment.getFilename() + "] to json.", exp);
     }
     jsonBuilder.closeDictionary();
   }
@@ -163,55 +159,75 @@ public class ImageScriptService implements ScriptService {
     }
     return null;
   }
-  
+
   public void crop(Document srcDoc, String srcFilename, String overwriteOutputFormat,
       OutputStream out) {
     int x = Integer.parseInt(getContext().getRequest().get("cropX"));
-    if(x < 0) { x = 0; }
+    if (x < 0) {
+      x = 0;
+    }
     int y = Integer.parseInt(getContext().getRequest().get("cropY"));
-    if(y < 0) { y = 0; }
+    if (y < 0) {
+      y = 0;
+    }
     int w = Integer.parseInt(getContext().getRequest().get("cropW"));
-    if(w <= 0) { w = 1; }
+    if (w <= 0) {
+      w = 1;
+    }
     int h = Integer.parseInt(getContext().getRequest().get("cropH"));
-    if(h <= 0) { h = 1; }
+    if (h <= 0) {
+      h = 1;
+    }
     LOGGER.debug("Cropping to " + x + ":" + y + " " + w + "x" + h);
     cropImage.crop(srcDoc, srcFilename, x, y, w, h, overwriteOutputFormat, out);
   }
-  
+
   public void crop(Document srcDoc, String srcFilename, int x, int y, int w, int h,
       String overwriteOutputFormat, OutputStream out) {
     cropImage.crop(srcDoc, srcFilename, x, y, w, h, overwriteOutputFormat, out);
   }
-  
-  public void outputCroppedImage(Document srcDoc, String srcFilename, 
+
+  public void outputCroppedImage(Document srcDoc, String srcFilename,
       String overwriteOutputFormat) {
     int x = Integer.parseInt(getContext().getRequest().get("cropX"));
-    if(x < 0) { x = 0; }
+    if (x < 0) {
+      x = 0;
+    }
     int y = Integer.parseInt(getContext().getRequest().get("cropY"));
-    if(y < 0) { y = 0; }
+    if (y < 0) {
+      y = 0;
+    }
     int w = Integer.parseInt(getContext().getRequest().get("cropW"));
-    if(w <= 0) { w = 1; }
+    if (w <= 0) {
+      w = 1;
+    }
     int h = Integer.parseInt(getContext().getRequest().get("cropH"));
-    if(h <= 0) { h = 1; }
+    if (h <= 0) {
+      h = 1;
+    }
     cropImage.outputCroppedImage(srcDoc, srcFilename, x, y, w, h, overwriteOutputFormat);
   }
 
   /**
-   * Get a specified image file in a zip archive, extract it, change it to the 
+   * Get a specified image file in a zip archive, extract it, change it to the
    * desired size and save it as an attachment to the given page.
    * 
-   * @param zipSourceDoc D
-   * @param attachmentName Filename of the zip archive file.
-   * @param unzipFileName Filename of the file to extract from the zip.
-   * @param destinationDoc Document to attach the extracted file to.
+   * @param zipSourceDoc
+   *          D
+   * @param attachmentName
+   *          Filename of the zip archive file.
+   * @param unzipFileName
+   *          Filename of the file to extract from the zip.
+   * @param destinationDoc
+   *          Document to attach the extracted file to.
    * @return The final attachment name (with added zip folder info and cleared by xwiki).
    */
-  public String unzipFileToAttachment(DocumentReference zipSrcDocRef, 
-      String attachmentName, String unzipFileName, DocumentReference destDocRef) {
+  public String unzipFileToAttachment(DocumentReference zipSrcDocRef, String attachmentName,
+      String unzipFileName, DocumentReference destDocRef) {
     XWikiAttachment zipFile;
     try {
-      zipFile = getContext().getWiki().getDocument(zipSrcDocRef,
-          getContext()).getAttachment(attachmentName);
+      zipFile = getContext().getWiki().getDocument(zipSrcDocRef, getContext()).getAttachment(
+          attachmentName);
       return unpack.unzipFileToAttachment(zipFile, unzipFileName, destDocRef);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception getting zip attachment document.", xwe);
@@ -219,22 +235,22 @@ public class ImageScriptService implements ScriptService {
     }
   }
 
-  public boolean addSlideFromTemplate(DocumentReference galleryDocRef,
-      String slideBaseName, String attFullName) {
+  public boolean addSlideFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
+      String attFullName) {
     if (imageService.checkAddSlideRights(galleryDocRef)) {
       return imageService.addSlideFromTemplate(galleryDocRef, slideBaseName, attFullName);
     }
     return false;
   }
 
-  public boolean addSlidesFromTemplate(DocumentReference galleryDocRef,
-      String slideBaseName, List<String> attFullNameList) {
+  public boolean addSlidesFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
+      List<String> attFullNameList) {
     if (imageService.checkAddSlideRights(galleryDocRef)) {
       boolean successfullAdded = true;
       for (Object attFullName : attFullNameList) {
         if (attFullName != null) {
-          successfullAdded &= imageService.addSlideFromTemplate(galleryDocRef,
-              slideBaseName, attFullName.toString());
+          successfullAdded &= imageService.addSlideFromTemplate(galleryDocRef, slideBaseName,
+              attFullName.toString());
         }
       }
       return successfullAdded;
@@ -244,14 +260,13 @@ public class ImageScriptService implements ScriptService {
     return false;
   }
 
-  public boolean addSlidesFromTemplate(DocumentReference galleryDocRef,
-      String slideBaseName, String[] attFullNameList) {
-    return addSlidesFromTemplate(galleryDocRef, slideBaseName, Arrays.asList(
-        attFullNameList));
+  public boolean addSlidesFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
+      String[] attFullNameList) {
+    return addSlidesFromTemplate(galleryDocRef, slideBaseName, Arrays.asList(attFullNameList));
   }
-  
+
   /**
-   * Returns a map containing the external URLs to a specified image attachment in 
+   * Returns a map containing the external URLs to a specified image attachment in
    * different aspect ratios (crops)
    * "all" aspect ratios as of now meaning 1:1, 3:4, 4:3, 16:9, 16:10
    * 
@@ -260,43 +275,44 @@ public class ImageScriptService implements ScriptService {
   public Map<String, String> getImageURLinAllAspectRatios(Attachment image) {
     Map<String, String> urls = Collections.emptyMap();
     try {
-      XWikiDocument doc = getContext().getWiki().getDocument(image.getDocument(
-          ).getDocumentReference(), getContext());
+      XWikiDocument doc = getContext().getWiki().getDocument(
+          image.getDocument().getDocumentReference(), getContext());
       XWikiAttachment xatt = doc.getAttachment(image.getFilename());
       urls = imageService.getImageURLinAllAspectRatios(xatt);
-    } catch(Exception ex) {
-      //Catching Exception since this method is used to build an XML export which
-      //should not throw an exception simply because one of many images can't be read 
-      //correctly e.g. due to a JAI problem.
+    } catch (Exception ex) {
+      // Catching Exception since this method is used to build an XML export which
+      // should not throw an exception simply because one of many images can't be read
+      // correctly e.g. due to a JAI problem.
       LOGGER.error("Could not get image URLs in different aspect ratios for attachment ["
-          + ((image != null)? image.getFilename() : "null") + "]", ex);
+          + ((image != null) ? image.getFilename() : "null") + "]", ex);
     }
     return urls;
   }
 
   /**
-   * Get a List of all attachments in the specified archive and the suggested 
+   * Get a List of all attachments in the specified archive and the suggested
    * action when importing.
    * 
-   * @param attachmentDoc Zip archive to check the files for the existence in the gallery.
-   * @param attachmentName Name of the zip archive attachment.
-   * @param galleryDoc Gallery Document to check for the files.
+   * @param attachmentDoc
+   *          Zip archive to check the files for the existence in the gallery.
+   * @param attachmentName
+   *          Name of the zip archive attachment.
+   * @param galleryDoc
+   *          Gallery Document to check for the files.
    * @return List of {@link ImportFileObject} for each file.
    */
-  public List<ImportFileObject> getAttachmentFileListWithActions(
-      DocumentReference attachmentDocRef, String attachmentName,
-      DocumentReference galleryDocRef) {
+  public List<ImportFileObject> getAttachmentFileListWithActions(DocumentReference attachmentDocRef,
+      String attachmentName, DocumentReference galleryDocRef) {
     try {
       XWikiDocument attachmentDoc = getContext().getWiki().getDocument(attachmentDocRef,
           getContext());
-      XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef,
-          getContext());
+      XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef, getContext());
       XWikiAttachment zipFile = attachmentDoc.getAttachment(attachmentName);
       return imageService.getAttachmentFileListWithActions(zipFile, galleryDoc);
     } catch (Exception exp) {
       LOGGER.error("Failed to getAttachmentFileListWithActions for attachmentDocRef ["
-          + attachmentDocRef + "], attachmentName [" + attachmentName
-          + "], galleryDocRef [" + galleryDocRef + "].", exp);
+          + attachmentDocRef + "], attachmentName [" + attachmentName + "], galleryDocRef ["
+          + galleryDocRef + "].", exp);
     }
     return Collections.emptyList();
   }
@@ -304,17 +320,16 @@ public class ImageScriptService implements ScriptService {
   public String fixMaxImageSizes(String pageContent, int maxWidth, int maxHeight) {
     return maxImageSizeService.fixMaxImageSizes(pageContent, maxWidth, maxHeight);
   }
-  
-  public List<Attachment> getRandomImages(String fullName,
-      int num) {
+
+  public List<Attachment> getRandomImages(String fullName, int num) {
     return WebUtils.getInstance().getRandomImages(fullName, num, getContext());
   }
-  
+
   public boolean useImageAnimations() {
     return "1".equals(getContext().getWiki().getSpacePreference("celImageAnimation",
         "celements.celImageAnimation", "0", getContext()));
   }
-  
+
   public String fileNameToDocName(String filename) {
     String cleaned = filename.replace(System.getProperty("file.separator"), ".");
     return getContext().getWiki().clearName(cleaned, true, true, getContext());

@@ -22,21 +22,22 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class MetaInfoService implements IMetaInfoService {
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(MetaInfoService.class);
-  
-  public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename, 
+
+  public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename,
       String directory) {
-    return getDirectoryTagsAsTagListInternal(getStreamForAttachment(
-        getAttachmentForDocRef(docRef, filename)), getDirClass(directory));
+    return getDirectoryTagsAsTagListInternal(getStreamForAttachment(getAttachmentForDocRef(docRef,
+        filename)), getDirClass(directory));
   }
 
   public List<Tag> getDirectoryTagsAsTagList(Attachment attachment, String directory) {
-    return getDirectoryTagsAsTagListInternal(getStreamForAttachment(getXAttForAtt(
-        attachment)), getDirClass(directory));
+    return getDirectoryTagsAsTagListInternal(getStreamForAttachment(getXAttForAtt(attachment)),
+        getDirClass(directory));
   }
 
   public Map<String, String> getAllTags(DocumentReference docRef, String filename) {
-    return getAllTagsInternal(getInputStreamForAttachment(getAttachmentForDocRef(docRef, 
+    return getAllTagsInternal(getInputStreamForAttachment(getAttachmentForDocRef(docRef,
         filename)));
   }
 
@@ -44,8 +45,7 @@ public class MetaInfoService implements IMetaInfoService {
     return getAllTagsInternal(getInputStreamForAttachment(getXAttForAtt(attachment)));
   }
 
-  List<Tag> getDirectoryTagsAsTagListInternal(InputStream imageFile, 
-      Class<Directory> directory) {
+  List<Tag> getDirectoryTagsAsTagListInternal(InputStream imageFile, Class<Directory> directory) {
     try {
       return new MetaInfoExtractor().getDirectoryTagsAsTagList(imageFile, directory);
     } catch (MetadataException mde) {
@@ -53,7 +53,7 @@ public class MetaInfoService implements IMetaInfoService {
     }
     return Collections.emptyList();
   }
-  
+
   Map<String, String> getAllTagsInternal(InputStream imageFile) {
     try {
       return new MetaInfoExtractor().getAllTags(imageFile);
@@ -62,36 +62,34 @@ public class MetaInfoService implements IMetaInfoService {
     }
     return Collections.emptyMap();
   }
-  
+
   InputStream getInputStreamForAttachment(XWikiAttachment attachment) {
     try {
       return attachment.getContentInputStream(getContext());
     } catch (XWikiException e) {
-      LOGGER.error("Exception getting content of attachment '" + attachment.getFilename()
-          + "'", e);
+      LOGGER.error("Exception getting content of attachment '" + attachment.getFilename() + "'", e);
     }
     return null;
   }
-  
+
   XWikiAttachment getAttachmentForDocRef(DocumentReference docRef, String filename) {
     try {
       XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
       return doc.getAttachment(filename);
     } catch (XWikiException e) {
-      LOGGER.error("Exception getting Document for DocumentReference '" + docRef + "'", 
-          e);
+      LOGGER.error("Exception getting Document for DocumentReference '" + docRef + "'", e);
     }
     return null;
   }
-  
+
   @SuppressWarnings("unchecked")
   Class<Directory> getDirClass(String directory) {
     Class<Directory> dirClass = null;
     try {
-      dirClass = (Class<Directory>)Class.forName(directory);
+      dirClass = (Class<Directory>) Class.forName(directory);
     } catch (ClassNotFoundException e) {
       try {
-        dirClass = (Class<Directory>)Class.forName("com.drew.metadata.exif." + directory);
+        dirClass = (Class<Directory>) Class.forName("com.drew.metadata.exif." + directory);
       } catch (ClassNotFoundException e1) {
         LOGGER.error("No directory found for '" + directory + "'");
       }
@@ -107,14 +105,14 @@ public class MetaInfoService implements IMetaInfoService {
     try {
       return attachment.getContentInputStream(getContext());
     } catch (XWikiException xwe) {
-      LOGGER.error("Exception while getting content of Attachment '" 
-          + attachment.getFilename() + "'", xwe);
+      LOGGER.error("Exception while getting content of Attachment '" + attachment.getFilename()
+          + "'", xwe);
     }
     return null;
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
   }
 }

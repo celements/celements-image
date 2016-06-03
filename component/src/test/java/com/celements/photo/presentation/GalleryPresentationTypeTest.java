@@ -29,8 +29,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 
-public class GalleryPresentationTypeTest
-    extends AbstractBridgedComponentTestCase {
+public class GalleryPresentationTypeTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private INavigation nav;
@@ -44,8 +43,7 @@ public class GalleryPresentationTypeTest
   @Before
   public void setUp_RenderedContentPresentationTypeTest() throws Exception {
     context = getContext();
-    currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyCurrentDoc");
+    currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
     nav = createMockAndAddToDefault(INavigation.class);
@@ -76,8 +74,8 @@ public class GalleryPresentationTypeTest
   public void testWriteNodeContent() throws Exception {
     context.setLanguage("fr");
     context.put("vcontext", new VelocityContext());
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "MyPage");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "MyPage");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     StringBuilder outStream = new StringBuilder();
@@ -86,20 +84,18 @@ public class GalleryPresentationTypeTest
     boolean isLeaf = true;
     String expectedNodeContent = "expected rendered content for node";
     expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
-    "id=\"N3:Content:Content.MyPage\"").once();
-    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem),
-        eq(isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
+        "id=\"N3:Content:Content.MyPage\"").once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
+        isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
             + " first cel_nav_isLeaf RichText\"").once();
-    DocumentReference templateRef = new DocumentReference(context.getDatabase(),
-        "Templates", "ImageGallerySlidesOverview");
+    DocumentReference templateRef = new DocumentReference(context.getDatabase(), "Templates",
+        "ImageGallerySlidesOverview");
     expect(xwiki.exists(eq(templateRef), same(context))).andReturn(true).once();
-    expect(renderCmdMock.renderTemplatePath(eq("Templates.ImageGallerySlidesOverview"),
-        eq("fr"))).andReturn(expectedNodeContent).once();
-    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc
-        ).atLeastOnce();
+    expect(renderCmdMock.renderTemplatePath(eq("Templates.ImageGallerySlidesOverview"), eq(
+        "fr"))).andReturn(expectedNodeContent).once();
+    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).atLeastOnce();
     replayDefault();
-    vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf,
-        1, nav);
+    vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
         + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
@@ -111,8 +107,8 @@ public class GalleryPresentationTypeTest
 
   @Test
   public void testGetPageLayoutForDoc_noGalery() {
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "MyPage");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "MyPage");
     XWikiDocument galleryDoc = new XWikiDocument(contextDocRef);
     context.setDoc(galleryDoc);
     replayDefault();
@@ -122,13 +118,12 @@ public class GalleryPresentationTypeTest
 
   @Test
   public void testGetPageLayoutForDoc_empty() {
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "MyPage");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "MyPage");
     XWikiDocument galleryDoc = new XWikiDocument(contextDocRef);
     BaseObject albumObj = new BaseObject();
     albumObj.setStringValue(OldCoreClasses.PHOTO_ALBUM_GALLERY_LAYOUT, "");
-    albumObj.setXClassReference(getOldCoreClasses().getPhotoAlbumClassRef(
-        context.getDatabase()));
+    albumObj.setXClassReference(getOldCoreClasses().getPhotoAlbumClassRef(context.getDatabase()));
     galleryDoc.addXObject(albumObj);
     context.setDoc(galleryDoc);
     replayDefault();
@@ -138,25 +133,23 @@ public class GalleryPresentationTypeTest
 
   @Test
   public void testGetPageLayoutForDoc() {
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "MyPage");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "MyPage");
     XWikiDocument galleryDoc = new XWikiDocument(contextDocRef);
     BaseObject albumObj = new BaseObject();
-    albumObj.setStringValue(OldCoreClasses.PHOTO_ALBUM_GALLERY_LAYOUT,
-        "galleryLayoutSpace");
-    albumObj.setXClassReference(getOldCoreClasses().getPhotoAlbumClassRef(
-        context.getDatabase()));
+    albumObj.setStringValue(OldCoreClasses.PHOTO_ALBUM_GALLERY_LAYOUT, "galleryLayoutSpace");
+    albumObj.setXClassReference(getOldCoreClasses().getPhotoAlbumClassRef(context.getDatabase()));
     galleryDoc.addXObject(albumObj);
     context.setDoc(galleryDoc);
     replayDefault();
-    assertEquals(new SpaceReference("galleryLayoutSpace", new WikiReference(
-        context.getDatabase())), vtPresType.getPageLayoutForDoc(contextDocRef));
+    assertEquals(new SpaceReference("galleryLayoutSpace", new WikiReference(context.getDatabase())),
+        vtPresType.getPageLayoutForDoc(contextDocRef));
     verifyDefault();
   }
 
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
   private OldCoreClasses getOldCoreClasses() {
     return (OldCoreClasses) Utils.getComponent(IClassCollectionRole.class,
@@ -175,13 +168,13 @@ public class GalleryPresentationTypeTest
     public XWikiRenderingEngine getMock() {
       return mockRenderEngine;
     }
-    
+
     public void addRenderer(String name, XWikiRenderer renderer) {
       throw new UnsupportedOperationException();
     }
 
-    public String convertMultiLine(String macroname, String params, String data,
-        String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+    public String convertMultiLine(String macroname, String params, String data, String allcontent,
+        XWikiVirtualMacro macro, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
@@ -206,15 +199,13 @@ public class GalleryPresentationTypeTest
       throw new UnsupportedOperationException();
     }
 
-    public String interpretText(String text, XWikiDocument includingdoc,
-        XWikiContext context) {
+    public String interpretText(String text, XWikiDocument includingdoc, XWikiContext context) {
       VelocityContext velocityContext = (VelocityContext) context.get("vcontext");
       storedVelocityContext.add((VelocityContext) velocityContext.clone());
       return mockRenderEngine.interpretText(text, includingdoc, context);
     }
 
-    public String renderDocument(XWikiDocument doc, XWikiContext context)
-        throws XWikiException {
+    public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
       throw new UnsupportedOperationException();
     }
 
@@ -223,13 +214,12 @@ public class GalleryPresentationTypeTest
       throw new UnsupportedOperationException();
     }
 
-    public String renderText(String text, XWikiDocument includingdoc,
-        XWikiContext context) {
+    public String renderText(String text, XWikiDocument includingdoc, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
-    public String renderText(String text, XWikiDocument contentdoc,
-        XWikiDocument includingdoc, XWikiContext context) {
+    public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
+        XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 

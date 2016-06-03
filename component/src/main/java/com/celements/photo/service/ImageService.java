@@ -57,8 +57,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class ImageService implements IImageService {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      ImageService.class);
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(ImageService.class);
 
   @Requirement
   EntityReferenceResolver<String> stringRefResolver;
@@ -79,7 +78,7 @@ public class ImageService implements IImageService {
 
   @Requirement
   private ILuceneSearchService searchService;
-  
+
   @Requirement
   IAttachmentServiceRole attService;
 
@@ -87,7 +86,7 @@ public class ImageService implements IImageService {
   Execution execution;
 
   AttachmentURLCommand attURLCmd;
-  
+
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
@@ -100,45 +99,41 @@ public class ImageService implements IImageService {
     return (NavigationClasses) navigationClasses;
   }
 
-  public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef
-      ) throws XWikiException {
-    XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef,
-        getContext());
-    BaseObject galleryObj = galleryDoc.getXObject(getOldCoreClasses(
-        ).getPhotoAlbumClassRef(getContext().getDatabase()));
+  public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef) throws XWikiException {
+    XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef, getContext());
+    BaseObject galleryObj = galleryDoc.getXObject(getOldCoreClasses().getPhotoAlbumClassRef(
+        getContext().getDatabase()));
     return galleryObj;
   }
 
-  public BaseObject getPhotoAlbumNavObject(DocumentReference galleryDocRef
-      ) throws XWikiException, NoGalleryDocumentException {
-    XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef,
-        getContext());
-    BaseObject navObj = galleryDoc.getXObject(getNavigationClasses(
-        ).getNavigationConfigClassRef(getContext().getDatabase()));
+  public BaseObject getPhotoAlbumNavObject(DocumentReference galleryDocRef) throws XWikiException,
+      NoGalleryDocumentException {
+    XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef, getContext());
+    BaseObject navObj = galleryDoc.getXObject(getNavigationClasses().getNavigationConfigClassRef(
+        getContext().getDatabase()));
     if (navObj == null) {
       throw new NoGalleryDocumentException();
     }
     return navObj;
   }
 
-  public SpaceReference getPhotoAlbumSpaceRef(DocumentReference galleryDocRef
-      ) throws NoGalleryDocumentException {
+  public SpaceReference getPhotoAlbumSpaceRef(DocumentReference galleryDocRef)
+      throws NoGalleryDocumentException {
     try {
       String spaceName = getPhotoAlbumNavObject(galleryDocRef).getStringValue(
           NavigationClasses.MENU_SPACE_FIELD);
-      return new SpaceReference(spaceName, webUtilsService.getWikiRef(
-          galleryDocRef));
+      return new SpaceReference(spaceName, webUtilsService.getWikiRef(galleryDocRef));
     } catch (XWikiException exp) {
       LOGGER.error("Failed to getPhotoAlbumSpaceRef.", exp);
     }
     return null;
   }
 
-  public int getPhotoAlbumMaxHeight(DocumentReference galleryDocRef
-      ) throws NoGalleryDocumentException {
+  public int getPhotoAlbumMaxHeight(DocumentReference galleryDocRef)
+      throws NoGalleryDocumentException {
     try {
       int maxImageHeight = getPhotoAlbumObject(galleryDocRef).getIntValue("height2");
-      //TODO allow template to reduce height
+      // TODO allow template to reduce height
       if (!StringUtils.isEmpty(getContext().getRequest().getParameter("slideContent"))) {
         maxImageHeight = Math.max(maxImageHeight - 20, 0);
       }
@@ -149,8 +144,8 @@ public class ImageService implements IImageService {
     return 2000;
   }
 
-  public int getPhotoAlbumMaxWidth(DocumentReference galleryDocRef
-      ) throws NoGalleryDocumentException {
+  public int getPhotoAlbumMaxWidth(DocumentReference galleryDocRef)
+      throws NoGalleryDocumentException {
     try {
       return getPhotoAlbumObject(galleryDocRef).getIntValue("photoWidth");
     } catch (XWikiException exp) {
@@ -160,16 +155,15 @@ public class ImageService implements IImageService {
   }
 
   private DocumentReference getDocRefFromFullName(String collDocName) {
-    DocumentReference eventRef = new DocumentReference(stringRefResolver.resolve(
-        collDocName, EntityType.DOCUMENT));
+    DocumentReference eventRef = new DocumentReference(stringRefResolver.resolve(collDocName,
+        EntityType.DOCUMENT));
     eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
-    LOGGER.debug("getDocRefFromFullName: for [" + collDocName + "] got reference ["
-        + eventRef + "].");
+    LOGGER.debug("getDocRefFromFullName: for [" + collDocName + "] got reference [" + eventRef
+        + "].");
     return eventRef;
   }
 
-  public ImageDimensions getDimension(String imageFullName)
-      throws XWikiException {
+  public ImageDimensions getDimension(String imageFullName) throws XWikiException {
     String fullName = imageFullName.split(";")[0];
     String imageFileName = imageFullName.split(";")[1];
     DocumentReference docRef = getDocRefFromFullName(fullName);
@@ -188,7 +182,7 @@ public class ImageService implements IImageService {
       imageInStream = theAttachment.getContentInputStream(getContext());
       imageDimensions = genThumbnail.getImageDimensions(imageInStream);
     } finally {
-      if(imageInStream != null) {
+      if (imageInStream != null) {
         try {
           imageInStream.close();
         } catch (IOException ioe) {
@@ -200,7 +194,7 @@ public class ImageService implements IImageService {
     }
     return imageDimensions;
   }
-  
+
   /**
    * getRandomImages computes a set of <num> randomly chosen images
    * from the given AttachmentList. It chooses the Images without duplicates if
@@ -208,15 +202,15 @@ public class ImageService implements IImageService {
    */
   public List<Attachment> getRandomImages(DocumentReference galleryRef, int num) {
     try {
-      Document imgDoc = getContext().getWiki().getDocument(galleryRef, getContext()
-          ).newDocument(getContext());
+      Document imgDoc = getContext().getWiki().getDocument(galleryRef, getContext()).newDocument(
+          getContext());
       List<Attachment> allImagesList = webUtilsService.getAttachmentListSorted(imgDoc,
           "AttachmentAscendingNameComparator", true);
       if (allImagesList.size() > 0) {
         List<Attachment> preSetImgList = prepareMaxCoverSet(num, allImagesList);
         List<Attachment> imgList = new ArrayList<Attachment>(num);
         Random rand = new Random();
-        for (int i=1; i<=num ; i++) {
+        for (int i = 1; i <= num; i++) {
           int nextimg = rand.nextInt(preSetImgList.size());
           imgList.add(preSetImgList.remove(nextimg));
         }
@@ -227,19 +221,19 @@ public class ImageService implements IImageService {
     }
     return Collections.emptyList();
   }
-  
+
   <T> List<T> prepareMaxCoverSet(int num, List<T> allImagesList) {
     List<T> preSetImgList = new Vector<T>(num);
     preSetImgList.addAll(allImagesList);
-    for(int i=2; i <= coveredQuotient(allImagesList.size(), num); i++) {
+    for (int i = 2; i <= coveredQuotient(allImagesList.size(), num); i++) {
       preSetImgList.addAll(allImagesList);
     }
     return preSetImgList;
   }
-  
+
   int coveredQuotient(int divisor, int dividend) {
     if (dividend >= 0) {
-      return ( (dividend + divisor - 1) / divisor);
+      return ((dividend + divisor - 1) / divisor);
     } else {
       return (dividend / divisor);
     }
@@ -263,21 +257,20 @@ public class ImageService implements IImageService {
     try {
       DocumentReference newSlideDocRef = getNextFreeDocNameCmd().getNextTitledPageDocRef(
           getPhotoAlbumSpaceRef(galleryDocRef).getName(), "Testname", getContext());
-      String newSlideDocFN = webUtilsService.getRefDefaultSerializer().serialize(
-          newSlideDocRef);
+      String newSlideDocFN = webUtilsService.getRefDefaultSerializer().serialize(newSlideDocRef);
       return (getContext().getWiki().getRightService().hasAccessLevel("edit",
           getContext().getUser(), newSlideDocFN, getContext()));
     } catch (XWikiException exp) {
       LOGGER.error("failed to checkAddSlideRights for [" + galleryDocRef + "].", exp);
     } catch (NoGalleryDocumentException exp) {
-      LOGGER.debug("failed to checkAddSlideRights for no gallery document ["
-          + galleryDocRef + "].", exp);
+      LOGGER.debug("failed to checkAddSlideRights for no gallery document [" + galleryDocRef + "].",
+          exp);
     }
     return false;
   }
 
-  public boolean addSlideFromTemplate(DocumentReference galleryDocRef,
-      String slideBaseName, String attFullName) {
+  public boolean addSlideFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
+      String attFullName) {
     try {
       DocumentReference slideTemplateRef = getImageSlideTemplateRef();
       String gallerySpaceName = getPhotoAlbumSpaceRef(galleryDocRef).getName();
@@ -286,29 +279,28 @@ public class ImageService implements IImageService {
           "^(.*)\\.[a-zA-Z]{3,4}$", "$1"), true, true, getContext());
       String slideDocName = slideBaseName + clearedAttName;
       Map<String, String> metaTagMap = Collections.emptyMap();
-      DocumentReference attDocRef = webUtilsService.resolveDocumentReference(
-          attFullName.replaceAll("^(.*);.*$", "$1"));
+      DocumentReference attDocRef = webUtilsService.resolveDocumentReference(attFullName.replaceAll(
+          "^(.*);.*$", "$1"));
       DocumentReference centralFBDocRef = null;
-      String centralFB = getContext().getWiki().getWebPreference("cel_centralfilebase", 
+      String centralFB = getContext().getWiki().getWebPreference("cel_centralfilebase",
           getContext());
-      if((centralFB != null) && !"".equals(centralFB.trim())) {
+      if ((centralFB != null) && !"".equals(centralFB.trim())) {
         centralFBDocRef = webUtilsService.resolveDocumentReference(centralFB);
       }
-      if(getContext().getWiki().exists(attDocRef, getContext()) 
-          && !attDocRef.equals(centralFBDocRef)) {
+      if (getContext().getWiki().exists(attDocRef, getContext()) && !attDocRef.equals(
+          centralFBDocRef)) {
         LOGGER.debug("get meta tags from attachment document " + attDocRef);
-        XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext(
-            ));
+        XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext());
         metaTagMap = getMetaTagObjectsFromDoc(attDoc);
-      } else if(attDocRef.equals(centralFBDocRef)) {
+      } else if (attDocRef.equals(centralFBDocRef)) {
         LOGGER.debug("get meta tags for central file base image" + attDocRef);
         LuceneQuery query = searchService.createQuery();
-        query.add(searchService.createRestriction("Celements2.PageType.page_type", 
+        query.add(searchService.createRestriction("Celements2.PageType.page_type",
             "\"DMS-Document\""));
-        query.add(searchService.createRestriction("Classes.PhotoMetainfoClass.name", 
+        query.add(searchService.createRestriction("Classes.PhotoMetainfoClass.name",
             "\"cleared_filename\""));
-        query.add(searchService.createRestriction("Classes.PhotoMetainfoClass." + 
-            "description", "\"" + filename + "\""));
+        query.add(searchService.createRestriction("Classes.PhotoMetainfoClass." + "description",
+            "\"" + filename + "\""));
         LuceneSearchResult searchResult = searchService.search(query, null, null);
         List<EntityReference> resultList = Collections.emptyList();
         try {
@@ -316,28 +308,27 @@ public class ImageService implements IImageService {
         } catch (LuceneSearchException lse) {
           LOGGER.error("Exception searching for imported images", lse);
         }
-        LOGGER.debug("addSlideFromTemplate: lucene query = '" + query.getQueryString() +
-            "'");
-        LOGGER.debug("addSlideFromTemplate: DMS-Document for " + filename + " found: " +
-            resultList.size());
-        if(resultList.size() > 0) {
-          XWikiDocument separateDoc = getContext().getWiki().getDocument(
-              new DocumentReference(resultList.get(0)), getContext());
+        LOGGER.debug("addSlideFromTemplate: lucene query = '" + query.getQueryString() + "'");
+        LOGGER.debug("addSlideFromTemplate: DMS-Document for " + filename + " found: "
+            + resultList.size());
+        if (resultList.size() > 0) {
+          XWikiDocument separateDoc = getContext().getWiki().getDocument(new DocumentReference(
+              resultList.get(0)), getContext());
           metaTagMap = getMetaTagObjectsFromDoc(separateDoc);
         } else {
           LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
           Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
           metaTagMap = new HashMap<String, String>();
-          for(String key : map.keySet()) {
+          for (String key : map.keySet()) {
             metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
           }
         }
-        if(metaTagMap.keySet().contains("cleared_filename_short")) {
+        if (metaTagMap.keySet().contains("cleared_filename_short")) {
           slideDocName = slideBaseName + metaTagMap.get("cleared_filename_short");
         }
       } else {
-        LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not" +
-            "exist and is not central file base " + centralFBDocRef);
+        LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not"
+            + "exist and is not central file base " + centralFBDocRef);
       }
       DocumentReference newSlideDocRef = getNextFreeDocNameCmd().getNextTitledPageDocRef(
           gallerySpaceName, slideDocName, getContext());
@@ -345,9 +336,8 @@ public class ImageService implements IImageService {
           getContext())) {
         XWikiDocument newSlideDoc = getContext().getWiki().getDocument(newSlideDocRef,
             getContext());
-        newSlideDoc.setDefaultLanguage(webUtilsService.getDefaultLanguage(
-            gallerySpaceName));
-        //TODO refactor and use com.celements.web.plugin.cmd.CreateDocumentCommand instead
+        newSlideDoc.setDefaultLanguage(webUtilsService.getDefaultLanguage(gallerySpaceName));
+        // TODO refactor and use com.celements.web.plugin.cmd.CreateDocumentCommand instead
         Date creationDate = new Date();
         newSlideDoc.setLanguage("");
         newSlideDoc.setCreationDate(creationDate);
@@ -356,27 +346,26 @@ public class ImageService implements IImageService {
         newSlideDoc.setCreator(getContext().getUser());
         newSlideDoc.setAuthor(getContext().getUser());
         newSlideDoc.setTranslation(0);
-        String imgURL = getAttURLCmd().getAttachmentURL(attFullName, "download",
-            getContext());
-        String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef)
-            + "&celheight=" + getPhotoAlbumMaxHeight(galleryDocRef);
-        String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0)?"?":"&") + resizeParam;
-        VelocityContext vcontext = (VelocityContext)getContext().get("vcontext");
+        String imgURL = getAttURLCmd().getAttachmentURL(attFullName, "download", getContext());
+        String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef) + "&celheight="
+            + getPhotoAlbumMaxHeight(galleryDocRef);
+        String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0) ? "?" : "&") + resizeParam;
+        VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
         vcontext.put("imageURL", fullImgURL);
         vcontext.put("attFullName", attFullName);
         vcontext.put("metaTagMap", metaTagMap);
-        DocumentReference slideContentRef = new DocumentReference(getContext(
-            ).getDatabase(), "Templates", "ImageSlideImportContent");
-        String slideContent = webUtilsService.renderInheritableDocument(slideContentRef, 
+        DocumentReference slideContentRef = new DocumentReference(getContext().getDatabase(),
+            "Templates", "ImageSlideImportContent");
+        String slideContent = webUtilsService.renderInheritableDocument(slideContentRef,
             getContext().getLanguage(), webUtilsService.getDefaultLanguage());
         newSlideDoc.setContent(slideContent);
         fixMenuItemPosition(newSlideDoc);
-        getContext().getWiki().saveDocument(newSlideDoc, "add default image slide"
-            + " content", true, getContext());
+        getContext().getWiki().saveDocument(newSlideDoc, "add default image slide" + " content",
+            true, getContext());
         return true;
       } else {
-        LOGGER.warn("failed to copy slideTemplateRef [" + slideTemplateRef
-            + "] to new slide doc [" + newSlideDocRef + "].");
+        LOGGER.warn("failed to copy slideTemplateRef [" + slideTemplateRef + "] to new slide doc ["
+            + newSlideDocRef + "].");
       }
     } catch (NoGalleryDocumentException exp) {
       LOGGER.error("failed to addSlideFromTemplate because no gallery doc.", exp);
@@ -391,11 +380,10 @@ public class ImageService implements IImageService {
     DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
         "Classes.PhotoMetainfoClass");
     List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
-    if(metaObjs != null) {
-      for(BaseObject tag : metaObjs) {
-        if(tag != null) {
-          metaTagMap.put(tag.getStringValue("name"), tag.getStringValue(
-              "description"));
+    if (metaObjs != null) {
+      for (BaseObject tag : metaObjs) {
+        if (tag != null) {
+          metaTagMap.put(tag.getStringValue("name"), tag.getStringValue("description"));
         }
       }
     }
@@ -404,8 +392,8 @@ public class ImageService implements IImageService {
 
   private boolean fixMenuItemPosition(XWikiDocument newSlideDoc) {
     if (treeNodeService.isTreeNode(newSlideDoc.getDocumentReference())) {
-      BaseObject menuItemObj = newSlideDoc.getXObject(getNavigationClasses(
-          ).getMenuItemClassRef(getContext().getDatabase()));
+      BaseObject menuItemObj = newSlideDoc.getXObject(getNavigationClasses().getMenuItemClassRef(
+          getContext().getDatabase()));
       if (menuItemObj != null) {
         int numElem = treeNodeService.getSubNodesForParent(
             newSlideDoc.getDocumentReference().getLastSpaceReference(), "").size();
@@ -429,9 +417,9 @@ public class ImageService implements IImageService {
   }
 
   public DocumentReference getImageSlideTemplateRef() {
-    DocumentReference slideTemplateRef = new DocumentReference(
-        getContext().getDatabase(), "ImageGalleryTemplates", "NewImageGallerySlide");
-    if(!getContext().getWiki().exists(slideTemplateRef, getContext())) {
+    DocumentReference slideTemplateRef = new DocumentReference(getContext().getDatabase(),
+        "ImageGalleryTemplates", "NewImageGallerySlide");
+    if (!getContext().getWiki().exists(slideTemplateRef, getContext())) {
       slideTemplateRef = new DocumentReference("celements2web", "ImageGalleryTemplates",
           "NewImageGallerySlide");
     }
@@ -447,13 +435,13 @@ public class ImageService implements IImageService {
       LOGGER.error("Exception reading image dimensions", xwe);
     }
     Map<String, String> urlMap = new HashMap<String, String>();
-    if(dim != null) {
-      String baseURL = ximage.getDoc().getExternalAttachmentURL(ximage.getFilename(), 
-          "download", getContext());
+    if (dim != null) {
+      String baseURL = ximage.getDoc().getExternalAttachmentURL(ximage.getFilename(), "download",
+          getContext());
       urlMap.put("orig", baseURL);
-      if(baseURL.indexOf("?") < 0) {
+      if (baseURL.indexOf("?") < 0) {
         baseURL += "?";
-      } else if(!baseURL.endsWith("&")) {
+      } else if (!baseURL.endsWith("&")) {
         baseURL += "&";
       }
       urlMap.put("1:1", baseURL + getFixedAspectURL(dim, 1, 1));
@@ -468,97 +456,100 @@ public class ImageService implements IImageService {
   String getFixedAspectURL(ImageDimensions dim, int xFact, int yFact) {
     double width = dim.getWidth();
     double height = dim.getHeight();
-    double isAspRatio = width / (double)height;
-    double targetAspRatio = xFact / (double)yFact;
+    double isAspRatio = width / (double) height;
+    double targetAspRatio = xFact / (double) yFact;
     double epsylon = 0.00001;
     String urlParams = "";
-    //only crop if dim does not matche target aspect ratio
-    if(Math.abs(isAspRatio - targetAspRatio) > epsylon) {
-      if(isAspRatio < targetAspRatio) {
-        urlParams += "cropX=0&cropW=" + (int)width;
-        int newHeight = (int)Math.floor(width * (1 / targetAspRatio));
-        int top = (int)Math.floor((height - (double)newHeight) / 2);
+    // only crop if dim does not matche target aspect ratio
+    if (Math.abs(isAspRatio - targetAspRatio) > epsylon) {
+      if (isAspRatio < targetAspRatio) {
+        urlParams += "cropX=0&cropW=" + (int) width;
+        int newHeight = (int) Math.floor(width * (1 / targetAspRatio));
+        int top = (int) Math.floor((height - (double) newHeight) / 2);
         urlParams += "&cropY=" + top + "&cropH=" + newHeight;
       } else {
-        int newWidth = (int)Math.floor(height * targetAspRatio);
-        int left = (int)Math.floor((width - (double)newWidth) / 2);
+        int newWidth = (int) Math.floor(height * targetAspRatio);
+        int left = (int) Math.floor((width - (double) newWidth) / 2);
         urlParams += "cropX=" + left + "&cropW=" + newWidth;
-        urlParams += "&cropY=0&cropH=" + (int)height;
+        urlParams += "&cropY=0&cropH=" + (int) height;
       }
     }
     return urlParams;
   }
-  
+
   private IMetaInfoService getMetaInfoService() {
     return (IMetaInfoService) Utils.getComponent(IMetaInfoService.class);
   }
 
   /**
-   * Get a List of all attachments in the specified archive and the suggested 
+   * Get a List of all attachments in the specified archive and the suggested
    * action when importing.
    * 
-   * @param importFile Zip archive to check the files for the existence in the gallery.
-   * @param galleryDoc Gallery Document to check for the files.
-   * @param context XWikiContext
+   * @param importFile
+   *          Zip archive to check the files for the existence in the gallery.
+   * @param galleryDoc
+   *          Gallery Document to check for the files.
+   * @param context
+   *          XWikiContext
    * @return List of {@link ImportFileObject} for each file.
    * @throws XWikiException
    */
-  public List<ImportFileObject>getAttachmentFileListWithActions(
-      XWikiAttachment importFile, XWikiDocument galleryDoc) throws XWikiException {
+  public List<ImportFileObject> getAttachmentFileListWithActions(XWikiAttachment importFile,
+      XWikiDocument galleryDoc) throws XWikiException {
     List<ImportFileObject> resultList = new ArrayList<ImportFileObject>();
-    
-    if(importFile != null){
-      if(isZipFile(importFile)){
+
+    if (importFile != null) {
+      if (isZipFile(importFile)) {
         List<String> fileList;
         try {
-          fileList = (new Unzip()).getZipContentList(
-              IOUtils.toByteArray(importFile.getContentInputStream(getContext())));
+          fileList = (new Unzip()).getZipContentList(IOUtils.toByteArray(
+              importFile.getContentInputStream(getContext())));
           String fileSep = System.getProperty("file.separator");
           for (Iterator<String> fileIterator = fileList.iterator(); fileIterator.hasNext();) {
             String fileName = (String) fileIterator.next();
-            if(!fileName.endsWith(fileSep)
-                && !fileName.startsWith(".") && !fileName.contains(fileSep + ".")){
-              ImportFileObject file = new ImportFileObject(fileName, getActionForFile(
-                  fileName, galleryDoc));
+            if (!fileName.endsWith(fileSep) && !fileName.startsWith(".") && !fileName.contains(
+                fileSep + ".")) {
+              ImportFileObject file = new ImportFileObject(fileName, getActionForFile(fileName,
+                  galleryDoc));
               resultList.add(file);
             }
           }
         } catch (IOException ioe) {
           LOGGER.error("Error reading file.", ioe);
         }
-      } else if(isImgFile(importFile)){
-        ImportFileObject file = new ImportFileObject(importFile.getFilename(), 
-            getActionForFile(importFile.getFilename(), galleryDoc));
+      } else if (isImgFile(importFile)) {
+        ImportFileObject file = new ImportFileObject(importFile.getFilename(), getActionForFile(
+            importFile.getFilename(), galleryDoc));
         resultList.add(file);
       }
-    } else{
-      LOGGER.error("zipFile='null' - galleryDoc='" + galleryDoc.getDocumentReference() + 
-          "'");
+    } else {
+      LOGGER.error("zipFile='null' - galleryDoc='" + galleryDoc.getDocumentReference() + "'");
     }
-    
+
     return resultList;
   }
 
   /**
-   * For a given filename return if, in the specified gallery, its import 
+   * For a given filename return if, in the specified gallery, its import
    * should be added, overwritten or skiped.
    * 
-   * @param fileName Filename of the file to check.
-   * @param galleryDoc Document of the gallery to check if the file already exists.
+   * @param fileName
+   *          Filename of the file to check.
+   * @param galleryDoc
+   *          Document of the gallery to check if the file already exists.
    * @return action when importing: -1 skip, 0 overwrite, 1 add
    */
   short getActionForFile(String fileName, XWikiDocument galleryDoc) {
     short action = ImportFileObject.ACTION_SKIP;
-    boolean isImportToFilebase = getContext().getDoc(
-        ).getXObjectSize(getImportClassRef()) == 0;
-    LOGGER.debug("getActionForFile [" + fileName + "] on gallery doc [" + galleryDoc 
+    boolean isImportToFilebase = getContext().getDoc().getXObjectSize(getImportClassRef()) == 0;
+    LOGGER.debug("getActionForFile [" + fileName + "] on gallery doc [" + galleryDoc
         + "], isImportToFilebase [" + isImportToFilebase + "]");
-    if(isImgFile(fileName) || isImportToFilebase){
+    if (isImgFile(fileName) || isImportToFilebase) {
       fileName = fileName.replace(System.getProperty("file.separator"), ".");
       fileName = getContext().getWiki().clearName(fileName, false, true, getContext());
-      if(!attService.existsAttachmentNameEqual(galleryDoc, fileName)) {
+      if (!attService.existsAttachmentNameEqual(galleryDoc, fileName)) {
         action = ImportFileObject.ACTION_ADD;
-      } else{
+      } else {
         action = ImportFileObject.ACTION_OVERWRITE;
       }
     }
@@ -566,14 +557,12 @@ public class ImageService implements IImageService {
   }
 
   DocumentReference getImportClassRef() {
-    return webUtilsService.resolveDocumentReference(
-        "Classes.ImportClass");
+    return webUtilsService.resolveDocumentReference("Classes.ImportClass");
   }
 
   private boolean isZipFile(XWikiAttachment file) {
-    return file.getMimeType(getContext()).equalsIgnoreCase(ImageLibStrings.MIME_ZIP) 
-        || file.getMimeType(getContext()).equalsIgnoreCase(
-            ImageLibStrings.MIME_ZIP_MICROSOFT);
+    return file.getMimeType(getContext()).equalsIgnoreCase(ImageLibStrings.MIME_ZIP)
+        || file.getMimeType(getContext()).equalsIgnoreCase(ImageLibStrings.MIME_ZIP_MICROSOFT);
   }
 
   private boolean isImgFile(String fileName) {
@@ -586,18 +575,12 @@ public class ImageService implements IImageService {
   }
 
   private boolean isImgFile(XWikiAttachment file) {
-    return file.getMimeType(getContext()).equalsIgnoreCase("image/"
-        + ImageLibStrings.MIME_BMP)
-        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
-            + ImageLibStrings.MIME_GIF)
-        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
-            + ImageLibStrings.MIME_JPE)
-        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
-            + ImageLibStrings.MIME_JPG)
-        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
-            + ImageLibStrings.MIME_JPEG)
-        || file.getMimeType(getContext()).equalsIgnoreCase("image/"
-            + ImageLibStrings.MIME_PNG);
+    return file.getMimeType(getContext()).equalsIgnoreCase("image/" + ImageLibStrings.MIME_BMP)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/" + ImageLibStrings.MIME_GIF)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/" + ImageLibStrings.MIME_JPE)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/" + ImageLibStrings.MIME_JPG)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/" + ImageLibStrings.MIME_JPEG)
+        || file.getMimeType(getContext()).equalsIgnoreCase("image/" + ImageLibStrings.MIME_PNG);
   }
 
 }

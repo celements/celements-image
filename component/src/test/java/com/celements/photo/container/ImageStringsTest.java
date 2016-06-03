@@ -25,12 +25,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ImageStringsTest {
+
   private final String ID = "id123";
   private final String NAME = "imgname.jpg";
   private final String URL = "/download/My/Img/imagname.jpg";
   private final String THUMB_URL = "/download/My/Img/imagname.jpg?celwidth=100px";
   ImageStrings is;
-  
+
   @Before
   public void setUp() throws Exception {
     is = new ImageStrings(ID, NAME, URL, THUMB_URL);
@@ -67,10 +68,10 @@ public class ImageStringsTest {
   public void testGetJSON() {
     assertEquals(getTestJSON(), is.getJSON());
   }
-  
+
   private String getTestJSON() {
-    return "{\"id\" : \"" + ID + "\", \"name\" : \"" + NAME + "\", \"URL\" : \"" + URL + 
-        "\", \"thumbURL\" : \"" + THUMB_URL + "\"}";
+    return "{\"id\" : \"" + ID + "\", \"name\" : \"" + NAME + "\", \"URL\" : \"" + URL
+        + "\", \"thumbURL\" : \"" + THUMB_URL + "\"}";
   }
 
 }

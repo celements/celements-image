@@ -8,9 +8,9 @@ import org.junit.Test;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 
 public class BarcodeScriptServiceTest extends AbstractBridgedComponentTestCase {
-  
+
   BarcodeScriptService bss;
-  
+
   @Before
   public void setUp_BarcodeScriptServiceTest() throws Exception {
     bss = new BarcodeScriptService();

@@ -48,16 +48,16 @@ import com.xpn.xwiki.web.Utils;
 
 @Component("celmetatags")
 public class MetaInfoScriptService implements ScriptService {
-  
+
   private static Logger _LOGGER = LoggerFactory.getLogger(MetaInfoScriptService.class);
-  
+
   @Requirement
   IMetadataDocumentRole metaDocComp;
-  
+
   @Requirement
   IMetaInfoService metaInfoService;
-  
-  public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename, 
+
+  public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename,
       String directory) {
     return metaInfoService.getDirectoryTagsAsTagList(docRef, filename, directory);
   }
@@ -77,99 +77,112 @@ public class MetaInfoScriptService implements ScriptService {
   /**
    * Get a specified Metadate from an image.
    * 
-   * @param doc XWikiDocument of the album.
-   * @param id Hashcode of the image.
-   * @param imageMethods Used to get the image.
-   * @param tag Name of the metatag to get.
-   * @param context XWikiContext
+   * @param doc
+   *          XWikiDocument of the album.
+   * @param id
+   *          Hashcode of the image.
+   * @param imageMethods
+   *          Used to get the image.
+   * @param tag
+   *          Name of the metatag to get.
+   * @param context
+   *          XWikiContext
    * @return The Metadate of the specified Tag.
    * @throws XWikiException
    * @throws MetadataException
    * @throws IOException
    */
   public Metadate getTag(Document doc, String id, String tag) {
-    //TODO implement
+    // TODO implement
     throw new NotImplementedException();
   }
-  
+
   /**
    * Returns an array of Metadate objects, excluding the tags starting with
    * the specified condition. If the condition is an empty String or null the
    * all metadata available is returned.
    * 
-   * @param doc XWikiDocument of the album.
-   * @param id Hashcode of the image.
-   * @param conditionTag Tags starting with this String are excluded from the result List.
-   * @param imageMethods Used to get the image.
-   * @param context XWikiContext
+   * @param doc
+   *          XWikiDocument of the album.
+   * @param id
+   *          Hashcode of the image.
+   * @param conditionTag
+   *          Tags starting with this String are excluded from the result List.
+   * @param imageMethods
+   *          Used to get the image.
+   * @param context
+   *          XWikiContext
    * @return Array of Metadate objects.
    * @throws XWikiException
    * @throws MetadataException
    * @throws IOException
    */
-  public Metadate[] getMetadataWithCondition(XWikiDocument doc, String id, 
-      String conditionTag, XWikiContext context) {
-    //TODO implement
-    throw new NotImplementedException();
-  }
-  
-  /**
-   * Get all metainformation contained in a specified image.
-   * 
-   * @param doc XWikiDocument of the album.
-   * @param id Hashcode of the image.
-   * @param imageMethods Used to get the image.
-   * @param context XWikiContext
-   * @return A List containing all the metadata from the specified image.
-   * @throws XWikiException
-   * @throws MetadataException
-   * @throws IOException 
-   */
-  public List<BaseObject> getMetadataList(XWikiDocument doc, String id, 
+  public Metadate[] getMetadataWithCondition(XWikiDocument doc, String id, String conditionTag,
       XWikiContext context) {
-    //TODO implement
-    throw new NotImplementedException();
-  }
-  
-  public Tag getMetaTag() {
-    //TODO implement
+    // TODO implement
     throw new NotImplementedException();
   }
 
-  public void extractMetadataToDocument(DocumentReference source, String filename, 
+  /**
+   * Get all metainformation contained in a specified image.
+   * 
+   * @param doc
+   *          XWikiDocument of the album.
+   * @param id
+   *          Hashcode of the image.
+   * @param imageMethods
+   *          Used to get the image.
+   * @param context
+   *          XWikiContext
+   * @return A List containing all the metadata from the specified image.
+   * @throws XWikiException
+   * @throws MetadataException
+   * @throws IOException
+   */
+  public List<BaseObject> getMetadataList(XWikiDocument doc, String id, XWikiContext context) {
+    // TODO implement
+    throw new NotImplementedException();
+  }
+
+  public Tag getMetaTag() {
+    // TODO implement
+    throw new NotImplementedException();
+  }
+
+  public void extractMetadataToDocument(DocumentReference source, String filename,
       DocumentReference destination, boolean filteredImport) {
     metaDocComp.extractMetadataToDocument(source, filename, destination, filteredImport);
   }
 
-  public void extractMetadataToDocument(DocumentReference source, String filename, 
+  public void extractMetadataToDocument(DocumentReference source, String filename,
       DocumentReference destination) {
     extractMetadataToDocument(source, filename, destination, true);
   }
-  
+
   public String cleanCtrlChars(String tag) {
-    if(!getContext().containsKey("nInfoExtractor")) {
+    if (!getContext().containsKey("nInfoExtractor")) {
       getContext().put("nInfoExtractor", new MetaInfoExtractor());
     }
-    MetaInfoExtractor extractor = (MetaInfoExtractor)getContext().get("nInfoExtractor");
+    MetaInfoExtractor extractor = (MetaInfoExtractor) getContext().get("nInfoExtractor");
     return extractor.cleanCtrlChars(tag);
   }
-  
+
   public void addTagToDocument(DocumentReference docRef, String name, String value) {
     XWikiDocument doc;
     try {
       doc = getContext().getWiki().getDocument(docRef, getContext());
       Map<String, String> tags = new HashMap<String, String>();
       tags.put(name, value);
-      if(metaDocComp.addTagsToDoc(tags, doc, false)) {
+      if (metaDocComp.addTagsToDoc(tags, doc, false)) {
         getContext().getWiki().saveDocument(doc, "added tag '" + name + "'", getContext());
       }
     } catch (XWikiException xwe) {
       _LOGGER.error("Exception adding tag to document " + docRef.getName(), xwe);
     }
   }
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
   }
 }
