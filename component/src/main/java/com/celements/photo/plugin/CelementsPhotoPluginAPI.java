@@ -46,8 +46,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * The CelementsPhotoPluginAPI acts as an Interface between the functionality, 
- * implemented in Java and the frontend using it (Velocity). 
+ * The CelementsPhotoPluginAPI acts as an Interface between the functionality,
+ * implemented in Java and the frontend using it (Velocity).
  * The photo plugin provides methods to create and manage galleries in XWiki.
  */
 public class CelementsPhotoPluginAPI extends Api {
@@ -62,7 +62,7 @@ public class CelementsPhotoPluginAPI extends Api {
     super(context);
     photoPlugin = plugin;
   }
-  
+
   public CelementsPhotoPlugin getPlugin() {
     return photoPlugin;
   }
@@ -70,53 +70,56 @@ public class CelementsPhotoPluginAPI extends Api {
   public void setPlugin(CelementsPhotoPlugin photoPlugin) {
     this.photoPlugin = photoPlugin;
   }
-  
+
   // ALBUM .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
   /**
    * Returns a List of all albums in the photo space.
    * 
    * @return List of all albums in the photo space.
    */
-  public List<String> getAlbumList(String space) throws XWikiException{
+  public List<String> getAlbumList(String space) throws XWikiException {
     List<String> albums = new Vector<String>();
     List<String> docs = context.getWiki().getSpaceDocsName(space, context);
-    
+
     for (Iterator<String> iter = docs.iterator(); iter.hasNext();) {
       String docName = iter.next();
-      DocumentReference docRef = new DocumentReference(context.getDatabase(), space, 
-          docName);
+      DocumentReference docRef = new DocumentReference(context.getDatabase(), space, docName);
       XWikiDocument doc = context.getWiki().getDocument(docRef, context);
-      if(doc.getXObject(ImageLibStrings.getAlbumClassDocRef()) != null){
+      if (doc.getXObject(ImageLibStrings.getAlbumClassDocRef()) != null) {
         albums.add(docName);
       }
     }
-    
+
     return albums;
   }
-  
+
   // IMAGE .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
   /**
    * Returns wether the specified image is marked as deleted or not.
    * 
-   * @param doc Document of the album.
-   * @param id Id of the image.
+   * @param doc
+   *          Document of the album.
+   * @param id
+   *          Id of the image.
    * @return true if the image is tagged as deleted.
    * @throws XWikiException
    */
-  public boolean isImageDeleted(Document album, String id) throws XWikiException{
+  public boolean isImageDeleted(Document album, String id) throws XWikiException {
     return photoPlugin.isImageDeleted(album.getDocument(), id, context);
   }
 
   /**
    * Set the "deleted" tag for the image to the specified value.
    * 
-   * @param doc Document of the album.
-   * @param id Id of the image.
-   * @param deleted true to tag the image as deleted.
+   * @param doc
+   *          Document of the album.
+   * @param id
+   *          Id of the image.
+   * @param deleted
+   *          true to tag the image as deleted.
    * @throws XWikiException
    */
-  public void setImageDeleted(Document album, String id, boolean deleted
-      ) throws XWikiException{
+  public void setImageDeleted(Document album, String id, boolean deleted) throws XWikiException {
     photoPlugin.setImageDeleted(album.getDocument(), id, deleted, context);
   }
 
@@ -126,111 +129,123 @@ public class CelementsPhotoPluginAPI extends Api {
    * the image's id.
    * 
    * @see com.celements.photo.plugin.container.ImageStrings
-   * @param doc Document of the album.
+   * @param doc
+   *          Document of the album.
    * @return Array of ImageStrings.
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageListExclThumbs(Document album
-      ) throws XWikiException, IOException{
+  public ImageStrings[] getImageListExclThumbs(Document album) throws XWikiException, IOException {
     return photoPlugin.getImageListExclThumbs(album.getDocument(), context);
   }
-  
+
   /**
    * Returns an array of ImageStrings for all images in the specified album.
    * 
    * @see com.celements.photo.plugin.container.ImageStrings
-   * @param doc Document of the album.
-   * @param width Desired maximum width of the thumbnails (aspect ratio is maintained).
-   * @param height Desired maximum height of the thumbnails (aspect ratio is maintained).
+   * @param doc
+   *          Document of the album.
+   * @param width
+   *          Desired maximum width of the thumbnails (aspect ratio is maintained).
+   * @param height
+   *          Desired maximum height of the thumbnails (aspect ratio is maintained).
    * @return Array of ImageStrings.
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageList(Document album, int width, int height
-      ) throws XWikiException, IOException{
+  public ImageStrings[] getImageList(Document album, int width, int height) throws XWikiException,
+      IOException {
     return photoPlugin.getImageList(album.getDocument(), width, height, context);
   }
-  
+
   // THUMBNAIL .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
   /**
    * Returns the URL to the thumbnail of a certain image in the specified
    * size. If the thumbnail does not exist it is created.
    * 
-   * @param doc Document of the album.
-   * @param id Id of the image.
-   * @param width desired width for the thumb
-   * @param height desired height for the thumb
+   * @param doc
+   *          Document of the album.
+   * @param id
+   *          Id of the image.
+   * @param width
+   *          desired width for the thumb
+   * @param height
+   *          desired height for the thumb
    * @return The download URL for the thumb
    * @throws XWikiException
    * @throws IOException
    */
-  public String getThumbnailURL(Document album, String id, int width, int height
-      ) throws XWikiException, IOException{
+  public String getThumbnailURL(Document album, String id, int width, int height)
+      throws XWikiException, IOException {
     return photoPlugin.getThumbnailUrl(album.getDocument(), id, width, height, context);
   }
-  
+
   // DATA MANIPULATION .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
   /**
    * Deletes the document with the metadata attached.
    * 
-   * @param doc Document of the album.
-   * @param id Id of the image.
+   * @param doc
+   *          Document of the album.
+   * @param id
+   *          Id of the image.
    * @throws XWikiException
    * @throws IOException
    */
-  public void forceClearMetadata(Document doc, String id
-      ) throws XWikiException, IOException{
+  public void forceClearMetadata(Document doc, String id) throws XWikiException, IOException {
     photoPlugin.forceClearMetadata(doc.getDocument(), id, context);
   }
-  
+
   // CELEMENTS USE .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
   /**
-   * Get a List of all attachments in the specified archive and the suggested 
+   * Get a List of all attachments in the specified archive and the suggested
    * action when importing.
-   * 
    * -->!!! needs programming rights to get the XWikiDocument out of the attachmentDoc !!!
    * 
-   * @param attachmentDoc Zip archive to check the files for the existence in the gallery.
-   * @param attachmentName Name of the zip archive attachment.
-   * @param galleryDoc Gallery Document to check for the files.
+   * @param attachmentDoc
+   *          Zip archive to check the files for the existence in the gallery.
+   * @param attachmentName
+   *          Name of the zip archive attachment.
+   * @param galleryDoc
+   *          Gallery Document to check for the files.
    * @return List of {@link ImportFileObject} for each file.
    * @throws XWikiException
-   * 
    * @deprecated instead use ImageScriptService.getAttachmentFileListWithActions
    */
   @Deprecated
-  public List<ImportFileObject> getAttachmentFileListWithActions(Document attachmentDoc, 
-      String attachmentName, Document galleryDoc) throws XWikiException{
+  public List<ImportFileObject> getAttachmentFileListWithActions(Document attachmentDoc,
+      String attachmentName, Document galleryDoc) throws XWikiException {
     XWikiAttachment zipFile = attachmentDoc.getDocument().getAttachment(attachmentName);
-    return photoPlugin.getAttachmentFileListWithActions(zipFile, galleryDoc.getDocument(),
-        context);
+    return photoPlugin.getAttachmentFileListWithActions(zipFile, galleryDoc.getDocument(), context);
   }
 
   /**
-   * Get a specified image file in a zip archive, extract it, change it to the 
+   * Get a specified image file in a zip archive, extract it, change it to the
    * desired size and save it as an attachment to the given page.
    * 
-   * @param zipDoc File containing the image to extract.
-   * @param attachmentName Filename of the image to extract.
-   * @param attachToDoc Document to attach the extracted and resized image.
-   * @param width Width (max - aspect ratio is maintained) to resize the image to.
-   * @param height Height (max - aspect ratio is maintained) to resize the image to.
+   * @param zipDoc
+   *          File containing the image to extract.
+   * @param attachmentName
+   *          Filename of the image to extract.
+   * @param attachToDoc
+   *          Document to attach the extracted and resized image.
+   * @param width
+   *          Width (max - aspect ratio is maintained) to resize the image to.
+   * @param height
+   *          Height (max - aspect ratio is maintained) to resize the image to.
    * @return The cleaned up file name of the unpacked file.
    * @throws XWikiException
    */
   @Deprecated
-  public String unzipFileToAttachment(Document zipDoc, String attachmentName, 
-      String unzipFileName, Document attachToDoc, int width, int height
-      ) throws XWikiException, IOException{
-    IUnpackComponentRole comp = (IUnpackComponentRole)Utils.getComponent(
+  public String unzipFileToAttachment(Document zipDoc, String attachmentName, String unzipFileName,
+      Document attachToDoc, int width, int height) throws XWikiException, IOException {
+    IUnpackComponentRole comp = (IUnpackComponentRole) Utils.getComponent(
         IUnpackComponentRole.class);
-    return comp.unzipFileToAttachment(zipDoc.getDocumentReference(), attachmentName, 
-        unzipFileName, attachToDoc.getDocumentReference());
+    return comp.unzipFileToAttachment(zipDoc.getDocumentReference(), attachmentName, unzipFileName,
+        attachToDoc.getDocumentReference());
   }
 
   /**
-   * @deprecated instead use ImageScriptService.getDimension(String) 
+   * @deprecated instead use ImageScriptService.getDimension(String)
    */
   @Deprecated
   public ImageDimensions getDimension(String imageFullName) {

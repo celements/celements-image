@@ -11,7 +11,8 @@ import com.xpn.xwiki.api.Attachment;
 
 @ComponentRole
 public interface IMetaInfoService {
-  public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename, 
+
+  public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename,
       String directory);
 
   public List<Tag> getDirectoryTagsAsTagList(Attachment attachment, String directory);

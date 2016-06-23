@@ -37,37 +37,40 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiException;
 
 public class Unzip {
+
   private static final int BUFFER = 1024;
-  
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(Unzip.class);
-  
-  public Unzip(){}
-  
+
+  public Unzip() {
+  }
+
   /**
    * Extracts the specified file from a given zip archive.
    * 
-   * @param zipFile byte array representation of a zip archive.
-   * @param filename Name of the file which should be extracted.
+   * @param zipFile
+   *          byte array representation of a zip archive.
+   * @param filename
+   *          Name of the file which should be extracted.
    * @return A ByteArrayOutputStream of the extractes file.
    * @throws XWikiException
    * @throws IOException
    */
-  public ByteArrayOutputStream getFile(byte[] zipFile, String filename
-      ) throws XWikiException, IOException{
+  public ByteArrayOutputStream getFile(byte[] zipFile, String filename) throws XWikiException,
+      IOException {
     return findAndExtractFile(filename, getZipInputStream(zipFile));
   }
 
-  public ByteArrayOutputStream getFile(String filename, InputStream zipFile
-      ) throws XWikiException, IOException{
+  public ByteArrayOutputStream getFile(String filename, InputStream zipFile) throws XWikiException,
+      IOException {
     return findAndExtractFile(filename, getZipInputStream(zipFile));
   }
-  
-  private ByteArrayOutputStream findAndExtractFile(String filename, ZipInputStream zipIn
-      ) throws IOException {
+
+  private ByteArrayOutputStream findAndExtractFile(String filename, ZipInputStream zipIn)
+      throws IOException {
     ByteArrayOutputStream out = null;
-    for(ZipEntry entry = zipIn.getNextEntry(); zipIn.available()>0; entry = 
-        zipIn.getNextEntry()){
-      if(!entry.isDirectory() && entry.getName().equals(filename)){
+    for (ZipEntry entry = zipIn.getNextEntry(); zipIn.available() > 0; entry = zipIn.getNextEntry()) {
+      if (!entry.isDirectory() && entry.getName().equals(filename)) {
         // read the data and write it to the OutputStream
         int count;
         byte[] data = new byte[BUFFER];
@@ -80,29 +83,30 @@ public class Unzip {
         break;
       }
     }
-    
+
     zipIn.close();
     return out;
   }
-  
+
   /**
    * Get a List of names of all files contained in the zip file.
    * 
-   * @param zipFile byte array of the zip file.
-   * @return List of all filenames (and directory names - ending with a file seperator) 
-   *              contained in the zip file.
+   * @param zipFile
+   *          byte array of the zip file.
+   * @return List of all filenames (and directory names - ending with a file seperator)
+   *         contained in the zip file.
    */
-  public List<String> getZipContentList(byte[] zipFile){
+  public List<String> getZipContentList(byte[] zipFile) {
     String fileSep = System.getProperty("file.separator");
     List<String> contentList = new ArrayList<String>();
     ZipInputStream zipStream = getZipInputStream(zipFile);
-    
+
     try {
-      while(zipStream.available() > 0){
+      while (zipStream.available() > 0) {
         ZipEntry entry = zipStream.getNextEntry();
-        if(entry != null){
+        if (entry != null) {
           String fileName = entry.getName();
-          if(entry.isDirectory() && !fileName.endsWith(fileSep)){
+          if (entry.isDirectory() && !fileName.endsWith(fileSep)) {
             fileName += fileSep;
           }
           contentList.add(fileName);
@@ -111,14 +115,15 @@ public class Unzip {
     } catch (IOException e) {
       LOGGER.error(e);
     }
-    
+
     return contentList;
   }
-  
+
   /*
    * Get a ZiInputStream for the specified file.
    * 
    * @param srcFile byte array representation of a zip file.
+   * 
    * @return A ZipInputStream for the file.
    */
   private ZipInputStream getZipInputStream(byte[] srcFile) {
@@ -127,13 +132,13 @@ public class Unzip {
   }
 
   private ZipInputStream getZipInputStream(InputStream in) {
-    //historically zip supported only IBM Code Page 437 encoding. Today others can occur,
+    // historically zip supported only IBM Code Page 437 encoding. Today others can occur,
     // like e.g. UTF-8 or OS defaults
-    //FIXME try apache commons zip
-    //  Java zip fails with ...
-    //    ... "Cp437" in recognizing umlauts correctly 
-    //                e.g. linux & mac command line 'zip', mac right-click compress
-    //    ... "UTF-8" in Windows system default and WinRAR with a Java Exception
+    // FIXME try apache commons zip
+    // Java zip fails with ...
+    // ... "Cp437" in recognizing umlauts correctly
+    // e.g. linux & mac command line 'zip', mac right-click compress
+    // ... "UTF-8" in Windows system default and WinRAR with a Java Exception
     return new ZipInputStream(new BufferedInputStream(in), Charset.forName("Cp437"));
   }
 }

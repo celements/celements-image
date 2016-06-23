@@ -32,14 +32,13 @@ import org.xwiki.component.annotation.Component;
 public class MaxImageSizeService implements IMaxImageSizeServiceRole {
 
   private static final String IMG_ATTR_REGEX = "(\\w+)=[\"'](\\S*)[\"']";
-  Pattern imgPattern = Pattern.compile("<img(?: " + IMG_ATTR_REGEX + ")+\\s*/>",
-      Pattern.MULTILINE);
+  Pattern imgPattern = Pattern.compile("<img(?: " + IMG_ATTR_REGEX + ")+\\s*/>", Pattern.MULTILINE);
   Pattern imgAttrPattern = Pattern.compile(IMG_ATTR_REGEX);
 
   public String fixMaxImageSizes(String pageContent, int maxWidth, int maxHeight) {
     List<Image> allImages = getAllImagesInSource(pageContent);
-    //TODO get greatest resize factor over all images
-    //TODO reduce max sizes of all images and apply to pageContent
+    // TODO get greatest resize factor over all images
+    // TODO reduce max sizes of all images and apply to pageContent
     return pageContent;
   }
 
@@ -48,8 +47,8 @@ public class MaxImageSizeService implements IMaxImageSizeServiceRole {
     Matcher imgMatcher = getImgMatcher(pageContent);
     while (imgMatcher.find()) {
       Map<String, String> imgAttrMap = getImageAttrMap(imgMatcher.group());
-      imagesList.add(new Image(imgAttrMap.get("id"), imgAttrMap.get("name"),
-          imgAttrMap.get("src")));
+      imagesList.add(new Image(imgAttrMap.get("id"), imgAttrMap.get("name"), imgAttrMap.get(
+          "src")));
     }
     return imagesList;
   }

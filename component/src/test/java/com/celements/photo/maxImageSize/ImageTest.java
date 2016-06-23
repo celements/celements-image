@@ -9,8 +9,8 @@ public class ImageTest {
 
   private static final Integer IMAGE_MAX_WIDTH = 600;
   private static final Integer IMAGE_MAX_HEIGHT = 500;
-  private static final String IMAGE_URL_QUERY_PART = "?celwidth=" + IMAGE_MAX_WIDTH
-      + "&celheight=" + IMAGE_MAX_HEIGHT;
+  private static final String IMAGE_URL_QUERY_PART = "?celwidth=" + IMAGE_MAX_WIDTH + "&celheight="
+      + IMAGE_MAX_HEIGHT;
   private static final String IMAGE_BASIS_URL = "/download/testSpace/test/fileName.jpg";
   private static final String IMAGE_ORIG_URL = IMAGE_BASIS_URL + IMAGE_URL_QUERY_PART;
   private static final String IMAGE_NAME = "firstImageName";
@@ -67,8 +67,8 @@ public class ImageTest {
     Integer newMaxWidth = IMAGE_MAX_WIDTH + 100;
     testImage.setMaxWidth(newMaxWidth);
     assertEquals(newMaxWidth, testImage.getMaxWidth());
-    assertEquals(IMAGE_BASIS_URL + "?celwidth=" + newMaxWidth + "&celheight="
-        + IMAGE_MAX_HEIGHT, testImage.getURL());
+    assertEquals(IMAGE_BASIS_URL + "?celwidth=" + newMaxWidth + "&celheight=" + IMAGE_MAX_HEIGHT,
+        testImage.getURL());
     assertEquals(IMAGE_ORIG_URL, testImage.getOrigURL());
   }
 
@@ -80,8 +80,8 @@ public class ImageTest {
     testImage = new Image(IMAGE_ID, IMAGE_NAME, origURL);
     testImage.setMaxWidth(newMaxWidth);
     assertEquals(newMaxWidth, testImage.getMaxWidth());
-    assertEquals(IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT + "&celwidth="
-        + newMaxWidth, testImage.getURL());
+    assertEquals(IMAGE_BASIS_URL + "?celheight=" + IMAGE_MAX_HEIGHT + "&celwidth=" + newMaxWidth,
+        testImage.getURL());
     assertEquals(origURL, testImage.getOrigURL());
   }
 
@@ -133,8 +133,8 @@ public class ImageTest {
     testImage = new Image(IMAGE_ID, IMAGE_NAME, origURL);
     testImage.setMaxHeight(newMaxHeight);
     assertEquals(newMaxHeight, testImage.getMaxHeight());
-    assertEquals(IMAGE_BASIS_URL + "?celheight=" + newMaxHeight + "&celwidth="
-        + IMAGE_MAX_WIDTH, testImage.getURL());
+    assertEquals(IMAGE_BASIS_URL + "?celheight=" + newMaxHeight + "&celwidth=" + IMAGE_MAX_WIDTH,
+        testImage.getURL());
     assertEquals(origURL, testImage.getOrigURL());
   }
 
@@ -143,8 +143,8 @@ public class ImageTest {
     Integer newMaxHeight = IMAGE_MAX_HEIGHT + 100;
     testImage.setMaxHeight(newMaxHeight);
     assertEquals(newMaxHeight, testImage.getMaxHeight());
-    assertEquals(IMAGE_BASIS_URL + "?celwidth=" + IMAGE_MAX_WIDTH + "&celheight="
-        + newMaxHeight, testImage.getURL());
+    assertEquals(IMAGE_BASIS_URL + "?celwidth=" + IMAGE_MAX_WIDTH + "&celheight=" + newMaxHeight,
+        testImage.getURL());
     assertEquals(IMAGE_ORIG_URL, testImage.getOrigURL());
   }
 
@@ -179,8 +179,8 @@ public class ImageTest {
 
   @Test
   public void testGetJSON() {
-    String expectedJSON = "{\"id\" : \"" + IMAGE_ID + "\", \"name\" : \""
-        + IMAGE_NAME + "\", \"URL\" : \"" + IMAGE_ORIG_URL + "\", \"thumbURL\" : null}";
+    String expectedJSON = "{\"id\" : \"" + IMAGE_ID + "\", \"name\" : \"" + IMAGE_NAME
+        + "\", \"URL\" : \"" + IMAGE_ORIG_URL + "\", \"thumbURL\" : null}";
     assertEquals(expectedJSON, testImage.getJSON());
   }
 
@@ -188,9 +188,8 @@ public class ImageTest {
   public void testGetJSON_includeThumb() {
     String thumbURL = "thumbURL";
     testImage.setThumbURL(thumbURL);
-    String expectedJSON = "{\"id\" : \"" + IMAGE_ID + "\", \"name\" : \""
-        + IMAGE_NAME + "\", \"URL\" : \"" + IMAGE_ORIG_URL + "\", \"thumbURL\" : \""
-        + thumbURL + "\"}";
+    String expectedJSON = "{\"id\" : \"" + IMAGE_ID + "\", \"name\" : \"" + IMAGE_NAME
+        + "\", \"URL\" : \"" + IMAGE_ORIG_URL + "\", \"thumbURL\" : \"" + thumbURL + "\"}";
     assertEquals(expectedJSON, testImage.getJSON());
   }
 

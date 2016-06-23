@@ -36,35 +36,40 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Provides diverse methodes to access and handle images. e.g. extract images 
+ * Provides diverse methodes to access and handle images. e.g. extract images
  * from zip files, to get a list of images or to delete and restore images.
  */
 public class Image {
+
   /**
    * Get an array of ImageStrings containing all the (non deleted) images in
    * the album.
    * 
    * @see com.celements.photo.plugin.container.ImageStrings
-   * @param doc XWikiDocument of the album.
-   * @param width Maximum allowed width of the thumbnails (aspect ratio 
-   *         maintaining).
-   * @param height Maximum allowed height of the thumbnails (aspect ratio 
+   * @param doc
+   *          XWikiDocument of the album.
+   * @param width
+   *          Maximum allowed width of the thumbnails (aspect ratio
    *          maintaining).
-   * @param thumb Thumbnail handler to get the URLs to the thumbnails.
-   * @param context XWikiContext
+   * @param height
+   *          Maximum allowed height of the thumbnails (aspect ratio
+   *          maintaining).
+   * @param thumb
+   *          Thumbnail handler to get the URLs to the thumbnails.
+   * @param context
+   *          XWikiContext
    * @return Array of ImageStrings for all images in the album.
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageList(XWikiDocument doc, int width, int height, 
-      Thumbnail thumb, XWikiContext context) throws XWikiException, IOException{
+  public ImageStrings[] getImageList(XWikiDocument doc, int width, int height, Thumbnail thumb,
+      XWikiContext context) throws XWikiException, IOException {
     ImageStrings[] imageArray = getImageListExclThumbs(doc, context);
-    
+
     for (int i = 0; i < imageArray.length; i++) {
-      imageArray[i].setThumbURL(thumb.getUrl(doc, imageArray[i].getId(), width, height, 
-          context));
+      imageArray[i].setThumbURL(thumb.getUrl(doc, imageArray[i].getId(), width, height, context));
     }
-    
+
     return imageArray;
   }
 
@@ -74,44 +79,44 @@ public class Image {
    * the image's id.
    * 
    * @see com.celements.photo.plugin.container.ImageStrings
-   * @param doc XWikiDocument of the album.
-   * @param context XWikiContext
+   * @param doc
+   *          XWikiDocument of the album.
+   * @param context
+   *          XWikiContext
    * @return Array of ImageStrings.
    * @throws XWikiException
    * @throws IOException
    */
-  public ImageStrings[] getImageListExclThumbs(XWikiDocument doc, XWikiContext context
-      ) throws XWikiException, IOException{
+  public ImageStrings[] getImageListExclThumbs(XWikiDocument doc, XWikiContext context)
+      throws XWikiException, IOException {
     String album = doc.getDocumentReference().getName();
     (new ZipAttachmentChanges()).checkZipAttatchmentChanges(doc, context);
-    
+
     List<XWikiDocument> images = new Vector<XWikiDocument>();
-    List<String> imageList = context.getWiki().getSpaceDocsName(
-        ImageLibStrings.getPhotoSpace(doc), context);
+    List<String> imageList = context.getWiki().getSpaceDocsName(ImageLibStrings.getPhotoSpace(doc),
+        context);
     getImagesFromAlbum(doc, album, images, imageList, context);
-    
+
     BaseObjectHandler handler = new BaseObjectHandler();
     ImageStrings[] imageArray = new ImageStrings[images.size()];
     Iterator<XWikiDocument> iter = images.iterator();
     for (int i = 0; iter.hasNext(); i++) {
       imageArray[i] = fetchDataFromImage(iter.next(), doc, imageArray, handler, context);
     }
-    
+
     return imageArray;
   }
 
-  private void getImagesFromAlbum(XWikiDocument doc, String album,
-      List<XWikiDocument> images, List<String> imageList, XWikiContext context)
-      throws XWikiException {
-    if(imageList != null){
+  private void getImagesFromAlbum(XWikiDocument doc, String album, List<XWikiDocument> images,
+      List<String> imageList, XWikiContext context) throws XWikiException {
+    if (imageList != null) {
       for (Iterator<String> iter = imageList.iterator(); iter.hasNext();) {
         String image = iter.next();
-        if(image.lastIndexOf(album + "_img_") == 0){
-          DocumentReference imgDocRef = new DocumentReference(context.getDatabase(), 
+        if (image.lastIndexOf(album + "_img_") == 0) {
+          DocumentReference imgDocRef = new DocumentReference(context.getDatabase(),
               ImageLibStrings.getPhotoSpace(doc), image);
-          XWikiDocument imageDoc = context.getWiki().getDocument(imgDocRef, context); 
-          if(!isDeleted(doc, image.substring(image.lastIndexOf(
-              "_")+1), context)){
+          XWikiDocument imageDoc = context.getWiki().getDocument(imgDocRef, context);
+          if (!isDeleted(doc, image.substring(image.lastIndexOf("_") + 1), context)) {
             images.add(imageDoc);
           }
         }
@@ -120,52 +125,56 @@ public class Image {
   }
 
   private ImageStrings fetchDataFromImage(XWikiDocument element, XWikiDocument doc,
-      ImageStrings[] imageArray, BaseObjectHandler handler,
-      XWikiContext context) throws XWikiException {
+      ImageStrings[] imageArray, BaseObjectHandler handler, XWikiContext context)
+      throws XWikiException {
     String id = handler.getImageString(element, ImageLibStrings.PHOTO_IMAGE_HASH);
     String name = handler.getImageString(element, ImageLibStrings.PHOTO_IMAGE_FILENAME);
-    String zipFilename = handler.getImageString(element, 
-        ImageLibStrings.PHOTO_IMAGE_ZIPNAME);
-    String origUrl = (new ZipAttachmentChanges()).getZipExplorerPluginApi(context
-        ).getFileLink(new Document(doc, context), zipFilename, name);
+    String zipFilename = handler.getImageString(element, ImageLibStrings.PHOTO_IMAGE_ZIPNAME);
+    String origUrl = (new ZipAttachmentChanges()).getZipExplorerPluginApi(context).getFileLink(
+        new Document(doc, context), zipFilename, name);
     return new ImageStrings(id, name, origUrl, "");
   }
 
   /**
    * Check if the specified image is tagged as deleted.
    * 
-   * @param doc XWikiDocument of the album.
-   * @param id Id of the image.
-   * @param context XWikiContext
+   * @param doc
+   *          XWikiDocument of the album.
+   * @param id
+   *          Id of the image.
+   * @param context
+   *          XWikiContext
    * @return true if the image is tagged as deleted.
    * @throws XWikiException
    */
-  public boolean isDeleted(XWikiDocument doc, String id, XWikiContext context
-      ) throws XWikiException {
-    DocumentReference metaDocRef = new DocumentReference(context.getDatabase(), 
-        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
-        "_img_" + id);
+  public boolean isDeleted(XWikiDocument doc, String id, XWikiContext context)
+      throws XWikiException {
+    DocumentReference metaDocRef = new DocumentReference(context.getDatabase(),
+        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + "_img_" + id);
     XWikiDocument celementsMetaDoc = context.getWiki().getDocument(metaDocRef, context);
-    return new BaseObjectHandler().getImageBoolean(celementsMetaDoc, 
+    return new BaseObjectHandler().getImageBoolean(celementsMetaDoc,
         ImageLibStrings.PHOTO_IMAGE_DELETED);
   }
 
   /**
    * Set the deleted status of an image to the specified value.
    * 
-   * @param doc XWikiDocument of the album.
-   * @param id Id of the image.
-   * @param deleted true taggs the image as deleted.
-   * @param context XWikiContext
+   * @param doc
+   *          XWikiDocument of the album.
+   * @param id
+   *          Id of the image.
+   * @param deleted
+   *          true taggs the image as deleted.
+   * @param context
+   *          XWikiContext
    * @throws XWikiException
    */
-  public void setDeleted(XWikiDocument doc, String id, boolean deleted, 
-      XWikiContext context) throws XWikiException {
-    DocumentReference metaDocRef = new DocumentReference(context.getDatabase(), 
-        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + 
-        "_img_" + id);
+  public void setDeleted(XWikiDocument doc, String id, boolean deleted, XWikiContext context)
+      throws XWikiException {
+    DocumentReference metaDocRef = new DocumentReference(context.getDatabase(),
+        ImageLibStrings.getPhotoSpace(doc), doc.getDocumentReference().getName() + "_img_" + id);
     XWikiDocument celementsMetaDoc = context.getWiki().getDocument(metaDocRef, context);
-    new BaseObjectHandler().setImageBoolean(celementsMetaDoc, 
-        ImageLibStrings.PHOTO_IMAGE_DELETED, deleted, context);
+    new BaseObjectHandler().setImageBoolean(celementsMetaDoc, ImageLibStrings.PHOTO_IMAGE_DELETED,
+        deleted, context);
   }
 }

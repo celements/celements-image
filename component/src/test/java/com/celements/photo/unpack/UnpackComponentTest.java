@@ -20,7 +20,6 @@ import com.celements.filebase.AttachmentToBigException;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.photo.container.ImageLibStrings;
-import com.celements.photo.utilities.AddAttachmentToDoc;
 import com.celements.photo.utilities.Unzip;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -28,6 +27,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
+
   private UnpackComponent upc;
   private XWiki xwiki;
 
@@ -40,51 +40,50 @@ public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testUnzipFileToAttachment_parameterPromotion() throws XWikiException, IOException, DocumentSaveException, AttachmentToBigException, AddingAttachmentContentFailedException {
+  public void testUnzipFileToAttachment_parameterPromotion() throws XWikiException, IOException,
+      DocumentSaveException, AttachmentToBigException, AddingAttachmentContentFailedException {
     String filename = "file.zip";
     String imgName = "file 1.png";
     String cleanImgName = "file1.png";
-    DocumentReference zipSrcDocRef = new DocumentReference(getContext().getDatabase(),
-        "AttSpace", "ZipDoc");
-    DocumentReference imgDestDocRef = new DocumentReference(getContext().getDatabase(),
-        "AttSpace", "AttDoc");
+    DocumentReference zipSrcDocRef = new DocumentReference(getContext().getDatabase(), "AttSpace",
+        "ZipDoc");
+    DocumentReference imgDestDocRef = new DocumentReference(getContext().getDatabase(), "AttSpace",
+        "AttDoc");
     XWikiDocument srcDoc = new XWikiDocument(zipSrcDocRef);
     XWikiDocument destDoc = new XWikiDocument(zipSrcDocRef);
     XWikiAttachment att = createMock(XWikiAttachment.class);
     expect(att.getFilename()).andReturn(filename).anyTimes();
     List<XWikiAttachment> atts = new ArrayList<XWikiAttachment>();
     expect(att.getMimeType(same(getContext()))).andReturn(ImageLibStrings.MIME_ZIP);
-    expect(att.getContentInputStream(same(getContext()))).andReturn(createMock(
-        InputStream.class));
+    expect(att.getContentInputStream(same(getContext()))).andReturn(createMock(InputStream.class));
     expect(att.clone()).andReturn(att).anyTimes();
     atts.add(att);
     srcDoc.setAttachmentList(atts);
     Unzip unzip = createMock(Unzip.class);
     upc.inject_unzip = unzip;
-    InputStream in = this.getClass().getClassLoader().getResourceAsStream(
-        "test.zip");
+    InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.zip");
     byte[] inArray = IOUtils.toByteArray(in);
     ByteArrayOutputStream bais = new ByteArrayOutputStream();
     bais.write(inArray);
-    expect(unzip.getFile(eq(imgName), (InputStream)anyObject())).andReturn(bais);
+    expect(unzip.getFile(eq(imgName), (InputStream) anyObject())).andReturn(bais);
     XWikiAttachment newAtt = new XWikiAttachment();
     newAtt.setFilename(cleanImgName);
     newAtt.setFilesize(123);
     newAtt.setDoc(destDoc);
     IAttachmentServiceRole attService = createMock(IAttachmentServiceRole.class);
     upc.attService = attService;
-    expect(attService.addAttachment(same(destDoc), (byte[])anyObject(), eq(cleanImgName),
-        eq(getContext().getUser()), eq((String)null))).andReturn(newAtt);
+    expect(attService.addAttachment(same(destDoc), (byte[]) anyObject(), eq(cleanImgName), eq(
+        getContext().getUser()), eq((String) null))).andReturn(newAtt);
     expect(attService.clearFileName(eq(imgName))).andReturn(cleanImgName);
     expect(xwiki.getDocument(same(zipSrcDocRef), same(getContext()))).andReturn(srcDoc);
     expect(xwiki.getDocument(same(imgDestDocRef), same(getContext()))).andReturn(destDoc);
     replay(att, attService, unzip, xwiki);
-    String resultImgName = upc.unzipFileToAttachment(zipSrcDocRef, filename, imgName, 
+    String resultImgName = upc.unzipFileToAttachment(zipSrcDocRef, filename, imgName,
         imgDestDocRef);
     verify(att, attService, unzip, xwiki);
     assertEquals(cleanImgName, resultImgName);
   }
-  
+
   @Test
   public void testIsZipFile_false() {
     assertFalse(upc.isZipFile(null));
@@ -106,8 +105,8 @@ public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsImgFile_false() {
-    assertFalse(upc.isImgFile((XWikiAttachment)null));
-    assertFalse(upc.isImgFile((String)null));
+    assertFalse(upc.isImgFile((XWikiAttachment) null));
+    assertFalse(upc.isImgFile((String) null));
     assertFalse(upc.isImgFile(""));
     assertFalse(upc.isImgFile("123.jzpg"));
     assertFalse(upc.isImgFile("jpg"));

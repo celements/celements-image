@@ -23,12 +23,11 @@ import com.celements.sajson.ECommand;
 import com.celements.sajson.IGenericLiteral;
 
 public enum EAlbumUpdateLiteral implements IGenericLiteral {
-  VALUE_PROPERTY(ECommand.VALUE_COMMAND),
-  ADD_REMOVE_ARRAY(ECommand.ARRAY_COMMAND, VALUE_PROPERTY),
-  ADD_REMOVE_PROPERTY(ECommand.PROPERTY_COMMAND, ADD_REMOVE_ARRAY),
-  REQUEST_DICT(ECommand.DICTIONARY_COMMAND, ADD_REMOVE_PROPERTY, VALUE_PROPERTY),
-  REQUEST_ARRAY(ECommand.ARRAY_COMMAND, REQUEST_DICT);
-  
+  VALUE_PROPERTY(ECommand.VALUE_COMMAND), ADD_REMOVE_ARRAY(ECommand.ARRAY_COMMAND,
+      VALUE_PROPERTY), ADD_REMOVE_PROPERTY(ECommand.PROPERTY_COMMAND,
+          ADD_REMOVE_ARRAY), REQUEST_DICT(ECommand.DICTIONARY_COMMAND, ADD_REMOVE_PROPERTY,
+              VALUE_PROPERTY), REQUEST_ARRAY(ECommand.ARRAY_COMMAND, REQUEST_DICT);
+
   private EAlbumUpdateLiteral[] literals;
   private ECommand command;
   private int nextLiteral = 0;
@@ -55,8 +54,7 @@ public enum EAlbumUpdateLiteral implements IGenericLiteral {
     return literals[0];
   }
 
-  public IGenericLiteral getPropertyLiteralForKey(String key,
-      IGenericLiteral placeholder) {
+  public IGenericLiteral getPropertyLiteralForKey(String key, IGenericLiteral placeholder) {
     return placeholder;
   }
 }

@@ -10,7 +10,6 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.utilities.ImportFileObject;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -26,19 +25,18 @@ public interface IImageService {
 
   public List<Attachment> getRandomImages(DocumentReference galleryRef, int num);
 
-  public SpaceReference getPhotoAlbumSpaceRef(DocumentReference galleryDocRef
-      ) throws NoGalleryDocumentException;
+  public SpaceReference getPhotoAlbumSpaceRef(DocumentReference galleryDocRef)
+      throws NoGalleryDocumentException;
 
   public boolean checkAddSlideRights(DocumentReference galleryDocRef);
 
-  public boolean addSlideFromTemplate(DocumentReference galleryDocRef,
-      String slideBaseName, String attFullName);
+  public boolean addSlideFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
+      String attFullName);
 
-  public BaseObject getPhotoAlbumNavObject(DocumentReference galleryDocRef
-      ) throws XWikiException, NoGalleryDocumentException;
+  public BaseObject getPhotoAlbumNavObject(DocumentReference galleryDocRef) throws XWikiException,
+      NoGalleryDocumentException;
 
-  public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef
-      ) throws XWikiException;
+  public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef) throws XWikiException;
 
   public DocumentReference getImageSlideTemplateRef();
 
