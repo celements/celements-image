@@ -793,6 +793,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _addNavigationButtonsBind : undefined,
       _addSlideShowCounterBind : undefined,
       _debug : undefined,
+      _menuDiv : undefined,
+      _contextMenuSlideShowListItemClickedBind : undefined,
 
       _init : function(config) {
         var _me = this;
@@ -802,6 +804,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
         _me._startStopClickHandlerBind = _me._startStopClickHandler.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
         _me._addSlideShowCounterBind = _me._addSlideShowCounter.bind(_me);
+        _me._contextMenuSlideShowListItemClickedBind = 
+          _me._contextMenuSlideShowListItemClicked.bind(_me);
       },
 
       _getContainerElemId : function() {
@@ -941,7 +945,114 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _startStopClickHandler : function(event) {
         var _me = this;
         event.stop();
-        _me.startStop();
+        var clickedElement = event.findElement();
+        var linkHref = clickedElement.up(0).href;
+        $(document.body).observe('click', _me._contextMenuSlideShowListItemClickedBind);
+        if((linkHref != null) && (linkHref != '')) {
+          var slideShowWrapper = clickedElement.up('.celimage_slideshow_wrapper');
+          var rect = slideShowWrapper.getBoundingClientRect();
+          var mouseCoord = _me._getMousePos(event);
+          var x = mouseCoord[0] - 6 - rect.left;
+          var y = mouseCoord[1] - 3 - rect.height;
+          _me._menuDiv = slideShowWrapper.down('.contextMenuSlideShow');
+          if(_me._menuDiv == null) {
+            _me._menuDiv = _me._generateMenuDiv(clickedElement);
+            slideShowWrapper.insert(_me._menuDiv);
+          } else {
+            _me._menuDiv.show();
+          }
+          $$('.contextMenuSlideShowListItem').each(function(element) {
+            element.observe('click', _me._contextMenuSlideShowListItemClickedBind)
+          });
+          _me._setPosition(x, y);
+          _me.startStop(false);
+        } else if(clickedElement.nodeName.toLowerCase() != 'img') {
+          if(_me._menuDiv != null) {
+            _me._menuDiv.hide();
+            _me._menuDiv.remove();
+            _me._menuDiv = null;
+          }
+        } else {
+          _me.startStop();
+        }
+      },
+      
+      _contextMenuSlideShowListItemClicked : function(event) {
+        var _me = this;
+        event.stop();
+        var clickedElement = event.findElement();
+        var linkHref = clickedElement.readAttribute('data-href');
+        var target = clickedElement.readAttribute('data-target');
+        if((linkHref != null) && (linkHref != '')) {
+          window.open(linkHref, target);
+        } else if (clickedElement.hasClassName('continueSlideshowContainer')) {
+          _me.startStop(true);
+        } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
+          _me.startStop(false);
+        }
+        _me._menuDiv.hide();
+        _me._menuDiv.remove();
+        _me._menuDiv = null;
+        $$('.contextMenuSlideShowListItem').each(function(element) {
+          element.stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+        });
+        $(document.body).stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+      },
+      
+      _generateMenuDiv : function (clickedElement) {
+        var _me = this;
+        var linkHref = clickedElement.up(0).href;
+        var menuDiv = new Element('div', {
+          'class' : 'contextMenuSlideShow'
+        }).setStyle({
+          'z-index' : 999,
+          'position' : 'absolute'
+        });
+        var list = new Element('ul');
+        var listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
+            ).insert(new Element('div', {
+              'data-href' : linkHref,
+              'data-target' : clickedElement.up(0).target
+        }).update("Open Link"));
+        list.insert(listElement);
+        listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
+          ).insert(new Element('div', {'class' : 'continueSlideshowContainer'}
+          ).update("Continue Slideshow"));
+        list.insert(listElement);
+        listElement = new Element('li', {'class' : 'stopMenuSlideShowListItem'}
+          ).insert(new Element('div', {'class' : 'stopSlideshowContainer'}
+          ).update("Stop Slideshow"));
+        list.insert(listElement);
+        menuDiv.insert(list);
+        return menuDiv;
+      },
+      
+      _getMousePos : function(event) {
+        var tmpCoord = new Array(0,0);
+        var posx = 0;
+        var posy = 0;
+        
+        if (!event) var event = window.event;
+        if (event.pageX || event.pageY) { // Firefox & co.
+          posx = event.pageX;
+          posy = event.pageY;
+        }
+        else if (event.clientX || event.clientY) { // IE
+          // NOTE: Explorer must be in strict mode for documentElement, otherwise use document.body.scrollLeft!
+          posx = event.clientX + document.documentElement.scrollLeft - 1;
+          posy = event.clientY + document.documentElement.scrollTop + 2;
+        }
+        tmpCoord[0] = posx;
+        tmpCoord[1] = posy;
+        return tmpCoord;
+      },
+      
+      _setPosition : function (x, y) {
+        var _me = this;
+        _me._menuDiv.setStyle({
+          'left' : x + 'px',
+          'top' : y + 'px'
+        });
       },
 
       startStop : function(isStart, delayedStart) {
