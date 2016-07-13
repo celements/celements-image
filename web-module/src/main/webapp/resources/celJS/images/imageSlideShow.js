@@ -946,9 +946,12 @@ window.CELEMENTS.image.SlideShow = function(config) {
         var _me = this;
         event.stop();
         var clickedElement = event.findElement();
-        var linkHref = clickedElement.up(0).href;
+        var linkHref = '';
+        if(clickedElement.up('div.cel_slideShow_slideWrapper a')) {
+          linkHref = clickedElement.up('div.cel_slideShow_slideWrapper a').href;
+        }
         $(document.body).observe('click', _me._contextMenuSlideShowListItemClickedBind);
-        if((linkHref != null) && (linkHref != '')) {
+        if(linkHref && (linkHref !== '')) {
           var slideShowWrapper = clickedElement.up('.celimage_slideshow_wrapper');
           var rect = slideShowWrapper.getBoundingClientRect();
           var mouseCoord = _me._getMousePos(event);
@@ -965,9 +968,10 @@ window.CELEMENTS.image.SlideShow = function(config) {
             element.observe('click', _me._contextMenuSlideShowListItemClickedBind)
           });
           _me._setPosition(x, y);
-          _me.startStop(false);
-        } else if(clickedElement.nodeName.toLowerCase() != 'img') {
+          _me.startStop(false, undefined, true);
+        } else if(clickedElement.nodeName.toLowerCase() !== 'img') {
           if(_me._menuDiv != null) {
+            console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _startStopClickHandler HIDE');
             _me._menuDiv.hide();
             _me._menuDiv.remove();
             _me._menuDiv = null;
@@ -979,6 +983,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       
       _contextMenuSlideShowListItemClicked : function(event) {
         var _me = this;
+        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _contextMenuSlideShowListItemClicked event: ', event);
         event.stop();
         var clickedElement = event.findElement();
         var linkHref = clickedElement.readAttribute('data-href');
@@ -990,6 +995,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
         } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
           _me.startStop(false);
         }
+        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _contextMenuSlideShowListItemClicked HIDE');
         _me._menuDiv.hide();
         _me._menuDiv.remove();
         _me._menuDiv = null;
@@ -1015,14 +1021,19 @@ window.CELEMENTS.image.SlideShow = function(config) {
               'data-target' : clickedElement.up(0).target
         }).update("Open Link"));
         list.insert(listElement);
-        listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
-          ).insert(new Element('div', {'class' : 'continueSlideshowContainer'}
-          ).update("Continue Slideshow"));
-        list.insert(listElement);
-        listElement = new Element('li', {'class' : 'stopMenuSlideShowListItem'}
-          ).insert(new Element('div', {'class' : 'stopSlideshowContainer'}
-          ).update("Stop Slideshow"));
-        list.insert(listElement);
+        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _generateMenuDiv _me._slideShowAnimation._paused: ', 
+            _me._slideShowAnimation._paused)
+        if(_me._slideShowAnimation._paused) {
+          listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
+            ).insert(new Element('div', {'class' : 'continueSlideshowContainer'}
+            ).update("Continue Slideshow"));
+          list.insert(listElement);
+        } else {
+          listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
+            ).insert(new Element('div', {'class' : 'stopSlideshowContainer'}
+            ).update("Stop Slideshow"));
+          list.insert(listElement);
+        }
         menuDiv.insert(list);
         return menuDiv;
       },
@@ -1055,7 +1066,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
         });
       },
 
-      startStop : function(isStart, delayedStart) {
+      startStop : function(isStart, delayedStart, isFreez) {
         var _me = this;
         if (typeof isStart === 'undefined') {
           isStart = _me._slideShowAnimation._paused;
@@ -1068,14 +1079,14 @@ window.CELEMENTS.image.SlideShow = function(config) {
           console.log('animation started for image slideshow',
               _me._getContainerElemId());
           _me._slideShowAnimation.startAnimation(delayedStart);
-          if (slideShowButton) {
+          if (slideShowButton && !isFreez) {
             Effect.Fade(slideShowButton, { duration : 1.0 });
           }
         } else {
           console.log('animation stopped for image slideshow',
               _me._getContainerElemId());
           _me._slideShowAnimation.stopAnimation();
-          if (slideShowButton) {
+          if (slideShowButton && !isFreez) {
             Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
           }
         }
