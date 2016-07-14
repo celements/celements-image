@@ -950,6 +950,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
         if(clickedElement.up('div.cel_slideShow_slideWrapper a')) {
           linkHref = clickedElement.up('div.cel_slideShow_slideWrapper a').href;
         }
+        $(document.body).stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
         $(document.body).observe('click', _me._contextMenuSlideShowListItemClickedBind);
         if(linkHref && (linkHref !== '')) {
           var slideShowWrapper = clickedElement.up('.celimage_slideshow_wrapper');
@@ -988,6 +989,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
         var target = clickedElement.readAttribute('data-target');
         if((linkHref != null) && (linkHref != '')) {
           window.open(linkHref, target);
+          _me.startStop(true);
         } else if (clickedElement.hasClassName('continueSlideshowContainer')) {
           _me.startStop(true);
         } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
