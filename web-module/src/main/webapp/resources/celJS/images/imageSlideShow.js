@@ -795,6 +795,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _debug : undefined,
       _menuDiv : undefined,
       _contextMenuSlideShowListItemClickedBind : undefined,
+      _isPaused : undefined,
 
       _init : function(config) {
         var _me = this;
@@ -931,6 +932,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
             _me.startStop(_me._configReader.hasAutoStart(), true);
           }
         }
+        _me._isPaused = _me._slideShowAnimation._paused;
       },
 
       _initManualStartButton : function() {
@@ -951,8 +953,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
           linkHref = clickedElement.up('div.cel_slideShow_slideWrapper a').href;
         }
         $(document.body).stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
-        $(document.body).observe('click', _me._contextMenuSlideShowListItemClickedBind);
         if(linkHref && (linkHref !== '')) {
+          $(document.body).observe('click', _me._contextMenuSlideShowListItemClickedBind);
           var slideShowWrapper = clickedElement.up('.celimage_slideshow_wrapper');
           var rect = slideShowWrapper.getBoundingClientRect();
           var mouseCoord = _me._getMousePos(event);
@@ -966,15 +968,21 @@ window.CELEMENTS.image.SlideShow = function(config) {
             _me._menuDiv.show();
           }
           $$('.contextMenuSlideShowListItem').each(function(element) {
-            element.observe('click', _me._contextMenuSlideShowListItemClickedBind)
+            element.stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+            element.observe('click', _me._contextMenuSlideShowListItemClickedBind);
           });
           _me._setPosition(x, y);
           _me.startStop(false, undefined, true);
-        } else if(clickedElement.nodeName.toLowerCase() !== 'img') {
+        } else if(!clickedElement.up('div.cel_slideShow_slideWrapper a')) {
           if(_me._menuDiv != null) {
             _me._menuDiv.hide();
             _me._menuDiv.remove();
             _me._menuDiv = null;
+          }
+          if(_me._isPaused) {
+            _me.startStop(false, true);
+          } else {
+            _me.startStop(true, true);
           }
         } else {
           _me.startStop();
@@ -994,6 +1002,12 @@ window.CELEMENTS.image.SlideShow = function(config) {
           _me.startStop(true);
         } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
           _me.startStop(false);
+        } else {
+          if(_me._isPaused) {
+            _me.startStop(false, true);
+          } else {
+            _me.startStop(true, true);
+          }
         }
         _me._menuDiv.hide();
         _me._menuDiv.remove();
@@ -1021,11 +1035,13 @@ window.CELEMENTS.image.SlideShow = function(config) {
         }).update("Open Link"));
         list.insert(listElement);
         if(_me._slideShowAnimation._paused) {
+          _me._isPaused = true;
           listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
             ).insert(new Element('div', {'class' : 'continueSlideshowContainer'}
             ).update("Continue Slideshow"));
           list.insert(listElement);
         } else {
+          _me._isPaused = false;
           listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
             ).insert(new Element('div', {'class' : 'stopSlideshowContainer'}
             ).update("Stop Slideshow"));
