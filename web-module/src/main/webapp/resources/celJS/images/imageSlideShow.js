@@ -971,7 +971,6 @@ window.CELEMENTS.image.SlideShow = function(config) {
           _me.startStop(false, undefined, true);
         } else if(clickedElement.nodeName.toLowerCase() !== 'img') {
           if(_me._menuDiv != null) {
-            console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _startStopClickHandler HIDE');
             _me._menuDiv.hide();
             _me._menuDiv.remove();
             _me._menuDiv = null;
@@ -983,7 +982,6 @@ window.CELEMENTS.image.SlideShow = function(config) {
       
       _contextMenuSlideShowListItemClicked : function(event) {
         var _me = this;
-        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _contextMenuSlideShowListItemClicked event: ', event);
         event.stop();
         var clickedElement = event.findElement();
         var linkHref = clickedElement.readAttribute('data-href');
@@ -995,7 +993,6 @@ window.CELEMENTS.image.SlideShow = function(config) {
         } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
           _me.startStop(false);
         }
-        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _contextMenuSlideShowListItemClicked HIDE');
         _me._menuDiv.hide();
         _me._menuDiv.remove();
         _me._menuDiv = null;
@@ -1021,8 +1018,6 @@ window.CELEMENTS.image.SlideShow = function(config) {
               'data-target' : clickedElement.up(0).target
         }).update("Open Link"));
         list.insert(listElement);
-        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< imageSlideShow _generateMenuDiv _me._slideShowAnimation._paused: ', 
-            _me._slideShowAnimation._paused)
         if(_me._slideShowAnimation._paused) {
           listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
             ).insert(new Element('div', {'class' : 'continueSlideshowContainer'}
