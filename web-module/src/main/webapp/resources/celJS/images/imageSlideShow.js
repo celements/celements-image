@@ -959,7 +959,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
           var rect = slideShowWrapper.getBoundingClientRect();
           var mouseCoord = _me._getMousePos(event);
           var x = mouseCoord[0] - 6 - rect.left;
-          var y = mouseCoord[1] - 3 - rect.height;
+          var y = mouseCoord[1] - 3 - rect.top;
           _me._menuDiv = slideShowWrapper.down('.contextMenuSlideShow');
           if(_me._menuDiv == null) {
             _me._menuDiv = _me._generateMenuDiv(clickedElement);
