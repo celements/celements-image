@@ -973,7 +973,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
           });
           _me._setPosition(x, y);
           _me.startStop(false, undefined, true);
-        } else if(!clickedElement.up('div.cel_slideShow_slideWrapper a')) {
+        } else if(!clickedElement.up('div.cel_slideShow_slideWrapper a') &&
+            clickedElement.hasClassName('celimage_slideshow_wrapper')) {
           if(_me._menuDiv != null) {
             _me._menuDiv.hide();
             _me._menuDiv.remove();
@@ -1035,13 +1036,11 @@ window.CELEMENTS.image.SlideShow = function(config) {
         }).update("Open Link"));
         list.insert(listElement);
         if(_me._slideShowAnimation._paused) {
-          _me._isPaused = true;
           listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
             ).insert(new Element('div', {'class' : 'continueSlideshowContainer'}
             ).update("Continue Slideshow"));
           list.insert(listElement);
         } else {
-          _me._isPaused = false;
           listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
             ).insert(new Element('div', {'class' : 'stopSlideshowContainer'}
             ).update("Stop Slideshow"));
@@ -1091,6 +1090,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
         if (isStart) {
           console.log('animation started for image slideshow',
               _me._getContainerElemId());
+          _me._isPaused = false;
           _me._slideShowAnimation.startAnimation(delayedStart);
           if (slideShowButton && !isFreez) {
             Effect.Fade(slideShowButton, { duration : 1.0 });
@@ -1098,6 +1098,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
         } else {
           console.log('animation stopped for image slideshow',
               _me._getContainerElemId());
+          _me._isPaused = true;
           _me._slideShowAnimation.stopAnimation();
           if (slideShowButton && !isFreez) {
             Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
