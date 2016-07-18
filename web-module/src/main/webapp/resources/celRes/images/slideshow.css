@@ -62,7 +62,7 @@
   border-right: 1px solid #3D3D3D;
 }
 #yuiOverlayContainer .slideshowButton,
-.celimage_slideshow_wrapper .slideshowButton { 
+#sitecontainer #content .celimage_slideshow_wrapper .slideshowButton { 
   background-image: url(buttons500.png);
   height: 66px !important; 
   width: 67px !important; 
@@ -81,7 +81,7 @@
 }
 
 #yuiOverlayContainer .slideshowButton:hover,
-.celimage_slideshow_wrapper .slideshowButton:hover { 
+#sitecontainer #content .celimage_slideshow_wrapper .slideshowButton:hover { 
   background-image: url(buttons500-hover.png);
 }
 
