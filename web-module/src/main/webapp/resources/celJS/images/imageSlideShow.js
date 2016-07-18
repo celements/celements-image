@@ -1098,8 +1098,10 @@ window.CELEMENTS.image.SlideShow = function(config) {
         } else {
           console.log('animation stopped for image slideshow',
               _me._getContainerElemId());
-          _me._isPaused = true;
           _me._slideShowAnimation.stopAnimation();
+          if(!isFreez) {
+            _me._isPaused = true;
+          }
           if (slideShowButton && !isFreez) {
             Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
           }
