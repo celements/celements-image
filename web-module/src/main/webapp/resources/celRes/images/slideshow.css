@@ -92,10 +92,10 @@
 /*
   * ContextMenuSlideShow 
 */
-#sitecontainer #content .contextMenuSlideShow {
+.contextMenuSlideShow {
   min-width: 125px;
 }
-#sitecontainer #content .contextMenuSlideShow ul {
+.contextMenuSlideShow ul {
   list-style: none;
   margin: 0px;
   padding: 0px;
@@ -104,7 +104,7 @@
   border-style: solid;
   border-color: black;
 }
-#sitecontainer #content .contextMenuSlideShow li {
+.contextMenuSlideShow li {
   display: block;
   cursor: pointer;
   border-bottom: 1px solid black;
@@ -114,7 +114,7 @@
   color: #900;
   color: black;
 }
-#sitecontainer #content .contextMenuSlideShow li:hover {
+.contextMenuSlideShow li:hover {
   background-color: #015470;
   color: white;
 }
