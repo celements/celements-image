@@ -796,6 +796,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _menuDiv : undefined,
       _contextMenuSlideShowListItemClickedBind : undefined,
       _isPaused : undefined,
+      _effect : undefined,
 
       _init : function(config) {
         var _me = this;
@@ -1093,7 +1094,10 @@ window.CELEMENTS.image.SlideShow = function(config) {
           _me._isPaused = false;
           _me._slideShowAnimation.startAnimation(delayedStart);
           if (slideShowButton && !isFreez) {
-            Effect.Fade(slideShowButton, { duration : 1.0 });
+            if((_me._effect) && (_me._effect.state != 'finished')) {
+              _me._effect.cancel();
+            }
+            _me._effect = Effect.Fade(slideShowButton, { duration : 1.0 });
           }
         } else {
           console.log('animation stopped for image slideshow',
@@ -1103,7 +1107,10 @@ window.CELEMENTS.image.SlideShow = function(config) {
             _me._isPaused = true;
           }
           if (slideShowButton && !isFreez) {
-            Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
+            if((_me._effect) && (_me._effect.state != 'finished')) {
+              _me._effect.cancel();
+            }
+            _me._effect = Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
           }
         }
       },
