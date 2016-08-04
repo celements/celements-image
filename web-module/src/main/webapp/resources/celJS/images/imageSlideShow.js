@@ -976,17 +976,14 @@ window.CELEMENTS.image.SlideShow = function(config) {
           _me.startStop(false, undefined, true);
         } else if(!clickedElement.up('div.cel_slideShow_slideWrapper a') &&
             clickedElement.hasClassName('celimage_slideshow_wrapper')) {
-          if(_me._menuDiv != null) {
-            _me._menuDiv.hide();
-            _me._menuDiv.remove();
-            _me._menuDiv = null;
-          }
+          _me._hideContextMenu();
           if(_me._isPaused) {
             _me.startStop(false, true);
           } else {
             _me.startStop(true, true);
           }
         } else {
+          _me._hideContextMenu();
           _me.startStop();
         }
       },
@@ -1015,13 +1012,20 @@ window.CELEMENTS.image.SlideShow = function(config) {
             _me.startStop(true, true);
           }
         }
-        _me._menuDiv.hide();
-        _me._menuDiv.remove();
-        _me._menuDiv = null;
+        _me._hideContextMenu();
         $$('.contextMenuSlideShowListItem').each(function(element) {
           element.stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
         });
         $(document.body).stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+      },
+      
+      _hideContextMenu :function() {
+        var _me = this;
+        if(_me._menuDiv != null) {
+          _me._menuDiv.hide();
+          _me._menuDiv.remove();
+          _me._menuDiv = null;
+        }
       },
       
       _generateMenuDiv : function (clickedElement) {
