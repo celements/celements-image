@@ -999,7 +999,11 @@ window.CELEMENTS.image.SlideShow = function(config) {
         var target = clickedElement.readAttribute('data-target');
         if((linkHref != null) && (linkHref != '')) {
           window.open(linkHref, target);
-          _me.startStop(true);
+          if(_me._isPaused) {
+            _me.startStop(false, true);
+          } else {
+            _me.startStop(true, true);
+          }
         } else if (clickedElement.hasClassName('continueSlideshowContainer')) {
           _me.startStop(true);
         } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
