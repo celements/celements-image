@@ -100,8 +100,7 @@ public class ComputeImageCommand {
             ICropImage cropComp = Utils.getComponent(ICropImage.class);
             // TODO accept CelImage instead of bufferedImage
             cropComp.crop(img.getFirstImage(), cropX, cropY, cropW, cropH, mimeType, null, out);
-            attachmentClone.setContent(new ByteArrayInputStream(
-                ((ByteArrayOutputStream) out).toByteArray()));
+            attachmentClone.setContent(new ByteArrayInputStream(out.toByteArray()));
             img = decodeImageCommand.readImage(attachmentClone, context);
           }
           timeLast = logRuntime(timeLast, "image cropped after ");
@@ -140,11 +139,11 @@ public class ComputeImageCommand {
                 int kerWidth = Integer.parseInt(filterParts[0]);
                 int kerHeight = Integer.parseInt(filterParts[1]);
                 float[] kerMatrix = new float[kerWidth * kerHeight];
-                for (int i = 0; i < kerWidth * kerHeight; i++) {
+                for (int i = 0; i < (kerWidth * kerHeight); i++) {
                   float x;
                   if (filterParts.length <= 4) {
                     x = Float.parseFloat(filterParts[2]);
-                    if ((filterParts.length == 4) && (i == ((kerWidth * kerHeight) - 1) / 2)) {
+                    if ((filterParts.length == 4) && (i == (((kerWidth * kerHeight) - 1) / 2))) {
                       x = Float.parseFloat(filterParts[3]);
                     }
                   } else {
