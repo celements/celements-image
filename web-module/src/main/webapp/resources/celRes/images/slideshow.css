@@ -92,20 +92,15 @@
 /*
   * ContextMenuSlideShow 
 */
-.contextMenuSlideShow {
-  min-width: 125px;
-}
 .contextMenuSlideShow ul {
   list-style: none;
   margin: 0px;
   padding: 0px;
   background: rgb(51, 51, 51);
   background: rgba(51, 51, 51, 0.92);
-  border: 1px solid #5e5e5e;
-  border-width: 1px 0px 1px 1px;
 }
 .contextMenuSlideShow li {
-	border-right: 1px solid #5e5e5e;
+	border: 1px solid #5e5e5e;
 	padding: 6px 10px;
 	height: auto;
 	font-family: "Open Sans", Tahoma, Geneva, Helvetica, Arial, sans-serif;
@@ -124,6 +119,9 @@
 	white-space: nowrap;
 	float: left;
 }
+.contextMenuSlideShow li + li {
+	border-left: 0px solid transparent;
+}
 .contextMenuSlideShow li:hover {
   background-color: #ff9900;
   color: #333333;
@@ -135,19 +133,19 @@
 	height: 22px;
 	width: 26px;
 }
-.contextMenuSlideShow li div:hover {
+.contextMenuSlideShow li:hover div {
   background-image: url("/file/resources/celRes/glyphicons/glyphicons-152-new-window.png");
 }
 .contextMenuSlideShow li div.continueSlideshowContainer {
   background-image: url("/file/resources/celRes/glyphicons/glyphicons-174-ccc-play.png");
 }
-.contextMenuSlideShow li div.continueSlideshowContainer:hover {
+.contextMenuSlideShow li:hover div.continueSlideshowContainer {
   background-image: url("/file/resources/celRes/glyphicons/glyphicons-174-play.png");
 }
 .contextMenuSlideShow li div.stopSlideshowContainer {
   background-image: url("/file/resources/celRes/glyphicons/glyphicons-175-ccc-pause.png");
 }
-.contextMenuSlideShow li div.stopSlideshowContainer:hover {
+.contextMenuSlideShow li:hover div.stopSlideshowContainer {
   background-image: url("/file/resources/celRes/glyphicons/glyphicons-175-pause.png");
 }
 

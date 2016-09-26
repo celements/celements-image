@@ -1042,20 +1042,21 @@ window.CELEMENTS.image.SlideShow = function(config) {
             ).insert(new Element('div', {
               'data-href' : linkHref,
               'data-target' : clickedElement.up(0).target,
-              'title' : 'Open Link'
+              'title' : (celMessages.celslideshow.cmOpenLink || 'Open Link')
         }));
         list.insert(listElement);
         if(_me._slideShowAnimation._paused) {
           listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
             ).insert(new Element('div', {
             	'class' : 'continueSlideshowContainer',
-            	'title' : 'Continue Slideshow'
+            	'title' : (celMessages.celslideshow.cmContinue || 'Continue Slideshow')
             }));
           list.insert(listElement);
         } else {
           listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
-            ).insert(new Element('div', {'class' : 'stopSlideshowContainer', 
-            	'title' : 'Pause Slideshow' 
+            ).insert(new Element('div', {
+            	'class' : 'stopSlideshowContainer', 
+            	'title' : (celMessages.celslideshow.cmPause || 'Pause Slideshow')  
             }));
           list.insert(listElement);
         }
