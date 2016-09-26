@@ -99,22 +99,33 @@
   list-style: none;
   margin: 0px;
   padding: 0px;
-  background: #fff;
-  border-width: 1px 1px 0px 1px;
-  border-style: solid;
-  border-color: black;
+  background: rgb(51, 51, 51);
+  background: rgba(51, 51, 51, 0.92);
+  border: 1px solid #5e5e5e;
 }
 .contextMenuSlideShow li {
-  display: block;
-  cursor: pointer;
-  border-bottom: 1px solid black;
-  padding-bottom: 2px;
-  padding-left: 15px;
-  padding-right: 15px;
-  color: #900;
-  color: black;
+	margin-top: 0px;
+	border-top: 1px solid #5e5e5e;
+	padding: 6px 18px 2px 6px;
+	height: auto;
+	width: 182px;
+	font-family: "Open Sans", Tahoma, Geneva, Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	line-height: 20px;
+	font-weight: 400;
+	font-style: normal;
+	letter-spacing: 0;
+	word-spacing: 2px;
+	overflow: hidden;
+	display: block;
+	cursor: pointer;
+	color: #ccc;
+	background: rgb(51, 51, 51);
+	background: rgba(51, 51, 51, 0.92);
+	text-decoration: none;
+	white-space: nowrap;
 }
 .contextMenuSlideShow li:hover {
-  background-color: #015470;
-  color: white;
+  background-color: #ff9900;
+  color: #333333;
 }
