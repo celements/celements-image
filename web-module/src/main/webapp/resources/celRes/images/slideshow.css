@@ -106,9 +106,8 @@
 }
 .contextMenuSlideShow li {
 	border-right: 1px solid #5e5e5e;
-	padding: 6px;
+	padding: 6px 10px;
 	height: auto;
-	width: 182px;
 	font-family: "Open Sans", Tahoma, Geneva, Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	line-height: 20px;
@@ -130,26 +129,25 @@
   color: #333333;
 }
 .contextMenuSlideShow li div {
-	background-image: url("/file/resources/celRes/glyphicons/glyphicons-152-ccc-new-window.png?celheight=18");
+	background-image: url("/file/resources/celRes/glyphicons/glyphicons-152-ccc-new-window.png");
 	background-position: center center;
 	background-repeat: no-repeat;
-	padding-left: 30px;
 	height: 22px;
 	width: 26px;
 }
 .contextMenuSlideShow li div:hover {
-  background-image: url("/file/resources/celRes/glyphicons/glyphicons-152-new-window.png?celheight=18");
+  background-image: url("/file/resources/celRes/glyphicons/glyphicons-152-new-window.png");
 }
 .contextMenuSlideShow li div.continueSlideshowContainer {
-  background-image: url("/file/resources/celRes/glyphicons/glyphicons-174-ccc-play.png?celheight=18");
+  background-image: url("/file/resources/celRes/glyphicons/glyphicons-174-ccc-play.png");
 }
 .contextMenuSlideShow li div.continueSlideshowContainer:hover {
-  background-image: url("/file/resources/celRes/glyphicons/glyphicons-174-play.png?celheight=18");
+  background-image: url("/file/resources/celRes/glyphicons/glyphicons-174-play.png");
 }
 .contextMenuSlideShow li div.stopSlideshowContainer {
-  background-image: url("/file/resources/celRes/glyphicons/glyphicons-175-ccc-pause.png?celheight=18");
+  background-image: url("/file/resources/celRes/glyphicons/glyphicons-175-ccc-pause.png");
 }
 .contextMenuSlideShow li div.stopSlideshowContainer:hover {
-  background-image: url("/file/resources/celRes/glyphicons/glyphicons-175-pause.png?celheight=18");
+  background-image: url("/file/resources/celRes/glyphicons/glyphicons-175-pause.png");
 }
 
