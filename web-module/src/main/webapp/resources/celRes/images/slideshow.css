@@ -131,14 +131,14 @@
   color: #333333;
 }
 .contextMenuSlideShow li div {
-	background-image: url("../glyphicons/glyphicons-152-ccc-new-window.png?celheight=20");
-	background-position: center left;
+	background-image: url("/file/resources/celRes/glyphicons/glyphicons-152-ccc-new-window.png?celheight=18");
+	background-position: 0px 0px;
 	background-repeat: no-repeat;
 	padding-left: 30px;
 }
 .contextMenuSlideShow li div.continueSlideshowContainer {
-  background-image: url("../glyphicons/glyphicons-174-ccc-play.png?celheight=20");
+  background-image: url("/file/resources/celRes/glyphicons/glyphicons-174-ccc-play.png?celheight=18");
 }
 .contextMenuSlideShow li div.stopSlideshowContainer {
-  background-image: url("../glyphicons/glyphicons-175-ccc-pause.png?celheight=20");
+  background-image: url("/file/resources/celRes/glyphicons/glyphicons-175-ccc-pause.png?celheight=18");
 }
