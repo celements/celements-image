@@ -793,6 +793,10 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _addNavigationButtonsBind : undefined,
       _addSlideShowCounterBind : undefined,
       _debug : undefined,
+      _menuDiv : undefined,
+      _contextMenuSlideShowListItemClickedBind : undefined,
+      _isPaused : undefined,
+      _effect : undefined,
 
       _init : function(config) {
         var _me = this;
@@ -802,6 +806,8 @@ window.CELEMENTS.image.SlideShow = function(config) {
         _me._startStopClickHandlerBind = _me._startStopClickHandler.bind(_me);
         _me._addNavigationButtonsBind = _me._addNavigationButtons.bind(_me);
         _me._addSlideShowCounterBind = _me._addSlideShowCounter.bind(_me);
+        _me._contextMenuSlideShowListItemClickedBind = 
+          _me._contextMenuSlideShowListItemClicked.bind(_me);
       },
 
       _getContainerElemId : function() {
@@ -927,6 +933,7 @@ window.CELEMENTS.image.SlideShow = function(config) {
             _me.startStop(_me._configReader.hasAutoStart(), true);
           }
         }
+        _me._isPaused = _me._slideShowAnimation._paused;
       },
 
       _initManualStartButton : function() {
@@ -941,10 +948,151 @@ window.CELEMENTS.image.SlideShow = function(config) {
       _startStopClickHandler : function(event) {
         var _me = this;
         event.stop();
-        _me.startStop();
+        var clickedElement = event.findElement();
+        var linkHref = '';
+        if(clickedElement.up('div.cel_slideShow_slideWrapper a')) {
+          linkHref = clickedElement.up('div.cel_slideShow_slideWrapper a').href;
+        }
+        $(document.body).stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+        if(linkHref && (linkHref !== '')) {
+          $(document.body).observe('click', _me._contextMenuSlideShowListItemClickedBind);
+          var slideShowWrapper = clickedElement.up('.celimage_slideshow_wrapper');
+          var rect = slideShowWrapper.getBoundingClientRect();
+          var mouseCoord = _me._getMousePos(event);
+          var x = mouseCoord[0] - 3;
+          var y = mouseCoord[1] - 6;
+          _me._menuDiv = $$('body')[0].down('.contextMenuSlideShow');
+          if(_me._menuDiv == null) {
+            _me._menuDiv = _me._generateMenuDiv(clickedElement);
+            $$('body')[0].insert(_me._menuDiv);
+          } else {
+            _me._menuDiv.show();
+          }
+          $$('.contextMenuSlideShowListItem').each(function(element) {
+            element.stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+            element.observe('click', _me._contextMenuSlideShowListItemClickedBind);
+          });
+          _me._setPosition(x, y);
+          _me.startStop(false, undefined, true);
+        } else if(!clickedElement.up('div.cel_slideShow_slideWrapper a') &&
+            clickedElement.hasClassName('celimage_slideshow_wrapper')) {
+          _me._hideContextMenu();
+          if(_me._isPaused) {
+            _me.startStop(false, true);
+          } else {
+            _me.startStop(true, true);
+          }
+        } else {
+          _me._hideContextMenu();
+          _me.startStop();
+        }
+      },
+      
+      _contextMenuSlideShowListItemClicked : function(event) {
+        var _me = this;
+        event.stop();
+        var clickedElement = event.findElement();
+        var linkHref = clickedElement.readAttribute('data-href');
+        var target = clickedElement.readAttribute('data-target');
+        if((linkHref != null) && (linkHref != '')) {
+          window.open(linkHref, target);
+          if(_me._isPaused) {
+            _me.startStop(false, true);
+          } else {
+            _me.startStop(true, true);
+          }
+        } else if (clickedElement.hasClassName('continueSlideshowContainer')) {
+          _me.startStop(true);
+        } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
+          _me.startStop(false);
+        } else {
+          if(_me._isPaused) {
+            _me.startStop(false, true);
+          } else {
+            _me.startStop(true, true);
+          }
+        }
+        _me._hideContextMenu();
+        $$('.contextMenuSlideShowListItem').each(function(element) {
+          element.stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+        });
+        $(document.body).stopObserving('click', _me._contextMenuSlideShowListItemClickedBind);
+      },
+      
+      _hideContextMenu :function() {
+        var _me = this;
+        if(_me._menuDiv != null) {
+          _me._menuDiv.hide();
+          _me._menuDiv.remove();
+          _me._menuDiv = null;
+        }
+      },
+      
+      _generateMenuDiv : function (clickedElement) {
+        var _me = this;
+        var linkHref = clickedElement.up(0).href;
+        var menuDiv = new Element('div', {
+          'class' : 'contextMenuSlideShow'
+        }).setStyle({
+          'z-index' : 999,
+          'position' : 'absolute'
+        });
+        var list = new Element('ul');
+        var listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
+            ).insert(new Element('div', {
+              'data-href' : linkHref,
+              'data-target' : clickedElement.up(0).target,
+              'title' : (celMessages.celslideshow.cmOpenLink || 'Open Link')
+        }));
+        list.insert(listElement);
+        if(_me._slideShowAnimation._paused) {
+          listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
+            ).insert(new Element('div', {
+            	'class' : 'continueSlideshowContainer',
+            	'title' : (celMessages.celslideshow.cmContinue || 'Continue Slideshow')
+            }));
+          list.insert(listElement);
+        } else {
+          listElement = new Element('li', {'class' : 'contextMenuSlideShowListItem'}
+            ).insert(new Element('div', {
+            	'class' : 'stopSlideshowContainer', 
+            	'title' : (celMessages.celslideshow.cmPause || 'Pause Slideshow')  
+            }));
+          list.insert(listElement);
+        }
+        menuDiv.insert(list);
+        return menuDiv;
+      },
+      
+      _getMousePos : function(event) {
+        var tmpCoord = new Array(0,0);
+        var posx = 0;
+        var posy = 0;
+        
+        if (!event) var event = window.event;
+        if (event.pageX || event.pageY) { // Firefox & co.
+          posx = event.pageX;
+          posy = event.pageY;
+        }
+        else if (event.clientX || event.clientY) { // IE
+          // NOTE: Explorer must be in strict mode for documentElement, otherwise use document.body.scrollLeft!
+          posx = event.clientX + document.documentElement.scrollLeft - 1;
+          posy = event.clientY + document.documentElement.scrollTop + 2;
+        }
+        tmpCoord[0] = posx;
+        tmpCoord[1] = posy;
+        return tmpCoord;
+      },
+      
+      _setPosition : function (x, y) {
+        var _me = this;
+        _me._menuDiv.setStyle({
+          'left' : x + 'px',
+          'top' : y + 'px'
+        });
       },
 
-      startStop : function(isStart, delayedStart) {
+      startStop : function(isStart, delayedStart, isFreez) {
         var _me = this;
         if (typeof isStart === 'undefined') {
           isStart = _me._slideShowAnimation._paused;
@@ -956,16 +1104,26 @@ window.CELEMENTS.image.SlideShow = function(config) {
         if (isStart) {
           console.log('animation started for image slideshow',
               _me._getContainerElemId());
+          _me._isPaused = false;
           _me._slideShowAnimation.startAnimation(delayedStart);
-          if (slideShowButton) {
-            Effect.Fade(slideShowButton, { duration : 1.0 });
+          if (slideShowButton && !isFreez) {
+            if((_me._effect) && (_me._effect.state != 'finished')) {
+              _me._effect.cancel();
+            }
+            _me._effect = Effect.Fade(slideShowButton, { duration : 1.0 });
           }
         } else {
           console.log('animation stopped for image slideshow',
               _me._getContainerElemId());
           _me._slideShowAnimation.stopAnimation();
-          if (slideShowButton) {
-            Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
+          if(!isFreez) {
+            _me._isPaused = true;
+          }
+          if (slideShowButton && !isFreez) {
+            if((_me._effect) && (_me._effect.state != 'finished')) {
+              _me._effect.cancel();
+            }
+            _me._effect = Effect.Appear(slideShowButton, { duration : 1.0 , to : 0.9 });
           }
         }
       },
