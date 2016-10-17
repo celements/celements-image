@@ -992,8 +992,10 @@ window.CELEMENTS.image.SlideShow = function(config) {
         var _me = this;
         event.stop();
         var clickedElement = event.findElement();
-        var linkHref = clickedElement.readAttribute('data-href');
-        var target = clickedElement.readAttribute('data-target');
+        var linkHref = clickedElement.readAttribute('data-href')
+            || clickedElement.down('div').readAttribute('data-href');
+        var target = clickedElement.readAttribute('data-target')
+            || clickedElement.down('div').readAttribute('data-target');;
         if((linkHref != null) && (linkHref != '')) {
           window.open(linkHref, target);
           if(_me._isPaused) {
@@ -1001,9 +1003,13 @@ window.CELEMENTS.image.SlideShow = function(config) {
           } else {
             _me.startStop(true, true);
           }
-        } else if (clickedElement.hasClassName('continueSlideshowContainer')) {
+        } else if (clickedElement.hasClassName('continueSlideshowContainer')
+            || (clickedElement.hasClassName('contextMenuSlideShowListItem')
+            && clickedElement.down('div.continueSlideshowContainer'))) {
           _me.startStop(true);
-        } else if (clickedElement.hasClassName('stopSlideshowContainer')) {
+        } else if (clickedElement.hasClassName('stopSlideshowContainer')
+            || (clickedElement.hasClassName('contextMenuSlideShowListItem')
+            && clickedElement.down('div.stopSlideshowContainer'))) {
           _me.startStop(false);
         } else {
           if(_me._isPaused) {
