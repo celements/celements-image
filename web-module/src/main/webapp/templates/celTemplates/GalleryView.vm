@@ -132,7 +132,8 @@ var lyteboxTheme = '$lyteboxTheme';
 var doBeforeEnd = function(arg) {
   history.back();
 };
-$j(document).ready(function() {
+## FP;24.10.2016; caution!!! document.ready does not function for current FF and Chrome
+Event.observe(window, 'load', function() {
 	myLytebox.start(document.getElementById('startLytebox'), true, false);
 });
 </script>
