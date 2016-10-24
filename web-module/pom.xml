@@ -56,7 +56,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-photo</artifactId>
-      <version>1.51</version>
+      <version>1.52</version>
     </dependency>
   </dependencies>
   <build>
