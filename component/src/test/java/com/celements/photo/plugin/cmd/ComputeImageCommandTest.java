@@ -19,6 +19,7 @@
  */
 package com.celements.photo.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -27,33 +28,24 @@ import java.awt.Color;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.common.test.AbstractComponentTest;
 
-public class ComputeImageCommandTest extends AbstractBridgedComponentTestCase {
+public class ComputeImageCommandTest extends AbstractComponentTest {
 
   private ComputeImageCommand computeImgCmd;
-  private XWikiContext context;
   private ImageCacheCommand mockImgCacheCmd;
-  private XWiki xwiki;
 
   @Before
   public void setUp_ComputeImageCommandTest() throws Exception {
-    context = getContext();
+    mockImgCacheCmd = createMockAndAddToDefault(ImageCacheCommand.class);
     computeImgCmd = new ComputeImageCommand();
-    mockImgCacheCmd = createMock(ImageCacheCommand.class);
     computeImgCmd.injectImageCacheCmd(mockImgCacheCmd);
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
   }
 
   @Test
   public void testGetImageCacheCmd() {
     computeImgCmd.injectImageCacheCmd(null);
-    replay(xwiki, mockImgCacheCmd);
     assertNotNull(computeImgCmd.getImageCacheCmd());
-    verify(xwiki, mockImgCacheCmd);
   }
 
   @Test
@@ -61,10 +53,10 @@ public class ComputeImageCommandTest extends AbstractBridgedComponentTestCase {
     ImageCacheCommand cacheCmdBefore = computeImgCmd.getImageCacheCmd();
     mockImgCacheCmd.flushCache();
     expectLastCall().once();
-    replay(xwiki, mockImgCacheCmd);
+    replayDefault();
     computeImgCmd.flushCache();
     assertNotSame(cacheCmdBefore, computeImgCmd.getImageCacheCmd());
-    verify(xwiki, mockImgCacheCmd);
+    verifyDefault();
   }
 
   @Test
