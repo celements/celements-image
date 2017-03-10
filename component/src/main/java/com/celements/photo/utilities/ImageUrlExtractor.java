@@ -67,8 +67,8 @@ public class ImageUrlExtractor {
   }
 
   Long getImgUrlSizeKey(String imgUrl) {
-    int w = parseImgUrlDimension(imgUrl, "celwidth");
-    int h = parseImgUrlDimension(imgUrl, "celheight");
+    int w = Math.min(parseImgUrlDimension(imgUrl, "celwidth"), 1000000000);
+    int h = Math.min(parseImgUrlDimension(imgUrl, "celheight"), 1000000000);
     Long area = new Long(h * w);
     if (area < 0) {
       area = area * area;
