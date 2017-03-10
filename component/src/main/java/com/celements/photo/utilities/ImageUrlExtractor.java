@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.context.Execution;
 
+import com.celements.model.context.ModelContext;
 import com.celements.photo.container.ImageUrlDim;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
@@ -59,8 +59,9 @@ public class ImageUrlExtractor {
       String docname = imgUrl.replaceAll("^(.*?/){3}(.*?)/.*$", "$2");
       String filename = imgUrl.replaceAll("^(.*?/){4}(.*?)(|\\?.*)$", "$2");
       String query = imgUrl.replaceAll("^.*\\?(.*)$", "$1");
-      imgUrl = getContext().getURLFactory().createAttachmentURL(filename, space, docname, action,
-          query, getContext().getDatabase(), getContext()).toString();
+      XWikiContext context = Utils.getComponent(ModelContext.class).getXWikiContext();
+      imgUrl = context.getURLFactory().createAttachmentURL(filename, space, docname, action, query,
+          context.getDatabase(), context).toString();
     }
     return new ImageUrlDim(imgUrl, parseImgUrlDimension(imgUrl, "celwidth"), parseImgUrlDimension(
         imgUrl, "celheight"));
@@ -86,10 +87,5 @@ public class ImageUrlExtractor {
       LOGGER.debug("Exception while parsing Integer from [{}]", str, nfe);
     }
     return -1;
-  }
-
-  private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
   }
 }
