@@ -10,16 +10,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class ImageUrlExtractorTest extends AbstractComponentTest {
+public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
 
-  private ImageUrlExtractor article;
+  private DefaultImageUrlExtractor article;
 
   @Before
   public void preapareTest() throws Exception {
     getContext().setURLFactory(registerComponentMock(XWikiURLFactory.class));
-    article = new ImageUrlExtractor();
+    article = (DefaultImageUrlExtractor) Utils.getComponent(ImageUrlExtractor.class);
   }
 
   @Test
@@ -63,6 +64,22 @@ public class ImageUrlExtractorTest extends AbstractComponentTest {
   public void testGetImgUrlSizeKey_both() {
     String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=1000&celheight=800";
     assertEquals(1000 * 800l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_maxSize() {
+    long max = DefaultImageUrlExtractor.MAX_ALLOWED_DIM;
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=" + max
+        + "&celheight=" + max;
+    assertEquals(max * max, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_exceedsMaxSize() {
+    long max = DefaultImageUrlExtractor.MAX_ALLOWED_DIM;
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=" + (max + 101)
+        + "&celheight=" + (max + 202);
+    assertEquals(max * max, (long) article.getImgUrlSizeKey(url));
   }
 
   @Test
