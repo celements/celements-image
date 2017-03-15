@@ -58,7 +58,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
     List<ImageUrlDim> sortedImages = new ArrayList<>();
     for (Long imgArea : articleImages.keySet()) {
       // Image size not extractable is in key == '-1' Don't include too small images.
-      if ((imgArea == -1) || (imgArea >= (MIN_SOCIAL_MEDIA_AREA_SIZE))) {
+      if ((imgArea == -1) || (imgArea >= MIN_SOCIAL_MEDIA_AREA_SIZE)) {
         Collections.reverse(articleImages.get(imgArea));
         sortedImages.addAll(articleImages.get(imgArea));
       }
@@ -67,7 +67,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
   }
 
   ImageUrlDim getImgUrlExternal(String imgUrl) {
-    if (!imgUrl.startsWith("http://") && !imgUrl.startsWith("https://")) {
+    if (imgUrl.startsWith("/")) {
       String action = getMatchedPart(EXTRACT_ACTION_PATTERN.matcher(imgUrl), 1);
       String space = getMatchedPart(EXTRACT_SPACE_PATTERN.matcher(imgUrl), 2);
       String docname = getMatchedPart(EXTRACT_DOCUMENT_PATTERN.matcher(imgUrl), 2);
@@ -91,11 +91,11 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
   Long getImgUrlSizeKey(String imgUrl) {
     long w = parseImgUrlDimension(imgUrl, "celwidth");
     long h = parseImgUrlDimension(imgUrl, "celheight");
-    Long area = new Long(h * w);
+    long area = h * w;
     if (area < 0) {
       area = area * area;
     } else if ((h == -1) && (w == -1)) {
-      area = -1l;
+      area = -1;
     }
     return area;
   }
