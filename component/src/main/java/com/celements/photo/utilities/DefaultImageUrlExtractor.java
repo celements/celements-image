@@ -34,10 +34,9 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
       * MIN_SOCIAL_MEDIA_IMAGE_SIZE;
 
   private final Pattern IMG_FROM_HTML_PATTERN = Pattern.compile("<img .*?src=['\"](.*?)['\"].*?/>");
-  private final Pattern EXTRACT_ACTION_PATTERN = Pattern.compile("^.*?/(.*?)/.*$");
-  private final Pattern EXTRACT_SPACE_PATTERN = Pattern.compile("^(.*?/){2}(.*?)/.*$");
-  private final Pattern EXTRACT_DOCUMENT_PATTERN = Pattern.compile("^(.*?/){3}(.*?)/.*$");
-  private final Pattern EXTRACT_FILENAME_PATTERN = Pattern.compile("^(.*?/){4}(.*?)(|\\?.*)$");
+  private final Pattern EXTRACT_URL_PART_PATTERN = Pattern.compile("/([^/?]*)");
+  private final Pattern CELWIDTH_FROM_URL_PATTERN = Pattern.compile("^.*celwidth=(\\d+)(&.*)?$");
+  private final Pattern CELHEIGHT_FROM_URL_PATTERN = Pattern.compile("^.*celheight=(\\d+)(&.*)?$");
 
   @Override
   public @NotNull List<ImageUrlDim> extractImagesList(@NotNull String content) {
@@ -68,29 +67,30 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
 
   ImageUrlDim getImgUrlExternal(String imgUrl) {
     if (imgUrl.startsWith("/")) {
-      String action = getMatchedPart(EXTRACT_ACTION_PATTERN.matcher(imgUrl), 1);
-      String space = getMatchedPart(EXTRACT_SPACE_PATTERN.matcher(imgUrl), 2);
-      String docname = getMatchedPart(EXTRACT_DOCUMENT_PATTERN.matcher(imgUrl), 2);
-      String filename = getMatchedPart(EXTRACT_FILENAME_PATTERN.matcher(imgUrl), 2);
+      Matcher matcher = EXTRACT_URL_PART_PATTERN.matcher(imgUrl);
+      String action = getNextMatchedPart(matcher);
+      String space = getNextMatchedPart(matcher);
+      String docname = getNextMatchedPart(matcher);
+      String filename = getNextMatchedPart(matcher);
       String query = imgUrl.substring(Math.min(imgUrl.indexOf('?') + 1, imgUrl.length()));
       XWikiContext context = Utils.getComponent(ModelContext.class).getXWikiContext();
       imgUrl = context.getURLFactory().createAttachmentURL(filename, space, docname, action, query,
           context.getDatabase(), context).toString();
     }
-    return new ImageUrlDim(imgUrl, parseImgUrlDimension(imgUrl, "celwidth"), parseImgUrlDimension(
-        imgUrl, "celheight"));
+    return new ImageUrlDim(imgUrl, parseImgUrlDimension(imgUrl, CELWIDTH_FROM_URL_PATTERN),
+        parseImgUrlDimension(imgUrl, CELHEIGHT_FROM_URL_PATTERN));
   }
 
-  String getMatchedPart(Matcher m, int group) {
+  String getNextMatchedPart(Matcher m) {
     if (m.find()) {
-      return m.group(group);
+      return m.group(1);
     }
     return "";
   }
 
   Long getImgUrlSizeKey(String imgUrl) {
-    long w = parseImgUrlDimension(imgUrl, "celwidth");
-    long h = parseImgUrlDimension(imgUrl, "celheight");
+    long w = parseImgUrlDimension(imgUrl, CELWIDTH_FROM_URL_PATTERN);
+    long h = parseImgUrlDimension(imgUrl, CELHEIGHT_FROM_URL_PATTERN);
     long area = h * w;
     if (area < 0) {
       area = area * area;
@@ -100,18 +100,21 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
     return area;
   }
 
-  int parseImgUrlDimension(String imgUrl, String dimension) {
-    String str = imgUrl.replaceAll("^.*" + dimension + "=(\\d+)(&.*)?$", "$1");
-    try {
-      int dim = Integer.parseInt(str);
-      if (dim > MAX_ALLOWED_DIM) {
-        LOGGER.warn("parseImgUrlDimension: Maximum allowed dimension of [{}] exceeded.",
-            MAX_ALLOWED_DIM);
-        dim = MAX_ALLOWED_DIM;
+  int parseImgUrlDimension(String imgUrl, Pattern dimensionPattern) {
+    Matcher m = dimensionPattern.matcher(imgUrl);
+    if (m.find()) {
+      String str = m.group(1);
+      try {
+        int dim = Integer.parseInt(str);
+        if (dim > MAX_ALLOWED_DIM) {
+          LOGGER.warn("parseImgUrlDimension: Maximum allowed dimension of [{}] exceeded.",
+              MAX_ALLOWED_DIM);
+          dim = MAX_ALLOWED_DIM;
+        }
+        return dim;
+      } catch (NumberFormatException nfe) {
+        LOGGER.debug("Exception while parsing Integer from [{}]", str, nfe);
       }
-      return dim;
-    } catch (NumberFormatException nfe) {
-      LOGGER.debug("Exception while parsing Integer from [{}]", str, nfe);
     }
     return -1;
   }

@@ -111,7 +111,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
     replayDefault();
-    assertEquals(domain + url, article.getImgUrlExternal("test.url" + url).getUrl());
+    assertEquals(domain + url, article.getImgUrlExternal(url).getUrl());
     verifyDefault();
   }
 
@@ -128,7 +128,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
     replayDefault();
-    assertEquals(domain + url, article.getImgUrlExternal("www.test.url" + url).getUrl());
+    assertEquals(domain + url, article.getImgUrlExternal(url).getUrl());
     verifyDefault();
   }
 
