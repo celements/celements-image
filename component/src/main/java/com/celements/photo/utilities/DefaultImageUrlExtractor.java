@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.concurrent.Immutable;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
@@ -19,8 +20,6 @@ import com.celements.model.context.ModelContext;
 import com.celements.photo.container.ImageUrlDim;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
-
-import groovy.lang.Immutable;
 
 @Immutable
 @Singleton

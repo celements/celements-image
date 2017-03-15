@@ -1,8 +1,8 @@
 package com.celements.photo.container;
 
-import com.google.common.base.Optional;
+import javax.annotation.concurrent.Immutable;
 
-import groovy.lang.Immutable;
+import com.google.common.base.Optional;
 
 @Immutable
 public class ImageUrlDim {
