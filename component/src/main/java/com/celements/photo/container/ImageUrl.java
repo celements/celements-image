@@ -188,13 +188,15 @@ public final class ImageUrl {
 
   Integer parseQueryDimension(Pattern dimensionPattern) {
     parseUrl();
-    Matcher m = dimensionPattern.matcher(query);
-    if (m.find()) {
-      String str = m.group(1);
-      try {
-        return Integer.parseInt(str);
-      } catch (NumberFormatException nfe) {
-        LOGGER.debug("Exception while parsing Integer from [{}]", str, nfe);
+    if (!Strings.isNullOrEmpty(query)) {
+      Matcher m = dimensionPattern.matcher(query);
+      if (m.find()) {
+        String str = m.group(1);
+        try {
+          return Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {
+          LOGGER.debug("Exception while parsing Integer from [{}]", str, nfe);
+        }
       }
     }
     return -1;
