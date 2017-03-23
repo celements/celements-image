@@ -192,34 +192,4 @@ public class ImageUrlTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  // @Test
-  // public void testParseUrl() {
-  // ImageUrl imgUrl = new ImageUrl.Builder().build();
-  // fail("Not yet implemented");
-  // }
-  //
-  // @Test
-  // public void testParseQueryDimension() {
-  // ImageUrl imgUrl = new ImageUrl.Builder().build();
-  // fail("Not yet implemented");
-  // }
-  //
-  // @Test
-  // public void testGetNextMatchedPart() {
-  // ImageUrl imgUrl = new ImageUrl.Builder().build();
-  // fail("Not yet implemented");
-  // }
-  // long max = DefaultImageUrlExtractor.MAX_ALLOWED_DIM;
-  // ImageUrl imgUrl = new ImageUrl.Builder().url("/download/images/imgurl/test.jpg?celwidth=" + max
-  // + "&celheight=" + max).build();
-  // long max = DefaultImageUrlExtractor.MAX_ALLOWED_DIM;
-  // ImageUrl imgUrl = new ImageUrl.Builder().url("/download/images/imgurl/test.jpg?celwidth=" +
-  // (max
-  // + 101) + "&celheight=" + (max + 202)).build();
-  // "/download/images/imgurl/test.jpg?celwidth=1000&celheight=800").build();
-  // "/download/images/imgurl/test.jpg?celwidth=1000&celheight=800").build();
-  // String querystring = "celwidth=1000&celheight=800";
-  // String querystring = "celwidth=1000&celheight=800&cropX=30";
-  // String querystring = "celwidth=1000&celheight=800";
-
 }
