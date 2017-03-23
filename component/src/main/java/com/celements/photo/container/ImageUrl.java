@@ -169,6 +169,7 @@ public final class ImageUrl {
     return getUrl();
   }
 
+  // TODO CELDEV-464 Make ImageUrl.parseUrl() work with prefix URL configurations
   void parseUrl() {
     if (!isParsed && !Strings.isNullOrEmpty(urlStr)) {
       Matcher matcher = EXTRACT_URL_PART_PATTERN.matcher(urlStr);
