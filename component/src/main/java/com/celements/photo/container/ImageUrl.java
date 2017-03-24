@@ -21,6 +21,8 @@ import com.xpn.xwiki.web.Utils;
 @Immutable
 public final class ImageUrl {
 
+  // TODO CELDEV-466 There are some cases where the builder is not as predictable and flexible as
+  // one might expect. For details see the improvement issue
   public static final class Builder {
 
     private String url;
