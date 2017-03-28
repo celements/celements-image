@@ -115,7 +115,7 @@ public final class ImageUrl {
   }
 
   public @NotNull String getUrl() {
-    return getContext().getURLFactory().getURL(getUrlInternal(), getContext());
+    return getXWikiContext().getURLFactory().getURL(getUrlInternal(), getXWikiContext());
   }
 
   public @NotNull String getExternalUrl() {
@@ -216,13 +216,13 @@ public final class ImageUrl {
   URL getUrlInternal() {
     parseUrl();
     if (url == null) {
-      url = getContext().getURLFactory().createAttachmentURL(filename, space, name, action, query,
-          getContext().getDatabase(), getContext());
+      url = getXWikiContext().getURLFactory().createAttachmentURL(filename, space, name, action, query,
+          getXWikiContext().getDatabase(), getXWikiContext());
     }
     return url;
   }
 
-  private XWikiContext getContext() {
+  private XWikiContext getXWikiContext() {
     return Utils.getComponent(ModelContext.class).getXWikiContext();
   }
 }
