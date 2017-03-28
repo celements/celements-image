@@ -30,7 +30,7 @@ public final class ImageUrl {
     private String url;
     private String action;
     private String space;
-    private String name;
+    private String docname;
     private String filename;
     private String query;
     private Integer width;
@@ -42,7 +42,7 @@ public final class ImageUrl {
 
     public Builder(@NotNull String spaceName, @NotNull String docName, @NotNull String fileName) {
       space(spaceName);
-      name(docName);
+      docname(docName);
       filename(fileName);
     }
 
@@ -66,8 +66,8 @@ public final class ImageUrl {
       return this;
     }
 
-    public @NotNull Builder name(@NotNull String name) {
-      this.name = checkNotNull(name);
+    public @NotNull Builder docname(@NotNull String docname) {
+      this.docname = checkNotNull(docname);
       return this;
     }
 
@@ -108,7 +108,7 @@ public final class ImageUrl {
   private String urlStr;
   private String action;
   private String space;
-  private String name;
+  private String docname;
   private String filename;
   private String query;
   private Integer width;
@@ -118,7 +118,7 @@ public final class ImageUrl {
     this.urlStr = builder.url;
     this.action = builder.action;
     this.space = builder.space;
-    this.name = builder.name;
+    this.docname = builder.docname;
     this.filename = builder.filename;
     this.query = builder.query;
     this.width = builder.width;
@@ -144,9 +144,9 @@ public final class ImageUrl {
     return space;
   }
 
-  public @NotNull String getName() {
+  public @NotNull String getDocname() {
     parseUrl();
-    return name;
+    return docname;
   }
 
   public @NotNull String getFilename() {
@@ -192,7 +192,7 @@ public final class ImageUrl {
       Matcher matcher = EXTRACT_URL_PART_PATTERN.matcher(urlStr);
       action = MoreObjects.firstNonNull(action, getNextMatchedPart(matcher));
       space = MoreObjects.firstNonNull(space, getNextMatchedPart(matcher));
-      name = MoreObjects.firstNonNull(name, getNextMatchedPart(matcher));
+      docname = MoreObjects.firstNonNull(docname, getNextMatchedPart(matcher));
       filename = MoreObjects.firstNonNull(filename, getNextMatchedPart(matcher));
       int queryStart = urlStr.indexOf('?');
       String extrQuery = "";
@@ -230,7 +230,7 @@ public final class ImageUrl {
   URL getUrlInternal() {
     parseUrl();
     if (url == null) {
-      url = getXWikiContext().getURLFactory().createAttachmentURL(filename, space, name, action,
+      url = getXWikiContext().getURLFactory().createAttachmentURL(filename, space, docname, action,
           query, getXWikiContext().getDatabase(), getXWikiContext());
     }
     return url;

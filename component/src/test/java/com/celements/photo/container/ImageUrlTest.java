@@ -89,12 +89,12 @@ public class ImageUrlTest extends AbstractComponentTest {
     String docname = "OtherDoc";
     String filename = "otherfile.png";
     String query = "otherquerystring=1";
-    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).action(action).space(space).name(
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).action(action).space(space).docname(
         docname).filename(filename).query(query).build();
     imgUrl.parseUrl(); // just to be sure - gets also called in the getters
     assertEquals(action, imgUrl.getAction().get());
     assertEquals(space, imgUrl.getSpace());
-    assertEquals(docname, imgUrl.getName());
+    assertEquals(docname, imgUrl.getDocname());
     assertEquals(filename, imgUrl.getFilename());
     assertEquals(query, imgUrl.getQuery().get());
   }
@@ -119,7 +119,7 @@ public class ImageUrlTest extends AbstractComponentTest {
   public void testGetName() throws Exception {
     ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
-    assertEquals(DEF_DOCNAME, imgUrl.getName());
+    assertEquals(DEF_DOCNAME, imgUrl.getDocname());
     verifyDefault();
   }
 
