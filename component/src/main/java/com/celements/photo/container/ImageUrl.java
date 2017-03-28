@@ -167,6 +167,8 @@ public final class ImageUrl {
     return Optional.absent();
   }
 
+  // TODO CELDEV-468 Implement hashCode/equals in ImageUrl
+
   @Override
   public String toString() {
     return getUrl();
@@ -216,8 +218,8 @@ public final class ImageUrl {
   URL getUrlInternal() {
     parseUrl();
     if (url == null) {
-      url = getXWikiContext().getURLFactory().createAttachmentURL(filename, space, name, action, query,
-          getXWikiContext().getDatabase(), getXWikiContext());
+      url = getXWikiContext().getURLFactory().createAttachmentURL(filename, space, name, action,
+          query, getXWikiContext().getDatabase(), getXWikiContext());
     }
     return url;
   }
