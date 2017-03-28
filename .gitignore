@@ -2,6 +2,6 @@ target
 .classpath
 .project
 .settings
-xwiki.log
+xwiki.lo*
 **/.DS_Store
 **/.svn
