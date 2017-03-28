@@ -40,7 +40,7 @@ public class ImageUrlTest extends AbstractComponentTest {
   public void testImageUrl_externalUrl() {
     String url = "http://www.celements.ch/test/out";
     try {
-      new ImageUrl.Builder().url(url).build();
+      new ImageUrl.Builder(url).build();
       fail("Expected IllegalImageUrlException (no external urls)");
     } catch (IllegalImageUrlException e) {
     }
@@ -48,7 +48,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetUrl() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     URL serverUrl = new URL(DEF_EXT_URL);
     expect(urlFactory.createAttachmentURL(eq(DEF_FILENAME), eq(DEF_SPACE), eq(DEF_DOCNAME), eq(
         DEF_ACTION), eq(""), eq(DEF_DB), eq(getContext()))).andReturn(serverUrl);
@@ -61,7 +61,7 @@ public class ImageUrlTest extends AbstractComponentTest {
   @Test
   public void testGetExternalUrl_urlInit() throws Exception {
     URL serverUrl = new URL(DEF_EXT_URL);
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     expect(urlFactory.createAttachmentURL(eq(DEF_FILENAME), eq(DEF_SPACE), eq(DEF_DOCNAME), eq(
         DEF_ACTION), eq(""), eq(DEF_DB), eq(getContext()))).andReturn(serverUrl);
     replayDefault();
@@ -73,8 +73,8 @@ public class ImageUrlTest extends AbstractComponentTest {
   public void testGetExternalUrl_noUrlInit() throws Exception {
     String queryStr = "celwidth=100&test=true";
     URL serverUrl = new URL(DEF_EXT_URL + queryStr);
-    ImageUrl imgUrl = new ImageUrl.Builder().action(DEF_ACTION).space(DEF_SPACE).name(
-        DEF_DOCNAME).filename(DEF_FILENAME).query(queryStr).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_SPACE, DEF_DOCNAME, DEF_FILENAME).action(
+        DEF_ACTION).query(queryStr).build();
     expect(urlFactory.createAttachmentURL(eq(DEF_FILENAME), eq(DEF_SPACE), eq(DEF_DOCNAME), eq(
         DEF_ACTION), eq(queryStr), eq(DEF_DB), eq(getContext()))).andReturn(serverUrl);
     replayDefault();
@@ -84,7 +84,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetAction() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
     assertEquals(DEF_ACTION, imgUrl.getAction().get());
     verifyDefault();
@@ -92,31 +92,31 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetSpace() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
-    assertEquals(DEF_SPACE, imgUrl.getSpace().get());
+    assertEquals(DEF_SPACE, imgUrl.getSpace());
     verifyDefault();
   }
 
   @Test
   public void testGetName() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
-    assertEquals(DEF_DOCNAME, imgUrl.getName().get());
+    assertEquals(DEF_DOCNAME, imgUrl.getName());
     verifyDefault();
   }
 
   @Test
   public void testGetFilename() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
-    assertEquals(DEF_FILENAME, imgUrl.getFilename().get());
+    assertEquals(DEF_FILENAME, imgUrl.getFilename());
     verifyDefault();
   }
 
   @Test
   public void testGetQuery_empty() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
     assertEquals("", imgUrl.getQuery().get());
     verifyDefault();
@@ -125,7 +125,7 @@ public class ImageUrlTest extends AbstractComponentTest {
   @Test
   public void testGetQuery_withQuery() throws Exception {
     String queryStr = "celwidth=1";
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL + queryStr).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL + queryStr).build();
     replayDefault();
     assertEquals(queryStr, imgUrl.getQuery().get());
     verifyDefault();
@@ -133,7 +133,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetWidth_none() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
     assertFalse(imgUrl.getWidth().isPresent());
     verifyDefault();
@@ -141,7 +141,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetWidth_invalid() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL + "celwidth=hi").build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL + "celwidth=hi").build();
     replayDefault();
     assertFalse(imgUrl.getWidth().isPresent());
     verifyDefault();
@@ -149,7 +149,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetWidth_valid() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL + "celwidth=1001").build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL + "celwidth=1001").build();
     replayDefault();
     assertEquals(1001, (int) imgUrl.getWidth().get());
     verifyDefault();
@@ -157,7 +157,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetHeight_none() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();
     assertFalse(imgUrl.getHeight().isPresent());
     verifyDefault();
@@ -165,7 +165,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetHeight_invalid() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL + "celheight=9999999999999").build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL + "celheight=9999999999999").build();
     replayDefault();
     assertFalse(imgUrl.getHeight().isPresent());
     verifyDefault();
@@ -173,7 +173,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testGetHeight_valid() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL
         + "celwidth=1001&celheight=999&other=x").build();
     replayDefault();
     assertEquals(999, (int) imgUrl.getHeight().get());
@@ -182,7 +182,7 @@ public class ImageUrlTest extends AbstractComponentTest {
 
   @Test
   public void testToString() throws Exception {
-    ImageUrl imgUrl = new ImageUrl.Builder().url(DEF_INT_URL).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     URL serverUrl = new URL(DEF_EXT_URL);
     expect(urlFactory.createAttachmentURL(eq(DEF_FILENAME), eq(DEF_SPACE), eq(DEF_DOCNAME), eq(
         DEF_ACTION), eq(""), eq(DEF_DB), eq(getContext()))).andReturn(serverUrl);

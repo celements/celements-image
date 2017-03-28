@@ -43,7 +43,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
         + "\" class=\"img\" alst=\"the image\" /></p>");
     assertEquals(1, imgUrls.size());
     assertEquals(action, imgUrls.get(0).getAction().get());
-    assertEquals(filename, imgUrls.get(0).getFilename().get());
+    assertEquals(filename, imgUrls.get(0).getFilename());
   }
 
   @Test
@@ -61,11 +61,11 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
         + filename3 + "?celwidth=800&celheight=600\" class=\"img\" alst=\"the image\" /></p>");
     assertEquals(3, imgUrls.size());
     assertEquals(action1, imgUrls.get(0).getAction().get());
-    assertEquals(filename1, imgUrls.get(0).getFilename().get());
+    assertEquals(filename1, imgUrls.get(0).getFilename());
     assertEquals(action2, imgUrls.get(1).getAction().get());
-    assertEquals(filename2, imgUrls.get(1).getFilename().get());
+    assertEquals(filename2, imgUrls.get(1).getFilename());
     assertEquals(action3, imgUrls.get(2).getAction().get());
-    assertEquals(filename3, imgUrls.get(2).getFilename().get());
+    assertEquals(filename3, imgUrls.get(2).getFilename());
   }
 
   @Test
@@ -109,14 +109,14 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   @Test
   public void testGetImgUrlSizeKey_externalUrl() {
     try {
-      new ImageUrl.Builder().url("https://www.test.url/download/images/imgurl/test.jpg").build();
+      new ImageUrl.Builder("https://www.test.url/download/images/imgurl/test.jpg").build();
       fail("Expected IllegalImageUrlException");
     } catch (IllegalImageUrlException e) {
     }
   }
 
   @Test
-  public void testFilterMinMaxSize() {
+  public void testFilterMinMaxSize() throws Exception {
     List<ImageUrl> imgList = article.filterMinMaxSize(getImageUrlTestListWithDefaultValues(),
         Optional.of(100), Optional.of(1000), Optional.of(1000L), Optional.of(1000000L), false);
     assertEquals(4, imgList.size());
@@ -131,7 +131,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterMinMaxSize_noLimits_withDefault() {
+  public void testFilterMinMaxSize_noLimits_withDefault() throws Exception {
     List<ImageUrl> imgList = article.filterMinMaxSize(getImageUrlTestListWithDefaultValues(),
         Optional.<Integer>absent(), Optional.<Integer>absent(), Optional.<Long>absent(),
         Optional.<Long>absent(), true);
@@ -169,7 +169,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterByPixels_withContent_hasDefault() {
+  public void testFilterByPixels_withContent_hasDefault() throws Exception {
     List<ImageUrl> imgUrlList = getImageUrlTestListWithDefaultValues();
     List<ImageUrl> newList = article.filterByPixels(imgUrlList, 1000L, 1000000L, true);
     assertEquals(8, newList.size());
@@ -192,7 +192,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterByPixels_withContent_noDefault() {
+  public void testFilterByPixels_withContent_noDefault() throws Exception {
     List<ImageUrl> imgUrlList = getImageUrlTestListWithDefaultValues();
     List<ImageUrl> newList = article.filterByPixels(imgUrlList, 1000L, 1000000L, false);
     assertEquals(6, newList.size());
@@ -211,7 +211,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterByPixels_withContent_noDefault_noMax() {
+  public void testFilterByPixels_withContent_noDefault_noMax() throws Exception {
     List<ImageUrl> imgUrlList = getImageUrlTestListWithDefaultValues();
     List<ImageUrl> newList = article.filterByPixels(imgUrlList, 1000L, Long.MAX_VALUE, false);
     assertEquals(7, newList.size());
@@ -239,7 +239,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterBySideLength_nonEmpty_withDefault() {
+  public void testFilterBySideLength_nonEmpty_withDefault() throws Exception {
     List<ImageUrl> imgUrlList = article.filterBySideLength(getImageUrlTestListWithDefaultValues(),
         100, 1000, true);
     assertEquals(6, imgUrlList.size());
@@ -258,7 +258,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterBySideLength_nonEmpty_withoutDefault() {
+  public void testFilterBySideLength_nonEmpty_withoutDefault() throws Exception {
     List<ImageUrl> imgUrlList = article.filterBySideLength(getImageUrlTestListWithDefaultValues(),
         100, 1000, false);
     assertEquals(4, imgUrlList.size());
@@ -281,7 +281,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
     String action = "download";
     String querystring = "celwidth=1000&celheight=800";
     String url = "/" + action + "/" + space + "/" + docname + "/" + filename + "?" + querystring;
-    ImageUrl imgUrl = new ImageUrl.Builder().url(url).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(url).build();
     expect(getContext().getURLFactory().createAttachmentURL(eq(filename), eq(space), eq(docname),
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
@@ -299,7 +299,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
     String action = "skin";
     String querystring = "celwidth=1000&celheight=800&cropX=30";
     String url = "/" + action + "/" + space + "/" + docname + "/" + filename + "?" + querystring;
-    ImageUrl imgUrl = new ImageUrl.Builder().url(url).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(url).build();
     expect(getContext().getURLFactory().createAttachmentURL(eq(filename), eq(space), eq(docname),
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
@@ -317,7 +317,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
     String action = "file";
     String querystring = "celwidth=1000&celheight=800";
     String url = "/" + action + "/" + space + "/" + docname + "/" + filename + "?" + querystring;
-    ImageUrl imgUrl = new ImageUrl.Builder().url(url).build();
+    ImageUrl imgUrl = new ImageUrl.Builder(url).build();
     expect(getContext().getURLFactory().createAttachmentURL(eq(filename), eq(space), eq(docname),
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
@@ -326,20 +326,21 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  private List<ImageUrl> getImageUrlTestListWithDefaultValues() {
+  private List<ImageUrl> getImageUrlTestListWithDefaultValues() throws Exception {
+    String url = "/file/space/doc/file.png";
     List<ImageUrl> imgUrlList = new ArrayList<>();
-    imgUrlList.add(new ImageUrl.Builder().build());
-    imgUrlList.add(new ImageUrl.Builder().build());
-    imgUrlList.add(new ImageUrl.Builder().width(200).height(1).build());
-    imgUrlList.add(new ImageUrl.Builder().width(2).height(100).build());
-    imgUrlList.add(new ImageUrl.Builder().width(20).height(10).build());
-    imgUrlList.add(new ImageUrl.Builder().width(500).build());
-    imgUrlList.add(new ImageUrl.Builder().height(500).build());
-    imgUrlList.add(new ImageUrl.Builder().width(250).height(1000).build());
-    imgUrlList.add(new ImageUrl.Builder().width(1800).height(400).build());
-    imgUrlList.add(new ImageUrl.Builder().width(400).height(1800).build());
-    imgUrlList.add(new ImageUrl.Builder().width(900).height(800).build());
-    imgUrlList.add(new ImageUrl.Builder().width(2000).height(800).build());
+    imgUrlList.add(new ImageUrl.Builder(url).build());
+    imgUrlList.add(new ImageUrl.Builder(url).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(200).height(1).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(2).height(100).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(20).height(10).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(500).build());
+    imgUrlList.add(new ImageUrl.Builder(url).height(500).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(250).height(1000).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(1800).height(400).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(400).height(1800).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(900).height(800).build());
+    imgUrlList.add(new ImageUrl.Builder(url).width(2000).height(800).build());
     return imgUrlList;
   }
 

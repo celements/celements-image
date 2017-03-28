@@ -35,7 +35,18 @@ public final class ImageUrl {
     private Integer width;
     private Integer height;
 
+    public Builder(@NotNull String url) throws IllegalImageUrlException {
+      url(url);
+    }
+
+    public Builder(@NotNull String spaceName, @NotNull String docName, @NotNull String fileName) {
+      space(spaceName);
+      name(docName);
+      filename(fileName);
+    }
+
     public @NotNull Builder url(@NotNull String url) throws IllegalImageUrlException {
+      // TODO CELDEV- Check URL using Regexp (needed are space, docname and filename)
       if (checkNotNull(url).startsWith("/")) {
         this.url = url;
       } else {
@@ -127,19 +138,19 @@ public final class ImageUrl {
     return Optional.fromNullable(action);
   }
 
-  public @NotNull Optional<String> getSpace() {
+  public @NotNull String getSpace() {
     parseUrl();
-    return Optional.fromNullable(space);
+    return space;
   }
 
-  public @NotNull Optional<String> getName() {
+  public @NotNull String getName() {
     parseUrl();
-    return Optional.fromNullable(name);
+    return name;
   }
 
-  public @NotNull Optional<String> getFilename() {
+  public @NotNull String getFilename() {
     parseUrl();
-    return Optional.fromNullable(filename);
+    return filename;
   }
 
   public @NotNull Optional<String> getQuery() {

@@ -22,20 +22,22 @@ public class SocialMedialComparatorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCompare() {
+  public void testCompare() throws Exception {
+    String url = "/space/doc/file.png";
+    String fileUrl = "/file" + url;
     List<ImageUrl> imgUrlList = new ArrayList<>();
-    imgUrlList.add(new ImageUrl.Builder().width(200).height(1).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().action("download").build());
-    imgUrlList.add(new ImageUrl.Builder().width(500).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().action("skin").build());
-    imgUrlList.add(new ImageUrl.Builder().width(20).height(10).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().width(1800).height(400).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().height(500).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().width(250).height(1000).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().width(2000).height(800).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().width(900).height(800).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().width(2).height(100).action("file").build());
-    imgUrlList.add(new ImageUrl.Builder().width(400).height(1800).action("file").build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(200).height(1).build());
+    imgUrlList.add(new ImageUrl.Builder("/download" + url).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(500).build());
+    imgUrlList.add(new ImageUrl.Builder("/skin" + url).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(20).height(10).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(1800).height(400).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).height(500).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(250).height(1000).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(2000).height(800).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(900).height(800).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(2).height(100).build());
+    imgUrlList.add(new ImageUrl.Builder(fileUrl).width(400).height(1800).build());
     Collections.sort(imgUrlList, comparator);
     assertEquals(12, imgUrlList.size());
     assertEquals("download", imgUrlList.get(0).getAction().get());

@@ -42,7 +42,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
     Matcher m = IMG_FROM_HTML_PATTERN.matcher(content);
     while (m.find()) {
       try {
-        imageUrls.add(new ImageUrl.Builder().url(m.group(1)).build());
+        imageUrls.add(new ImageUrl.Builder(m.group(1)).build());
       } catch (IllegalImageUrlException iiue) {
         LOGGER.info("ImageUrl only works for relative URLs. Failed for {}", iiue.getUrl());
       }
