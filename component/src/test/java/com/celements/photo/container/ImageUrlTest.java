@@ -83,6 +83,23 @@ public class ImageUrlTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testParseUrl_overrideFields() throws Exception {
+    String action = "file";
+    String space = "OtherSpace";
+    String docname = "OtherDoc";
+    String filename = "otherfile.png";
+    String query = "otherquerystring=1";
+    ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).action(action).space(space).name(
+        docname).filename(filename).query(query).build();
+    imgUrl.parseUrl(); // just to be sure - gets also called in the getters
+    assertEquals(action, imgUrl.getAction().get());
+    assertEquals(space, imgUrl.getSpace());
+    assertEquals(docname, imgUrl.getName());
+    assertEquals(filename, imgUrl.getFilename());
+    assertEquals(query, imgUrl.getQuery().get());
+  }
+
+  @Test
   public void testGetAction() throws Exception {
     ImageUrl imgUrl = new ImageUrl.Builder(DEF_INT_URL).build();
     replayDefault();

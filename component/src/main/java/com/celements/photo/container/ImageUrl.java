@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.celements.model.context.ModelContext;
 import com.celements.photo.exception.IllegalImageUrlException;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -189,16 +190,16 @@ public final class ImageUrl {
   void parseUrl() {
     if (!isParsed && !Strings.isNullOrEmpty(urlStr)) {
       Matcher matcher = EXTRACT_URL_PART_PATTERN.matcher(urlStr);
-      action = getNextMatchedPart(matcher);
-      space = getNextMatchedPart(matcher);
-      name = getNextMatchedPart(matcher);
-      filename = getNextMatchedPart(matcher);
+      action = MoreObjects.firstNonNull(action, getNextMatchedPart(matcher));
+      space = MoreObjects.firstNonNull(space, getNextMatchedPart(matcher));
+      name = MoreObjects.firstNonNull(name, getNextMatchedPart(matcher));
+      filename = MoreObjects.firstNonNull(filename, getNextMatchedPart(matcher));
       int queryStart = urlStr.indexOf('?');
+      String extrQuery = "";
       if (queryStart >= 0) {
-        query = urlStr.substring(queryStart + 1);
-      } else {
-        query = "";
+        extrQuery = urlStr.substring(queryStart + 1);
       }
+      query = MoreObjects.firstNonNull(query, extrQuery);
       isParsed = true;
     }
   }
