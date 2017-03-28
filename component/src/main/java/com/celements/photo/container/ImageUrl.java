@@ -1,5 +1,7 @@
 package com.celements.photo.container;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.celements.model.context.ModelContext;
 import com.celements.photo.exception.IllegalImageUrlException;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
@@ -35,7 +36,7 @@ public final class ImageUrl {
     private Integer height;
 
     public @NotNull Builder url(@NotNull String url) throws IllegalImageUrlException {
-      if (Preconditions.checkNotNull(url).startsWith("/")) {
+      if (checkNotNull(url).startsWith("/")) {
         this.url = url;
       } else {
         throw new IllegalImageUrlException(url);
@@ -44,27 +45,27 @@ public final class ImageUrl {
     }
 
     public @NotNull Builder action(@NotNull String action) {
-      this.action = Preconditions.checkNotNull(action);
+      this.action = checkNotNull(action);
       return this;
     }
 
     public @NotNull Builder space(@NotNull String space) {
-      this.space = Preconditions.checkNotNull(space);
+      this.space = checkNotNull(space);
       return this;
     }
 
     public @NotNull Builder name(@NotNull String name) {
-      this.name = Preconditions.checkNotNull(name);
+      this.name = checkNotNull(name);
       return this;
     }
 
     public @NotNull Builder filename(@NotNull String filename) {
-      this.filename = Preconditions.checkNotNull(filename);
+      this.filename = checkNotNull(filename);
       return this;
     }
 
     public @NotNull Builder query(@NotNull String query) {
-      this.query = Preconditions.checkNotNull(query);
+      this.query = checkNotNull(query);
       return this;
     }
 
@@ -78,7 +79,7 @@ public final class ImageUrl {
       return this;
     }
 
-    public ImageUrl build() {
+    public @NotNull ImageUrl build() {
       return new ImageUrl(this);
     }
 
@@ -113,11 +114,11 @@ public final class ImageUrl {
     this.isParsed = false;
   }
 
-  public String getUrl() {
+  public @NotNull String getUrl() {
     return getContext().getURLFactory().getURL(getUrlInternal(), getContext());
   }
 
-  public String getExternalUrl() {
+  public @NotNull String getExternalUrl() {
     return getUrlInternal().toString();
   }
 
