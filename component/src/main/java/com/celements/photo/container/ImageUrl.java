@@ -99,6 +99,8 @@ public final class ImageUrl {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ImageUrl.class);
 
+  private final String DEFAULT_ACTION = "download";
+  private final String DEFAULT_QUERY = "";
   private final Pattern EXTRACT_URL_PART_PATTERN = Pattern.compile("/([^/?]*)");
   private final Pattern CELWIDTH_FROM_URL_PATTERN = Pattern.compile("^.*celwidth=(\\d+)(&.*)?$");
   private final Pattern CELHEIGHT_FROM_URL_PATTERN = Pattern.compile("^.*celheight=(\\d+)(&.*)?$");
@@ -230,10 +232,10 @@ public final class ImageUrl {
   }
 
   URL getUrlInternal() {
-    parseUrl();
     if (url == null) {
-      url = getXWikiContext().getURLFactory().createAttachmentURL(filename, space, docname, action,
-          query, getXWikiContext().getDatabase(), getXWikiContext());
+      url = getXWikiContext().getURLFactory().createAttachmentURL(getFilename(), getSpace(),
+          getDocname(), getAction().or(DEFAULT_ACTION), getQuery().or(DEFAULT_QUERY),
+          getXWikiContext().getDatabase(), getXWikiContext());
     }
     return url;
   }
