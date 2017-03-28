@@ -189,18 +189,20 @@ public final class ImageUrl {
   // TODO CELDEV-464 Make ImageUrl.parseUrl() work with prefix URL configurations
   void parseUrl() {
     if (!isParsed && !Strings.isNullOrEmpty(urlStr)) {
-      Matcher matcher = EXTRACT_URL_PART_PATTERN.matcher(urlStr);
-      action = MoreObjects.firstNonNull(action, getNextMatchedPart(matcher));
-      space = MoreObjects.firstNonNull(space, getNextMatchedPart(matcher));
-      docname = MoreObjects.firstNonNull(docname, getNextMatchedPart(matcher));
-      filename = MoreObjects.firstNonNull(filename, getNextMatchedPart(matcher));
-      int queryStart = urlStr.indexOf('?');
-      String extrQuery = "";
-      if (queryStart >= 0) {
-        extrQuery = urlStr.substring(queryStart + 1);
+      synchronized (this) {
+        Matcher matcher = EXTRACT_URL_PART_PATTERN.matcher(urlStr);
+        action = MoreObjects.firstNonNull(action, getNextMatchedPart(matcher));
+        space = MoreObjects.firstNonNull(space, getNextMatchedPart(matcher));
+        docname = MoreObjects.firstNonNull(docname, getNextMatchedPart(matcher));
+        filename = MoreObjects.firstNonNull(filename, getNextMatchedPart(matcher));
+        int queryStart = urlStr.indexOf('?');
+        String extrQuery = "";
+        if (queryStart >= 0) {
+          extrQuery = urlStr.substring(queryStart + 1);
+        }
+        query = MoreObjects.firstNonNull(query, extrQuery);
+        isParsed = true;
       }
-      query = MoreObjects.firstNonNull(query, extrQuery);
-      isParsed = true;
     }
   }
 
