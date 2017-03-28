@@ -47,7 +47,7 @@ public final class ImageUrl {
     }
 
     public @NotNull Builder url(@NotNull String url) throws IllegalImageUrlException {
-      // TODO CELDEV- Check URL using Regexp (needed are space, docname and filename)
+      // TODO CELDEV-470 Check URL using Regexp (needed are space, docname and filename)
       if (checkNotNull(url).startsWith("/")) {
         this.url = url;
       } else {
@@ -156,6 +156,7 @@ public final class ImageUrl {
     return filename;
   }
 
+  // TODO CELDEV-471 ImageUrl allow overwriting celwidth/celheight in query
   public @NotNull Optional<String> getQuery() {
     parseUrl();
     return Optional.fromNullable(query);
