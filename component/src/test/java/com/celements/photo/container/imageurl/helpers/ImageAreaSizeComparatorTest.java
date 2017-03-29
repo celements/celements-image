@@ -12,13 +12,13 @@ import org.junit.Test;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.photo.container.ImageUrl;
 
-public class SocialMedialComparatorTest extends AbstractComponentTest {
+public class ImageAreaSizeComparatorTest extends AbstractComponentTest {
 
-  private SocialMedialComparator comparator;
+  private ImageAreaSizeComparator comparator;
 
   @Before
   public void prepareTest() throws Exception {
-    comparator = new SocialMedialComparator();
+    comparator = new ImageAreaSizeComparator();
   }
 
   @Test

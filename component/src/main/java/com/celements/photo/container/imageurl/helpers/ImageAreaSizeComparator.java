@@ -14,7 +14,7 @@ import com.google.common.base.Optional;
  * order of their appearance.
  */
 @Immutable
-public class SocialMedialComparator implements Comparator<ImageUrl>, Serializable {
+public class ImageAreaSizeComparator implements Comparator<ImageUrl>, Serializable {
 
   private static final long serialVersionUID = 2816775271883495599L;
 

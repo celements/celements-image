@@ -7,13 +7,13 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
 @Immutable
-public class LimitImageSideSizePredicate implements Predicate<ImageUrl> {
+public class LimitImageSideLengthPredicate implements Predicate<ImageUrl> {
 
   private final int minSideLength;
   private final int maxSideLength;
   private final boolean keepEmptyAsDefault;
 
-  public LimitImageSideSizePredicate(int minSideLength, int maxSideLength,
+  public LimitImageSideLengthPredicate(int minSideLength, int maxSideLength,
       boolean keepEmptyAsDefault) {
     this.minSideLength = minSideLength;
     this.maxSideLength = maxSideLength;
