@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.photo.container.ImageUrl;
-import com.google.common.base.Optional;
 
 @ComponentRole
 public interface ImageUrlExtractor {
@@ -30,27 +29,5 @@ public interface ImageUrlExtractor {
    * @return list containing all social media usable images
    */
   public @NotNull List<ImageUrl> extractImagesSocialMediaUrlList(@NotNull String content);
-
-  /**
-   * Filters out elements outside of size limits
-   *
-   * @param imageUrls
-   *          list of image URLs
-   * @param minSideLength
-   *          only include images with a minimum side length
-   * @param maxSideLength
-   *          only include images with a maximum side length
-   * @param minPixels
-   *          remove map entries with a smaller key (default 1)
-   * @param maxPixels
-   *          remove map entries with a larger key (default max long)
-   * @param keepUndefinedSize
-   *          keep image URLs with indeterminable size by default
-   * @return reduced map of image URLs
-   */
-  public @NotNull List<ImageUrl> filterMinMaxSize(@NotNull List<ImageUrl> groupedImageUrls,
-      @NotNull Optional<Integer> minSideLength, @NotNull Optional<Integer> maxSideLength,
-      @NotNull Optional<Long> minPixels, @NotNull Optional<Long> maxPixels,
-      boolean keepUndefinedSize);
 
 }
