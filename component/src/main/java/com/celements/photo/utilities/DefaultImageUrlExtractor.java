@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.celements.photo.container.ImageUrl;
+import com.celements.photo.container.imageurl.helpers.ImageAreaSizeComparator;
 import com.celements.photo.container.imageurl.helpers.LimitImageAreaSizePredicate;
 import com.celements.photo.container.imageurl.helpers.LimitImageSideLengthPredicate;
-import com.celements.photo.container.imageurl.helpers.ImageAreaSizeComparator;
 import com.celements.photo.exception.IllegalImageUrlException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -57,7 +57,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
     Collections.sort(imageUrls, new ImageAreaSizeComparator());
     Predicate<ImageUrl> predicateArea = new LimitImageAreaSizePredicate(MIN_SOCIAL_MEDIA_AREA_SIZE,
         Long.MAX_VALUE, true);
-    LimitImageSideLengthPredicate predicateSideLength = new LimitImageSideLengthPredicate(
+    Predicate<ImageUrl> predicateSideLength = new LimitImageSideLengthPredicate(
         MIN_SOCIAL_MEDIA_IMAGE_SIZE, Integer.MAX_VALUE, true);
     return FluentIterable.from(FluentIterable.from(imageUrls).filter(
         predicateArea).toList()).filter(predicateSideLength).toList();
