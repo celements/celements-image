@@ -14,6 +14,14 @@ class AreaWithLimitsAndDefault {
 
   public static final int MAX_ALLOWED_DIM = 1000000000;
 
+  /**
+   * Return the image area (number of pixels) for an ImageUrl. If only one out of width and height
+   * is set we assume a square image, thus squaring the availabe side length.
+   * To prevent an overflow the side length is limited to MAX_ALLOWED_DIM
+   *
+   * @param imgUrl
+   * @return
+   */
   public @NotNull Optional<Long> getAreaKey(@NotNull ImageUrl imgUrl) {
     int w = checkBelowMaxAllowed(imgUrl.getWidth().or(-1));
     int h = checkBelowMaxAllowed(imgUrl.getHeight().or(-1));

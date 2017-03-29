@@ -6,6 +6,11 @@ import com.celements.photo.container.ImageUrl;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
+/**
+ * Returns true if the area (number of pixels) of an ImageUrl is within the boundaries of
+ * [minPixels,maxPixels]. Depending on keepUndefinedSize true / false is returned for ImageUrls
+ * with unknown area.
+ */
 @Immutable
 public class LimitImageAreaSizePredicate implements Predicate<ImageUrl> {
 

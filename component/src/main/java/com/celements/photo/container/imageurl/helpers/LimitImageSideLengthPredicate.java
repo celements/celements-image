@@ -6,6 +6,12 @@ import com.celements.photo.container.ImageUrl;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
+/**
+ * Returns true if both side lengths of the ImageUrls are within [minSideLength,maxSideLength]
+ * An exception is made for ImageUrls where either width OR height is missing. For those the
+ * only the available side is checked. Depending on keepEmptyAsDefault true / false is returned for
+ * ImageUrls with width AND height missing.
+ */
 @Immutable
 public class LimitImageSideLengthPredicate implements Predicate<ImageUrl> {
 
