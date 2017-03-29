@@ -49,6 +49,14 @@ public class BarcodeScriptService implements ScriptService {
     return (10 - ((s1 + s2) % 10)) % 10;
   }
 
+  /**
+   * Generates an image representation of a barcode
+   *
+   * @param number
+   *          complete number including check sum
+   * @param out
+   *          image representation of the barcode
+   */
   public void generate(String number, OutputStream out) {
     String moduleHeight = getContext().getRequest().get("moduleHeight");
     if ((moduleHeight == null) || "".equals(moduleHeight.trim())) {
