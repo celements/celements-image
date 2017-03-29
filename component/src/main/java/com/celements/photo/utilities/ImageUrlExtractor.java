@@ -21,6 +21,7 @@ public interface ImageUrlExtractor {
   public @NotNull List<ImageUrl> extractImageUrlList(@NotNull String content);
 
   /**
+   * TODO CELDEV-474 On reuse resolve the issue
    * Returns all relative (internal) image URLs that match certain size criteria to be shown on
    * social media sites. The list is sorted by image area size ascending.
    *
