@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.celements.photo.container.ImageUrl;
 import com.google.common.base.Optional;
 
-public class AreaWithLimitsAndDefault {
+class AreaWithLimitsAndDefault {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AreaWithLimitsAndDefault.class);
 

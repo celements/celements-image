@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.celements.photo.container.ImageUrl;
-import com.celements.photo.container.imageurl.helpers.AreaWithLimitsAndDefault;
 import com.celements.photo.container.imageurl.helpers.LimitImageAreaSizePredicate;
 import com.celements.photo.container.imageurl.helpers.LimitImageSideSizePredicate;
 import com.celements.photo.container.imageurl.helpers.SocialMedialComparator;
@@ -68,7 +67,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
     List<ImageUrl> filteredList = filterByPixels(groupedImageUrls, minPixels.or(1L), maxPixels.or(
         Long.MAX_VALUE), keepUndefinedSize);
     return filterBySideLength(filteredList, minSideLength.or(1), maxSideLength.or(
-        AreaWithLimitsAndDefault.MAX_ALLOWED_DIM), keepUndefinedSize);
+        Integer.MAX_VALUE), keepUndefinedSize);
   }
 
   List<ImageUrl> filterByPixels(List<ImageUrl> imageUrls, long minPixels, long maxPixels,
