@@ -50,6 +50,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
     return imageUrls;
   }
 
+  // TODO CELDEV-474 On reuse resolve the issue
   @Override
   public List<ImageUrl> extractImagesSocialMediaUrlList(String content) {
     List<ImageUrl> imageUrls = extractImageUrlList(content);
