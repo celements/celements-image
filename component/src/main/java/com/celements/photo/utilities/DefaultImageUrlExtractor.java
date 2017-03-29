@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +34,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
   private final Pattern IMG_FROM_HTML_PATTERN = Pattern.compile("<img .*?src=['\"](.*?)['\"].*?/>");
 
   @Override
-  public @NotNull List<ImageUrl> extractImageUrlList(@NotNull String content) {
+  public List<ImageUrl> extractImageUrlList(String content) {
     Preconditions.checkNotNull(content);
     List<ImageUrl> imageUrls = new ArrayList<>();
     Matcher m = IMG_FROM_HTML_PATTERN.matcher(content);
@@ -51,7 +49,7 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
   }
 
   @Override
-  public @NotNull List<ImageUrl> extractImagesSocialMediaUrlList(@NotNull String content) {
+  public List<ImageUrl> extractImagesSocialMediaUrlList(String content) {
     final int MIN_SOCIAL_MEDIA_IMAGE_SIZE = 200;
     final long MIN_SOCIAL_MEDIA_AREA_SIZE = MIN_SOCIAL_MEDIA_IMAGE_SIZE
         * MIN_SOCIAL_MEDIA_IMAGE_SIZE;
@@ -64,10 +62,9 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
   }
 
   @Override
-  public @NotNull List<ImageUrl> filterMinMaxSize(@NotNull List<ImageUrl> groupedImageUrls,
-      @Nullable Optional<Integer> minSideLength, @Nullable Optional<Integer> maxSideLength,
-      @Nullable Optional<Long> minPixels, @Nullable Optional<Long> maxPixels,
-      @Nullable boolean keepUndefinedSize) {
+  public List<ImageUrl> filterMinMaxSize(List<ImageUrl> groupedImageUrls,
+      Optional<Integer> minSideLength, Optional<Integer> maxSideLength, Optional<Long> minPixels,
+      Optional<Long> maxPixels, boolean keepUndefinedSize) {
     List<ImageUrl> filteredList = filterByPixels(groupedImageUrls, minPixels.or(1L), maxPixels.or(
         Long.MAX_VALUE), keepUndefinedSize);
     return filterBySideLength(filteredList, minSideLength.or(1), maxSideLength.or(

@@ -2,7 +2,6 @@ package com.celements.photo.utilities;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -50,8 +49,7 @@ public interface ImageUrlExtractor {
    * @return reduced map of image URLs
    */
   public @NotNull List<ImageUrl> filterMinMaxSize(@NotNull List<ImageUrl> groupedImageUrls,
-      @Nullable Optional<Integer> minSideLength, @Nullable Optional<Integer> maxSideLength,
-      @Nullable Optional<Long> minPixels, @Nullable Optional<Long> maxPixels,
-      @Nullable boolean keepUndefinedSize);
+      Optional<Integer> minSideLength, Optional<Integer> maxSideLength, Optional<Long> minPixels,
+      Optional<Long> maxPixels, boolean keepUndefinedSize);
 
 }
