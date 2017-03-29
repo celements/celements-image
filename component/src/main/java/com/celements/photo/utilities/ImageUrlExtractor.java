@@ -49,7 +49,8 @@ public interface ImageUrlExtractor {
    * @return reduced map of image URLs
    */
   public @NotNull List<ImageUrl> filterMinMaxSize(@NotNull List<ImageUrl> groupedImageUrls,
-      Optional<Integer> minSideLength, Optional<Integer> maxSideLength, Optional<Long> minPixels,
-      Optional<Long> maxPixels, boolean keepUndefinedSize);
+      @NotNull Optional<Integer> minSideLength, @NotNull Optional<Integer> maxSideLength,
+      @NotNull Optional<Long> minPixels, @NotNull Optional<Long> maxPixels,
+      boolean keepUndefinedSize);
 
 }
