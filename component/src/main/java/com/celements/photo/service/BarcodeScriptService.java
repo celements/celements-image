@@ -11,6 +11,7 @@ import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeException;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.krysalis.barcode4j.BarcodeUtil;
@@ -21,6 +22,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -58,16 +60,40 @@ public class BarcodeScriptService implements ScriptService {
    *          image representation of the barcode
    */
   public void generate(String number, OutputStream out) {
-    String moduleHeight = getContext().getRequest().get("moduleHeight");
-    if ((moduleHeight == null) || "".equals(moduleHeight.trim())) {
-      moduleHeight = MODULE_HEIGHT;
-    }
     String moduleWidth = getContext().getRequest().get("moduleWidth");
     if ((moduleWidth == null) || "".equals(moduleWidth.trim())) {
       moduleWidth = MODULE_WIDTH;
     }
-    BitmapCanvasProvider provider = new BitmapCanvasProvider(out, "image/png", 150,
+    String moduleHeight = getContext().getRequest().get("moduleHeight");
+    if ((moduleHeight == null) || "".equals(moduleHeight.trim())) {
+      moduleHeight = MODULE_HEIGHT;
+    }
+    generate(number, moduleWidth, moduleHeight, 150, Optional.<BarcodeDimension>absent(), out);
+  }
+
+  /**
+   * Generates an image representation of a barcode
+   *
+   * @param number
+   *          complete number including check sum
+   * @param moduleWidth
+   *          module height in the format '15mm'
+   * @param moduleHeight
+   *          module width in the format '0.3mm'
+   * @param resolution
+   *          resolution of the output image (DPI)
+   * @param dim
+   *          (optional) dimensions of the output
+   * @param out
+   *          image representation of the barcode
+   */
+  public void generate(String number, String moduleWidth, String moduleHeight, int resolution,
+      Optional<BarcodeDimension> dim, OutputStream out) {
+    BitmapCanvasProvider provider = new BitmapCanvasProvider(out, "image/png", resolution,
         BufferedImage.TYPE_BYTE_GRAY, true, 0);
+    if (dim.isPresent()) {
+      provider.establishDimensions(dim.get());
+    }
     DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
     String xmlConf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><barcode><ean8>" + "<height>"
         + moduleHeight + "</height>" + "<module-width>" + moduleWidth + "</module-width>"
