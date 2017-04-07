@@ -427,7 +427,6 @@
     }
   };
   
-  
   celAddOnBeforeLoadListener(function() {
     if($$('.presentationList').size() > 0) {
       var column = new CEL.Column('content');
