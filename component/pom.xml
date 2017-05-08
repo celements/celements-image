@@ -7,13 +7,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-photo</artifactId>
-  <version>1.54-SNAPSHOT</version>
+  <version>1.54-RC1</version>
   <description>Celements Photo</description>
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
     <url>https://github.com/celements/celements-photo</url>
-    <tag>HEAD</tag>
+    <tag>celements-photo-1.54-RC1</tag>
   </scm>
   <dependencies>
     <!-- Add here all your dependencies -->
