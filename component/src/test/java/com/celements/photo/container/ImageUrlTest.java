@@ -70,6 +70,23 @@ public class ImageUrlTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testGetExternalUrl_urlInitEncoded() throws Exception {
+    final String filename = "2010%2D09%2D24%2DPZ%2DPCT%2D01.jpg";
+    final String filenameDecoded = "2010-09-24-PZ-PCT-01.jpg";
+    final String internalUrl = "/" + DEF_ACTION + "/" + DEF_SPACE + "/" + DEF_DOCNAME + "/"
+        + filename + DEF_QUERY;
+    final String externalUrl = DEF_DOMAIN + "/" + DEF_ACTION + "/" + DEF_SPACE + "/" + DEF_DOCNAME
+        + "/" + filenameDecoded + DEF_QUERY;
+    URL serverUrl = new URL(externalUrl);
+    ImageUrl imgUrl = new ImageUrl.Builder(internalUrl).build();
+    expect(urlFactory.createAttachmentURL(eq(filenameDecoded), eq(DEF_SPACE), eq(DEF_DOCNAME), eq(
+        DEF_ACTION), eq(""), eq(DEF_DB), eq(getContext()))).andReturn(serverUrl);
+    replayDefault();
+    assertEquals(externalUrl, imgUrl.getExternalUrl());
+    verifyDefault();
+  }
+
+  @Test
   public void testGetExternalUrl_noUrlInit() throws Exception {
     String queryStr = "celwidth=100&test=true";
     URL serverUrl = new URL(DEF_EXT_URL + queryStr);

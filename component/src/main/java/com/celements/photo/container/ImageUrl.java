@@ -2,7 +2,10 @@ package com.celements.photo.container;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +52,11 @@ public final class ImageUrl {
     public @NotNull Builder url(@NotNull String url) throws IllegalImageUrlException {
       // TODO CELDEV-470 Check URL using Regexp (needed are space, docname and filename)
       if (checkNotNull(url).startsWith("/")) {
-        this.url = url;
+        try {
+          this.url = URLDecoder.decode(url, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException uee) {
+          throw new RuntimeException("UTF-8 Encoding not available", uee);
+        }
       } else {
         throw new IllegalImageUrlException(url);
       }
