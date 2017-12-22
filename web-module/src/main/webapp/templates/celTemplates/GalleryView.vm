@@ -32,10 +32,13 @@ $celementsweb.addExtJSfileOnce(':celJS/lytebox5/lytebox.js', 'file')
 #if("$!comparator" == '')
   #set($comparator = 'AttachmentAscendingNameComparator')
 #end
+#set($showDescription = $!obj.getProperty("showDescription").getValue())
 #if("$!withoutEnclosingDiv" != '1')
 <div id="Gallery${galleryDoc.getName()}:${galleryDoc}" class="celements_gallery_overview cel_cm_gallery">
- <h2 class="celements_gallery_title">$!galleryDoc.getTitle()</h2>		##already Multilingual title??
- <p class="celements_gallery_description">$!obj.getProperty("description").getValue()<!--ie6.0--></p>
+  <h2 class="celements_gallery_title">$!galleryDoc.getTitle()</h2>		##already Multilingual title??
+  #if($showDescription == 1)
+    <p class="celements_gallery_description">$!obj.getProperty("description").getValue()<!--ie6.0--></p>
+  #end
 #end
 #set($dataLyteOptions = "$!{xwiki.getSpacePreference('LyteboxOptions')}")
 #if("$!dataLyteOptions" == '')
