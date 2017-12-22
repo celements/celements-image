@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-photo</artifactId>
-  <version>1.55-SNAPSHOT</version>
+  <version>1.56-SNAPSHOT</version>
   <description>Celements Photo</description>
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
@@ -26,13 +26,13 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-core</artifactId>
-      <version>1.172-SNAPSHOT</version>
+      <version>1.172</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
