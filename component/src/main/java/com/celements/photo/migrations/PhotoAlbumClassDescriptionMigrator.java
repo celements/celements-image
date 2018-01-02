@@ -18,7 +18,8 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
-import com.celements.pagetype.classes.PageTypeClass;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.google.common.base.Optional;
@@ -49,6 +50,9 @@ public class PhotoAlbumClassDescriptionMigrator extends AbstractCelementsHiberna
   @Requirement(XObjectFieldAccessor.NAME)
   private FieldAccessor<BaseObject> xObjFieldAccessor;
 
+  @Requirement
+  private IPageTypeResolverRole pageTypeResolver;
+
   @Override
   public String getName() {
     return "PhotoAlbumClassDescriptionMigrator";
@@ -61,7 +65,7 @@ public class PhotoAlbumClassDescriptionMigrator extends AbstractCelementsHiberna
 
   /**
    * getVersion is using days since 1.1.2010 until the day of committing this migration
-   * 21.08.2017 -> 2912 https://www.convertunits.com/dates/from/Jan+1,+2010/to/Dec+22,+2017
+   * 22.12.2017 -> 2912 https://www.convertunits.com/dates/from/Jan+1,+2010/to/Dec+22,+2017
    */
   @Override
   public XWikiDBVersion getVersion() {
@@ -80,28 +84,37 @@ public class PhotoAlbumClassDescriptionMigrator extends AbstractCelementsHiberna
       Query xwqlQuery = queryManager.createQuery(xwql, Query.XWQL);
       for (DocumentReference docRef : queryExecutor.executeAndGetDocRefs(xwqlQuery)) {
         try {
+          boolean docChanged = false;
           XWikiDocument galleryDoc = modelAccess.getDocument(docRef);
-          Optional<BaseObject> imgGalPageTypeObj = XWikiObjectEditor.on(galleryDoc).filter(
-              PageTypeClass.FIELD_PAGE_TYPE, "ImageGallery").fetch().first();
-          Optional<BaseObject> galPageTypeObj = XWikiObjectEditor.on(galleryDoc).filter(
-              PageTypeClass.FIELD_PAGE_TYPE, "Gallery").fetch().first();
+          PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDoc(galleryDoc);
+          String pageTypeConfigName = pageTypeRef.getConfigName();
           Optional<BaseObject> photoAlbumClassObj = XWikiObjectEditor.on(galleryDoc).filter(
               new ClassReference(oldCoreClassConfig.getPhotoAlbumClassRef())).fetch().first();
-          if (imgGalPageTypeObj.isPresent() && photoAlbumClassObj.isPresent()) {
+          // TODO: ClassDefinition for PhotoAlbumClass will be implemented with the Ticket
+          // CELDEV-614
+          if (pageTypeConfigName.equals("ImageGallery") && photoAlbumClassObj.isPresent()) {
             modelAccess.setProperty(photoAlbumClassObj.get(), "showDescription", 0);
-          } else if (galPageTypeObj.isPresent() && photoAlbumClassObj.isPresent()) {
+            docChanged = true;
+          } else if (pageTypeConfigName.equals("Gallery") && photoAlbumClassObj.isPresent()) {
             modelAccess.setProperty(photoAlbumClassObj.get(), "showDescription", 1);
+            docChanged = true;
+          } else {
+            if (!photoAlbumClassObj.isPresent()) {
+              LOGGER.warn("No PhotoAlbumClass Object on doc with docRef {}", docRef);
+            } else {
+              LOGGER.warn("pageTypeConfigName '{}' is not 'Gallery' or 'ImageGallery'",
+                  pageTypeConfigName);
+            }
           }
-          modelAccess.saveDocument(galleryDoc);
+          if (docChanged) {
+            modelAccess.saveDocument(galleryDoc);
+          }
         } catch (DocumentNotExistsException exp) {
           LOGGER.error("Could not get Document with docRef {} ", docRef, exp);
-        } catch (DocumentSaveException exp) {
-          LOGGER.error("Could not save Document with docRef {} ", docRef, exp);
         }
       }
-    } catch (QueryException qexc) {
-      throw new XWikiException(0, 0,
-          "Error while searching ProgonEvent with Progon.URLClass Object", qexc);
+    } catch (QueryException | DocumentSaveException exp) {
+      throw new XWikiException(0, 0, "PhotoAlbumClassDescriptionMigrator failed", exp);
     }
   }
 
