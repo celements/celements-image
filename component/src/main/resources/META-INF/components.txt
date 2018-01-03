@@ -11,3 +11,4 @@ com.celements.photo.presentation.GalleryPresentationType
 com.celements.photo.maxImageSize.MaxImageSizeService
 com.celements.photo.utilities.DefaultImageUrlExtractor
 com.celements.photo.search.ImageWebSearchPackage
+com.celements.photo.migrations.PhotoAlbumClassDescriptionMigrator
