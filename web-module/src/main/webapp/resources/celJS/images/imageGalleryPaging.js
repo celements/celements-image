@@ -9,9 +9,9 @@
   /**
    * Column constructor
    */
-  CEL.Column = function(htmlElemId) {
+  CEL.Column = function(htmlElemCssPath) {
     // constructor
-    this._init(htmlElemId);
+    this._init(htmlElemCssPath);
   };
 
   /**
@@ -47,11 +47,10 @@
     _periodicalExecuter : undefined,
     _scrollHeight : undefined, 
     
-    _init : function(htmlElemId) {
+    _init : function(htmlElemCssPath) {
       var _me = this;
-//      _me._columnHTMLElem = $(htmlElemId);
-      $$('.presentationList')[0].id = 'gallerySwiper';
-      _me._columnHTMLElem = $$('.presentationList')[0];
+      $$(htmlElemCssPath)[0].id = 'gallerySwiper';
+      _me._columnHTMLElem = $$(htmlElemCssPath)[0];
       _me._swiperScrollBind = _me._swiperScroll.bind(_me);
       _me._reInitScrollbarHandlerBind = _me._reInitScrollbarHandler.bind(_me);
       _me._updateScrollbarBind = _me._updateScrollbar.bind(_me);
@@ -430,7 +429,7 @@
   
   celAddOnBeforeLoadListener(function() {
     if($$('.presentationList').size() > 0) {
-      var column = new CEL.Column('content');
+      var column = new CEL.Column('.presentationList');
       column._initSwiperScrollbar();
     }
   });
