@@ -75,46 +75,44 @@ public class PhotoAlbumClassDescriptionMigrator extends AbstractCelementsHiberna
   @Override
   public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
       throws XWikiException {
-    migratePhotoAlbumClassObjects();
-  }
-
-  private void migratePhotoAlbumClassObjects() throws XWikiException {
     try {
-      String xwql = getPhotoAlbumClassXWQL();
-      Query xwqlQuery = queryManager.createQuery(xwql, Query.XWQL);
+      Query xwqlQuery = queryManager.createQuery(getPhotoAlbumClassXWQL(), Query.XWQL);
       for (DocumentReference docRef : queryExecutor.executeAndGetDocRefs(xwqlQuery)) {
-        try {
-          boolean docChanged = false;
-          XWikiDocument galleryDoc = modelAccess.getDocument(docRef);
-          PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDoc(galleryDoc);
-          String pageTypeConfigName = pageTypeRef.getConfigName();
-          Optional<BaseObject> photoAlbumClassObj = XWikiObjectEditor.on(galleryDoc).filter(
-              new ClassReference(oldCoreClassConfig.getPhotoAlbumClassRef())).fetch().first();
-          // TODO: ClassDefinition for PhotoAlbumClass will be implemented with the Ticket
-          // CELDEV-614
-          if (pageTypeConfigName.equals("ImageGallery") && photoAlbumClassObj.isPresent()) {
-            modelAccess.setProperty(photoAlbumClassObj.get(), "showDescription", 0);
-            docChanged = true;
-          } else if (pageTypeConfigName.equals("Gallery") && photoAlbumClassObj.isPresent()) {
-            modelAccess.setProperty(photoAlbumClassObj.get(), "showDescription", 1);
-            docChanged = true;
-          } else {
-            if (!photoAlbumClassObj.isPresent()) {
-              LOGGER.warn("No PhotoAlbumClass Object on doc with docRef {}", docRef);
-            } else {
-              LOGGER.warn("pageTypeConfigName '{}' is not 'Gallery' or 'ImageGallery'",
-                  pageTypeConfigName);
-            }
-          }
-          if (docChanged) {
-            modelAccess.saveDocument(galleryDoc);
-          }
-        } catch (DocumentNotExistsException exp) {
-          LOGGER.error("Could not get Document with docRef {} ", docRef, exp);
-        }
+        migrateGallery(docRef);
       }
     } catch (QueryException | DocumentSaveException exp) {
+      LOGGER.error("PhotoAlbumClassDescriptionMigrator failed", exp);
       throw new XWikiException(0, 0, "PhotoAlbumClassDescriptionMigrator failed", exp);
+    }
+  }
+
+  private void migrateGallery(DocumentReference docRef) throws DocumentSaveException {
+    try {
+      boolean docChanged = false;
+      XWikiDocument galleryDoc = modelAccess.getDocument(docRef);
+      PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDoc(galleryDoc);
+      String pageTypeConfigName = pageTypeRef.getConfigName();
+      Optional<BaseObject> photoAlbumClassObj = XWikiObjectEditor.on(galleryDoc).filter(
+          new ClassReference(oldCoreClassConfig.getPhotoAlbumClassRef())).fetch().first();
+      // TODO: ClassDefinition for PhotoAlbumClass will be implemented with the Ticket
+      // CELDEV-614
+      if (pageTypeConfigName.equals("ImageGallery") && photoAlbumClassObj.isPresent()) {
+        docChanged = modelAccess.setProperty(photoAlbumClassObj.get(), "showDescription", 0);
+      } else if (pageTypeConfigName.equals("Gallery") && photoAlbumClassObj.isPresent()) {
+        docChanged = modelAccess.setProperty(photoAlbumClassObj.get(), "showDescription", 1);
+      } else {
+        if (!photoAlbumClassObj.isPresent()) {
+          LOGGER.warn("No PhotoAlbumClass Object on doc with docRef {}", docRef);
+        } else {
+          LOGGER.warn("pageTypeConfigName '{}' is not 'Gallery' or 'ImageGallery' for '{}'",
+              pageTypeConfigName, docRef);
+        }
+      }
+      if (docChanged) {
+        modelAccess.saveDocument(galleryDoc);
+      }
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.warn("Could not get Document with docRef {} ", docRef, exp);
     }
   }
 
