@@ -83,8 +83,10 @@ public class PhotoAlbumClassDescriptionMigrator extends AbstractCelementsHiberna
       }
       LOGGER.info("migrate: end");
     } catch (QueryException | DocumentSaveException exp) {
-      LOGGER.error("PhotoAlbumClassDescriptionMigrator failed", exp);
       throw new XWikiException(0, 0, "PhotoAlbumClassDescriptionMigrator failed", exp);
+    } catch (Exception exc) {
+      LOGGER.error("PhotoAlbumClassDescriptionMigrator failed", exc);
+      throw exc;
     }
   }
 
