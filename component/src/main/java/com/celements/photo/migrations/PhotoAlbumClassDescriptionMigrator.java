@@ -75,11 +75,13 @@ public class PhotoAlbumClassDescriptionMigrator extends AbstractCelementsHiberna
   @Override
   public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
       throws XWikiException {
+    LOGGER.info("migrate: start");
     try {
       Query xwqlQuery = queryManager.createQuery(getPhotoAlbumClassXWQL(), Query.XWQL);
       for (DocumentReference docRef : queryExecutor.executeAndGetDocRefs(xwqlQuery)) {
         migrateGallery(docRef);
       }
+      LOGGER.info("migrate: end");
     } catch (QueryException | DocumentSaveException exp) {
       LOGGER.error("PhotoAlbumClassDescriptionMigrator failed", exp);
       throw new XWikiException(0, 0, "PhotoAlbumClassDescriptionMigrator failed", exp);
