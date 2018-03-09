@@ -47,7 +47,6 @@ import javax.media.jai.UnpackedImageData;
 
 import org.apache.sanselan.ImageReadException;
 import org.apache.tika.io.IOUtils;
-import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +55,7 @@ import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.plugin.cmd.DecodeImageCommand;
 import com.celements.photo.utilities.Util;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -72,7 +72,7 @@ public class GenerateThumbnail {
   public static final Map<String, String> saveTypes = getSaveTypes();
 
   static Map<String, String> getSaveTypes() {
-    HashMap<String, String> map = new HashMap<String, String>();
+    HashMap<String, String> map = new HashMap<>();
     map.put("gif", "GIF");
     map.put("image/gif", "GIF");
     map.put("jpg", "JPEG");
@@ -90,7 +90,7 @@ public class GenerateThumbnail {
    * Calculates an ImageDimensions object, containing the width and height of a
    * thumbnail, respecting the specified maximums (maintaining the aspect
    * ratio of the original image).
-   * 
+   *
    * @see com.celements.photo.plugin.container.ImageDimensions
    * @param in
    *          InputStream of the image.
@@ -111,7 +111,7 @@ public class GenerateThumbnail {
    * Calculates an ImageDimensions object, containing the width and height of a
    * thumbnail, respecting the specified maximums (maintaining the aspect
    * ratio of the original image).
-   * 
+   *
    * @see com.celements.photo.plugin.container.ImageDimensions
    * @param img
    *          BufferedImage representation of the image.
@@ -140,7 +140,7 @@ public class GenerateThumbnail {
    * ratio of the original image).
    * Maximum values <= 0 for a dimension take the original image's value as
    * maximum for that dimension.
-   * 
+   *
    * @see com.celements.photo.plugin.container.ImageDimensions
    * @param imgWidth
    *          Width of the original image.
@@ -196,7 +196,7 @@ public class GenerateThumbnail {
 
   /**
    * Calculates the dimensions of the specified image.
-   * 
+   *
    * @see com.celements.photo.plugin.container.ImageDimensions
    * @param in
    *          InputStream of the image.
@@ -213,7 +213,7 @@ public class GenerateThumbnail {
 
   /**
    * Calculates the dimensions of the specified image.
-   * 
+   *
    * @see com.celements.photo.plugin.container.ImageDimensions
    * @param img
    *          BufferedImage representation of the image.
@@ -238,7 +238,7 @@ public class GenerateThumbnail {
   /**
    * Creates a thumbnail, reading from an InputStream and writing the result
    * to an OutputStream.
-   * 
+   *
    * @param in
    *          InputStream of the original sized image.
    * @param out
@@ -265,7 +265,7 @@ public class GenerateThumbnail {
   /**
    * Creates a thumbnail, reading from an InputStream and writing the result
    * to an OutputStream.
-   * 
+   *
    * @param in
    *          InputStream of the original sized image.
    * @param out
@@ -290,7 +290,7 @@ public class GenerateThumbnail {
   /**
    * Creates a thumbnail from a BufferedImage and writes the result
    * to an OutputStream.
-   * 
+   *
    * @param img
    *          BufferedImage representation of the original image.
    * @param out
@@ -419,7 +419,7 @@ public class GenerateThumbnail {
   /**
    * Encodes a BufferedImage to png format (default, override for other formats) and
    * writes it to the specified OutputStream.
-   * 
+   *
    * @param out
    *          OutputStream to write the image to.
    * @param image
@@ -483,7 +483,7 @@ public class GenerateThumbnail {
   /**
    * Encodes a BufferedImage to png format (default, override for other formats) and
    * writes it to the specified OutputStream.
-   * 
+   *
    * @param out
    *          OutputStream to write the image to.
    * @param image
@@ -518,13 +518,13 @@ public class GenerateThumbnail {
 
   /*
    * Converts an Image to a BufferedImage and adds watermark and copyright.
-   * 
+   *
    * @param thumbImg The Image to convert.
-   * 
+   *
    * @param watermark String to add as a watermark to the image.
-   * 
+   *
    * @param copyright String to add as a copyright to the image.
-   * 
+   *
    * @return The BufferedImage representation of the Image.
    */
   BufferedImage convertImageToBufferedImage(Image thumbImg, String watermark, String copyright,
@@ -551,9 +551,9 @@ public class GenerateThumbnail {
 
   /*
    * Draws the watermark onto the image.
-   * 
+   *
    * @param watermark String to draw on the image.
-   * 
+   *
    * @param g2d Graphics object of the image.
    */
   private void drawWatermark(String watermark, Graphics2D g2d, int width, int height) {
@@ -589,9 +589,9 @@ public class GenerateThumbnail {
 
   /*
    * Draws the copyright information onto the image.
-   * 
+   *
    * @param copyright String to draw on the image.
-   * 
+   *
    * @param g2d Graphics object of the image.
    */
   private void drawCopyright(String copyright, Graphics2D g2d, int width, int height) {
@@ -626,9 +626,9 @@ public class GenerateThumbnail {
     g2d.setColor(new Color(0, 0, 0));
     AlphaComposite transprency = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f);
     g2d.setComposite(transprency);
-    g2d.fillRoundRect(width - metrics.stringWidth(copyright) - rightSpace - 2 * hSpacing, height
-        - stringHeight - bottomSpace - 2 * vSpacing, metrics.stringWidth(copyright) + 2 * hSpacing,
-        stringHeight + 2 * vSpacing, rounding, rounding);
+    g2d.fillRoundRect(width - metrics.stringWidth(copyright) - rightSpace - (2 * hSpacing), height
+        - stringHeight - bottomSpace - (2 * vSpacing), metrics.stringWidth(copyright) + (2
+            * hSpacing), stringHeight + (2 * vSpacing), rounding, rounding);
   }
 
   private void drawString(String copyright, int width, int height, int bottomSpace, int rightSpace,
@@ -645,7 +645,7 @@ public class GenerateThumbnail {
   /**
    * Decodes a jpeg from an InputStream to a BufferedImage.
    * Replaced by DecodeImageCommand which can handle CMYK images and embedded profiles.
-   * 
+   *
    * @param in
    *          InputStream representation of a jpeg image.
    * @return Decoded jpeg as BufferedImage.
@@ -705,7 +705,7 @@ public class GenerateThumbnail {
    * hash in file paths, URLs, ...
    * The hashing is done using the SHA-256 algorithm. Thus the resulting hash
    * has a length of 256 bit (32 byte) i.e. after the hex conversion 64 byte.
-   * 
+   *
    * @param in
    *          InputStream with the image to hash.
    * @return Hash code of the specified image, excluding metainformation.
@@ -732,8 +732,8 @@ public class GenerateThumbnail {
     UnpackedImageData uid = pa.getPixels(img.getData(), img.getData().getBounds(),
         DataBuffer.TYPE_BYTE, false);
     byte[][] pixels = uid.getByteData();
-    for (int i = 0; i < pixels.length; i++) {
-      digest.update(pixels[i]);
+    for (byte[] pixel : pixels) {
+      digest.update(pixel);
     }
 
     return new String(digest.digest());
