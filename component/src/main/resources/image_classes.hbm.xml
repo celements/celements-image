@@ -3,7 +3,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
   <class entity-name="Classes.PhotoAlbumClass" table="cel_image_photo_album_class">
-    <id name="id" type="integer" unsaved-value="undefined">
+    <id name="id" type="long" unsaved-value="undefined">
       <column name="IPA_ID" not-null="true" />
       <generator class="assigned" />
     </id>
@@ -18,7 +18,7 @@
     </property>
   </class>
   <class entity-name="Classes.PhotoImageClass" table="cel_image_photo_image_class">
-    <id name="id" type="integer" unsaved-value="undefined">
+    <id name="id" type="long" unsaved-value="undefined">
       <column name="IPI_ID" not-null="true" />
       <generator class="assigned" />
     </id>
@@ -48,7 +48,7 @@
     </property>
   </class>
   <class entity-name="Classes.PhotoMetainfoClass" table="cel_image_metainfo_class">
-    <id name="id" type="integer" unsaved-value="undefined">
+    <id name="id" type="long" unsaved-value="undefined">
       <column name="IPM_ID" not-null="true" />
       <generator class="assigned" />
     </id>
