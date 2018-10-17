@@ -90,7 +90,7 @@ body div.mask.cel-ImageGalleryOverlay {
 }
 .cel-ImageGalleryOverlay .celPresSlideShow_prev {
   left: 0px;
-  background-image: url('gallery/newimg/galleryOverlayLeftArrowWhite.png');
+  background-image: url('layouts/gallery/newimg/galleryOverlayLeftArrowWhite.png');
 }
 .cel-ImageGalleryOverlay .celimage_overlay {
   cursor: pointer;
