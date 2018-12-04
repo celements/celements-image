@@ -1,9 +1,9 @@
 package com.celements.photo.presentation;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -11,6 +11,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.cells.ICellWriter;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
@@ -23,9 +24,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("gallerySlidesOverview")
-public class GalleryPresentationType implements IPresentationTypeRole {
+public class GalleryPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(GalleryPresentationType.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(GalleryPresentationType.class);
 
   private static final String _CEL_CM_GALLERY_DEFAULT_CSSCLASS = "cel_cm_gallery_view";
 
@@ -48,6 +49,13 @@ public class GalleryPresentationType implements IPresentationTypeRole {
     return (OldCoreClasses) oldCoreClasses;
   }
 
+  @Override
+  public void writeNodeContent(ICellWriter writer, DocumentReference docRef,
+      INavigation navigation) {
+    writeNodeContent(writer.getAsStringBuilder(), false, false, docRef, true, 0, navigation);
+  }
+
+  @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
     LOGGER.debug("writeNodeContent for [" + docRef + "].");
@@ -86,14 +94,17 @@ public class GalleryPresentationType implements IPresentationTypeRole {
     return renderCmd;
   }
 
+  @Override
   public String getDefaultCssClass() {
     return _CEL_CM_GALLERY_DEFAULT_CSSCLASS;
   }
 
+  @Override
   public String getEmptyDictionaryKey() {
     return "cel_nav_empty_presentation";
   }
 
+  @Override
   public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
     BaseObject albumObj = getContext().getDoc().getXObject(
         getOldCoreClasses().getPhotoAlbumClassRef(getContext().getDatabase()));

@@ -1,5 +1,6 @@
 package com.celements.photo.presentation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -13,7 +14,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.rendering.RenderCommand;
@@ -29,7 +31,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 
-public class GalleryPresentationTypeTest extends AbstractBridgedComponentTestCase {
+public class GalleryPresentationTypeTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private INavigation nav;
@@ -42,6 +44,7 @@ public class GalleryPresentationTypeTest extends AbstractBridgedComponentTestCas
 
   @Before
   public void setUp_RenderedContentPresentationTypeTest() throws Exception {
+    registerComponentMock(IModelAccessFacade.class);
     context = getContext();
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
@@ -90,7 +93,7 @@ public class GalleryPresentationTypeTest extends AbstractBridgedComponentTestCas
             + " first cel_nav_isLeaf RichText\"").once();
     DocumentReference templateRef = new DocumentReference(context.getDatabase(), "Templates",
         "ImageGallerySlidesOverview");
-    expect(xwiki.exists(eq(templateRef), same(context))).andReturn(true).once();
+    expect(getMock(IModelAccessFacade.class).exists(eq(templateRef))).andReturn(true).once();
     expect(renderCmdMock.renderTemplatePath(eq("Templates.ImageGallerySlidesOverview"), eq(
         "fr"))).andReturn(expectedNodeContent).once();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).atLeastOnce();
@@ -169,60 +172,73 @@ public class GalleryPresentationTypeTest extends AbstractBridgedComponentTestCas
       return mockRenderEngine;
     }
 
+    @Override
     public void addRenderer(String name, XWikiRenderer renderer) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void flushCache() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public XWikiRenderer getRenderer(String name) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public List<XWikiRenderer> getRendererList() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public List<String> getRendererNames() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String interpretText(String text, XWikiDocument includingdoc, XWikiContext context) {
       VelocityContext velocityContext = (VelocityContext) context.get("vcontext");
       storedVelocityContext.add((VelocityContext) velocityContext.clone());
       return mockRenderEngine.interpretText(text, includingdoc, context);
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiDocument includingdoc,
         XWikiContext context) throws XWikiException {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String renderText(String text, XWikiDocument includingdoc, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
         XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void virtualInit(XWikiContext context) {
       throw new UnsupportedOperationException();
     }

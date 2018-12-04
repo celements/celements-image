@@ -1,14 +1,15 @@
 package com.celements.photo.presentation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.ICellWriter;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.rendering.RenderCommand;
@@ -18,10 +19,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("galleryOverview")
-public class GalleryOverviewPresentationType implements IPresentationTypeRole {
+public class GalleryOverviewPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      GalleryOverviewPresentationType.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(GalleryOverviewPresentationType.class);
 
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
@@ -37,6 +37,13 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
+  public void writeNodeContent(ICellWriter writer, DocumentReference docRef,
+      INavigation navigation) {
+    writeNodeContent(writer.getAsStringBuilder(), false, false, docRef, true, 0, navigation);
+  }
+
+  @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
     LOGGER.debug("writeNodeContent for [" + docRef + "].");
@@ -73,14 +80,17 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole {
     return renderCmd;
   }
 
+  @Override
   public String getDefaultCssClass() {
     return _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
   }
 
+  @Override
   public String getEmptyDictionaryKey() {
     return "cel_nav_empty_presentation";
   }
 
+  @Override
   public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
     return null;
   }
