@@ -1,5 +1,11 @@
-#set($l = $doc.getURL($'view', "xpage=overlay&conf=ImportIntoGallery"))
-#set($l = "${l}&language=${language}")
+#if("$!elemId" == '')
+#if($elemParams.size() > 1)
+#set($galleryDocRef = $scripts.model.resolveDocument($elemParams.get(1)))
+#else
+#set($galleryDocRef = $doc.documentReference)
+#end
+#set($queryStr = "xpage=overlay&conf=ImportIntoGallery&language=$!{language}")
+#set($l = "$scripts.url.getURL($galleryDocRef, 'view', $queryStr)")
 #set($xredirect = "$!doc.getURL()")
 #if("$!xredirect" == '')
 #set($xredirect = '/')
@@ -7,3 +13,4 @@
 #set($xredirect = $escapetool.url("$!xredirect"))
 #set($cmenu_pageLink = "${l}&xredirect=$!{xredirect}")
 window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end

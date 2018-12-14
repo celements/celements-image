@@ -34,7 +34,7 @@
   #end
   #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
   #set($galleryPresentationCount = $galleryPresentationCount + 1)
-  <div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery_view galleryViewScrollContainer swiper-container">
+  <div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{contentDoc.getName()}:$!{gallerySpace}:" class="gallery cel_cm_gallery_view galleryViewScrollContainer swiper-container">
     #set($obj = $celGalleryDoc.getObject("XWiki.PhotoAlbumClass"))
     #set($showDescription = $!obj.getProperty("showDescription").getValue())
     #set($description = $!obj.getProperty("description").getValue())
