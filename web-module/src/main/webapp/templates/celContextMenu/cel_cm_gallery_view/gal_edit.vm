@@ -1,10 +1,14 @@
 #if("$!elemId" == '')
+<<<<<<< HEAD
 #if($elemParams.size() > 1)
 #set($galleryDocRef = $scripts.model.resolveDocument($elemParams.get(1)))
 #else
 #set($galleryDocRef = $doc.documentReference)
 #end
 #set($l = "$scripts.url.getURL($galleryDocRef, 'edit')")
+=======
+#set($l = "$doc.getURL('edit')")
+>>>>>>> refs/remotes/origin/dev
 #set($l = "${l}?language=${language}")
 #set($cmenu_pageLink = "${l}")
 window.location.href=&quot;${cmenu_pageLink}&quot;##

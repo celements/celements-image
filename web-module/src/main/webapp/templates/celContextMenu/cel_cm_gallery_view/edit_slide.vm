@@ -1,5 +1,9 @@
 #if("$!elemId" != '')
+<<<<<<< HEAD
 #set($l = "$scripts.url.getURL($scripts.model.resolveDocument($elemId), 'edit')")
+=======
+#set($l = "$xwiki.getURL($elemId, 'edit')")
+>>>>>>> refs/remotes/origin/dev
 #set($l = "${l}?language=${language}")
 #set($xredirect = "$!doc.getURL()")
 #if("$!xredirect" == '')

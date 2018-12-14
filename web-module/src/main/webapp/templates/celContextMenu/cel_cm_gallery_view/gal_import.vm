@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #if("$!elemId" == '')
 #if($elemParams.size() > 1)
 #set($galleryDocRef = $scripts.model.resolveDocument($elemParams.get(1)))
@@ -14,3 +15,14 @@
 #set($cmenu_pageLink = "${l}&xredirect=$!{xredirect}")
 window.location.href=&quot;${cmenu_pageLink}&quot;##
 #end
+=======
+#set($l = $doc.getURL($'view', "xpage=overlay&conf=ImportIntoGallery"))
+#set($l = "${l}&language=${language}")
+#set($xredirect = "$!doc.getURL()")
+#if("$!xredirect" == '')
+#set($xredirect = '/')
+#end
+#set($xredirect = $escapetool.url("$!xredirect"))
+#set($cmenu_pageLink = "${l}&xredirect=$!{xredirect}")
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+>>>>>>> refs/remotes/origin/dev
