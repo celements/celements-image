@@ -1,5 +1,5 @@
 #if("$!elemId" != '')
-#set($l = "$xwiki.getURL($elemId, 'delete')")
+#set($l = "$services.url.getURL($services.model.resolveDocument($elemId), 'delete')")
 #set($l = "${l}?language=${language}")
 #set($l = "${l}&xcancel=/${doc.getSpace()}/$doc.getName()")
 #set($xredirect = "$!doc.getURL()")

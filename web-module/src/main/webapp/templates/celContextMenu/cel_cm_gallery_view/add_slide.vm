@@ -12,7 +12,7 @@
 #if(!$xwiki.exists($services.model.resolveDocument($slideTemplate)))
 #set($slideTemplate = 'celements2web:ImageGalleryTemplates.NewImageGallerySlide')
 #end
-#set($l = $xwiki.getURL($services.model.serialize($newSlideDocRef,'local'), 'inline', "template=${slideTemplate}&language=${default_language}"))
+#set($l = $services.url.getURL($newSlideDocRef, 'inline', "template=${slideTemplate}&language=${default_language}"))
 #set($cmenu_pageLink = "${l}&xredirect=$escapetool.url($doc.getURL('view'))")
 window.location.href=&quot;${cmenu_pageLink}&quot;##
 #end

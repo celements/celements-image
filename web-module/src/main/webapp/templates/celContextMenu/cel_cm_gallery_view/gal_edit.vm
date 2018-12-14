@@ -1,5 +1,10 @@
 #if("$!elemId" == '')
-#set($l = "$doc.getURL('edit')")
+#if($elemParams.size() > 1)
+#set($galleryDocRef = $services.model.resolveDocument($elemParams.get(1)))
+#else
+#set($galleryDocRef = $doc.documentReference)
+#end
+#set($l = "$services.url.getURL($galleryDocRef, 'edit')")
 #set($l = "${l}?language=${language}")
 #set($cmenu_pageLink = "${l}")
 window.location.href=&quot;${cmenu_pageLink}&quot;##
