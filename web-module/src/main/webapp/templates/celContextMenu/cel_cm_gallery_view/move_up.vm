@@ -3,12 +3,12 @@
 #set($menuItemObj = $menuItemDoc.getObject('Celements2.MenuItem'))
 #if("$!menuItemObj" != '')
 #if("$!helpNav" == '')
-#set($helpNav = $scripts.treeNode.getEmptyNavigation())
+#set($helpNav = $services.treeNode.getEmptyNavigation())
 #end
 #set($prevMenuItemFullName = $helpNav.getPrevMenuItemFullName($menuItemObj))
 #if(("$prevMenuItemFullName" != '') && $xwiki.exists("$prevMenuItemFullName"))
  #set($prevItemName = $xwiki.getDocument("$prevMenuItemFullName").getName())
- #set($l = $xscripts.url.getURL($scripts.model.resolveDocument($elemId), 'view', "xpage=celements_ajax&ajax_mode=switchMenuItemPos"))
+ #set($l = $services.url.getURL($services.model.resolveDocument($elemId), 'view', "xpage=celements_ajax&ajax_mode=switchMenuItemPos"))
  #set($l = "${l}&space=${menuItemDoc.space}&item1=${menuItemDoc.name}")
  #set($cmenu_pageLink = "${l}&item2=${prevItemName}&xredirect=${doc.fullName}")
 window.location.href=&quot;${cmenu_pageLink}&quot;##

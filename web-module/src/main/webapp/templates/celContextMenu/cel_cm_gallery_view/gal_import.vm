@@ -1,11 +1,11 @@
 #if("$!elemId" == '')
 #if($elemParams.size() > 1)
-#set($galleryDocRef = $scripts.model.resolveDocument($elemParams.get(1)))
+#set($galleryDocRef = $services.model.resolveDocument($elemParams.get(1)))
 #else
 #set($galleryDocRef = $doc.documentReference)
 #end
 #set($queryStr = "xpage=overlay&conf=ImportIntoGallery&language=$!{language}")
-#set($l = "$scripts.url.getURL($galleryDocRef, 'view', $queryStr)")
+#set($l = "$services.url.getURL($galleryDocRef, 'view', $queryStr)")
 #set($xredirect = "$!doc.getURL()")
 #if("$!xredirect" == '')
 #set($xredirect = '/')
