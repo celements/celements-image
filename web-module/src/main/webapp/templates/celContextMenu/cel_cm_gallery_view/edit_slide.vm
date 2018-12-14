@@ -1,0 +1,11 @@
+#if("$!elemId" != '')
+#set($l = "$xwiki.getURL($elemId, 'edit')")
+#set($l = "${l}?language=${language}")
+#set($xredirect = "$!doc.getURL()")
+#if("$!xredirect" == '')
+#set($xredirect = '/')
+#end
+#set($xredirect = $escapetool.url("$!xredirect"))
+#set($cmenu_pageLink = "${l}&xredirect=$!xredirect")
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end

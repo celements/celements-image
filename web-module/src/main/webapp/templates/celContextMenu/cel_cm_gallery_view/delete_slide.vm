@@ -1,0 +1,12 @@
+#if("$!elemId" != '')
+#set($l = "$xwiki.getURL($elemId, 'delete')")
+#set($l = "${l}?language=${language}")
+#set($l = "${l}&xcancel=/${doc.getSpace()}/$doc.getName()")
+#set($xredirect = "$!doc.getURL()")
+#if("$!xredirect" == '')
+#set($xredirect = '/')
+#end
+#set($xredirect = $escapetool.url("$xredirect"))
+#set($cmenu_pageLink = "${l}&xredirect=$!{xredirect}")
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end

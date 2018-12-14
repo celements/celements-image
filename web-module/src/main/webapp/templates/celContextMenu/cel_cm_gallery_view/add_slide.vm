@@ -1,0 +1,18 @@
+#if("$!elemId" == '')
+#if($elemParams.size() > 1)
+#set($gallerySpace = $elemParams.get(1))
+#set($addMenuItem = 'true')
+#end
+#set($slideName = $adminMsg.get('gallery_editor_newSlideTitle'))
+#if("$!slideName" == '')
+#set($slideName = "Slide-")
+#end
+#set($newSlideDocRef = $celementsweb.getNextTitledPageDocRef(${gallerySpace}, $slideName))
+#set($slideTemplate = 'ImageGalleryTemplates.NewImageGallerySlide')
+#if(!$xwiki.exists($services.model.resolveDocument($slideTemplate)))
+#set($slideTemplate = 'celements2web:ImageGalleryTemplates.NewImageGallerySlide')
+#end
+#set($l = $xwiki.getURL($services.model.serialize($newSlideDocRef,'local'), 'inline', "template=${slideTemplate}&language=${default_language}"))
+#set($cmenu_pageLink = "${l}&xredirect=$escapetool.url($doc.getURL('view'))")
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end
