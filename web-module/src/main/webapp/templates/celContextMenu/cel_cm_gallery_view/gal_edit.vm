@@ -4,7 +4,7 @@
 #else
 #set($galleryDocRef = $doc.documentReference)
 #end
-#set($xredirect = "$!doc.getURL()")
+#set($xredirect = "$!services.url.getURL()")
 #if("$!xredirect" == '')
 #set($xredirect = '/')
 #end
