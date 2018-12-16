@@ -6,11 +6,7 @@
 #end
 #set($queryStr = "xpage=overlay&conf=ImportIntoGallery&language=$!{language}")
 #set($l = "$services.url.getURL($galleryDocRef, 'view', $queryStr)")
-#set($xredirect = "$!doc.getURL()")
-#if("$!xredirect" == '')
-#set($xredirect = '/')
-#end
-#set($xredirect = $escapetool.url("$!xredirect"))
+#set($xredirect = $escapetool.url("$!services.url.getURL()"))
 #set($cmenu_pageLink = "${l}&xredirect=$!{xredirect}")
 window.location.href=&quot;${cmenu_pageLink}&quot;##
 #end
