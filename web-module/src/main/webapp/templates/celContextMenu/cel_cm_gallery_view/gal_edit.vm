@@ -4,8 +4,7 @@
 #else
 #set($galleryDocRef = $doc.documentReference)
 #end
-#set($l = "$services.url.getURL($galleryDocRef, 'edit')")
-#set($l = "${l}?language=${language}")
-#set($cmenu_pageLink = "${l}")
+#set($xredirect = $escapetool.url("$!services.url.getURL()"))
+#set($cmenu_pageLink  = $services.url.getURL($galleryDocRef, 'edit', "language=${language}&xredirect=$!xredirect"))
 window.location.href=&quot;${cmenu_pageLink}&quot;##
 #end
