@@ -17,6 +17,7 @@
   #set($overwriteNavCMcssClass = 'cel_cm_gallery_view')
   #set($emptyDictKeySuffix = '_gallery_overview')
   #set($overwriteNavPresentationType = 'gallerySlidesOverview')
+  #set($galleryPresentationCount = $!services.celementsweb.getGlobalContextValue('galleryPresentationCount'))
   #if("$!galleryPresentationCount" == '')
     #set($galleryPresentationCount = 0)
   #end
@@ -34,6 +35,7 @@
   #end
   #set($gallerySpace = $galleryNav.getNodeSpaceRef().getName())
   #set($galleryPresentationCount = $galleryPresentationCount + 1)
+$!services.celementsweb.setGlobalContextValue('galleryPresentationCount',$galleryPresentationCount)
   <div id="GP$!{galleryPresentationCount}$!{contentDoc.getName()}:$!{services.model.serialize($contentDoc.documentReference, 'local')}:$!{gallerySpace}:"##
  class="gallery cel_cm_gallery_view galleryViewScrollContainer swiper-container">
     #set($obj = $celGalleryDoc.getObject("XWiki.PhotoAlbumClass"))

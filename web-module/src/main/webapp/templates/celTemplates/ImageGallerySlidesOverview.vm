@@ -67,7 +67,8 @@
   #if($hasedit)
     #set($elemTitle = "$!{slidenum}:$!{slidedoc.documentReference.name}")
   #end
-  <div id="ImgGallerySlide$!{imgGalSlidecount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:$!{slidenum}:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
+  #set($imgGallCount = $!services.celementsweb.getGlobalContextValue('galleryPresentationCount'))
+  <div id="ImgGallery$!{imgGallCount}Slide$!{imgGalSlidecount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:$!{slidenum}:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;" title="$!elemTitle">
   #*
       zoom: 2; /* all browsers */
