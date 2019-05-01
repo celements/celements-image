@@ -19,6 +19,7 @@
  */
 package com.celements.photo.metadata;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class MetaInfoExtractor {
   /**
    * Returns an array of Tag elements representing the metainformation,
    * contained in the specified directory of the given file.
-   * 
+   *
    * @param imageFile
    *          The file to extract the data from.
    * @param directory
@@ -61,7 +62,7 @@ public class MetaInfoExtractor {
       throws MetadataException {
     Metadata metadata = getMetadata(imageFile);
     Directory dir = metadata.getDirectory(directory);
-    List<Tag> data = new ArrayList<Tag>();
+    List<Tag> data = new ArrayList<>();
     for (Tag tag : dir.getTags()) {
       data.add(tag);
     }
@@ -70,7 +71,7 @@ public class MetaInfoExtractor {
 
   /**
    * To get all meta tags possibly contained in an image.
-   * 
+   *
    * @param imageFile
    *          File to extract the Metadata from.
    * @return Hashtable containing the directorys data.
@@ -78,7 +79,7 @@ public class MetaInfoExtractor {
    */
   public Map<String, String> getAllTags(InputStream imageFile) throws MetadataException {
     Metadata data = getMetadata(imageFile);
-    Map<String, String> tags = new HashMap<String, String>();
+    Map<String, String> tags = new HashMap<>();
     if (data != null) {
       Iterable<Directory> dirs = data.getDirectories();
       for (Directory dir : dirs) {
@@ -90,16 +91,16 @@ public class MetaInfoExtractor {
 
   /*
    * Extracts the metadata from the image file represented by an InputStream
-   * 
+   *
    * @param imageFile InputStream of an image file.
-   * 
+   *
    * @return Metadata containied in the specified image.
    */
   Metadata getMetadata(InputStream imageFile) {
     Metadata metadata = null;
     try {
       metadata = JpegMetadataReader.readMetadata(imageFile);
-    } catch (JpegProcessingException e) {
+    } catch (JpegProcessingException | IOException e) {
       LOGGER.error("Not able to load the meta data of " + imageFile, e);
     }
     return metadata;
@@ -108,15 +109,15 @@ public class MetaInfoExtractor {
   /*
    * Saves all tags contained in the specified directory to a Hashtable and
    * returnes them.
-   * 
+   *
    * @param dir Directory to extract the tags from.
-   * 
+   *
    * @return Hashtable containing th metatags from the Directory.
-   * 
+   *
    * @throws MetadataException
    */
   Hashtable<String, String> getDirsTags(Directory dir) throws MetadataException {
-    Hashtable<String, String> metadata = new Hashtable<String, String>();
+    Hashtable<String, String> metadata = new Hashtable<>();
     for (Tag tag : dir.getTags()) {
       metadata.put(cleanCtrlChars(tag.getTagName()), cleanCtrlChars(tag.toString()));
     }
