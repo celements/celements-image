@@ -170,7 +170,7 @@ public class CelementsPhotoPlugin extends XWikiDefaultPlugin {
           copyright, watermark, defaultBg, defaultBgString, filterString, mimeType);
     }
     //TODO only for testing:
-    context.getResponse().setContentType("image/png;charset=");
+    attachment.setFilename(attachment.getFilename() + ".png");
     return attachment;
   }
 
