@@ -260,9 +260,11 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
       /**
        * TODO move to celYuiOverlay
        */
-      _resizeOverlay : function() {
+      _resizeOverlay : function(event) {
         var _me = this;
-        if (_me._configReader.isAutoResize()) {
+        if (!_me._configReader.isAutoResize()) {
+          console.log('skip ResizeOverlay in imageSlideShow.');
+        } else if (!event || (event.memo.getDialogId() === 'modal dialog')) {
           console.log('_resizeOverlay: start for ', _me._htmlElemId);
           var openDialog = CELEMENTS.presentation.getOverlayObj();
           var zoomFactor = _me._configReader.computeZoomFactor();
@@ -299,8 +301,6 @@ window.CELEMENTS.image.OverlayContainer = function(htmlElem) {
             }
           }
           openDialog._overlayDialog.center();
-        } else {
-          console.log('skip ResizeOverlay in imageSlideShow.');
         }
       },
 
