@@ -397,7 +397,6 @@
         });
         openDialog.intermediatOpenHandler();
       }
-
     });
   }
 
@@ -479,7 +478,7 @@
         _me._replaceElemHandlerBind = _me._replaceElemHandler.bind(_me);
         _me._centerSplashImageBind = _me._centerSplashImage.bind(_me);
         _me._responsiveResizeBind = _me._responsiveResize.bind(_me);
-        _me_starterObj.celObserve('celimage_slideshowstarter:replaceElem',
+        _me._starterObj.celObserve('celimage_slideshowstarter:replaceElem',
            _me._replaceElemHandlerBind);
       },
 
@@ -496,7 +495,7 @@
         let _me = this;
         var parentElem = event.memo;
         if (_me._getHtmlElem().descendantOf(parentElem)) {
-          _me_starterObj.celStopObserving('celimage_slideshowstarter:replaceElem',
+          _me._starterObj.celStopObserving('celimage_slideshowstarter:replaceElem',
             _me._replaceElemHandlerBind);
           _me._getHtmlElem().observe('celimage_slideshow:afterWrapSplashImage',
             _me._centerSplashImageBind);
