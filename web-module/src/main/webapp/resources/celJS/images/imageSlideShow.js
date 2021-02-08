@@ -73,16 +73,11 @@
   //////////////////////////////////////////////////////////////////////////////
   // Celements image Slideshow
   //////////////////////////////////////////////////////////////////////////////
-  window.CELEMENTS.image.SlideShowStarter = function (htmlElem) {
-    // constructor
-    this._init(htmlElem);
-  };
-
-  window.CELEMENTS.image.SlideShowStarter.prototype = {
+  window.CELEMENTS.image.SlideShowStarter = Class.create({
     _parentElem: undefined,
     _debug: undefined,
 
-    _init: function (htmlElem) {
+    initialize: function (htmlElem) {
       let _me = this;
       _me._parentElem = htmlElem || $(document.body);
     },
@@ -152,17 +147,12 @@
       }
     }
 
-  };
+  });
 
   //////////////////////////////////////////////////////////////////////////////
   // image SlideShow container in a celYuiOverlay
   //////////////////////////////////////////////////////////////////////////////
-  window.CELEMENTS.image.OverlayContainer = function (htmlElem) {
-    // constructor
-    this._init(htmlElem);
-  };
-
-  window.CELEMENTS.image.OverlayContainer.prototype = {
+  window.CELEMENTS.image.OverlayContainer = Class.create({
     _htmlElemId: undefined,
     _containerHtmlElem: undefined,
     _configReader: undefined,
@@ -184,7 +174,7 @@
      * information might geht lost. Only keep the htmlElem.id because
      * the element might get replaced.
      */
-    _init: function (htmlElem) {
+    initialize: function (htmlElem) {
       let _me = this;
       _me._htmlElemId = htmlElem.id;
       _me._configReader = new CELEMENTS.image.ConfigReader(htmlElem, {
@@ -393,26 +383,16 @@
       openDialog.intermediatOpenHandler();
     }
 
-  };
+  });
 
   //////////////////////////////////////////////////////////////////////////////
   // image SlideShow container in a rich text context (inline)
   //////////////////////////////////////////////////////////////////////////////
-  window.CELEMENTS.image.InlineContainer = function (htmlElem) {
-    // constructor
-    this._init(htmlElem);
-  };
-
-  let LoadingImagesClass = function () {
-    // constructor
-    this._init();
-  };
-
-  LoadingImagesClass.prototype = {
+  let LoadingImagesClass = Class.create({
     _loadingImg: undefined,
     _loadingSmallImg: undefined,
 
-    _init: function () {
+    initialize: function () {
       let _me = this;
 
       _me._loadingImg = new Image();
@@ -452,11 +432,11 @@
       let _me = this;
       return _me._loadingSmallImg.cloneNode(true);
     },
-  };
+  });
 
   var loadingImages = new LoadingImagesClass();
 
-  window.CELEMENTS.image.InlineContainer.prototype = {
+  window.CELEMENTS.image.InlineContainer = Class.create({
     _htmlElemId: undefined,
     _configReader: undefined,
     _containerHtmlElem: undefined,
@@ -473,7 +453,7 @@
      * information might geht lost. Only keep the htmlElem.id because
      * the element might get replaced.
      */
-    _init: function (htmlElem) {
+    initialize: function (htmlElem) {
       let _me = this;
       _me._htmlElemId = htmlElem.id;
       _me._configReader = new CELEMENTS.image.ConfigReader(htmlElem);
@@ -815,17 +795,12 @@
       _me.changeContainerSize(newWidth, newHeight);
     }
 
-  };
+  });
 
   //////////////////////////////////////////////////////////////////////////////
   //image SlideShow logic independent of container
   //////////////////////////////////////////////////////////////////////////////
-  window.CELEMENTS.image.SlideShow = function (config) {
-    // constructor
-    this._init(config);
-  };
-
-  window.CELEMENTS.image.SlideShow.prototype = {
+  window.CELEMENTS.image.SlideShow = Class.create({
     _configReader: undefined,
     _config: undefined,
     _celSlideShowObj: undefined,
@@ -838,7 +813,7 @@
     _isPaused: undefined,
     _effect: undefined,
 
-    _init: function (config) {
+    initialize: function (config) {
       let _me = this;
       _me._config = config;
       _me._configReader = config.configReader;
@@ -1181,18 +1156,12 @@
       _me._imageSlideShowLoadFirstContent_internal();
     }
 
-  };
+  });
 
   //////////////////////////////////////////////////////////////////////////////
   //image SlideShow config reader
   //////////////////////////////////////////////////////////////////////////////
-  window.CELEMENTS.image.ConfigReader = function (htmlElem, configDef) {
-    // constructor
-    var configDefParam = configDef || {};
-    this._init(htmlElem, configDefParam);
-  };
-
-  window.CELEMENTS.image.ConfigReader.prototype = {
+  window.CELEMENTS.image.ConfigReader = Class.create({
     _htmlElemId: undefined,
     _htmlElemClasses: undefined,
     _configDef: undefined,
@@ -1211,8 +1180,9 @@
     _layoutName: undefined,
     _centerSplashImage: undefined,
 
-    _init: function (htmlElem, configDef) {
+    initialize: function (htmlElem, configDef) {
       let _me = this;
+      const configDefParam = configDef || {};
       _me._htmlElemId = htmlElem.id;
       _me._htmlElemClasses = $w(htmlElem.className);
       _me._mobileDim = new CELEMENTS.mobile.Dimensions();
@@ -1232,7 +1202,7 @@
         'addCloseButton': 'celimage_overlay_addCloseButton',
         'addCounterZeros': 'celimage_addCounterZeros',
         'forceAutoResize': 'celimage_forceAutoResize'
-      }).update(configDef).toObject();
+      }).update(configDefParam).toObject();
       _me._galleryFN = _me._getPart(1, null);
       _me._overlayWidth = _me._getPart(4, _me._overlayWidthDefault);
       _me._overlayHeight = _me._getPart(5, _me._overlayHeightDefault);
@@ -1457,6 +1427,6 @@
       return zoomFactor;
     }
 
-  };
+  });
 
 }) (window);
