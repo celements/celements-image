@@ -19,23 +19,23 @@
  */
 (function(window, undefined) {
 
-  let galleryHideDesc= function(event) {
-    let galleryLink = event.findElement('.celements_gallery_link');
+  const galleryHideDesc= function(event) {
+    const galleryLink = event.findElement('.celements_gallery_link');
     if (galleryLink) {
       galleryLink.down('.text').hide();
       galleryLink.down('.background').hide();
     }
   };
 
-  let galleryShowDesc = function(event) {
-    let galleryLink = this;
+  const galleryShowDesc = function(event) {
+    const galleryLink = this;
     if (galleryLink) {
       galleryLink.down('.text').show();
       galleryLink.down('.background').show();
     }
   };
 
-  let galleryMobileFix = function() {
+  const galleryMobileFix = function() {
     $$('.celements_gallery_link .text, .celements_gallery_link .background').each(
       function(galleryElem) {
         galleryElem.observe('click', galleryHideDesc);
