@@ -937,7 +937,7 @@
                 navObj._updateNextContent.bind(navObj));
             });
         } else {
-          const startIndex = 0;
+          let startIndex = 0;
           if (_me._configReader.hasRandomStart()) {
             startIndex = '!RANDOM!';
           } else if (!isNaN(_me._configReader.getStartSlideNum())) {
@@ -979,7 +979,7 @@
         const _me = this;
         event.stop();
         const clickedElement = event.findElement();
-        const linkHref = '';
+        let linkHref = '';
         if (clickedElement.up('div.cel_slideShow_slideWrapper a')) {
           linkHref = clickedElement.up('div.cel_slideShow_slideWrapper a').href;
         }
@@ -1023,7 +1023,7 @@
         const linkHref = clickedElement.readAttribute('data-href')
           || clickedElement.down('div').readAttribute('data-href');
         const target = clickedElement.readAttribute('data-target')
-          || clickedElement.down('div').readAttribute('data-target');;
+          || clickedElement.down('div').readAttribute('data-target');
         if ((linkHref != null) && (linkHref != '')) {
           window.open(linkHref, target);
           if (_me._isPaused) {
@@ -1072,7 +1072,7 @@
           'position': 'absolute'
         });
         const list = new Element('ul');
-        const listElement = new Element('li', { 'class': 'contextMenuSlideShowListItem' }
+        let listElement = new Element('li', { 'class': 'contextMenuSlideShowListItem' }
         ).insert(new Element('div', {
           'data-href': linkHref,
           'data-target': clickedElement.up(0).target,
