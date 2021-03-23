@@ -82,6 +82,7 @@
 
       initialize: function (htmlElem) {
         const _me = this;
+        _me._debug = true;
         _me._parentElem = htmlElem || $(document.body);
       },
 
@@ -112,6 +113,7 @@
               console.log('inline image initialization for ', slideShowElem.id);
             }
             const inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem, _me);
+            inlineContainerObj._debug = true;
             inlineContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
             CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
           } else if (_me._debug
