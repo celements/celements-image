@@ -664,8 +664,7 @@
           _me._origStyleValues = null;
           slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
         }
-        let zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
-          'MsZoom') || slideWrapperStyles.get('transform');
+        let zoomFactor = slideWrapperStyles.get('transform');
         if (zoomFactor) {
           zoomFactor = zoomFactor.replace(/[^.0-9]*/g, '');
         }
@@ -692,7 +691,6 @@
           if (thumbContainer) {
             thumbContainer.setStyle({
               'position': '',
-              'zoom': '',
               'transform': '',
               'height': '',
               'width': '',
@@ -700,11 +698,9 @@
               'left': ''
             });
           }
-          slideWrapper.setStyle({
-            'position': 'absolute',
-            'zoom': '1',
-            'transform': 'scale(1)'
-          });
+          const resetStylesProp = _me._configReader.getZoomStyles(1, '', '');
+          resetStylesProp['position'] = 'absolute';
+          slideWrapper.setStyle(resetStylesProp);
           if (_me._debug) {
             console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
@@ -717,8 +713,8 @@
             'height': rootHeight + 'px',
             'width': rootWidth + 'px'
           });
-          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
-            slideWrapper.getHeight());
+          const stylesProp = _me._configReader.getZoomStyles(zoomFactor,
+            _me._configReader.getContainerAnimWidth(), _me._configReader.getContainerAnimHeight());
           stylesProp['position'] = 'relative';
           if (_me._debug) {
             console.debug('_prepareCenterSplashImage: stylesProperty ', _me._htmlElemId,
@@ -783,9 +779,9 @@
 
       changeContainerSize: function (newMaxWidth, newMaxHeight) {
         const _me = this;
-        console.log('changeContainerSize: SKIPP ', _me._htmlElemId, newMaxWidth, newMaxHeight);
-        // _me._getImageSlideShowObj()._getCelSlideShowObj().changeContainerSize(newMaxWidth,
-        //   newMaxHeight);
+        console.log('changeContainerSize: ', _me._htmlElemId, newMaxWidth, newMaxHeight);
+        _me._getImageSlideShowObj()._getCelSlideShowObj().changeContainerSize(newMaxWidth,
+          newMaxHeight);
       },
 
       _removeSlideShowDimension: function () {
