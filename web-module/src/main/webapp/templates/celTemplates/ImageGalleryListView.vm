@@ -7,7 +7,7 @@ $!celementsweb.addExtJSfileOnce(':celJS/yui/container/container-min.js', 'file')
 $celementsweb.addExtJSfileOnce(':celJS/celpresentation/celYuiOverlay.js', 'file')
 $celementsweb.addExtJSfileOnce(':celJS/celpresentation/CelementsSlideShow.js', 'file')
 $celementsweb.addExtJSfileOnce(':celJS/images/imageSlideShow.js', 'file')
-$celementsweb.addExtJSfileOnce(':celJS/images/gallerylist-mobile-fix.js', 'file')
+##$celementsweb.addExtJSfileOnce(':celJS/images/gallerylist-mobile-fix.js', 'file')
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/yui/container/assets/skins/sam/container.css', 'file')" type="text/css" media="screen" />
 <link rel="stylesheet" href="$celementsweb.getSkinFile(':celJS/yui/button/assets/skins/sam/button.css', 'file')" type="text/css" media="screen" />
 ##TODO fix broken exended layout by Gartnernzuft
