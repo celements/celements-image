@@ -714,7 +714,7 @@
             'width': rootWidth + 'px'
           });
           const stylesProp = _me._configReader.getZoomStyles(zoomFactor,
-            _me._configReader.getContainerAnimWidth(), _me._configReader.getContainerAnimHeight());
+            _me._configReader.getOverlayWidth(), _me._configReader.getOverlayHeight());
           stylesProp['position'] = 'relative';
           if (_me._debug) {
             console.debug('_prepareCenterSplashImage: stylesProperty ', _me._htmlElemId,
