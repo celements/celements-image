@@ -783,9 +783,9 @@
 
       changeContainerSize: function (newMaxWidth, newMaxHeight) {
         const _me = this;
-        console.log('changeContainerSize: ', _me._htmlElemId, newMaxWidth, newMaxHeight);
-        _me._getImageSlideShowObj()._getCelSlideShowObj().changeContainerSize(newMaxWidth,
-          newMaxHeight);
+        console.log('changeContainerSize: SKIPP ', _me._htmlElemId, newMaxWidth, newMaxHeight);
+        // _me._getImageSlideShowObj()._getCelSlideShowObj().changeContainerSize(newMaxWidth,
+        //   newMaxHeight);
       },
 
       _removeSlideShowDimension: function () {
