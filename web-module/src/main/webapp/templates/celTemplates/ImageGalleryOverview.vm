@@ -58,7 +58,7 @@
 #elseif("$firstSlideContent" != '')
   #set($zoomFactorH = $mathtool.div($!{thumbHeight}, $!{photoHeight}))
   #set($zoomFactorW = $mathtool.div($!{thumbWidth}, $!{photoWidth}))
-  #set($zoomFactor = $mathtool.min($!{zoomFactorH}, $!{zoomFactorH}))
+  #set($zoomFactor = $mathtool.min($!{zoomFactorH}, $!{zoomFactorW}))
   <div id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;">
         <div class="cel_slideShow_slideRoot">
