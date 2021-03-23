@@ -711,7 +711,8 @@
           }
           const rootHeight = (zoomFactor * slideWrapper.getHeight());
           const rootWidth = (zoomFactor * slideWrapper.getWidth());
-          console.debug("_prepareCenterSplashImage: root height, width ", zoomFactor, rootHeight, rootWidth);
+          console.debug("_prepareCenterSplashImage: root height, width ", zoomFactor, rootHeight,
+              rootWidth, slideRoot);
           slideRoot.setStyle({
             'height': rootHeight + 'px',
             'width': rootWidth + 'px'
@@ -782,12 +783,14 @@
 
       changeContainerSize: function (newMaxWidth, newMaxHeight) {
         const _me = this;
+        console.log('changeContainerSize: ', _me._htmlElemId, newMaxWidth, newMaxHeight);
         _me._getImageSlideShowObj()._getCelSlideShowObj().changeContainerSize(newMaxWidth,
           newMaxHeight);
       },
 
       _removeSlideShowDimension: function () {
         const _me = this;
+        console.log('_removeSlideShowDimension: ', _me._htmlElemId);
         if (_me._containerHtmlElem) {
           _me._containerHtmlElem.setStyle({
             'width': '',
