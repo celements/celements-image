@@ -716,6 +716,10 @@
           const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
             slideWrapper.getHeight());
           stylesProp['position'] = 'relative';
+          if (_me._debug) {
+            console.debug('_prepareCenterSplashImage: stylesProperty ', _me._htmlElemId,
+              stylesProp);
+          }
           slideWrapper.setStyle(stylesProp);
         }
       },
