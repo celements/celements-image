@@ -709,9 +709,12 @@
             console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
           }
+          const rootHeight = (zoomFactor * slideWrapper.getHeight());
+          const rootWidth = (zoomFactor * slideWrapper.getWidth());
+          console.debug("_prepareCenterSplashImage: root height, width ", zoomFactor, rootHeight, rootWidth);
           slideRoot.setStyle({
-            'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
-            'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
+            'height': rootHeight + 'px',
+            'width': rootWidth + 'px'
           });
           const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
             slideWrapper.getHeight());
