@@ -709,8 +709,8 @@
           });
           console.log('>> _prepareCenterSplashImage: slideRoot style ', _me._htmlElemId,
               window.getComputedStyle(slideRoot));
-          const stylesProp = _me._configReader.getZoomStyles(zoomFactor,
-            _me._configReader.getOverlayWidth(), _me._configReader.getOverlayHeight());
+          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
+          	slideWrapper.getHeight());
           stylesProp['position'] = 'relative';
           if (_me._debug) {
             console.debug('_prepareCenterSplashImage: stylesProperty ', _me._htmlElemId,
