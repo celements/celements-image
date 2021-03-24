@@ -7,8 +7,14 @@
 #else
   #set($galleryLink = "$!services.url.getURL($galleryDocRef, 'view', 'diapo=1')")
 #end
-#set($thumbHeight = "100")
-#set($thumbWidth = "100")
+#set($thumbHeight = "$!albumobj.getProperty('height').getValue()")
+#if("$!thumbHeight" == '')
+  #set($thumbHeight = "100")
+#end
+#set($thumbWidth = "$!albumobj.getProperty('thumbWidth').getValue()")
+#if("$!thumbWidth" == '')
+  #set($thumbWidth = "100")
+#end
 <a class="celements_gallery_link" href="$galleryLink"##
  style="display:block;width:$!{thumbWidth}px;height:$!{thumbHeight}px">
 #set($firstImageLink = '')
