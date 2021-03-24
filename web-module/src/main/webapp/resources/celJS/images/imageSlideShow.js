@@ -699,16 +699,17 @@
           const resetStylesProp = _me._configReader.getZoomStyles(1, '', '');
           resetStylesProp['position'] = 'absolute';
           slideWrapper.setStyle(resetStylesProp);
-          if (_me._debug) {
-            console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
-              slideWrapper.getWidth(), slideWrapper.getHeight());
-          }
+          // if (_me._debug) {
+            console.log('>> _prepareCenterSplashImage: set width and height ', _me._htmlElemId,
+              slideWrapper.getWidth(), slideWrapper.getHeight(),
+              slideWrapper.getBoundingClientRect());
+          // }
+          console.log('>> _prepareCenterSplashImage: slideRoot dim ', _me._htmlElemId,
+            slideRoot.getBoundingClientRect());
           slideRoot.setStyle({
             'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
             'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
           });
-          console.log('>> _prepareCenterSplashImage: slideRoot style ', _me._htmlElemId,
-              window.getComputedStyle(slideRoot));
           const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
           	slideWrapper.getHeight());
           stylesProp['position'] = 'relative';
