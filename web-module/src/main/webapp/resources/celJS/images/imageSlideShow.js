@@ -82,7 +82,6 @@
 
       initialize: function (htmlElem) {
         const _me = this;
-        _me._debug = true;
         _me._parentElem = htmlElem || $(document.body);
       },
 
@@ -113,7 +112,6 @@
               console.log('inline image initialization for ', slideShowElem.id);
             }
             const inlineContainerObj = new CELEMENTS.image.InlineContainer(slideShowElem, _me);
-            inlineContainerObj._debug = true;
             inlineContainerObj._getHtmlElem().addClassName('celimage_inline_initalized');
             CISS_SlideShowObjHash.set(slideShowElem.id, inlineContainerObj);
           } else if (_me._debug
@@ -705,13 +703,9 @@
             console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
           }
-          const rootHeight = (zoomFactor * slideWrapper.getHeight());
-          const rootWidth = (zoomFactor * slideWrapper.getWidth());
-          console.debug("_prepareCenterSplashImage: root height, width ", zoomFactor, rootHeight,
-              rootWidth, slideRoot);
           slideRoot.setStyle({
-            'height': rootHeight + 'px',
-            'width': rootWidth + 'px'
+            'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
+            'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
           });
           const stylesProp = _me._configReader.getZoomStyles(zoomFactor,
             _me._configReader.getOverlayWidth(), _me._configReader.getOverlayHeight());
@@ -785,7 +779,6 @@
 
       _removeSlideShowDimension: function () {
         const _me = this;
-        console.log('_removeSlideShowDimension: ', _me._htmlElemId);
         if (_me._containerHtmlElem) {
           _me._containerHtmlElem.setStyle({
             'width': '',
