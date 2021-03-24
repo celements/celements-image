@@ -707,7 +707,8 @@
             'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
             'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
           });
-          console.log('>> _prepareCenterSplashImage: slideRoot style ', slideRoot.getStyle());
+          console.log('>> _prepareCenterSplashImage: slideRoot style ',
+              window.getComputedStyle(slideRoot));
           const stylesProp = _me._configReader.getZoomStyles(zoomFactor,
             _me._configReader.getOverlayWidth(), _me._configReader.getOverlayHeight());
           stylesProp['position'] = 'relative';
