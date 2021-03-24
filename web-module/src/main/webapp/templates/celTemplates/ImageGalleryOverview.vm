@@ -8,7 +8,7 @@
   #set($galleryLink = "$!services.url.getURL($galleryDocRef, 'view', 'diapo=1')")
 #end
 <a class="celements_gallery_link" href="$galleryLink"##
- style="display:block;width:$!{thumbWidth};height:$!{thumbHeight}">
+ style="display:block;width:$!{thumbWidth}px;height:$!{thumbHeight}px">
 #set($firstImageLink = '')
 #set($gallerySpace = '')
 #set($firstSlideContent = '')
