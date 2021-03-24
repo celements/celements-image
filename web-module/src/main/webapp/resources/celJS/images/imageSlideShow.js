@@ -707,7 +707,7 @@
             'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
             'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
           });
-          console.log('>> _prepareCenterSplashImage: slideRoot style ',
+          console.log('>> _prepareCenterSplashImage: slideRoot style ', _me._htmlElemId,
               window.getComputedStyle(slideRoot));
           const stylesProp = _me._configReader.getZoomStyles(zoomFactor,
             _me._configReader.getOverlayWidth(), _me._configReader.getOverlayHeight());
