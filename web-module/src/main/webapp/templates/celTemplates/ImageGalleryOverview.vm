@@ -7,7 +7,8 @@
 #else
   #set($galleryLink = "$!services.url.getURL($galleryDocRef, 'view', 'diapo=1')")
 #end
-<span class="celements_gallery_link" href="$galleryLink">
+<a class="celements_gallery_link" href="$galleryLink"##
+ style="display:block;width:$!{thumbWidth};height:$!{thumbHeight}">
 #set($firstImageLink = '')
 #set($gallerySpace = '')
 #set($firstSlideContent = '')
@@ -68,4 +69,4 @@ $adminMsg.get('cel_gal_no_pictures')##
 #end
   <span class="background"></span>
   <span class="text">$!title</span>
-</span>
+</a>
