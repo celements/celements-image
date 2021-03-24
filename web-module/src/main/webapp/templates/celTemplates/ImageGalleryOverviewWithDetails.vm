@@ -70,7 +70,7 @@
 $adminMsg.get('cel_gal_no_pictures')##
   </span>
 #end
-</span>
+</a>
 </div>
 <p class="galleryDescription">$!title</p>
 <br />

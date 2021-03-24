@@ -15,7 +15,16 @@
 #else
   #set($slideLink = "$!services.url.getURL($slideDocRef, 'view', 'diapo=1')")
 #end
-<span class="celements_gallery_link" href="$slideLink">
+#set($thumbHeight = "$!albumobj.getProperty('height').getValue()")
+#if("$!thumbHeight" == '')
+  #set($thumbHeight = "100")
+#end
+#set($thumbWidth = "$!albumobj.getProperty('thumbWidth').getValue()")
+#if("$!thumbWidth" == '')
+  #set($thumbWidth = "100")
+#end
+<a class="celements_gallery_link" href="$slideLink"##
+ style="display:block;width:$!{thumbWidth}px;height:$!{thumbHeight}px">
 #set($gallerySpace = '')
 #set($navObj = $!theGalleryDoc.getObject("Celements2.NavigationConfigClass"))
 #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
@@ -47,14 +56,6 @@
 #if("$!photoHeight" == '')
   #set($photoHeight = "662")
 #end
-#set($thumbHeight = "$!albumobj.getProperty('height').getValue()")
-#if("$!thumbHeight" == '')
-  #set($thumbHeight = "100")
-#end
-#set($thumbWidth = "$!albumobj.getProperty('thumbWidth').getValue()")
-#if("$!thumbWidth" == '')
-  #set($thumbWidth = "100")
-#end
   #set($zoomFactorH = $mathtool.div($thumbHeight, $photoHeight))
   #set($zoomFactorW = $mathtool.div($thumbWidth, $photoWidth))
   #set($zoomFactor = $mathtool.min($zoomFactorH, $zoomFactorW))
@@ -82,8 +83,4 @@
         <!-- slideRoot --></div>
         <!-- thumbContainer --></div>
   <!-- ImgGallerySlide --></div>
-#*
-  <span class="background"></span>
-  <span class="text">$!title</span>
-*#
-</span>
+</a>
