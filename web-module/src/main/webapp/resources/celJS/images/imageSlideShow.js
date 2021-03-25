@@ -807,6 +807,8 @@
         let origHeight = _me._configReader.getContainerAnimHeight();
         let newWidth = _me._containerHtmlElem.getWidth();
         let newHeight = newWidth * origHeight / origWidth;
+        console.log('>> _responsiveResize: before changeContainerSize ',
+            _me._getContainerElemId, newWidth, newHeight);
         _me.changeContainerSize(newWidth, newHeight);
       }
 
