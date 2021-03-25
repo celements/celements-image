@@ -701,17 +701,15 @@
           slideWrapper.setStyle(resetStylesProp);
           // if (_me._debug) {
             console.log('>> _prepareCenterSplashImage: set width and height ', _me._htmlElemId,
-              slideWrapper.getWidth(), slideWrapper.getHeight(),
-              slideWrapper.getBoundingClientRect());
+              slideWrapper.getWidth(), slideWrapper.getHeight(), slideWrapper.scrollWidth,
+               slideWrapper.scrollHeight);
           // }
-          console.log('>> _prepareCenterSplashImage: slideRoot dim ', _me._htmlElemId,
-            slideRoot.getBoundingClientRect());
           slideRoot.setStyle({
-            'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
-            'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
+            'height': (zoomFactor * slideWrapper.scrollHeight) + 'px',
+            'width': (zoomFactor * slideWrapper.scrollWidth) + 'px'
           });
-          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
-          	slideWrapper.getHeight());
+          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.scrollWidth,
+          	slideWrapper.scrollHeight);
           stylesProp['position'] = 'relative';
           if (_me._debug) {
             console.debug('_prepareCenterSplashImage: stylesProperty ', _me._htmlElemId,
