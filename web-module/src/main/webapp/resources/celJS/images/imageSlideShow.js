@@ -699,11 +699,10 @@
           const resetStylesProp = _me._configReader.getZoomStyles(1, '', '');
           resetStylesProp['position'] = 'absolute';
           slideWrapper.setStyle(resetStylesProp);
-          // if (_me._debug) {
-            console.log('>> _prepareCenterSplashImage: set width and height ', _me._htmlElemId,
-              slideWrapper.getWidth(), slideWrapper.getHeight(), slideWrapper.scrollWidth,
-               slideWrapper.scrollHeight);
-          // }
+          if (_me._debug) {
+            console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
+              slideWrapper.getWidth(), slideWrapper.getHeight());
+          }
           slideRoot.setStyle({
             'height': (zoomFactor * slideWrapper.scrollHeight) + 'px',
             'width': (zoomFactor * slideWrapper.scrollWidth) + 'px'
@@ -807,8 +806,6 @@
         let origHeight = _me._configReader.getContainerAnimHeight();
         let newWidth = _me._containerHtmlElem.getWidth();
         let newHeight = newWidth * origHeight / origWidth;
-        console.log('>> _responsiveResize: before changeContainerSize ',
-            _me._getContainerElemId, newWidth, newHeight);
         _me.changeContainerSize(newWidth, newHeight);
       }
 
