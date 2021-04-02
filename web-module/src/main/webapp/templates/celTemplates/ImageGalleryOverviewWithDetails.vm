@@ -12,7 +12,7 @@
 <div class="celements_gallery_thumbnail">
 #set($thumbHeight = "130")
 #set($thumbWidth = "130")
-<a class="celements_gallery_link" href="$galleryLink"##
+<a class="celements_gallery_link" href="$!galleryLink"##
  style="display:block;width:$!{thumbWidth}px;height:$!{thumbHeight}px">
 #set($firstImageLink = '')
 #set($gallerySpace = '')

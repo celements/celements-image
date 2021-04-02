@@ -9,7 +9,7 @@
 #end
 #set($thumbHeight = "100")
 #set($thumbWidth = "100")
-<a class="celements_gallery_link" href="$galleryLink"##
+<a class="celements_gallery_link" href="$!galleryLink"##
  style="display:block;width:$!{thumbWidth}px;height:$!{thumbHeight}px">
 #set($firstImageLink = '')
 #set($gallerySpace = '')
