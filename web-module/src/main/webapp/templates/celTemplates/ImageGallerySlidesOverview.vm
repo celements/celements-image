@@ -23,7 +23,7 @@
 #if("$!thumbWidth" == '')
   #set($thumbWidth = "100")
 #end
-<a class="celements_gallery_link" href="$slideLink"##
+<a class="celements_gallery_link" href="$!slideLink"##
  style="display:block;width:$!{thumbWidth}px;height:$!{thumbHeight}px">
 #set($gallerySpace = '')
 #set($navObj = $!theGalleryDoc.getObject("Celements2.NavigationConfigClass"))
