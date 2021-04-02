@@ -989,7 +989,7 @@
           const mouseCoord = _me._getMousePos(event);
           const x = mouseCoord[0] - 3;
           const y = mouseCoord[1] - 6;
-          _me._menuDiv = $$('body')[0].querySelector('.contextMenuSlideShow');
+          _me._menuDiv = document.body.querySelector('.contextMenuSlideShow');
           if (_me._menuDiv == null) {
             _me._menuDiv = _me._generateMenuDiv(clickedElement);
             $$('body')[0].insert(_me._menuDiv);
