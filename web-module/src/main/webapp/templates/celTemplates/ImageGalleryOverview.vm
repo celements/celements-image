@@ -27,9 +27,9 @@
     #set($firstSlideContent = $services.celementsweb.renderCelementsDocument($slidesMenu.get(0).documentReference))
   #end
   #set($imgCssClasses = "celimage_slideshow")
-  #set($imgCssClasses = "${imgCssClasses} celimage_nonestart celimage_overlay ")
-  #set($imgCssClasses = "${imgCssClasses} celimage_addNavigationOverlay celimage_overlay_addCloseButton")
-  #set($imgCssClasses = "${imgCssClasses} celimage_overlaynonestart celimage_customStartSlide")
+  #set($imgCssClasses = "$!{imgCssClasses} celimage_nonestart celimage_overlay ")
+  #set($imgCssClasses = "$!{imgCssClasses} celimage_addNavigationOverlay celimage_overlay_addCloseButton")
+  #set($imgCssClasses = "$!{imgCssClasses} celimage_overlaynonestart celimage_customStartSlide")
 #end
   #if("$!imgGalcount" == '')
     #set($imgGalcount = 0)
