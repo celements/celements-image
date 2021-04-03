@@ -662,8 +662,7 @@
           _me._origStyleValues = null;
           slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
         }
-        let zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
-          'MsZoom') || slideWrapperStyles.get('transform');
+        let zoomFactor = slideWrapperStyles.get('transform');
         if (zoomFactor) {
           zoomFactor = zoomFactor.replace(/[^.0-9]*/g, '');
         }
@@ -672,7 +671,7 @@
 
       _prepareCenterSplashImage: function () {
         const _me = this;
-        const slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+        const slideWrapper = _me._containerHtmlElem.querySelector('.cel_slideShow_slideWrapper');
         const slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
         _me._origStyleValues = null;
         const slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
@@ -686,11 +685,10 @@
           }
           //FF has problem in getting the right width for slideWrapper
           // if slideWrapper is in position: relative
-          const thumbContainer = _me._containerHtmlElem.down('.cel_slideShow_thumbContainer');
+          const thumbContainer = _me._containerHtmlElem.querySelector('.cel_slideShow_thumbContainer');
           if (thumbContainer) {
             thumbContainer.setStyle({
               'position': '',
-              'zoom': '',
               'transform': '',
               'height': '',
               'width': '',
@@ -698,29 +696,31 @@
               'left': ''
             });
           }
-          slideWrapper.setStyle({
-            'position': 'absolute',
-            'zoom': '1',
-            'transform': 'scale(1)'
-          });
+          const resetStylesProp = _me._configReader.getZoomStyles(1, '', '');
+          resetStylesProp['position'] = 'absolute';
+          slideWrapper.setStyle(resetStylesProp);
           if (_me._debug) {
             console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
           }
           slideRoot.setStyle({
-            'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
-            'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
+            'height': (zoomFactor * slideWrapper.scrollHeight) + 'px',
+            'width': (zoomFactor * slideWrapper.scrollWidth) + 'px'
           });
-          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
-            slideWrapper.getHeight());
+          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.scrollWidth,
+          	slideWrapper.scrollHeight);
           stylesProp['position'] = 'relative';
+          if (_me._debug) {
+            console.debug('_prepareCenterSplashImage: stylesProperty ', _me._htmlElemId,
+              stylesProp);
+          }
           slideWrapper.setStyle(stylesProp);
         }
       },
 
       _showSplashImage: function () {
         const _me = this;
-        const slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+        const slideWrapper = _me._containerHtmlElem.querySelector('.cel_slideShow_slideWrapper');
         const slideRoot = slideWrapper.up('.cel_slideShow_slideRoot');
         slideRoot.setStyle({
           'visibility': ''
@@ -738,7 +738,7 @@
         if (_me._configReader.isCenterSplashImage()) {
           const celSlideShowObj = _me._getImageSlideShowObj()._getCelSlideShowObj();
           //image gallery overview slides have precomputed resize factor
-          const slideWrapper = _me._containerHtmlElem.down('.cel_slideShow_slideWrapper');
+          const slideWrapper = _me._containerHtmlElem.querySelector('.cel_slideShow_slideWrapper');
           const precomputedZoomFactor = _me._getPrecomputedZoomFactor(slideWrapper);
           if (_me._debug) {
             console.log('_centerSplashImage: before setResizeSlide false ',
@@ -884,12 +884,12 @@
           console.log('_addSlideShowCounter: ', !_me._configReader.hasAddCounterNone());
         }
         if (!_me._configReader.hasAddCounterNone()) {
-          if (!_me.getContainerElement().down('> div.celPresSlideShow_countSlideNum')) {
+          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_countSlideNum')) {
             const countSlideNumElem = new Element('div').addClassName(
               'celPresSlideShow_countSlideNum');
             _me.getContainerElement().insert({ 'bottom': countSlideNumElem });
           }
-          if (!_me.getContainerElement().down('> div.celPresSlideShow_currentSlideNum')) {
+          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_currentSlideNum')) {
             const currentSlideNumElem = new Element('div').addClassName(
               'celPresSlideShow_currentSlideNum');
             _me.getContainerElement().insert({ 'bottom': currentSlideNumElem });
@@ -903,11 +903,11 @@
           console.log('_addNavigationButtons: ', _me._configReader.hasAddNavigation());
         }
         if (_me._configReader.hasAddNavigation()) {
-          if (!_me.getContainerElement().down('> div.celPresSlideShow_next')) {
+          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_next')) {
             const nextButton = new Element('div').addClassName('celPresSlideShow_next');
             _me.getContainerElement().insert({ 'bottom': nextButton });
           }
-          if (!_me.getContainerElement().down('> div.celPresSlideShow_prev')) {
+          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_prev')) {
             const prevButton = new Element('div').addClassName('celPresSlideShow_prev');
             _me.getContainerElement().insert({ 'top': prevButton });
           }
@@ -989,7 +989,7 @@
           const mouseCoord = _me._getMousePos(event);
           const x = mouseCoord[0] - 3;
           const y = mouseCoord[1] - 6;
-          _me._menuDiv = $$('body')[0].down('.contextMenuSlideShow');
+          _me._menuDiv = document.body.querySelector('.contextMenuSlideShow');
           if (_me._menuDiv == null) {
             _me._menuDiv = _me._generateMenuDiv(clickedElement);
             $$('body')[0].insert(_me._menuDiv);
@@ -1021,9 +1021,9 @@
         event.stop();
         const clickedElement = event.findElement();
         const linkHref = clickedElement.readAttribute('data-href')
-          || clickedElement.down('div').readAttribute('data-href');
+          || clickedElement.querySelector('div').readAttribute('data-href');
         const target = clickedElement.readAttribute('data-target')
-          || clickedElement.down('div').readAttribute('data-target');
+          || clickedElement.querySelector('div').readAttribute('data-target');
         if ((linkHref != null) && (linkHref != '')) {
           window.open(linkHref, target);
           if (_me._isPaused) {
@@ -1033,11 +1033,11 @@
           }
         } else if (clickedElement.hasClassName('continueSlideshowContainer')
           || (clickedElement.hasClassName('contextMenuSlideShowListItem')
-            && clickedElement.down('div.continueSlideshowContainer'))) {
+            && clickedElement.querySelector('div.continueSlideshowContainer'))) {
           _me.startStop(true);
         } else if (clickedElement.hasClassName('stopSlideshowContainer')
           || (clickedElement.hasClassName('contextMenuSlideShowListItem')
-            && clickedElement.down('div.stopSlideshowContainer'))) {
+            && clickedElement.querySelector('div.stopSlideshowContainer'))) {
           _me.startStop(false);
         } else {
           if (_me._isPaused) {
@@ -1134,7 +1134,7 @@
         if (typeof delayedStart === 'undefined') {
           delayedStart = false;
         }
-        const slideShowButton = _me.getContainerElement().down('.slideshowButton');
+        const slideShowButton = _me.getContainerElement().querySelector('.slideshowButton');
         if (isStart) {
           console.log('animation started for image slideshow',
             _me._getContainerElemId());
