@@ -662,8 +662,7 @@
           _me._origStyleValues = null;
           slideWrapperStyles = _me._getOriginalStyleValues(slideWrapper);
         }
-        let zoomFactor = slideWrapperStyles.get('zoom') || slideWrapperStyles.get(
-          'MsZoom') || slideWrapperStyles.get('transform');
+        let zoomFactor = slideWrapperStyles.get('transform');
         if (zoomFactor) {
           zoomFactor = zoomFactor.replace(/[^.0-9]*/g, '');
         }
@@ -690,7 +689,6 @@
           if (thumbContainer) {
             thumbContainer.setStyle({
               'position': '',
-              'zoom': '',
               'transform': '',
               'height': '',
               'width': '',
@@ -698,21 +696,19 @@
               'left': ''
             });
           }
-          slideWrapper.setStyle({
-            'position': 'absolute',
-            'zoom': '1',
-            'transform': 'scale(1)'
-          });
+          const resetStylesProp = _me._configReader.getZoomStyles(1, '', '');
+          resetStylesProp['position'] = 'absolute';
+          slideWrapper.setStyle(resetStylesProp);
           if (_me._debug) {
             console.log('_prepareCenterSplashImage: set width and height ', _me._htmlElemId,
               slideWrapper.getWidth(), slideWrapper.getHeight());
           }
           slideRoot.setStyle({
-            'height': (zoomFactor * slideWrapper.getHeight()) + 'px',
-            'width': (zoomFactor * slideWrapper.getWidth()) + 'px'
+            'height': (zoomFactor * slideWrapper.scrollHeight) + 'px',
+            'width': (zoomFactor * slideWrapper.scrollWidth) + 'px'
           });
-          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.getWidth(),
-            slideWrapper.getHeight());
+          const stylesProp = _me._configReader.getZoomStyles(zoomFactor, slideWrapper.scrollWidth,
+          	slideWrapper.scrollHeight);
           stylesProp['position'] = 'relative';
           slideWrapper.setStyle(stylesProp);
         }

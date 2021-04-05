@@ -1,37 +1,33 @@
 #set($title = "$!gallerydoc.getTitle()")
-#set($galleryFN = $services.model.serialize($gallerydoc.documentReference, 'local'))
+#set($galleryDocRef = $gallerydoc.documentReference)
+#set($galleryFN = $services.model.serialize($galleryDocRef, 'local'))
 #set($albumobj = $!gallerydoc.getObject("XWiki.PhotoAlbumClass"))
 #if("$!albumobj.getProperty('hasOverview').getValue()" != "0")
-  #set($galleryLink = "$!xwiki.getURL($galleryFN, 'view')")
+  #set($galleryLink = "$!services.url.getURL($galleryDocRef, 'view')")
 #else
-  #set($galleryLink = "$!xwiki.getURL($galleryFN, 'view')?diapo=1")
+  #set($galleryLink = "$!services.url.getURL($galleryDocRef, 'view', 'diapo=1')")
 #end
 <div class="celements_gallery_overview">
 <div class="celements_gallery_left">
 <div class="celements_gallery_thumbnail">
-<span class="celements_gallery_link" href="$galleryLink">
+#set($thumbHeight = "130")
+#set($thumbWidth = "130")
+<span class="celements_gallery_link" href="$!galleryLink"##
+ style="display:block;width:$!{thumbWidth}px;height:$!{thumbHeight}px">
 #set($firstImageLink = '')
 #set($gallerySpace = '')
+#set($firstSlideContent = '')
 #if($gallerydoc.attachmentList.size() > 0)
-#set($attach = $gallerydoc.attachmentList.get(0))
-#set($firstImageLink = $gallerydoc.getAttachmentURL($attach.filename, "download"))
-#set($imgCssClasses = 'celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation celanim_overlay_addCloseButton celimage_customStartSlide')
-#elseif("$!services.pageType.getPageTypeRef($gallerydoc.documentReference).configName" == 'ImageGallery')
+  #set($attach = $gallerydoc.attachmentList.get(0))
+  #set($firstImageLink = $gallerydoc.getAttachmentURL($attach.filename, "download"))
+  #set($imgCssClasses = 'celanim_slideshow celanim_manualstart celanim_overlay celanim_addNavigation celanim_overlay_addCloseButton celimage_customStartSlide')
+#elseif("$!services.pageType.getPageTypeRef($galleryDocRef).configName" == 'ImageGallery')
   #set($navObj = $!gallerydoc.getObject("Celements2.NavigationConfigClass"))
   #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
   #set($gallerySlidesDocRef = $services.model.createDocumentReference('', "$!{gallerySpace}", ''))
-  #set($slidesMenu = $xwiki.celementsweb.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
+  #set($slidesMenu = $services.treeNode.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
   #if($slidesMenu.size() > 0)
-    #set($slideContent = $services.celementsweb.renderCelementsDocument($slidesMenu.get(0).documentReference))
-#*
-    #set($slideContentOneLine = $slideContent.replaceAll('[\n\r]',''))
-    #set($imageTagInSlide = $slideContentOneLine.replaceAll('.*<img [^>]*src="([^"]*)".*', '$1'))
-    #if($imageTagInSlide.indexOf('?') > 0)
-      #set($imageInSlide = $imageTagInSlide.substring(0, $imageTagInSlide.indexOf('?')))
-    #end
-*#
-##    #set($firstImageLink = $imageInSlide)
-    #set($firstSlideContent = $slideContent)
+    #set($firstSlideContent = $services.celementsweb.renderCelementsDocument($slidesMenu.get(0).documentReference))
   #end
   #set($imgCssClasses = "celimage_slideshow")
   #set($imgCssClasses = "${imgCssClasses} celimage_nonestart celimage_overlay ")
@@ -53,32 +49,21 @@
   #if("$!photoHeight" == '')
     #set($photoHeight = "662")
   #end
-  #set($thumbHeight = "130")
-  #set($thumbWidth = "130")
 #if("$!firstImageLink" != '')
   <img id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" src="${firstImageLink}?celwidth=$!{thumbWidth}&celheight=$!{thumbHeight}&lowBound=1" alt="" />
-#elseif("$firstSlideContent" != '')
+#elseif("$!firstSlideContent" != '')
   #set($zoomFactorH = $mathtool.div($!{thumbHeight}, $!{photoHeight}))
   #set($zoomFactorW = $mathtool.div($!{thumbWidth}, $!{photoWidth}))
-  #set($zoomFactor = $mathtool.min($!{zoomFactorH}, $!{zoomFactorH}))
+  #set($zoomFactor = $mathtool.min($!{zoomFactorH}, $!{zoomFactorW}))
   <div id="ImgGallery$!{imgGalcount}:${galleryFN}:1::$!{photoWidth}:$!{photoHeight}:1:$!{gallerySpace}:$!{thumbWidth}:$!{thumbHeight}"##
    class="$imgCssClasses" style="width:$!{thumbWidth}px;height:$!{thumbHeight}px;">
-  #*
-      zoom: 2; /* all browsers */
-     -moz-transform: scale(2);  /* Firefox */
-     position: absolute;
-     -moz-transform-origin: 0 0 0;
-  *#
-##      <div style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
-##        <div class="cel_slideShow_slideRoot" style="width:$!{photoWidth}px; height:$!{photoHeight}px;">
         <div class="cel_slideShow_slideRoot">
           <div class="cel_slideShow_slideWrapper"##
-          style="zoom: $!{zoomFactor}; -moz-transform: scale($!{zoomFactor}); -moz-transform-origin: 0 0 0;">
-          $firstSlideContent
+          style="transform: scale($!{zoomFactor}); transform-origin: 0 0 0;">
+          $!firstSlideContent
           </div>
         </div>
-##      </div>
   </div>
 #else
   <span class="cel_gal_no_pictures_text">##
