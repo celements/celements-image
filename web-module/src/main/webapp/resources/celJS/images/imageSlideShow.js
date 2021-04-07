@@ -884,12 +884,12 @@
           console.log('_addSlideShowCounter: ', !_me._configReader.hasAddCounterNone());
         }
         if (!_me._configReader.hasAddCounterNone()) {
-          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_countSlideNum')) {
+          if (!_me.getContainerElement().querySelector('div > div.celPresSlideShow_countSlideNum')) {
             const countSlideNumElem = new Element('div').addClassName(
               'celPresSlideShow_countSlideNum');
             _me.getContainerElement().insert({ 'bottom': countSlideNumElem });
           }
-          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_currentSlideNum')) {
+          if (!_me.getContainerElement().querySelector('div > div.celPresSlideShow_currentSlideNum')) {
             const currentSlideNumElem = new Element('div').addClassName(
               'celPresSlideShow_currentSlideNum');
             _me.getContainerElement().insert({ 'bottom': currentSlideNumElem });
@@ -903,11 +903,11 @@
           console.log('_addNavigationButtons: ', _me._configReader.hasAddNavigation());
         }
         if (_me._configReader.hasAddNavigation()) {
-          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_next')) {
+          if (!_me.getContainerElement().querySelector('div > div.celPresSlideShow_next')) {
             const nextButton = new Element('div').addClassName('celPresSlideShow_next');
             _me.getContainerElement().insert({ 'bottom': nextButton });
           }
-          if (!_me.getContainerElement().querySelector('> div.celPresSlideShow_prev')) {
+          if (!_me.getContainerElement().querySelector('div > div.celPresSlideShow_prev')) {
             const prevButton = new Element('div').addClassName('celPresSlideShow_prev');
             _me.getContainerElement().insert({ 'top': prevButton });
           }
