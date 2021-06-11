@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
@@ -45,7 +45,7 @@ import com.drew.metadata.Tag;
  */
 public class MetaInfoExtractor {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(MetaInfoExtractor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetaInfoExtractor.class);
 
   /**
    * Returns an array of Tag elements representing the metainformation,

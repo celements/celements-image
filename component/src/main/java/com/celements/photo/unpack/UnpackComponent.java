@@ -4,8 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -34,7 +34,7 @@ public class UnpackComponent implements IUnpackComponentRole {
   XWikiContext inject_context = null;
   Unzip inject_unzip = null;
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(UnpackComponent.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UnpackComponent.class);
 
   public String unzipFileToAttachment(DocumentReference zipSrcDocRef, String attachmentName,
       String unzipFileName, DocumentReference destinationDoc) {

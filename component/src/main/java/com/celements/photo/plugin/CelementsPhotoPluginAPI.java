@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.photo.container.ImageDimensions;
@@ -52,7 +52,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class CelementsPhotoPluginAPI extends Api {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       CelementsPhotoPluginAPI.class);
 
   private CelementsPhotoPlugin photoPlugin;

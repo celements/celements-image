@@ -5,8 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.sanselan.ImageReadException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -23,7 +23,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 public class CropImage implements ICropImage {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(CropImage.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CropImage.class);
 
   @Requirement
   Execution execution;

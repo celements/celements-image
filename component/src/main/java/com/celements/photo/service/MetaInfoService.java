@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -23,7 +23,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class MetaInfoService implements IMetaInfoService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(MetaInfoService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetaInfoService.class);
 
   public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename,
       String directory) {
