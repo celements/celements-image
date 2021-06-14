@@ -21,7 +21,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("galleryOverview")
 public class GalleryOverviewPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(GalleryOverviewPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GalleryOverviewPresentationType.class);
 
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 

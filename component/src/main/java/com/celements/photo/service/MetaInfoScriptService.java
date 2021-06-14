@@ -49,7 +49,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("celmetatags")
 public class MetaInfoScriptService implements ScriptService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(MetaInfoScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetaInfoScriptService.class);
 
   @Requirement
   IMetadataDocumentRole metaDocComp;
