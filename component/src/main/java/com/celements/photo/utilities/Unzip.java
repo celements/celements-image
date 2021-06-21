@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -40,14 +40,13 @@ public class Unzip {
 
   private static final int BUFFER = 1024;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(Unzip.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Unzip.class);
 
-  public Unzip() {
-  }
+  public Unzip() {}
 
   /**
    * Extracts the specified file from a given zip archive.
-   * 
+   *
    * @param zipFile
    *          byte array representation of a zip archive.
    * @param filename
@@ -69,7 +68,8 @@ public class Unzip {
   private ByteArrayOutputStream findAndExtractFile(String filename, ZipInputStream zipIn)
       throws IOException {
     ByteArrayOutputStream out = null;
-    for (ZipEntry entry = zipIn.getNextEntry(); zipIn.available() > 0; entry = zipIn.getNextEntry()) {
+    for (ZipEntry entry = zipIn.getNextEntry(); zipIn.available() > 0; entry = zipIn
+        .getNextEntry()) {
       if (!entry.isDirectory() && entry.getName().equals(filename)) {
         // read the data and write it to the OutputStream
         int count;
@@ -90,7 +90,7 @@ public class Unzip {
 
   /**
    * Get a List of names of all files contained in the zip file.
-   * 
+   *
    * @param zipFile
    *          byte array of the zip file.
    * @return List of all filenames (and directory names - ending with a file seperator)
@@ -98,7 +98,7 @@ public class Unzip {
    */
   public List<String> getZipContentList(byte[] zipFile) {
     String fileSep = System.getProperty("file.separator");
-    List<String> contentList = new ArrayList<String>();
+    List<String> contentList = new ArrayList<>();
     ZipInputStream zipStream = getZipInputStream(zipFile);
 
     try {
@@ -113,7 +113,7 @@ public class Unzip {
         }
       }
     } catch (IOException e) {
-      LOGGER.error(e);
+      LOGGER.error("getZipContentList failed", e);
     }
 
     return contentList;
@@ -121,9 +121,9 @@ public class Unzip {
 
   /*
    * Get a ZiInputStream for the specified file.
-   * 
+   *
    * @param srcFile byte array representation of a zip file.
-   * 
+   *
    * @return A ZipInputStream for the file.
    */
   private ZipInputStream getZipInputStream(byte[] srcFile) {

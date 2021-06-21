@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -66,7 +66,7 @@ public class ImageScriptService implements ScriptService {
   public static final String IMAGE_CHANGED_BY = "lastChangedBy";
   public static final String IMAGE_MIME_TYPE = "mimeType";
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(ImageScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ImageScriptService.class);
 
   @Requirement
   IImageService imageService;

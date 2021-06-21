@@ -6,17 +6,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Vector;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -57,7 +55,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class ImageService implements IImageService {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(ImageService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ImageService.class);
 
   @Requirement
   EntityReferenceResolver<String> stringRefResolver;
@@ -99,6 +97,7 @@ public class ImageService implements IImageService {
     return (NavigationClasses) navigationClasses;
   }
 
+  @Override
   public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef) throws XWikiException {
     XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef, getContext());
     BaseObject galleryObj = galleryDoc.getXObject(getOldCoreClasses().getPhotoAlbumClassRef(
@@ -106,6 +105,7 @@ public class ImageService implements IImageService {
     return galleryObj;
   }
 
+  @Override
   public BaseObject getPhotoAlbumNavObject(DocumentReference galleryDocRef) throws XWikiException,
       NoGalleryDocumentException {
     XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef, getContext());
@@ -117,6 +117,7 @@ public class ImageService implements IImageService {
     return navObj;
   }
 
+  @Override
   public SpaceReference getPhotoAlbumSpaceRef(DocumentReference galleryDocRef)
       throws NoGalleryDocumentException {
     try {
@@ -163,6 +164,7 @@ public class ImageService implements IImageService {
     return eventRef;
   }
 
+  @Override
   public ImageDimensions getDimension(String imageFullName) throws XWikiException {
     String fullName = imageFullName.split(";")[0];
     String imageFileName = imageFullName.split(";")[1];
@@ -171,6 +173,7 @@ public class ImageService implements IImageService {
     return getDimension(imgRef);
   }
 
+  @Override
   public ImageDimensions getDimension(AttachmentReference imgRef) throws XWikiException {
     DocumentReference docRef = (DocumentReference) imgRef.getParent();
     XWikiDocument theDoc = getContext().getWiki().getDocument(docRef, getContext());
@@ -200,6 +203,7 @@ public class ImageService implements IImageService {
    * from the given AttachmentList. It chooses the Images without duplicates if
    * possible.
    */
+  @Override
   public List<Attachment> getRandomImages(DocumentReference galleryRef, int num) {
     try {
       Document imgDoc = getContext().getWiki().getDocument(galleryRef, getContext()).newDocument(
@@ -208,7 +212,7 @@ public class ImageService implements IImageService {
           "AttachmentAscendingNameComparator", true);
       if (allImagesList.size() > 0) {
         List<Attachment> preSetImgList = prepareMaxCoverSet(num, allImagesList);
-        List<Attachment> imgList = new ArrayList<Attachment>(num);
+        List<Attachment> imgList = new ArrayList<>(num);
         Random rand = new Random();
         for (int i = 1; i <= num; i++) {
           int nextimg = rand.nextInt(preSetImgList.size());
@@ -216,14 +220,14 @@ public class ImageService implements IImageService {
         }
         return imgList;
       }
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException xwe) {
+      LOGGER.error("getRandomImages failed for gallery [{}]", galleryRef, xwe);
     }
     return Collections.emptyList();
   }
 
   <T> List<T> prepareMaxCoverSet(int num, List<T> allImagesList) {
-    List<T> preSetImgList = new Vector<T>(num);
+    List<T> preSetImgList = new ArrayList<>(num);
     preSetImgList.addAll(allImagesList);
     for (int i = 2; i <= coveredQuotient(allImagesList.size(), num); i++) {
       preSetImgList.addAll(allImagesList);
@@ -233,7 +237,7 @@ public class ImageService implements IImageService {
 
   int coveredQuotient(int divisor, int dividend) {
     if (dividend >= 0) {
-      return ((dividend + divisor - 1) / divisor);
+      return (((dividend + divisor) - 1) / divisor);
     } else {
       return (dividend / divisor);
     }
@@ -253,6 +257,7 @@ public class ImageService implements IImageService {
     return attURLCmd;
   }
 
+  @Override
   public boolean checkAddSlideRights(DocumentReference galleryDocRef) {
     try {
       DocumentReference newSlideDocRef = getNextFreeDocNameCmd().getNextTitledPageDocRef(
@@ -269,6 +274,7 @@ public class ImageService implements IImageService {
     return false;
   }
 
+  @Override
   public boolean addSlideFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
       String attFullName) {
     try {
@@ -318,7 +324,7 @@ public class ImageService implements IImageService {
         } else {
           LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
           Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
-          metaTagMap = new HashMap<String, String>();
+          metaTagMap = new HashMap<>();
           for (String key : map.keySet()) {
             metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
           }
@@ -376,7 +382,7 @@ public class ImageService implements IImageService {
   }
 
   Map<String, String> getMetaTagObjectsFromDoc(XWikiDocument attDoc) {
-    Map<String, String> metaTagMap = new HashMap<String, String>();
+    Map<String, String> metaTagMap = new HashMap<>();
     DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
         "Classes.PhotoMetainfoClass");
     List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
@@ -416,6 +422,7 @@ public class ImageService implements IImageService {
     return key.replaceAll("^(\\[.*\\] )?(.*)$", "$2");
   }
 
+  @Override
   public DocumentReference getImageSlideTemplateRef() {
     DocumentReference slideTemplateRef = new DocumentReference(getContext().getDatabase(),
         "ImageGalleryTemplates", "NewImageGallerySlide");
@@ -426,6 +433,7 @@ public class ImageService implements IImageService {
     return slideTemplateRef;
   }
 
+  @Override
   public Map<String, String> getImageURLinAllAspectRatios(XWikiAttachment ximage) {
     ImageDimensions dim = null;
     try {
@@ -434,7 +442,7 @@ public class ImageService implements IImageService {
     } catch (XWikiException xwe) {
       LOGGER.error("Exception reading image dimensions", xwe);
     }
-    Map<String, String> urlMap = new HashMap<String, String>();
+    Map<String, String> urlMap = new HashMap<>();
     if (dim != null) {
       String baseURL = ximage.getDoc().getExternalAttachmentURL(ximage.getFilename(), "download",
           getContext());
@@ -456,7 +464,7 @@ public class ImageService implements IImageService {
   String getFixedAspectURL(ImageDimensions dim, int xFact, int yFact) {
     double width = dim.getWidth();
     double height = dim.getHeight();
-    double isAspRatio = width / (double) height;
+    double isAspRatio = width / height;
     double targetAspRatio = xFact / (double) yFact;
     double epsylon = 0.00001;
     String urlParams = "";
@@ -465,11 +473,11 @@ public class ImageService implements IImageService {
       if (isAspRatio < targetAspRatio) {
         urlParams += "cropX=0&cropW=" + (int) width;
         int newHeight = (int) Math.floor(width * (1 / targetAspRatio));
-        int top = (int) Math.floor((height - (double) newHeight) / 2);
+        int top = (int) Math.floor((height - newHeight) / 2);
         urlParams += "&cropY=" + top + "&cropH=" + newHeight;
       } else {
         int newWidth = (int) Math.floor(height * targetAspRatio);
-        int left = (int) Math.floor((width - (double) newWidth) / 2);
+        int left = (int) Math.floor((width - newWidth) / 2);
         urlParams += "cropX=" + left + "&cropW=" + newWidth;
         urlParams += "&cropY=0&cropH=" + (int) height;
       }
@@ -478,13 +486,13 @@ public class ImageService implements IImageService {
   }
 
   private IMetaInfoService getMetaInfoService() {
-    return (IMetaInfoService) Utils.getComponent(IMetaInfoService.class);
+    return Utils.getComponent(IMetaInfoService.class);
   }
 
   /**
    * Get a List of all attachments in the specified archive and the suggested
    * action when importing.
-   * 
+   *
    * @param importFile
    *          Zip archive to check the files for the existence in the gallery.
    * @param galleryDoc
@@ -494,9 +502,10 @@ public class ImageService implements IImageService {
    * @return List of {@link ImportFileObject} for each file.
    * @throws XWikiException
    */
+  @Override
   public List<ImportFileObject> getAttachmentFileListWithActions(XWikiAttachment importFile,
       XWikiDocument galleryDoc) throws XWikiException {
-    List<ImportFileObject> resultList = new ArrayList<ImportFileObject>();
+    List<ImportFileObject> resultList = new ArrayList<>();
 
     if (importFile != null) {
       if (isZipFile(importFile)) {
@@ -505,8 +514,8 @@ public class ImageService implements IImageService {
           fileList = (new Unzip()).getZipContentList(IOUtils.toByteArray(
               importFile.getContentInputStream(getContext())));
           String fileSep = System.getProperty("file.separator");
-          for (Iterator<String> fileIterator = fileList.iterator(); fileIterator.hasNext();) {
-            String fileName = (String) fileIterator.next();
+          for (String string : fileList) {
+            String fileName = string;
             if (!fileName.endsWith(fileSep) && !fileName.startsWith(".") && !fileName.contains(
                 fileSep + ".")) {
               ImportFileObject file = new ImportFileObject(fileName, getActionForFile(fileName,
@@ -532,7 +541,7 @@ public class ImageService implements IImageService {
   /**
    * For a given filename return if, in the specified gallery, its import
    * should be added, overwritten or skiped.
-   * 
+   *
    * @param fileName
    *          Filename of the file to check.
    * @param galleryDoc

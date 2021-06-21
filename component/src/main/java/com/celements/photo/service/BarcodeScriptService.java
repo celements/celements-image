@@ -9,13 +9,13 @@ import java.io.OutputStream;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeException;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.krysalis.barcode4j.BarcodeUtil;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -32,7 +32,7 @@ public class BarcodeScriptService implements ScriptService {
   private String MODULE_WIDTH = "0.33mm";
   private String MODULE_HEIGHT = "15mm";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(BarcodeScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BarcodeScriptService.class);
 
   @Requirement
   Execution execution;
@@ -108,9 +108,9 @@ public class BarcodeScriptService implements ScriptService {
     } catch (ConfigurationException e) {
       LOGGER.error("Exception in configuration for barcode module.", e);
     } catch (SAXException e) {
-      LOGGER.error(e);
+      LOGGER.error("generate", e);
     } catch (IOException e) {
-      LOGGER.error(e);
+      LOGGER.error("generate", e);
     } catch (BarcodeException e) {
       LOGGER.error("Exception in barcode module.", e);
     }

@@ -21,8 +21,8 @@ package com.celements.photo.utilities;
 
 import java.io.ByteArrayOutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.filebase.AddingAttachmentContentFailedException;
 import com.celements.filebase.AttachmentService;
@@ -41,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
 @Deprecated
 public class AddAttachmentToDoc {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(AddAttachmentToDoc.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AddAttachmentToDoc.class);
 
   /**
    * Converts the given ByteArrayOutputStream to an XWikiAttachment and adds

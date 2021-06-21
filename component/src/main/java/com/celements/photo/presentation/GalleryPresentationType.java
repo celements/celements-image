@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("gallerySlidesOverview")
 public class GalleryPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(GalleryPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GalleryPresentationType.class);
 
   private static final String _CEL_CM_GALLERY_DEFAULT_CSSCLASS = "cel_cm_gallery_view";
 

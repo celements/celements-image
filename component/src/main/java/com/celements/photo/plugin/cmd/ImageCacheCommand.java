@@ -28,8 +28,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -46,7 +46,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class ImageCacheCommand {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(ImageCacheCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ImageCacheCommand.class);
 
   /**
    * Cache for already served images.

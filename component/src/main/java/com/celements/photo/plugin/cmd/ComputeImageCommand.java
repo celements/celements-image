@@ -74,9 +74,6 @@ public class ComputeImageCommand {
     int width = parseIntWithDefault(swidth, 0);
     try {
       attachmentClone = (XWikiAttachment) attachment.clone();
-      // mLogger.debug("dimension: target width=" + width + "; target height=" + height
-      // + "; resized width=" + dimension.getWidth() + "; resized height="
-      // + dimension.getHeight());
       String key = getImageCacheCmd().getCacheKey(attachmentClone, new ImageDimensions(width,
           height), copyright, watermark, cropX, cropY, cropW, cropH, blackAndWhite, defaultBg,
           lowerBound, lowerBoundPositioning, filterStr, overwriteOutputFormat, raw);

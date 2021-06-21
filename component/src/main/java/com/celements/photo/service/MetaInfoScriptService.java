@@ -49,7 +49,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("celmetatags")
 public class MetaInfoScriptService implements ScriptService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(MetaInfoScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetaInfoScriptService.class);
 
   @Requirement
   IMetadataDocumentRole metaDocComp;
@@ -177,7 +177,7 @@ public class MetaInfoScriptService implements ScriptService {
         getContext().getWiki().saveDocument(doc, "added tag '" + name + "'", getContext());
       }
     } catch (XWikiException xwe) {
-      _LOGGER.error("Exception adding tag to document " + docRef.getName(), xwe);
+      LOGGER.error("Exception adding tag to document " + docRef.getName(), xwe);
     }
   }
 
