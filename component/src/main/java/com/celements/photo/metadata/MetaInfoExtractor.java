@@ -58,10 +58,9 @@ public class MetaInfoExtractor {
    * @return An arry of Tags.
    * @throws MetadataException
    */
-  public List<Tag> getDirectoryTagsAsTagList(InputStream imageFile, Class<Directory> directory)
-      throws MetadataException {
+  public List<Tag> getDirectoryTagsAsTagList(InputStream imageFile, Class<Directory> directory) {
     Metadata metadata = getMetadata(imageFile);
-    Directory dir = metadata.getDirectory(directory);
+    Directory dir = metadata.getFirstDirectoryOfType(directory);
     List<Tag> data = new ArrayList<>();
     for (Tag tag : dir.getTags()) {
       data.add(tag);

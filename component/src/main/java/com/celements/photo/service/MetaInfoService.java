@@ -25,33 +25,32 @@ public class MetaInfoService implements IMetaInfoService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MetaInfoService.class);
 
+  @Override
   public List<Tag> getDirectoryTagsAsTagList(DocumentReference docRef, String filename,
       String directory) {
     return getDirectoryTagsAsTagListInternal(getStreamForAttachment(getAttachmentForDocRef(docRef,
         filename)), getDirClass(directory));
   }
 
+  @Override
   public List<Tag> getDirectoryTagsAsTagList(Attachment attachment, String directory) {
     return getDirectoryTagsAsTagListInternal(getStreamForAttachment(getXAttForAtt(attachment)),
         getDirClass(directory));
   }
 
+  @Override
   public Map<String, String> getAllTags(DocumentReference docRef, String filename) {
     return getAllTagsInternal(getInputStreamForAttachment(getAttachmentForDocRef(docRef,
         filename)));
   }
 
+  @Override
   public Map<String, String> getAllTags(Attachment attachment) {
     return getAllTagsInternal(getInputStreamForAttachment(getXAttForAtt(attachment)));
   }
 
   List<Tag> getDirectoryTagsAsTagListInternal(InputStream imageFile, Class<Directory> directory) {
-    try {
-      return new MetaInfoExtractor().getDirectoryTagsAsTagList(imageFile, directory);
-    } catch (MetadataException mde) {
-      LOGGER.error("Exception extracting Metadata directory " + directory, mde);
-    }
-    return Collections.emptyList();
+    return new MetaInfoExtractor().getDirectoryTagsAsTagList(imageFile, directory);
   }
 
   Map<String, String> getAllTagsInternal(InputStream imageFile) {
