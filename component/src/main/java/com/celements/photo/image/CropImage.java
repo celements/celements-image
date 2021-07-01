@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.sanselan.ImageReadException;
+import org.apache.commons.imaging.ImageReadException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;

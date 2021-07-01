@@ -45,7 +45,7 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.PixelAccessor;
 import javax.media.jai.UnpackedImageData;
 
-import org.apache.sanselan.ImageReadException;
+import org.apache.commons.imaging.ImageReadException;
 import org.apache.tika.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
