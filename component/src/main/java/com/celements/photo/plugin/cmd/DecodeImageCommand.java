@@ -32,8 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
@@ -41,12 +41,13 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 
-import org.apache.sanselan.ImageReadException;
-import org.apache.sanselan.Sanselan;
-import org.apache.sanselan.common.byteSources.ByteSource;
-import org.apache.sanselan.common.byteSources.ByteSourceInputStream;
-import org.apache.sanselan.formats.jpeg.JpegImageParser;
-import org.apache.sanselan.formats.jpeg.segments.UnknownSegment;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.bytesource.ByteSource;
+import org.apache.commons.imaging.common.bytesource.ByteSourceInputStream;
+import org.apache.commons.imaging.formats.jpeg.JpegImageParser;
+import org.apache.commons.imaging.formats.jpeg.segments.Segment;
+import org.apache.commons.imaging.formats.jpeg.segments.UnknownSegment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +116,7 @@ public class DecodeImageCommand {
           imageStream.reset();
           hasAdobeMarker = hasAdobeMarker(imageStream, filename);
           imageStream.reset();
-          profile = Sanselan.getICCProfile(imageStream, filename);
+          profile = Imaging.getICCProfile(imageStream, filename);
           WritableRaster raster = (WritableRaster) reader.readRaster(0, null);
           if (colorType == COLOR_TYPE_YCCK) {
             convertYcckToCmyk(raster);
@@ -143,14 +144,11 @@ public class DecodeImageCommand {
 
   // Requires Java Advanced Imaging - used as fallback for certain jpeg files containing
   // conflicting information on where the actual image data begins (JFIF != EXIF)
-  BufferedImage readUsingJAI(InputStream inputStream, String mimeType) throws IOException,
-      XWikiException {
+  BufferedImage readUsingJAI(InputStream inputStream, String mimeType) throws IOException {
     SeekableStream seekableStream = new FileCacheSeekableStream(inputStream);
     ParameterBlock paramBlock = new ParameterBlock();
     paramBlock.add(seekableStream);
-    BufferedImage image = JAI.create(mimeType.replaceAll("image/", ""),
-        paramBlock).getAsBufferedImage();
-    return image;
+    return JAI.create(mimeType.replace("image/", ""), paramBlock).getAsBufferedImage();
   }
 
   boolean hasAdobeMarker(InputStream imgIn, String filename) throws IOException,
@@ -158,15 +156,14 @@ public class DecodeImageCommand {
     boolean hasAdobeMarker = true;
     JpegImageParser parser = new JpegImageParser();
     ByteSource byteSource = new ByteSourceInputStream(imgIn, filename);// new ByteSourceFile(file);
-    @SuppressWarnings("rawtypes")
-    ArrayList segments = parser.readSegments(byteSource, new int[] { 0xffee }, true);
-    if (segments != null && segments.size() >= 1) {
+    List<Segment> segments = parser.readSegments(byteSource, new int[] { 0xffee }, true);
+    if ((segments != null) && !segments.isEmpty()) {
       UnknownSegment app14Segment = (UnknownSegment) segments.get(0);
-      byte[] data = app14Segment.bytes;
-      if (data.length >= 12 && data[0] == 'A' && data[1] == 'd' && data[2] == 'o' && data[3] == 'b'
-          && data[4] == 'e') {
-        hasAdobeMarker = true;
-        int transform = app14Segment.bytes[11] & 0xff;
+      byte[] data = app14Segment.getSegmentData();
+      if ((data.length >= 12) && (data[0] == 'A') && (data[1] == 'd') && (data[2] == 'o')
+          && (data[3] == 'b')
+          && (data[4] == 'e')) {
+        int transform = data[11] & 0xff;
         if (transform == 2) {
           colorType = COLOR_TYPE_YCCK;
         }
@@ -186,21 +183,24 @@ public class DecodeImageCommand {
         int y = pixelRow[x];
         int cb = pixelRow[x + 1];
         int cr = pixelRow[x + 2];
-        int c = (int) (y + 1.402 * cr - 178.956);
-        int m = (int) (y - 0.34414 * cb - 0.71414 * cr + 135.95984);
-        y = (int) (y + 1.772 * cb - 226.316);
-        if (c < 0)
+        int c = (int) ((y + (1.402 * cr)) - 178.956);
+        int m = (int) ((y - (0.34414 * cb) - (0.71414 * cr)) + 135.95984);
+        y = (int) ((y + (1.772 * cb)) - 226.316);
+        if (c < 0) {
           c = 0;
-        else if (c > 255)
+        } else if (c > 255) {
           c = 255;
-        if (m < 0)
+        }
+        if (m < 0) {
           m = 0;
-        else if (m > 255)
+        } else if (m > 255) {
           m = 255;
-        if (y < 0)
+        }
+        if (y < 0) {
           y = 0;
-        else if (y > 255)
+        } else if (y > 255) {
           y = 255;
+        }
         pixelRow[x] = 255 - c;
         pixelRow[x + 1] = 255 - m;
         pixelRow[x + 2] = 255 - y;
