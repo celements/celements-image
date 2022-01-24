@@ -62,7 +62,7 @@
     return CISS_BodySlideShowStarter;
   };
 
-  window.celAddOnBeforeLoadListener(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     window.celBeforeInitializeSlideShowHandler();
     const initCelEvent = window.CELEMENTS.image.getBodySlideShowStarter().celFire(
       'celimage_slideshowstarter:beforeAutoInitSlideShow');
