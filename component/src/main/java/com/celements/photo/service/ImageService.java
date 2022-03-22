@@ -24,10 +24,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.reference.RefBuilder;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.photo.container.ImageDimensions;
@@ -156,11 +156,11 @@ public class ImageService implements IImageService {
   }
 
   private DocumentReference getDocRefFromFullName(String collDocName) {
-    DocumentReference eventRef = new DocumentReference(stringRefResolver.resolve(collDocName,
-        EntityType.DOCUMENT));
-    eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
-    LOGGER.debug("getDocRefFromFullName: for [" + collDocName + "] got reference [" + eventRef
-        + "].");
+    DocumentReference eventRef = RefBuilder.from(stringRefResolver
+        .resolve(collDocName, EntityType.DOCUMENT))
+        .wiki(getContext().getDatabase())
+        .build(DocumentReference.class);
+    LOGGER.debug("getDocRefFromFullName: for [{}] got reference [{}].", collDocName, eventRef);
     return eventRef;
   }
 
