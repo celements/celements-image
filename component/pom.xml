@@ -24,11 +24,11 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
-    <version>5.5</version>
+    <version>5.6</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-photo</artifactId>
-  <version>5.3-SNAPSHOT</version>
+  <version>5.4-SNAPSHOT</version>
   <description>Celements Photo</description>
   <scm>
     <connection>scm:git:git://github.com/celements/celements-photo</connection>
@@ -59,7 +59,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-core</artifactId>
-      <version>5.4</version>
+      <version>5.5</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
