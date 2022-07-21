@@ -21,33 +21,33 @@
 (function(window, undefined) {
   "use strict";
 
-  var closePreimport = function(event){
+  const closePreimport = function(event){
     if(!confirm($('c3_not_yet_imported_msg').value)){
       event.stop();
     }
   };
   
-  var nothingToImport = function(){
+  const nothingToImport = function(){
     alert($('c3_nothing_to_import_msg').value);
   };
   
-  var overwriteOnImport = function(event){
+  const overwriteOnImport = function(event){
     if(!confirm($('c3_overwrite_on_import_msg').value)){
       event.stop();
     }
   };
   
-  var doesOverwrite = function(){
-    var hasOverwrite = false;
+  const doesOverwrite = function(){
+    let hasOverwrite = false;
     $$('.cel_photo_overwrite').each(function(ele){
       hasOverwrite |= !(ele.getStyle('display') == 'none');
     });
     return hasOverwrite;
   };
   
-  var countChecked = function(){
-    var checkboxes = $$('.c3_import_checkbox_element');
-    var checkedFiles = 0;
+  const countChecked = function(){
+    const checkboxes = $$('.c3_import_checkbox_element');
+    let checkedFiles = 0;
     checkboxes.each(function(chkbox){
       if(chkbox.checked){ checkedFiles++; }
     });
@@ -69,10 +69,10 @@
     }
   };
   
-  var changeImportAction = function(elem) {
-    var chkboxspan = elem.up('.c3_import_row');
-    var actionspan = chkboxspan.down('.c3_import_action', 0);
-    var actionspanskip = chkboxspan.down('.c3_import_action', 1);
+  const changeImportAction = function(elem) {
+    const chkboxspan = elem.up('.c3_import_row');
+    const actionspan = chkboxspan.down('.c3_import_action', 0);
+    const actionspanskip = chkboxspan.down('.c3_import_action', 1);
     if(elem.checked){
       console.debug('show action, hide skip');
       actionspan.setStyle({display: ''});
@@ -84,21 +84,21 @@
     }
   };
   
-  var changeImportActionEvent = function(event) {
+  const changeImportActionEvent = function(event) {
     changeImportAction(event.element());
   };
   
-  var changeAndCount = function(event){
+  const changeAndCount = function(event){
     console.debug('clicked check box');
     changeImportActionEvent(event);
     countChecked();
   };
   
-  var preimport = function(event){
-    var origEvent = event.memo;
-    var src = "";
-    var filename = "";
-    var element = origEvent.target.down('.c3_file_link');
+  const pkreimport = function(event){
+    const origEvent = event.memo;
+    let src = "";
+    let filename = "";
+    const element = origEvent.target.down('.c3_file_link');
     element.siblings().each(function(sibl){
       if(sibl.name == 'c3_fb_file_src'){
         src = sibl.value;
@@ -107,7 +107,7 @@
       }
     });
     
-    var url = $('c3_preimport_url').value + "&attDoc=" + src + "&filename=" + filename;
+    const url = $('c3_preimport_url').value + "&attDoc=" + src + "&filename=" + filename;
     getProgressBar($('c3_title_preimport').value);
     new Ajax.Request(url, { 
       method: 'post', 
@@ -118,7 +118,8 @@
     }});
   };
   
-  var importNow = function(event) {
+  const importNow = function(event) {
+    event.stop();
     console.debug('start progress bar');
     getProgressBar($('c3_title_importing').value);
     console.debug('start ajax');
@@ -132,10 +133,9 @@
         resizeTab();
       }
     });
-    event.stop();
   };
 
-  var preimportChanged = function() {
+  const preimportChanged = function() {
     console.debug('import box content is ready');
     $$('.c3_import_checkbox_element').each(function(chkbox){
       chkbox.observe('click', changeAndCount);
@@ -168,7 +168,7 @@
     }
   };
   
-  var registerListener = function() {
+  const registerListener = function() {
     $('c3_import_box').stopObserving('preimport:changed', preimportChanged);
     $('c3_import_box').observe('preimport:changed', preimportChanged);
     $('c3_import_box').stopObserving('preimport:clickOnRow', preimport);
