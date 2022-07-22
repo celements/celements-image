@@ -112,25 +112,35 @@
     new Ajax.Request(url, { 
       method: 'post', 
       onComplete: function(transport){
-        $('c3_import_box').innerHTML = transport.responseText;
-        $('c3_import_box').fire("preimport:changed");
-        resizeTab();
+        updateImportBox(transport.responseText);
     }});
   };
   
+  const updateImportBox = function(newInnerHtml) {
+    $('c3_import_box').innerHTML = newInnerHtml;
+    $('c3_import_box').fire("preimport:changed");
+    try {
+      resizeTab();
+    } catch (e) {
+      console.error('resizeTab in updateImportBox failed ', e);
+    }
+  };
+
   const importNow = function(event) {
     event.stop();
     console.debug('start progress bar');
-    getProgressBar($('c3_title_importing').value);
+    try {
+      getProgressBar($('c3_title_importing').value);
+    } catch (e) {
+      console.error('getProgressBar failed ', e);
+    }
     console.debug('start ajax');
     console.debug('url is: "' + $('c3_import_url').value + '"');
     console.debug('params are: "' + $('importForm').serialize(true) + '"');
     new Ajax.Request($('c3_import_url').value, {
       parameters : $('importForm').serialize(true),
       onComplete : function(transport){
-        $('c3_import_box').innerHTML = transport.responseText;
-        $('c3_import_box').fire("preimport:changed");
-        resizeTab();
+        updateImportBox(transport.responseText);
       }
     });
   };
