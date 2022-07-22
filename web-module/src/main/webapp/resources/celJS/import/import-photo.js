@@ -94,7 +94,7 @@
     countChecked();
   };
   
-  const pkreimport = function(event){
+  const preimport = function(event){
     const origEvent = event.memo;
     let src = "";
     let filename = "";
