@@ -13,6 +13,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.cells.ICellWriter;
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.context.ModelContext;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.rendering.RenderCommand;
@@ -39,6 +40,9 @@ public class GalleryPresentationType implements IPresentationTypeRole<INavigatio
   IWebUtilsService webUtilsService;
 
   @Requirement
+  ModelContext context;
+
+  @Requirement
   Execution execution;
 
   private XWikiContext getContext() {
@@ -58,7 +62,7 @@ public class GalleryPresentationType implements IPresentationTypeRole<INavigatio
   @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
-    LOGGER.debug("writeNodeContent for [" + docRef + "].");
+    LOGGER.debug("writeNodeContent for [{}].", docRef);
     outStream.append("<div ");
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
         + " ");
@@ -74,10 +78,11 @@ public class GalleryPresentationType implements IPresentationTypeRole<INavigatio
       XWikiDocument slideDoc = getContext().getWiki().getDocument(docRef, getContext());
       vcontext.put("slidedoc", slideDoc.newDocument(getContext()));
       vcontext.put("slidenum", numItem);
-      return getRenderCommand().renderTemplatePath(templatePath, getContext().getLanguage());
+      String defaultLang = context.getDefaultLanguage();
+      return getRenderCommand().renderTemplatePath(templatePath,
+          context.getLanguage().orElse(defaultLang), defaultLang);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to render template path [" + templatePath + "] for [" + docRef + "].",
-          exp);
+      LOGGER.error("Failed to render template path [{}] for [{}].", templatePath, docRef, exp);
     }
     return "";
   }
