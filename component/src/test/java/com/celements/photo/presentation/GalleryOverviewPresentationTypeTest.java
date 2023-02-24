@@ -5,6 +5,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.ModelContext;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.rendering.RenderCommand;
@@ -36,10 +38,12 @@ public class GalleryOverviewPresentationTypeTest extends AbstractComponentTest {
   private GalleryOverviewPresentationType vtPresType;
   private TestRenderEngine testRenderEngine;
   private RenderCommand renderCmdMock;
+  private ModelContext modelContext;
 
   @Before
   public void setUp_RenderedContentPresentationTypeTest() throws Exception {
-    registerComponentMock(IModelAccessFacade.class);
+    registerComponentMocks(IModelAccessFacade.class, ModelContext.class);
+    modelContext = getMock(ModelContext.class);
     context = getContext();
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
@@ -70,6 +74,9 @@ public class GalleryOverviewPresentationTypeTest extends AbstractComponentTest {
 
   @Test
   public void testWriteNodeContent() throws Exception {
+    expect(modelContext.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(modelContext.getLanguage()).andReturn(Optional.of("fr")).anyTimes();
+    expect(modelContext.getXWikiContext()).andReturn(context).anyTimes();
     context.setLanguage("fr");
     context.put("vcontext", new VelocityContext());
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
@@ -90,7 +97,7 @@ public class GalleryOverviewPresentationTypeTest extends AbstractComponentTest {
         "ImageGalleryOverview");
     expect(getMock(IModelAccessFacade.class).exists(eq(templateRef))).andReturn(true).once();
     expect(renderCmdMock.renderTemplatePath(eq("Templates.ImageGalleryOverview"), eq(
-        "fr"))).andReturn(expectedNodeContent).once();
+        "fr"), eq("de"))).andReturn(expectedNodeContent).once();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).atLeastOnce();
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);

@@ -10,6 +10,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.ICellWriter;
+import com.celements.model.context.ModelContext;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.rendering.RenderCommand;
@@ -21,7 +22,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("galleryOverview")
 public class GalleryOverviewPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GalleryOverviewPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(GalleryOverviewPresentationType.class);
 
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
@@ -29,6 +31,9 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole<IN
 
   @Requirement
   IWebUtilsService webUtilsService;
+
+  @Requirement
+  ModelContext context;
 
   @Requirement
   Execution execution;
@@ -46,7 +51,7 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole<IN
   @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
-    LOGGER.debug("writeNodeContent for [" + docRef + "].");
+    LOGGER.debug("writeNodeContent for [{}].", docRef);
     outStream.append("<div ");
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
         + " ");
@@ -61,10 +66,11 @@ public class GalleryOverviewPresentationType implements IPresentationTypeRole<IN
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       XWikiDocument galleryDoc = getContext().getWiki().getDocument(docRef, getContext());
       vcontext.put("gallerydoc", galleryDoc.newDocument(getContext()));
-      return getRenderCommand().renderTemplatePath(templatePath, getContext().getLanguage());
+      String defaultLang = context.getDefaultLanguage();
+      return getRenderCommand().renderTemplatePath(templatePath,
+          context.getLanguage().orElse(defaultLang), defaultLang);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to render template path [" + templatePath + "] for [" + docRef + "].",
-          exp);
+      LOGGER.error("Failed to render template path [{}] for [{}].", templatePath, docRef, exp);
     }
     return "";
   }
