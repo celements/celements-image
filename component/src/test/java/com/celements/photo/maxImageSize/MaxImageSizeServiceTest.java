@@ -32,10 +32,10 @@ import java.util.regex.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class MaxImageSizeServiceTest extends AbstractBridgedComponentTestCase {
+public class MaxImageSizeServiceTest extends AbstractComponentTest {
 
   private MaxImageSizeService maxImageSizeService;
 

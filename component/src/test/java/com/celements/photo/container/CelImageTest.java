@@ -11,9 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 
-public class CelImageTest extends AbstractBridgedComponentTestCase {
+public class CelImageTest extends AbstractComponentTest {
 
   CelImage image;
 

@@ -1,5 +1,6 @@
 package com.celements.photo.service;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -11,7 +12,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWiki;
@@ -22,7 +23,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class ImageScriptServiceTest extends AbstractComponentTest {
 
   private static final String _ATT_AUTHOR_NAME = "User Name";
   private static final String _IMG_FILENAME = "myImage.jpg";
@@ -41,9 +42,9 @@ public class ImageScriptServiceTest extends AbstractBridgedComponentTestCase {
     xwiki = getWikiMock();
     imageScriptService = (ImageScriptService) Utils.getComponent(ScriptService.class,
         "celementsphoto");
-    urlFactoryMock = createMockAndAddToDefault(XWikiURLFactory.class);
+    urlFactoryMock = createDefaultMock(XWikiURLFactory.class);
     context.setURLFactory(urlFactoryMock);
-    imageServiceMock = createMockAndAddToDefault(IImageService.class);
+    imageServiceMock = createDefaultMock(IImageService.class);
     imageScriptService.imageService = imageServiceMock;
   }
 

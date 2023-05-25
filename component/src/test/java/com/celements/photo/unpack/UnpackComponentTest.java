@@ -1,5 +1,6 @@
 package com.celements.photo.unpack;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -14,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.filebase.AddingAttachmentContentFailedException;
 import com.celements.filebase.AttachmentToBigException;
 import com.celements.filebase.IAttachmentServiceRole;
@@ -26,7 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class UnpackComponentTest extends AbstractBridgedComponentTestCase {
+public class UnpackComponentTest extends AbstractComponentTest {
 
   private UnpackComponent upc;
   private XWiki xwiki;

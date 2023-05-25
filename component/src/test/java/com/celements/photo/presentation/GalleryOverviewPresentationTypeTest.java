@@ -48,14 +48,14 @@ public class GalleryOverviewPresentationTypeTest extends AbstractComponentTest {
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
-    nav = createMockAndAddToDefault(INavigation.class);
+    nav = createDefaultMock(INavigation.class);
     xwiki = getWikiMock();
     context.setWiki(xwiki);
     testRenderEngine = new TestRenderEngine();
     expect(xwiki.getRenderingEngine()).andReturn(testRenderEngine).anyTimes();
     vtPresType = (GalleryOverviewPresentationType) Utils.getComponent(IPresentationTypeRole.class,
         "galleryOverview");
-    renderCmdMock = createMockAndAddToDefault(RenderCommand.class);
+    renderCmdMock = createDefaultMock(RenderCommand.class);
     vtPresType.renderCmd = renderCmdMock;
   }
 
@@ -120,7 +120,7 @@ public class GalleryOverviewPresentationTypeTest extends AbstractComponentTest {
     private XWikiRenderingEngine mockRenderEngine;
 
     public TestRenderEngine() {
-      mockRenderEngine = createMockAndAddToDefault(XWikiRenderingEngine.class);
+      mockRenderEngine = createDefaultMock(XWikiRenderingEngine.class);
     }
 
     public XWikiRenderingEngine getMock() {
