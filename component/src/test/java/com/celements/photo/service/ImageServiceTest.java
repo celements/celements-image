@@ -1,5 +1,6 @@
 package com.celements.photo.service;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -17,7 +18,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.nextfreedoc.INextFreeDocRole;
@@ -36,7 +37,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class ImageServiceTest extends AbstractBridgedComponentTestCase {
+public class ImageServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private ImageService imageService;
@@ -52,16 +53,16 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
   public void setUp_ImageServiceTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    rightServiceMock = createMockAndAddToDefault(XWikiRightService.class);
+    rightServiceMock = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightServiceMock).anyTimes();
     imageService = (ImageService) getComponentManager().lookup(IImageService.class);
-    treeNodeServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
+    treeNodeServiceMock = createDefaultMock(ITreeNodeService.class);
     imageService.treeNodeService = treeNodeServiceMock;
     componentManager = Utils.getComponentManager();
     defaultNextFreeDocService = componentManager.lookup(INextFreeDocRole.class);
     componentManager.release(defaultNextFreeDocService);
     nextFreeDocDesc = componentManager.getComponentDescriptor(INextFreeDocRole.class, "default");
-    nextFreeDocMock = createMockAndAddToDefault(INextFreeDocRole.class);
+    nextFreeDocMock = createDefaultMock(INextFreeDocRole.class);
     componentManager.registerComponent(nextFreeDocDesc, nextFreeDocMock);
   }
 
@@ -232,7 +233,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
   public void testAddSlideFromTemplate() throws Exception {
     String editorUser = "XWiki.myEditor";
     context.setUser(editorUser);
-    AttachmentURLCommand attURLCmdMock = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLCmdMock = createDefaultMock(AttachmentURLCommand.class);
     imageService.attURLCmd = attURLCmdMock;
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "galleryDoc");
@@ -268,7 +269,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
         context))).andReturn(imgAttURL).once();
-    imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
+    imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
@@ -297,7 +298,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         "").once();
     expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
-    XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("");
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
@@ -320,7 +321,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
   public void testAddSlideFromTemplate_slideContentNull() throws Exception {
     String editorUser = "XWiki.myEditor";
     context.setUser(editorUser);
-    AttachmentURLCommand attURLCmdMock = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLCmdMock = createDefaultMock(AttachmentURLCommand.class);
     imageService.attURLCmd = attURLCmdMock;
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "galleryDoc");
@@ -356,7 +357,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
         context))).andReturn(imgAttURL).once();
-    imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
+    imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
@@ -385,7 +386,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         "").once();
     expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
-    XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn(null);
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
@@ -408,7 +409,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
   public void testAddSlideFromTemplate_with_caption() throws Exception {
     String editorUser = "XWiki.myEditor";
     context.setUser(editorUser);
-    AttachmentURLCommand attURLCmdMock = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLCmdMock = createDefaultMock(AttachmentURLCommand.class);
     imageService.attURLCmd = attURLCmdMock;
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "galleryDoc");
@@ -444,7 +445,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
     String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
         context))).andReturn(imgAttURL).once();
-    imageService.webUtilsService = createMockAndAddToDefault(IWebUtilsService.class);
+    imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
@@ -473,7 +474,7 @@ public class ImageServiceTest extends AbstractBridgedComponentTestCase {
         "").once();
     expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
-    XWikiRequest mockRequest = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("test content line");
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(

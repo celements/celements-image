@@ -24,7 +24,7 @@ public class ImageWebSearchPackageTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    LucenePlugin lucenePlugin = createMockAndAddToDefault(LucenePlugin.class);
+    LucenePlugin lucenePlugin = createDefaultMock(LucenePlugin.class);
     expect(getWikiMock().getPlugin(eq("lucene"), same(getContext())))
         .andReturn(lucenePlugin).anyTimes();
     expect(lucenePlugin.getAnalyzer()).andReturn(null).anyTimes();

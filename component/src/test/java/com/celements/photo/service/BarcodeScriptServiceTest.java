@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 
-public class BarcodeScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class BarcodeScriptServiceTest extends AbstractComponentTest {
 
   BarcodeScriptService bss;
 

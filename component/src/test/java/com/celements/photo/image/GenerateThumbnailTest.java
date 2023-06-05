@@ -11,10 +11,10 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.photo.container.ImageDimensions;
 
-public class GenerateThumbnailTest extends AbstractBridgedComponentTestCase {
+public class GenerateThumbnailTest extends AbstractComponentTest {
 
   private GenerateThumbnail genThum;
 

@@ -19,7 +19,6 @@
  */
 package com.celements.photo.plugin.cmd;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -37,7 +36,7 @@ public class ComputeImageCommandTest extends AbstractComponentTest {
 
   @Before
   public void setUp_ComputeImageCommandTest() throws Exception {
-    mockImgCacheCmd = createMockAndAddToDefault(ImageCacheCommand.class);
+    mockImgCacheCmd = createDefaultMock(ImageCacheCommand.class);
     computeImgCmd = new ComputeImageCommand();
     computeImgCmd.injectImageCacheCmd(mockImgCacheCmd);
   }

@@ -24,48 +24,35 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
-    <version>5.8</version>
+    <version>6.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-photo</artifactId>
-  <version>5.5-SNAPSHOT</version>
+  <version>6.0-SNAPSHOT</version>
   <description>Celements Photo</description>
-  <scm>
-    <connection>scm:git:git://github.com/celements/celements-photo</connection>
-    <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
-    <url>https://github.com/celements/celements-photo</url>
-    <tag>HEAD</tag>
-  </scm>
   <dependencies>
-    <!-- Add here all your dependencies -->
-    <dependency>
-      <groupId>com.celements</groupId>
-      <artifactId>celements-shared-tests-deprecated</artifactId>
-      <version>5.1</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-subsystem-migration-manager</artifactId>
-      <version>5.2</version>
+      <version>6.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
-      <version>5.7</version>
+      <version>6.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-core</artifactId>
-      <version>5.11</version>
+      <version>6.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-search</artifactId>
-      <version>5.7</version>
+      <version>6.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -125,4 +112,10 @@
       <version>4.3.1</version>
     </dependency>
   </dependencies>
+  <scm>
+    <connection>scm:git:git://github.com/celements/celements-photo</connection>
+    <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
+    <url>https://github.com/celements/celements-photo/component</url>
+    <tag>HEAD</tag>
+  </scm>
 </project>
