@@ -1,6 +1,5 @@
 package com.celements.photo.service;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -9,11 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -34,7 +30,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class ImageServiceTest extends AbstractComponentTest {
@@ -44,32 +39,17 @@ public class ImageServiceTest extends AbstractComponentTest {
   private XWiki xwiki;
   private XWikiRightService rightServiceMock;
   private ITreeNodeService treeNodeServiceMock;
-  private INextFreeDocRole defaultNextFreeDocService;
-  private ComponentManager componentManager;
   private INextFreeDocRole nextFreeDocMock;
-  private ComponentDescriptor<INextFreeDocRole> nextFreeDocDesc;
 
   @Before
-  public void setUp_ImageServiceTest() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
+  public void setUp() throws Exception {
+    context = getXContext();
+    xwiki = getMock(XWiki.class);
     rightServiceMock = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightServiceMock).anyTimes();
-    imageService = (ImageService) getComponentManager().lookup(IImageService.class);
-    treeNodeServiceMock = createDefaultMock(ITreeNodeService.class);
-    imageService.treeNodeService = treeNodeServiceMock;
-    componentManager = Utils.getComponentManager();
-    defaultNextFreeDocService = componentManager.lookup(INextFreeDocRole.class);
-    componentManager.release(defaultNextFreeDocService);
-    nextFreeDocDesc = componentManager.getComponentDescriptor(INextFreeDocRole.class, "default");
-    nextFreeDocMock = createDefaultMock(INextFreeDocRole.class);
-    componentManager.registerComponent(nextFreeDocDesc, nextFreeDocMock);
-  }
-
-  @After
-  public void teardown_ImageServiceTest() throws Exception {
-    componentManager.release(nextFreeDocMock);
-    componentManager.registerComponent(nextFreeDocDesc, defaultNextFreeDocService);
+    treeNodeServiceMock = registerComponentMock(ITreeNodeService.class);
+    nextFreeDocMock = registerComponentMock(INextFreeDocRole.class);
+    imageService = getBeanFactory().getBean(ImageService.class);
   }
 
   @Test
@@ -270,7 +250,7 @@ public class ImageServiceTest extends AbstractComponentTest {
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
         context))).andReturn(imgAttURL).once();
     imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
-    DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(),
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
     expect(webUtils.resolveDocumentReference(eq("ContentAttachment.FileBaseDoc"))).andReturn(
@@ -294,9 +274,9 @@ public class ImageServiceTest extends AbstractComponentTest {
         "Templates", "ImageSlideImportContent");
     expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), eq(context.getLanguage()),
         eq("de"))).andReturn("content").once();
-    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(getContext()))).andReturn(
+    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(context))).andReturn(
         "").once();
-    expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
+    expect(xwiki.exists(eq(attDocRef), same(context))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
     XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("");
@@ -306,7 +286,7 @@ public class ImageServiceTest extends AbstractComponentTest {
     expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide"
         + clearedAttFilename))).andReturn(slideDocRef);
     expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), same(
-        getContext()))).andReturn(clearedAttFilename).once();
+        context))).andReturn(clearedAttFilename).once();
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(galleryDocRef,
         "Slide", attFullName));
@@ -358,7 +338,7 @@ public class ImageServiceTest extends AbstractComponentTest {
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
         context))).andReturn(imgAttURL).once();
     imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
-    DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(),
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
     expect(webUtils.resolveDocumentReference(eq("ContentAttachment.FileBaseDoc"))).andReturn(
@@ -382,9 +362,9 @@ public class ImageServiceTest extends AbstractComponentTest {
         "Templates", "ImageSlideImportContent");
     expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), eq(context.getLanguage()),
         eq("de"))).andReturn("content").once();
-    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(getContext()))).andReturn(
+    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(context))).andReturn(
         "").once();
-    expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
+    expect(xwiki.exists(eq(attDocRef), same(context))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
     XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn(null);
@@ -394,7 +374,7 @@ public class ImageServiceTest extends AbstractComponentTest {
     expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide"
         + clearedAttFilename))).andReturn(slideDocRef);
     expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), same(
-        getContext()))).andReturn(clearedAttFilename).once();
+        context))).andReturn(clearedAttFilename).once();
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(galleryDocRef,
         "Slide", attFullName));
@@ -446,7 +426,7 @@ public class ImageServiceTest extends AbstractComponentTest {
     expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
         context))).andReturn(imgAttURL).once();
     imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
-    DocumentReference attDocRef = new DocumentReference(getContext().getDatabase(),
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
     expect(webUtils.resolveDocumentReference(eq("ContentAttachment.FileBaseDoc"))).andReturn(
@@ -470,9 +450,9 @@ public class ImageServiceTest extends AbstractComponentTest {
         "Templates", "ImageSlideImportContent");
     expect(webUtils.renderInheritableDocument(eq(imgImportContentRef), eq(context.getLanguage()),
         eq("de"))).andReturn("content").once();
-    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(getContext()))).andReturn(
+    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(context))).andReturn(
         "").once();
-    expect(xwiki.exists(eq(attDocRef), same(getContext()))).andReturn(true);
+    expect(xwiki.exists(eq(attDocRef), same(context))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
     XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("test content line");
@@ -482,7 +462,7 @@ public class ImageServiceTest extends AbstractComponentTest {
     expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide"
         + clearedAttFilename))).andReturn(slideDocRef);
     expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), same(
-        getContext()))).andReturn(clearedAttFilename).once();
+        context))).andReturn(clearedAttFilename).once();
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(galleryDocRef,
         "Slide", attFullName));
@@ -649,13 +629,13 @@ public class ImageServiceTest extends AbstractComponentTest {
   @Test
   public void testGetActionForFile_noAtts() {
     String fileName = "test.jpg";
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(context.getDatabase(), "S",
         "D"));
-    getContext().setDoc(doc);
+    context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
     importClassObj.setXClassReference(imageService.getImportClassRef());
     doc.addXObject(importClassObj);
-    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))).andReturn(
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(context))).andReturn(
         fileName);
     replayDefault();
     assertEquals(ImportFileObject.ACTION_ADD, imageService.getActionForFile(fileName, doc));
@@ -665,18 +645,18 @@ public class ImageServiceTest extends AbstractComponentTest {
   @Test
   public void testGetActionForFile_otherAtts() throws XWikiException {
     String fileName = "test.jpg";
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(context.getDatabase(), "S",
         "D"));
-    getContext().setDoc(doc);
+    context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
     importClassObj.setXClassReference(imageService.getImportClassRef());
     doc.addXObject(importClassObj);
     XWikiAttachment att = new XWikiAttachment();
     att.setFilename("otherFile.jpg");
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     attList.add(att);
     doc.setAttachmentList(attList);
-    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))).andReturn(
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(context))).andReturn(
         fileName);
     replayDefault();
     assertEquals(ImportFileObject.ACTION_ADD, imageService.getActionForFile(fileName, doc));
@@ -686,13 +666,13 @@ public class ImageServiceTest extends AbstractComponentTest {
   @Test
   public void testGetActionForFile_hasAtt() throws XWikiException {
     String fileName = "test.jpg";
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(context.getDatabase(), "S",
         "D"));
-    getContext().setDoc(doc);
+    context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
     importClassObj.setXClassReference(imageService.getImportClassRef());
     doc.addXObject(importClassObj);
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     XWikiAttachment att = new XWikiAttachment();
     att.setFilename("otherFile.jpg");
     attList.add(att);
@@ -700,7 +680,7 @@ public class ImageServiceTest extends AbstractComponentTest {
     att.setFilename(fileName);
     attList.add(att);
     doc.setAttachmentList(attList);
-    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))).andReturn(
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(context))).andReturn(
         fileName);
     replayDefault();
     assertEquals(ImportFileObject.ACTION_OVERWRITE, imageService.getActionForFile(fileName, doc));
@@ -710,18 +690,18 @@ public class ImageServiceTest extends AbstractComponentTest {
   @Test
   public void testGetActionForFile_hasAttZip() throws XWikiException {
     String fileName = "test.jpg";
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(context.getDatabase(), "S",
         "D"));
-    getContext().setDoc(doc);
+    context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
     importClassObj.setXClassReference(imageService.getImportClassRef());
     doc.addXObject(importClassObj);
     XWikiAttachment att = new XWikiAttachment();
     att.setFilename(fileName + ".zip");
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     attList.add(att);
     doc.setAttachmentList(attList);
-    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(getContext()))).andReturn(
+    expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(context))).andReturn(
         fileName);
     replayDefault();
     assertEquals(ImportFileObject.ACTION_ADD, imageService.getActionForFile(fileName, doc));

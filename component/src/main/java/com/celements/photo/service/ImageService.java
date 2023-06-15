@@ -58,30 +58,30 @@ public class ImageService implements IImageService {
   private static final Logger LOGGER = LoggerFactory.getLogger(ImageService.class);
 
   @Requirement
-  EntityReferenceResolver<String> stringRefResolver;
+  private EntityReferenceResolver<String> stringRefResolver;
 
   @Requirement("celements.oldCoreClasses")
-  IClassCollectionRole oldCoreClasses;
+  private IClassCollectionRole oldCoreClasses;
 
   @Requirement("celements.celNavigationClasses")
-  IClassCollectionRole navigationClasses;
+  private IClassCollectionRole navigationClasses;
 
   @Requirement
   IWebUtilsService webUtilsService;
 
   @Requirement
-  ITreeNodeService treeNodeService;
+  private ITreeNodeService treeNodeService;
 
-  NextFreeDocNameCommand nextFreeDocNameCmd;
+  private NextFreeDocNameCommand nextFreeDocNameCmd;
 
   @Requirement
   private ILuceneSearchService searchService;
 
   @Requirement
-  IAttachmentServiceRole attService;
+  private IAttachmentServiceRole attService;
 
   @Requirement
-  Execution execution;
+  private Execution execution;
 
   AttachmentURLCommand attURLCmd;
 
