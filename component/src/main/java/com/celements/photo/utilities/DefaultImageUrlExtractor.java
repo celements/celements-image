@@ -1,5 +1,7 @@
 package com.celements.photo.utilities;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,12 +44,20 @@ public class DefaultImageUrlExtractor implements ImageUrlExtractor {
     Matcher m = IMG_FROM_HTML_PATTERN.matcher(content);
     while (m.find()) {
       try {
-        imageUrls.add(new ImageUrl.Builder(m.group(1)).build());
+        String url = m.group(1);
+        imageUrls.add(new ImageUrl.Builder(convertToAbsoluteImageUrl(url)).build());
       } catch (IllegalImageUrlException iiue) {
         LOGGER.info("ImageUrl only works for relative URLs. Failed for {}", iiue.getUrl());
       }
     }
     return imageUrls;
+  }
+
+  private String convertToAbsoluteImageUrl(String url) {
+    if (checkNotNull(url).startsWith("../../download/")) {
+      return url.replace("../../download/", "/download/");
+    }
+    return url;
   }
 
   // TODO CELDEV-474 On reuse resolve the issue

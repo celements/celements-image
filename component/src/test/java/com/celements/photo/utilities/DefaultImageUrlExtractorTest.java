@@ -46,6 +46,21 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_extractImageUrlList_crop() {
+    List<ImageUrl> imgUrls = article.extractImageUrlList("<h5><span style=\"color: #333333;"
+        + " font-family: FrutigerLTStd, Arial, sans-serif; font-size: 14px;\"><img width=\"120\""
+        + " height=\"120\" class=\"celanim_addCounterNone celanim_autostartnostop"
+        + " celanim_overlayautostart celanim_addCounterOverlayNone\" style=\"border: 0px;\""
+        + " src=\"../../download/Content_attachments/FileBaseDoc/steien-edito-06-23.jpg"
+        + "?celwidth=120&amp;celheight=120&amp;cropX=411&amp;cropY=292&amp;cropW=664&amp;"
+        + "cropH=664&amp;\" border=\"0\" />Editorial aus <br />dem Juniheft 2023<br /></span><b>"
+        + "</b></h5>\\n<p class=\"p1\"><span class=\"s1\">Bye-bye «Kinostrasse»</span></p>\\n<p>"
+        + "<b><span style=\"color: black; font-family: CharterEF-Regular, Arial, sans-serif;"
+        + " font-style: italic;\">Sabine Knosala</span></b></p>");
+    assertEquals(1, imgUrls.size());
+  }
+
+  @Test
   public void testExtractImageUrlList_multipleImage() {
     String action1 = "skin";
     String filename1 = "file1.png";
@@ -110,8 +125,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
     try {
       new ImageUrl.Builder("https://www.test.url/download/images/imgurl/test.jpg").build();
       fail("Expected IllegalImageUrlException");
-    } catch (IllegalImageUrlException e) {
-    }
+    } catch (IllegalImageUrlException e) {}
   }
 
   @Test
