@@ -28,12 +28,12 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testExtractImageUrlList_noImage() {
+  public void test_extractImageUrlList_noImage() {
     assertTrue(article.extractImageUrlList("<div>hi there, no images to see!</div>").isEmpty());
   }
 
   @Test
-  public void testExtractImageUrlList_oneImage() {
+  public void test_extractImageUrlList_oneImage() {
     String action = "skin";
     String filename = "file.png";
     List<ImageUrl> imgUrls = article.extractImageUrlList("<div>hi there, no images to see!</div>"
@@ -61,7 +61,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testExtractImageUrlList_multipleImage() {
+  public void test_extractImageUrlList_multipleImage() {
     String action1 = "skin";
     String filename1 = "file1.png";
     String action2 = "file";
@@ -83,7 +83,7 @@ public class DefaultImageUrlExtractorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testExtractImagesSocialMediaUrlList() throws Exception {
+  public void test_extractImagesSocialMediaUrlList() throws Exception {
     String domain = "http://www.celements.ch";
     String url1 = getAndExpectUrl(domain, "skin", "Space", "Doc", "image1.png",
         "?celwidth=400&celheight=300", true);

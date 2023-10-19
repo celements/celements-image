@@ -52,9 +52,9 @@
     <finalName>image-web</finalName>
   </build>
   <scm>
-    <connection>scm:git:git://github.com/celements/celements-photo</connection>
-    <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
-    <url>https://github.com/celements/celements-photo/web-module</url>
+    <connection>scm:git:git://github.com/celements/celements-image</connection>
+    <developerConnection>scm:git:git@github.com:celements/celements-image.git</developerConnection>
+    <url>https://github.com/celements/celements-image/web-module</url>
     <tag>HEAD</tag>
   </scm>
 </project>
