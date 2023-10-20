@@ -27,9 +27,9 @@
     <version>6.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>celements-photo</artifactId>
+  <artifactId>celements-image</artifactId>
   <version>6.1-SNAPSHOT</version>
-  <description>Celements Photo</description>
+  <description>Celements Image</description>
   <dependencies>
     <dependency>
       <groupId>com.celements</groupId>
@@ -115,9 +115,9 @@
     </dependency>
   </dependencies>
   <scm>
-    <connection>scm:git:git://github.com/celements/celements-photo</connection>
-    <developerConnection>scm:git:git@github.com:celements/celements-photo.git</developerConnection>
-    <url>https://github.com/celements/celements-photo/component</url>
+    <connection>scm:git:git://github.com/celements/celements-image</connection>
+    <developerConnection>scm:git:git@github.com:celements/celements-image.git</developerConnection>
+    <url>https://github.com/celements/celements-image/component</url>
     <tag>HEAD</tag>
   </scm>
 </project>
