@@ -45,7 +45,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-image</artifactId>
-      <version>6.1-SNAPSHOT</version>
+      <version>6.1</version>
     </dependency>
   </dependencies>
   <build>
