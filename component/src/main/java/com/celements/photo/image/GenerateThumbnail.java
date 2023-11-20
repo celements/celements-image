@@ -625,10 +625,10 @@ public class GenerateThumbnail {
     g2d.setColor(new Color(0, 0, 0));
     AlphaComposite transprency = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f);
     g2d.setComposite(transprency);
-    g2d.fillRoundRect(width - metrics.stringWidth(copyright) - rightSpace - (2 * hSpacing), height
-        - stringHeight - bottomSpace - (2 * vSpacing),
-        metrics.stringWidth(copyright) + (2
-            * hSpacing),
+    g2d.fillRoundRect(
+        width - metrics.stringWidth(copyright) - rightSpace - (2 * hSpacing),
+        height - stringHeight - bottomSpace - (2 * vSpacing),
+        metrics.stringWidth(copyright) + (2 * hSpacing),
         stringHeight + (2 * vSpacing), rounding, rounding);
   }
 
