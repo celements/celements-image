@@ -1,5 +1,6 @@
 package com.celements.photo.image;
 
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.awt.Color;
@@ -8,11 +9,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import org.apache.commons.imaging.ImageReadException;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.photo.container.ImageDimensions;
+import com.celements.photo.plugin.cmd.DecodeImageCommand;
+import com.xpn.xwiki.XWikiException;
 
 public class GenerateThumbnailTest extends AbstractComponentTest {
 
@@ -94,6 +98,16 @@ public class GenerateThumbnailTest extends AbstractComponentTest {
     out.close();
     assertEquals(495, outImg.getWidth(null));
     assertEquals(247, outImg.getHeight(null));
+  }
+
+  @Test
+  public void test_decodeImage_ImageReadException() throws Exception {
+    var is = new ByteArrayInputStream(new byte[0]);
+    var cmdMock = createDefaultMock(DecodeImageCommand.class);
+    expect(cmdMock.readImage(same(is), eq(""), same(null))).andThrow(new ImageReadException(""));
+    replayDefault();
+    assertThrows(XWikiException.class, () -> genThum.decodeImage(is, cmdMock));
+    verifyDefault();
   }
 
 }

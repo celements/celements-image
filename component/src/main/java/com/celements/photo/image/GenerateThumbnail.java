@@ -654,6 +654,10 @@ public class GenerateThumbnail {
    */
   @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
+    return decodeImage(in, new DecodeImageCommand());
+  }
+
+  BufferedImage decodeImage(InputStream in, DecodeImageCommand cmd) throws XWikiException {
     boolean markSupported = in.markSupported();
     try (ByteArrayOutputStream convertOut = new ByteArrayOutputStream()) {
       // URLConnection.guessContentTypeFromStream needs a stream supporting mark
@@ -667,8 +671,7 @@ public class GenerateThumbnail {
         // NOTICE: ByteArrayInputStream supports mark and marks by default on position 0
         in = new ByteArrayInputStream(convertOut.toByteArray());
       }
-      return new DecodeImageCommand()
-          .readImage(in, "", URLConnection.guessContentTypeFromStream(in))
+      return cmd.readImage(in, "", URLConnection.guessContentTypeFromStream(in))
           .getFirstImage();
     } catch (ImageReadException | IOException e) {
       throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
