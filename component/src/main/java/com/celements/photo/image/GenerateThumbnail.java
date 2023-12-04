@@ -83,8 +83,7 @@ public class GenerateThumbnail {
     return map;
   }
 
-  public GenerateThumbnail() {
-  }
+  public GenerateThumbnail() {}
 
   /**
    * Calculates an ImageDimensions object, containing the width and height of a
@@ -626,9 +625,11 @@ public class GenerateThumbnail {
     g2d.setColor(new Color(0, 0, 0));
     AlphaComposite transprency = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f);
     g2d.setComposite(transprency);
-    g2d.fillRoundRect(width - metrics.stringWidth(copyright) - rightSpace - (2 * hSpacing), height
-        - stringHeight - bottomSpace - (2 * vSpacing), metrics.stringWidth(copyright) + (2
-            * hSpacing), stringHeight + (2 * vSpacing), rounding, rounding);
+    g2d.fillRoundRect(
+        width - metrics.stringWidth(copyright) - rightSpace - (2 * hSpacing),
+        height - stringHeight - bottomSpace - (2 * vSpacing),
+        metrics.stringWidth(copyright) + (2 * hSpacing),
+        stringHeight + (2 * vSpacing), rounding, rounding);
   }
 
   private void drawString(String copyright, int width, int height, int bottomSpace, int rightSpace,
@@ -653,11 +654,12 @@ public class GenerateThumbnail {
    */
   @Deprecated
   public BufferedImage decodeImage(InputStream in) throws XWikiException {
-    CelImage celImage = null;
-    ByteArrayOutputStream convertOut = null;
+    return decodeImage(in, new DecodeImageCommand());
+  }
+
+  BufferedImage decodeImage(InputStream in, DecodeImageCommand cmd) throws XWikiException {
     boolean markSupported = in.markSupported();
-    try {
-      convertOut = new ByteArrayOutputStream();
+    try (ByteArrayOutputStream convertOut = new ByteArrayOutputStream()) {
       // URLConnection.guessContentTypeFromStream needs a stream supporting mark
       if (!markSupported) {
         byte[] buffer = new byte[1024];
@@ -669,12 +671,9 @@ public class GenerateThumbnail {
         // NOTICE: ByteArrayInputStream supports mark and marks by default on position 0
         in = new ByteArrayInputStream(convertOut.toByteArray());
       }
-      DecodeImageCommand decodeImageCommand = new DecodeImageCommand();
-      celImage = decodeImageCommand.readImage(in, "", URLConnection.guessContentTypeFromStream(in));
-    } catch (ImageReadException e) {
-      LOGGER.error("Could not read image!", e);
-    } catch (IOException e) {
-      LOGGER.error("Could not open the file! ", e);
+      return cmd.readImage(in, "", URLConnection.guessContentTypeFromStream(in))
+          .getFirstImage();
+    } catch (ImageReadException | IOException e) {
       throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
           XWikiException.ERROR_XWIKI_UNKNOWN, "Could not decode the image file.", e);
     } finally {
@@ -685,15 +684,7 @@ public class GenerateThumbnail {
           LOGGER.error("Closing input stream failed", ioe);
         }
       }
-      if (convertOut != null) {
-        try {
-          convertOut.close();
-        } catch (IOException ioe) {
-          LOGGER.error("Closing input stream failed", ioe);
-        }
-      }
     }
-    return celImage.getFirstImage();
   }
 
   /**
