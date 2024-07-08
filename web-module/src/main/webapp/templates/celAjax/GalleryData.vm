@@ -38,7 +38,7 @@ $jsonBuilder.addBoolean($isNewImageGallery)
   #set($galleryLayout = $albumObj.getProperty('galleryLayout').getValue())
   $jsonBuilder.addStringProperty('galleryLayout', "$!galleryLayout")
   #set($gallerySlidesDocRef = $services.model.createDocumentReference('', "$!{gallerySpace}", ''))
-  #set($slidesMenu = $xwiki.celementsweb.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
+  #set($slidesMenu = $services.treeNode.getSubNodesForParentRef($gallerySlidesDocRef.lastSpaceReference))
   #set($numberOfImages = $slidesMenu.size())
 #else
   #set($numberOfImages = $attachments.size())
