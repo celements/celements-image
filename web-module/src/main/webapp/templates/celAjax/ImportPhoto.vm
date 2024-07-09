@@ -41,7 +41,7 @@
     #set($helpNav = $xwiki.celementsweb.createNavigation())
     #set($menuSpaceRef = $services.model.createDocumentReference('', $menuSpace, '').lastSpaceReference)
     ## get $menu with list of all menu items in space
-    #set($menu = $celementsweb.getSubNodesForParentRef($menuSpaceRef))
+    #set($menu = $services.treeNode.getSubNodesForParentRef($menuSpaceRef))
     #foreach($item in $menu)
       #set($itemName = '')
       #set($menuName = '')
