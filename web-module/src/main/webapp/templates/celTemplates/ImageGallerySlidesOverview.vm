@@ -30,7 +30,7 @@
 #set($gallerySpace = $navObj.getProperty('menu_space').getValue())
 #set($galleryLayout = $albumobj.getProperty('galleryLayout').getValue())
 #set($galleryLayoutRef = $services.model.createDocumentReference('', "$!{galleryLayout}", '').getLastSpaceReference())
-#if(("$!galleryLayout" == '') || !$celementsweb.layoutExists($galleryLayoutRef))
+#if(("$!galleryLayout" == '') || !$services.layout.layoutExists($galleryLayoutRef))
 #set($galleryLayout = 'SimpleLayout')
 #set($galleryLayoutRef = $services.model.createDocumentReference('', "SimpleLayout", '').getLastSpaceReference())
 #end
