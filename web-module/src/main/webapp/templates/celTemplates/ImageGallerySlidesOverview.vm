@@ -36,7 +36,7 @@
 #end
 #if(!$recursiveCheck)
 #set($recursiveCheck = true)
-#set($slideContent = $celementsweb.renderCelementsDocumentWithLayout($slideDocRef, $galleryLayoutRef))
+#set($slideContent = $services.layout.renderCelementsDocumentWithLayout($slideDocRef, $galleryLayoutRef))
 #end
 #set($recursiveCheck = false)
 #set($imgCssClasses = "celimagelayout_${galleryLayout} celimage_slideshow")
