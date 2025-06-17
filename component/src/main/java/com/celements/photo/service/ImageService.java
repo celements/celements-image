@@ -27,9 +27,12 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.photo.container.ImageDimensions;
 import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.image.GenerateThumbnail;
@@ -41,8 +44,8 @@ import com.celements.search.lucene.LuceneSearchResult;
 import com.celements.search.lucene.query.LuceneQuery;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
-import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -72,7 +75,8 @@ public class ImageService implements IImageService {
   @Requirement
   private ITreeNodeService treeNodeService;
 
-  private NextFreeDocNameCommand nextFreeDocNameCmd;
+  @Requirement
+  private INextFreeDocRole nextFreeDocName;
 
   @Requirement
   private ILuceneSearchService searchService;
@@ -81,12 +85,15 @@ public class ImageService implements IImageService {
   private IAttachmentServiceRole attService;
 
   @Requirement
-  private Execution execution;
+  private ModelContext modelContext;
+
+  @Requirement
+  private ModelUtils modelUtils;
 
   AttachmentURLCommand attURLCmd;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    return modelContext.getXWikiContext();
   }
 
   private OldCoreClasses getOldCoreClasses() {
@@ -99,7 +106,7 @@ public class ImageService implements IImageService {
 
   @Override
   public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef) throws XWikiException {
-    XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef, getContext());
+    XWikiDocument galleryDoc = getXWiki().getDocument(galleryDocRef, getContext());
     BaseObject galleryObj = galleryDoc.getXObject(getOldCoreClasses().getPhotoAlbumClassRef(
         getContext().getDatabase()));
     return galleryObj;
@@ -108,7 +115,7 @@ public class ImageService implements IImageService {
   @Override
   public BaseObject getPhotoAlbumNavObject(DocumentReference galleryDocRef) throws XWikiException,
       NoGalleryDocumentException {
-    XWikiDocument galleryDoc = getContext().getWiki().getDocument(galleryDocRef, getContext());
+    XWikiDocument galleryDoc = getXWiki().getDocument(galleryDocRef, getContext());
     BaseObject navObj = galleryDoc.getXObject(getNavigationClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     if (navObj == null) {
@@ -176,7 +183,7 @@ public class ImageService implements IImageService {
   @Override
   public ImageDimensions getDimension(AttachmentReference imgRef) throws XWikiException {
     DocumentReference docRef = (DocumentReference) imgRef.getParent();
-    XWikiDocument theDoc = getContext().getWiki().getDocument(docRef, getContext());
+    XWikiDocument theDoc = getXWiki().getDocument(docRef, getContext());
     XWikiAttachment theAttachment = theDoc.getAttachment(imgRef.getName());
     ImageDimensions imageDimensions = null;
     GenerateThumbnail genThumbnail = new GenerateThumbnail();
@@ -206,7 +213,7 @@ public class ImageService implements IImageService {
   @Override
   public List<Attachment> getRandomImages(DocumentReference galleryRef, int num) {
     try {
-      Document imgDoc = getContext().getWiki().getDocument(galleryRef, getContext()).newDocument(
+      Document imgDoc = getXWiki().getDocument(galleryRef, getContext()).newDocument(
           getContext());
       List<Attachment> allImagesList = webUtilsService.getAttachmentListSorted(imgDoc,
           "AttachmentAscendingNameComparator", true);
@@ -243,13 +250,6 @@ public class ImageService implements IImageService {
     }
   }
 
-  private NextFreeDocNameCommand getNextFreeDocNameCmd() {
-    if (this.nextFreeDocNameCmd == null) {
-      this.nextFreeDocNameCmd = new NextFreeDocNameCommand();
-    }
-    return this.nextFreeDocNameCmd;
-  }
-
   private AttachmentURLCommand getAttURLCmd() {
     if (attURLCmd == null) {
       attURLCmd = new AttachmentURLCommand();
@@ -260,10 +260,10 @@ public class ImageService implements IImageService {
   @Override
   public boolean checkAddSlideRights(DocumentReference galleryDocRef) {
     try {
-      DocumentReference newSlideDocRef = getNextFreeDocNameCmd().getNextTitledPageDocRef(
-          getPhotoAlbumSpaceRef(galleryDocRef).getName(), "Testname", getContext());
+      DocumentReference newSlideDocRef = nextFreeDocName.getNextTitledPageDocRef(
+          getPhotoAlbumSpaceRef(galleryDocRef), "Testname");
       String newSlideDocFN = webUtilsService.getRefDefaultSerializer().serialize(newSlideDocRef);
-      return (getContext().getWiki().getRightService().hasAccessLevel("edit",
+      return (getXWiki().getRightService().hasAccessLevel("edit",
           getContext().getUser(), newSlideDocFN, getContext()));
     } catch (XWikiException exp) {
       LOGGER.error("failed to checkAddSlideRights for [" + galleryDocRef + "].", exp);
@@ -278,25 +278,24 @@ public class ImageService implements IImageService {
   public boolean addSlideFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
       String attFullName) {
     try {
-      DocumentReference slideTemplateRef = getImageSlideTemplateRef();
-      String gallerySpaceName = getPhotoAlbumSpaceRef(galleryDocRef).getName();
+      DocumentReference slideTemplateRef = getImageSlideTemplateRef();;
       String filename = attFullName.replaceAll("^.*;(.*)$", "$1");
-      String clearedAttName = getContext().getWiki().clearName(filename.replaceAll(
+      String clearedAttName = getXWiki().clearName(filename.replaceAll(
           "^(.*)\\.[a-zA-Z]{3,4}$", "$1"), true, true, getContext());
       String slideDocName = slideBaseName + clearedAttName;
       Map<String, String> metaTagMap = Collections.emptyMap();
       DocumentReference attDocRef = webUtilsService.resolveDocumentReference(attFullName.replaceAll(
           "^(.*);.*$", "$1"));
       DocumentReference centralFBDocRef = null;
-      String centralFB = getContext().getWiki().getWebPreference("cel_centralfilebase",
+      String centralFB = getXWiki().getWebPreference("cel_centralfilebase",
           getContext());
       if ((centralFB != null) && !"".equals(centralFB.trim())) {
         centralFBDocRef = webUtilsService.resolveDocumentReference(centralFB);
       }
-      if (getContext().getWiki().exists(attDocRef, getContext()) && !attDocRef.equals(
+      if (getXWiki().exists(attDocRef, getContext()) && !attDocRef.equals(
           centralFBDocRef)) {
         LOGGER.debug("get meta tags from attachment document " + attDocRef);
-        XWikiDocument attDoc = getContext().getWiki().getDocument(attDocRef, getContext());
+        XWikiDocument attDoc = getXWiki().getDocument(attDocRef, getContext());
         metaTagMap = getMetaTagObjectsFromDoc(attDoc);
       } else if (attDocRef.equals(centralFBDocRef)) {
         LOGGER.debug("get meta tags for central file base image" + attDocRef);
@@ -318,7 +317,7 @@ public class ImageService implements IImageService {
         LOGGER.debug("addSlideFromTemplate: DMS-Document for " + filename + " found: "
             + resultList.size());
         if (resultList.size() > 0) {
-          XWikiDocument separateDoc = getContext().getWiki().getDocument(new DocumentReference(
+          XWikiDocument separateDoc = getXWiki().getDocument(new DocumentReference(
               resultList.get(0)), getContext());
           metaTagMap = getMetaTagObjectsFromDoc(separateDoc);
         } else {
@@ -336,13 +335,13 @@ public class ImageService implements IImageService {
         LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not"
             + "exist and is not central file base " + centralFBDocRef);
       }
-      DocumentReference newSlideDocRef = getNextFreeDocNameCmd().getNextTitledPageDocRef(
-          gallerySpaceName, slideDocName, getContext());
-      if (getContext().getWiki().copyDocument(slideTemplateRef, newSlideDocRef, true,
+      DocumentReference newSlideDocRef = nextFreeDocName.getNextTitledPageDocRef(
+          getPhotoAlbumSpaceRef(galleryDocRef), slideDocName);
+      if (getXWiki().copyDocument(slideTemplateRef, newSlideDocRef, true,
           getContext())) {
-        XWikiDocument newSlideDoc = getContext().getWiki().getDocument(newSlideDocRef,
+        XWikiDocument newSlideDoc = getXWiki().getDocument(newSlideDocRef,
             getContext());
-        newSlideDoc.setDefaultLanguage(webUtilsService.getDefaultLanguage(gallerySpaceName));
+        newSlideDoc.setDefaultLanguage(webUtilsService.getDefaultLanguage(getPhotoAlbumSpaceRef(galleryDocRef).getName()));
         // TODO refactor and use com.celements.web.plugin.cmd.CreateDocumentCommand instead
         Date creationDate = new Date();
         newSlideDoc.setLanguage("");
@@ -366,7 +365,7 @@ public class ImageService implements IImageService {
             getContext().getLanguage(), webUtilsService.getDefaultLanguage());
         newSlideDoc.setContent(slideContent);
         fixMenuItemPosition(newSlideDoc);
-        getContext().getWiki().saveDocument(newSlideDoc, "add default image slide" + " content",
+        getXWiki().saveDocument(newSlideDoc, "add default image slide" + " content",
             true, getContext());
         return true;
       } else {
@@ -383,8 +382,8 @@ public class ImageService implements IImageService {
 
   Map<String, String> getMetaTagObjectsFromDoc(XWikiDocument attDoc) {
     Map<String, String> metaTagMap = new HashMap<>();
-    DocumentReference tagClassRef = webUtilsService.resolveDocumentReference(
-        "Classes.PhotoMetainfoClass");
+    DocumentReference tagClassRef = modelUtils.resolveRef(
+        "Classes.PhotoMetainfoClass", DocumentReference.class);
     List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
     if (metaObjs != null) {
       for (BaseObject tag : metaObjs) {
@@ -426,7 +425,7 @@ public class ImageService implements IImageService {
   public DocumentReference getImageSlideTemplateRef() {
     DocumentReference slideTemplateRef = new DocumentReference(getContext().getDatabase(),
         "ImageGalleryTemplates", "NewImageGallerySlide");
-    if (!getContext().getWiki().exists(slideTemplateRef, getContext())) {
+    if (!getXWiki().exists(slideTemplateRef, getContext())) {
       slideTemplateRef = new DocumentReference("celements2web", "ImageGalleryTemplates",
           "NewImageGallerySlide");
     }
@@ -555,7 +554,7 @@ public class ImageService implements IImageService {
         + "], isImportToFilebase [" + isImportToFilebase + "]");
     if (isImgFile(fileName) || isImportToFilebase) {
       fileName = fileName.replace(System.getProperty("file.separator"), ".");
-      fileName = getContext().getWiki().clearName(fileName, false, true, getContext());
+      fileName = getXWiki().clearName(fileName, false, true, getContext());
       if (!attService.existsAttachmentNameEqual(galleryDoc, fileName)) {
         action = ImportFileObject.ACTION_ADD;
       } else {
@@ -565,8 +564,12 @@ public class ImageService implements IImageService {
     return action;
   }
 
+  private XWiki getXWiki() {
+    return modelContext.getXWikiContext().getWiki();
+  }
+
   DocumentReference getImportClassRef() {
-    return webUtilsService.resolveDocumentReference("Classes.ImportClass");
+    return modelUtils.resolveRef("Classes.ImportClass", DocumentReference.class);
   }
 
   private boolean isZipFile(XWikiAttachment file) {
