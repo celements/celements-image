@@ -6,15 +6,22 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.ModelContext;
+import com.celements.model.reference.RefBuilder;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.nextfreedoc.INextFreeDocRole;
@@ -40,6 +47,9 @@ public class ImageServiceTest extends AbstractComponentTest {
   private XWikiRightService rightServiceMock;
   private ITreeNodeService treeNodeServiceMock;
   private INextFreeDocRole nextFreeDocMock;
+  private IModelAccessFacade modelAccess;
+  private ModelContext modelContext;
+  private RefBuilder refBuilder;
 
   @Before
   public void setUp() throws Exception {
@@ -49,6 +59,11 @@ public class ImageServiceTest extends AbstractComponentTest {
     expect(xwiki.getRightService()).andReturn(rightServiceMock).anyTimes();
     treeNodeServiceMock = registerComponentMock(ITreeNodeService.class);
     nextFreeDocMock = registerComponentMock(INextFreeDocRole.class);
+    modelAccess = registerComponentMock(IModelAccessFacade.class);
+    modelContext = registerComponentMock(ModelContext.class);
+    expect(modelContext.getXWikiContext()).andReturn(context).anyTimes();
+    expect(modelContext.getWikiRef()).andReturn(new WikiReference(context.getDatabase())).anyTimes();
+    refBuilder = registerComponentMock(RefBuilder.class);
     imageService = getBeanFactory().getBean(ImageService.class);
   }
 
@@ -61,7 +76,10 @@ public class ImageServiceTest extends AbstractComponentTest {
     expectedPhotoAlbumNavObj.setXClassReference(new NavigationClasses().getNavigationConfigClassRef(
         context.getDatabase()));
     galleryDoc.addXObject(expectedPhotoAlbumNavObj);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).once();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).once();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty());
     replayDefault();
     BaseObject photoAlbumNavObj = imageService.getPhotoAlbumNavObject(galleryDocRef);
     assertNotNull(photoAlbumNavObj);
@@ -74,7 +92,10 @@ public class ImageServiceTest extends AbstractComponentTest {
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "noGalleryDoc");
     XWikiDocument galleryDoc = new XWikiDocument(galleryDocRef);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).once();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).once();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty());
     replayDefault();
     try {
       imageService.getPhotoAlbumNavObject(galleryDocRef);
@@ -90,7 +111,10 @@ public class ImageServiceTest extends AbstractComponentTest {
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "noGalleryDoc");
     XWikiDocument galleryDoc = new XWikiDocument(galleryDocRef);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).once();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).once();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty());
     replayDefault();
     try {
       imageService.getPhotoAlbumSpaceRef(galleryDocRef);
@@ -104,6 +128,8 @@ public class ImageServiceTest extends AbstractComponentTest {
   public void testGetPhotoAlbumSpaceRef_galleryDoc() throws Exception {
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "galleryDoc");
+    SpaceReference expectedSpaceRef = new SpaceReference("gallerySpace",
+        (WikiReference) galleryDocRef.getLastSpaceReference().getParent());
     XWikiDocument galleryDoc = new XWikiDocument(galleryDocRef);
     BaseObject expectedPhotoAlbumNavObj = new BaseObject();
     expectedPhotoAlbumNavObj.setXClassReference(new NavigationClasses().getNavigationConfigClassRef(
@@ -111,10 +137,12 @@ public class ImageServiceTest extends AbstractComponentTest {
     String gallerySpaceName = "gallerySpace";
     expectedPhotoAlbumNavObj.setStringValue("menu_space", gallerySpaceName);
     galleryDoc.addXObject(expectedPhotoAlbumNavObj);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).once();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).once();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty());
+    expectRefBuildWith(galleryDocRef, expectedSpaceRef, gallerySpaceName);
     replayDefault();
-    SpaceReference expectedSpaceRef = new SpaceReference("gallerySpace",
-        (WikiReference) galleryDocRef.getLastSpaceReference().getParent());
     assertEquals(expectedSpaceRef, imageService.getPhotoAlbumSpaceRef(galleryDocRef));
     verifyDefault();
   }
@@ -124,7 +152,10 @@ public class ImageServiceTest extends AbstractComponentTest {
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "noGalleryDoc");
     XWikiDocument galleryDoc = new XWikiDocument(galleryDocRef);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).once();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).once();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty());
     replayDefault();
     assertFalse("Expecting no addSlide rights if document is no gallery document.",
         imageService.checkAddSlideRights(galleryDocRef));
@@ -158,21 +189,25 @@ public class ImageServiceTest extends AbstractComponentTest {
     String editorUser = "XWiki.myEditor";
     context.setUser(editorUser);
     DocumentReference galleryDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "galleryDoc");
+    "galleryDoc");
     XWikiDocument galleryDoc = new XWikiDocument(galleryDocRef);
     BaseObject photoAlbumNavObj = new BaseObject();
     photoAlbumNavObj.setXClassReference(new NavigationClasses().getNavigationConfigClassRef(
         context.getDatabase()));
     String gallerySpaceName = "gallerySpace";
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
     photoAlbumNavObj.setStringValue("menu_space", gallerySpaceName);
     galleryDoc.addXObject(photoAlbumNavObj);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).once();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).once();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty());
+    expectRefBuildWith(galleryDocRef, spaceRef, gallerySpaceName);
     DocumentReference testSlideDocRef = new DocumentReference(context.getDatabase(),
         gallerySpaceName, "Testname1");
     expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(editorUser), eq(
         "xwikidb:gallerySpace.Testname1"), same(context))).andReturn(true).once();
-    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
-        context.getDatabase()));
     expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Testname")).andReturn(
         testSlideDocRef);
     replayDefault();
@@ -192,15 +227,19 @@ public class ImageServiceTest extends AbstractComponentTest {
     photoAlbumNavObj.setXClassReference(new NavigationClasses().getNavigationConfigClassRef(
         context.getDatabase()));
     String gallerySpaceName = "gallerySpace";
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
     photoAlbumNavObj.setStringValue("menu_space", gallerySpaceName);
     galleryDoc.addXObject(photoAlbumNavObj);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).once();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).once();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty());
+    expectRefBuildWith(galleryDocRef, spaceRef, gallerySpaceName);
     DocumentReference testSlideDocRef = new DocumentReference(context.getDatabase(),
         gallerySpaceName, "Testname1");
     expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(editorUser), eq(
         "xwikidb:gallerySpace.Testname1"), same(context))).andReturn(false).once();
-    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
-        context.getDatabase()));
     expect(nextFreeDocMock.getNextTitledPageDocRef(spaceRef, "Testname")).andReturn(
         testSlideDocRef);
     replayDefault();
@@ -232,11 +271,14 @@ public class ImageServiceTest extends AbstractComponentTest {
     photoAlbumObj.setIntValue("height2", maxHeight);
     photoAlbumObj.setIntValue("photoWidth", maxWidth);
     galleryDoc.addXObject(photoAlbumObj);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).atLeastOnce();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).atLeastOnce();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).atLeastOnce();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty(), 2);
     DocumentReference slideDocRef = new DocumentReference(context.getDatabase(), gallerySpaceName,
         "Slide1");
     XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
-    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
+    expect(modelAccess.getOrCreateDocument(eq(slideDocRef))).andReturn(slideDoc).once();
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
         "ImageGalleryTemplates", "NewImageGallerySlide");
     expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
@@ -247,25 +289,25 @@ public class ImageServiceTest extends AbstractComponentTest {
     String clearedAttFilename = "myImg";
     String attFullName = "ContentAttachment.FileBaseDoc;" + attFilename;
     String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
-    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
-        context))).andReturn(imgAttURL).once();
+    Optional<UriComponents> imgAttURIComp = Optional.of(UriComponentsBuilder.fromUriString(imgAttURL).build());
+    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), eq(""))).andReturn(imgAttURIComp).once();
     imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(context.getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
-    expect(webUtils.resolveDocumentReference(eq("ContentAttachment.FileBaseDoc"))).andReturn(
-        attDocRef).once();
     XWikiDocument attDoc = new XWikiDocument(new DocumentReference("a", "b", "c"));
-    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
-    expect(webUtils.resolveDocumentReference(eq("Classes.PhotoMetainfoClass"))).andReturn(
-        attDocRef).once();
+    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(modelAccess.exists(eq(attDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(attDocRef))).andReturn(attDoc).once();
+    expectRefBuildWith(galleryDocRef, spaceRef, gallerySpaceName, 2);
     xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true), same(
         context));
     expectLastCall().once();
     expect(webUtils.getWikiRef((DocumentReference) anyObject())).andReturn(
         attDocRef.getWikiReference()).anyTimes();
-    expect(webUtils.getDefaultLanguage()).andReturn("de").anyTimes();
-    expect(webUtils.getDefaultLanguage((String) anyObject())).andReturn("de").anyTimes();
+    expect(modelContext.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(modelContext.getDefaultLanguage((EntityReference) anyObject())).andReturn("de").anyTimes();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""), same(
         context))).andReturn("de").anyTimes();
     VelocityContext vcontext = new VelocityContext();
@@ -276,17 +318,17 @@ public class ImageServiceTest extends AbstractComponentTest {
         eq("de"))).andReturn("content").once();
     expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(context))).andReturn(
         "").once();
-    expect(xwiki.exists(eq(attDocRef), same(context))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
     XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("");
     context.setRequest(mockRequest);
-    SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
-        context.getDatabase()));
     expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide"
         + clearedAttFilename))).andReturn(slideDocRef);
     expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), same(
         context))).andReturn(clearedAttFilename).once();
+    DocumentReference tagClassRef = new DocumentReference(context.getDatabase(), "Classes", "PhotoMetainfoClass");
+    expectRefBuild(DocumentReference.class, tagClassRef, Optional.empty(), 
+        Optional.of("Classes"), Optional.of("PhotoMetainfoClass"));
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(galleryDocRef,
         "Slide", attFullName));
@@ -320,11 +362,14 @@ public class ImageServiceTest extends AbstractComponentTest {
     photoAlbumObj.setIntValue("height2", maxHeight);
     photoAlbumObj.setIntValue("photoWidth", maxWidth);
     galleryDoc.addXObject(photoAlbumObj);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).atLeastOnce();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).atLeastOnce();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).atLeastOnce();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty(), 2);
     DocumentReference slideDocRef = new DocumentReference(context.getDatabase(), gallerySpaceName,
         "Slide1");
     XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
-    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
+    expect(modelAccess.getOrCreateDocument(eq(slideDocRef))).andReturn(slideDoc).once();
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
         "ImageGalleryTemplates", "NewImageGallerySlide");
     expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
@@ -335,25 +380,22 @@ public class ImageServiceTest extends AbstractComponentTest {
     String clearedAttFilename = "myImg";
     String attFullName = "ContentAttachment.FileBaseDoc;" + attFilename;
     String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
-    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
-        context))).andReturn(imgAttURL).once();
+    Optional<UriComponents> imgAttURIComp = Optional.of(UriComponentsBuilder.fromUriString(imgAttURL).build());
+    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), eq(""))).andReturn(imgAttURIComp).once();
     imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(context.getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
-    expect(webUtils.resolveDocumentReference(eq("ContentAttachment.FileBaseDoc"))).andReturn(
-        attDocRef).once();
     XWikiDocument attDoc = new XWikiDocument(new DocumentReference("a", "b", "c"));
-    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
-    expect(webUtils.resolveDocumentReference(eq("Classes.PhotoMetainfoClass"))).andReturn(
-        attDocRef).once();
+    expect(modelAccess.exists(eq(attDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(attDocRef))).andReturn(attDoc).once();
     xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true), same(
         context));
     expectLastCall().once();
     expect(webUtils.getWikiRef((DocumentReference) anyObject())).andReturn(
         attDocRef.getWikiReference()).anyTimes();
-    expect(webUtils.getDefaultLanguage()).andReturn("de").anyTimes();
-    expect(webUtils.getDefaultLanguage((String) anyObject())).andReturn("de").anyTimes();
+    expect(modelContext.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(modelContext.getDefaultLanguage((EntityReference) anyObject())).andReturn("de").anyTimes();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""), same(
         context))).andReturn("de").anyTimes();
     VelocityContext vcontext = new VelocityContext();
@@ -364,17 +406,20 @@ public class ImageServiceTest extends AbstractComponentTest {
         eq("de"))).andReturn("content").once();
     expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(context))).andReturn(
         "").once();
-    expect(xwiki.exists(eq(attDocRef), same(context))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
     XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn(null);
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
         context.getDatabase()));
+    expectRefBuildWith(galleryDocRef, spaceRef, gallerySpaceName, 2);
     expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide"
         + clearedAttFilename))).andReturn(slideDocRef);
     expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), same(
         context))).andReturn(clearedAttFilename).once();
+    DocumentReference tagClassRef = new DocumentReference(context.getDatabase(), "Classes", "PhotoMetainfoClass");
+    expectRefBuild(DocumentReference.class, tagClassRef, Optional.empty(), 
+        Optional.of("Classes"), Optional.of("PhotoMetainfoClass"));
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(galleryDocRef,
         "Slide", attFullName));
@@ -408,11 +453,14 @@ public class ImageServiceTest extends AbstractComponentTest {
     photoAlbumObj.setIntValue("height2", maxHeight);
     photoAlbumObj.setIntValue("photoWidth", maxWidth);
     galleryDoc.addXObject(photoAlbumObj);
-    expect(xwiki.getDocument(eq(galleryDocRef), same(context))).andReturn(galleryDoc).atLeastOnce();
+    expect(modelAccess.exists(eq(galleryDocRef))).andReturn(true).atLeastOnce();
+    expect(modelAccess.getOrCreateDocument(eq(galleryDocRef))).andReturn(galleryDoc).atLeastOnce();
+    expectRefBuild(WikiReference.class, new WikiReference(context.getDatabase()), 
+        Optional.of(context.getDatabase()), Optional.empty(), Optional.empty(), 2);
     DocumentReference slideDocRef = new DocumentReference(context.getDatabase(), gallerySpaceName,
         "Slide1");
     XWikiDocument slideDoc = new XWikiDocument(slideDocRef);
-    expect(xwiki.getDocument(eq(slideDocRef), same(context))).andReturn(slideDoc).once();
+    expect(modelAccess.getOrCreateDocument(eq(slideDocRef))).andReturn(slideDoc).once();
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
         "ImageGalleryTemplates", "NewImageGallerySlide");
     expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
@@ -423,25 +471,22 @@ public class ImageServiceTest extends AbstractComponentTest {
     String clearedAttFilename = "myImg";
     String attFullName = "ContentAttachment.FileBaseDoc;" + attFilename;
     String imgAttURL = "/download/ContentAttachment/FileBaseDoc/" + attFilename;
-    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), same(
-        context))).andReturn(imgAttURL).once();
+    Optional<UriComponents> imgAttURIComp = Optional.of(UriComponentsBuilder.fromUriString(imgAttURL).build());
+    expect(attURLCmdMock.getAttachmentURL(eq(attFullName), eq("download"), eq(""))).andReturn(imgAttURIComp).once();
     imageService.webUtilsService = createDefaultMock(IWebUtilsService.class);
     DocumentReference attDocRef = new DocumentReference(context.getDatabase(),
         "ContentAttachment", "FileBaseDoc");
     IWebUtilsService webUtils = imageService.webUtilsService;
-    expect(webUtils.resolveDocumentReference(eq("ContentAttachment.FileBaseDoc"))).andReturn(
-        attDocRef).once();
     XWikiDocument attDoc = new XWikiDocument(new DocumentReference("a", "b", "c"));
-    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
-    expect(webUtils.resolveDocumentReference(eq("Classes.PhotoMetainfoClass"))).andReturn(
-        attDocRef).once();
+    expect(modelAccess.exists(eq(attDocRef))).andReturn(true).once();
+    expect(modelAccess.getOrCreateDocument(eq(attDocRef))).andReturn(attDoc).once();
     xwiki.saveDocument(same(slideDoc), eq("add default image slide content"), eq(true), same(
         context));
     expectLastCall().once();
     expect(webUtils.getWikiRef((DocumentReference) anyObject())).andReturn(
         attDocRef.getWikiReference()).anyTimes();
-    expect(webUtils.getDefaultLanguage()).andReturn("de").anyTimes();
-    expect(webUtils.getDefaultLanguage((String) anyObject())).andReturn("de").anyTimes();
+    expect(modelContext.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(modelContext.getDefaultLanguage((EntityReference) anyObject())).andReturn("de").anyTimes();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("gallerySpace"), eq(""), same(
         context))).andReturn("de").anyTimes();
     VelocityContext vcontext = new VelocityContext();
@@ -452,17 +497,20 @@ public class ImageServiceTest extends AbstractComponentTest {
         eq("de"))).andReturn("content").once();
     expect(xwiki.getWebPreference(eq("cel_centralfilebase"), same(context))).andReturn(
         "").once();
-    expect(xwiki.exists(eq(attDocRef), same(context))).andReturn(true);
     expect(treeNodeServiceMock.isTreeNode(eq(slideDocRef))).andReturn(false).anyTimes();
     XWikiRequest mockRequest = createDefaultMock(XWikiRequest.class);
     expect(mockRequest.getParameter(eq("slideContent"))).andReturn("test content line");
     context.setRequest(mockRequest);
     SpaceReference spaceRef = new SpaceReference(gallerySpaceName, new WikiReference(
         context.getDatabase()));
+    expectRefBuildWith(galleryDocRef, spaceRef, gallerySpaceName, 2);
     expect(nextFreeDocMock.getNextTitledPageDocRef(eq(spaceRef), eq("Slide"
         + clearedAttFilename))).andReturn(slideDocRef);
     expect(xwiki.clearName(eq(attFilenameNoExtension), eq(true), eq(true), same(
         context))).andReturn(clearedAttFilename).once();
+    DocumentReference tagClassRef = new DocumentReference(context.getDatabase(), "Classes", "PhotoMetainfoClass");
+    expectRefBuild(DocumentReference.class, tagClassRef, Optional.empty(), 
+        Optional.of("Classes"), Optional.of("PhotoMetainfoClass"));
     replayDefault();
     assertTrue("Expecting successful adding slide", imageService.addSlideFromTemplate(galleryDocRef,
         "Slide", attFullName));
@@ -633,7 +681,10 @@ public class ImageServiceTest extends AbstractComponentTest {
         "D"));
     context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
-    importClassObj.setXClassReference(imageService.getImportClassRef());
+    DocumentReference importClassRef = new DocumentReference(context.getDatabase(), "Classes", "ImportClass");
+    expectRefBuild(DocumentReference.class, importClassRef, Optional.empty(),
+        Optional.of("Classes"), Optional.of("ImportClass"));
+    importClassObj.setXClassReference(importClassRef);
     doc.addXObject(importClassObj);
     expect(xwiki.clearName(eq(fileName), eq(false), eq(true), same(context))).andReturn(
         fileName);
@@ -649,7 +700,10 @@ public class ImageServiceTest extends AbstractComponentTest {
         "D"));
     context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
-    importClassObj.setXClassReference(imageService.getImportClassRef());
+    DocumentReference importClassRef = new DocumentReference(context.getDatabase(), "Classes", "ImportClass");
+    expectRefBuild(DocumentReference.class, importClassRef, Optional.empty(),
+        Optional.of("Classes"), Optional.of("ImportClass"));
+    importClassObj.setXClassReference(importClassRef);
     doc.addXObject(importClassObj);
     XWikiAttachment att = new XWikiAttachment();
     att.setFilename("otherFile.jpg");
@@ -670,7 +724,10 @@ public class ImageServiceTest extends AbstractComponentTest {
         "D"));
     context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
-    importClassObj.setXClassReference(imageService.getImportClassRef());
+    DocumentReference importClassRef = new DocumentReference(context.getDatabase(), "Classes", "ImportClass");
+    expectRefBuild(DocumentReference.class, importClassRef, Optional.empty(),
+        Optional.of("Classes"), Optional.of("ImportClass"));
+    importClassObj.setXClassReference(importClassRef);
     doc.addXObject(importClassObj);
     List<XWikiAttachment> attList = new ArrayList<>();
     XWikiAttachment att = new XWikiAttachment();
@@ -694,7 +751,10 @@ public class ImageServiceTest extends AbstractComponentTest {
         "D"));
     context.setDoc(doc);
     BaseObject importClassObj = new BaseObject();
-    importClassObj.setXClassReference(imageService.getImportClassRef());
+    DocumentReference importClassRef = new DocumentReference(context.getDatabase(), "Classes", "ImportClass");
+    expectRefBuild(DocumentReference.class, importClassRef, Optional.empty(),
+        Optional.of("Classes"), Optional.of("ImportClass"));
+    importClassObj.setXClassReference(importClassRef);
     doc.addXObject(importClassObj);
     XWikiAttachment att = new XWikiAttachment();
     att.setFilename(fileName + ".zip");
@@ -706,5 +766,37 @@ public class ImageServiceTest extends AbstractComponentTest {
     replayDefault();
     assertEquals(ImportFileObject.ACTION_ADD, imageService.getActionForFile(fileName, doc));
     verifyDefault();
+  }
+  
+  private void expectRefBuildWith(DocumentReference galleryDocRef, SpaceReference expectedSpaceRef, String gallerySpaceName) {
+    expectRefBuildWith(galleryDocRef, expectedSpaceRef, gallerySpaceName, 1);
+  }
+  
+  private void expectRefBuildWith(DocumentReference galleryDocRef, SpaceReference expectedSpaceRef, 
+      String gallerySpaceName, int times) {
+    expect(refBuilder.with(eq(galleryDocRef))).andReturn(refBuilder).times(times);
+    expect(refBuilder.space(eq(gallerySpaceName))).andReturn(refBuilder).times(times);
+    expect(refBuilder.build(eq(SpaceReference.class))).andReturn(expectedSpaceRef).times(times);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends EntityReference> void expectRefBuild(Class clazz, T ref, Optional<String> wiki, 
+        Optional<String> space, Optional<String> doc) {
+    expectRefBuild(clazz, ref, wiki, space, doc, 1);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends EntityReference> void expectRefBuild(Class clazz, T ref, Optional<String> wiki, 
+        Optional<String> space, Optional<String> doc, int times) {
+    if (wiki.isPresent()) {
+      expect(refBuilder.wiki((String) wiki.get())).andReturn(refBuilder).times(times);
+    }
+    if (space.isPresent()) {
+      expect(refBuilder.space((String) space.get())).andReturn(refBuilder).times(times);
+    }
+    if (doc.isPresent()) {
+      expect(refBuilder.doc((String) doc.get())).andReturn(refBuilder).times(times);
+    }
+    expect(refBuilder.build(same(clazz))).andReturn(ref).times(times);
   }
 }
