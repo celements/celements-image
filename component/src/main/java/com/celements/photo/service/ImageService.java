@@ -13,6 +13,7 @@ import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.xhtml.p;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,85 +293,26 @@ public class ImageService implements IImageService {
   public boolean addSlideFromTemplate(DocumentReference galleryDocRef, String slideBaseName,
       String attFullName) {
     try {
-      DocumentReference slideTemplateRef = getImageSlideTemplateRef();;
       String filename = attFullName.replaceAll("^.*;(.*)$", "$1");
       String clearedAttName = getXWiki().clearName(filename.replaceAll(
           "^(.*)\\.[a-zA-Z]{3,4}$", "$1"), true, true, getContext());
       String slideDocName = slideBaseName + clearedAttName;
-      Map<String, String> metaTagMap = Collections.emptyMap();
       DocumentReference attDocRef = modelUtils.resolveRef(attFullName.replaceAll(
           "^(.*);.*$", "$1"), DocumentReference.class);
-      DocumentReference centralFBDocRef = null;
-      String centralFB = getXWiki().getWebPreference("cel_centralfilebase",
-          getContext());
-      if ((centralFB != null) && !"".equals(centralFB.trim())) {
-        centralFBDocRef = modelUtils.resolveRef(centralFB, DocumentReference.class);
-      }
-      if (modelAccess.exists(attDocRef) && !attDocRef.equals(centralFBDocRef)) {
-        LOGGER.debug("get meta tags from attachment document {}", attDocRef);
-        XWikiDocument attDoc = modelAccess.getOrCreateDocument(attDocRef);
-        metaTagMap = getMetaTagObjectsFromDoc(attDoc);
-      } else if (attDocRef.equals(centralFBDocRef)) {
-        LOGGER.debug("get meta tags for central file base image {}", attDocRef);
-        LuceneQuery query = searchService.createQuery();
-        query.add(searchService.createRestriction("Celements2.PageType.page_type",
-            "\"DMS-Document\""));
-        query.add(searchService.createRestriction("Classes.PhotoMetainfoClass.name",
-            "\"cleared_filename\""));
-        query.add(searchService.createRestriction("Classes.PhotoMetainfoClass." + "description",
-            "\"" + filename + "\""));
-        LuceneSearchResult searchResult = searchService.search(query, null, null);
-        List<EntityReference> resultList = Collections.emptyList();
-        try {
-          resultList = searchResult.getResults();
-        } catch (LuceneSearchException lse) {
-          LOGGER.error("Exception searching for imported images", lse);
-        }
-        LOGGER.debug("addSlideFromTemplate: lucene query = '{}'", query.getQueryString());
-        LOGGER.debug("addSlideFromTemplate: DMS-Document for {} found: {}", filename, 
-            resultList.size());
-        if (resultList.size() > 0) {
-          XWikiDocument separateDoc = modelAccess.getOrCreateDocument(
-              RefBuilder.from(resultList.get(0)).build(DocumentReference.class));
-          metaTagMap = getMetaTagObjectsFromDoc(separateDoc);
-        } else {
-          LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
-          Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
-          metaTagMap = new HashMap<>();
-          for (String key : map.keySet()) {
-            metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
-          }
-        }
-        if (metaTagMap.keySet().contains("cleared_filename_short")) {
-          slideDocName = slideBaseName + metaTagMap.get("cleared_filename_short");
-        }
-      } else {
-        LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not"
-            + "exist and is not central file base " + centralFBDocRef);
+      Map<String, String> metaTagMap = getMetaTags(attDocRef, filename);
+      if ((metaTagMap.size() > 0) && metaTagMap.keySet().contains("cleared_filename_short")) {
+        slideDocName = slideBaseName + metaTagMap.get("cleared_filename_short");
       }
       DocumentReference newSlideDocRef = nextFreeDocName.getNextTitledPageDocRef(
           getPhotoAlbumSpaceRef(galleryDocRef), slideDocName);
       XWikiDocument newSlideDoc = modelAccess.getOrCreateDocument(newSlideDocRef);
-      newSlideDoc.readFromTemplate(slideTemplateRef, getContext());
-      // newSlideDoc.setDefaultLanguage(context.getDefaultLanguage(getPhotoAlbumSpaceRef(galleryDocRef)));
-      // // TODO refactor and use com.celements.web.plugin.cmd.CreateDocumentCommand instead
-      // Date creationDate = new Date();
-      // newSlideDoc.setLanguage("");
-      // newSlideDoc.setCreationDate(creationDate);
-      // newSlideDoc.setContentUpdateDate(creationDate);
-      // newSlideDoc.setDate(creationDate);
-      // newSlideDoc.setCreator(getContext().getUser());
-      // newSlideDoc.setAuthor(getContext().getUser());
-      // newSlideDoc.setTranslation(0);
+      newSlideDoc.readFromTemplate(getImageSlideTemplateRef(), getContext());
       Optional<UriComponents> imgUriComponent = getAttURLCmd().getAttachmentURL(attFullName, "download", "");
       String imgURL = imgUriComponent.isPresent() ? imgUriComponent.get().toUriString() : "";
       String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef) + "&celheight="
           + getPhotoAlbumMaxHeight(galleryDocRef);
       String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0) ? "?" : "&") + resizeParam;
-      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-      vcontext.put("imageURL", fullImgURL);
-      vcontext.put("attFullName", attFullName);
-      vcontext.put("metaTagMap", metaTagMap);
+      addToVcontext(attFullName, metaTagMap, fullImgURL);
       DocumentReference slideContentRef = new DocumentReference(getContext().getDatabase(),
           "Templates", "ImageSlideImportContent");
       String slideContent = webUtilsService.renderInheritableDocument(slideContentRef,
@@ -387,6 +329,73 @@ public class ImageService implements IImageService {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
     }
     return false;
+  }
+  
+  private Map<String, String> getMetaTags(DocumentReference attDocRef, String filename) {
+    DocumentReference centralFBDocRef = getCentralFBDocRef();
+      if (modelAccess.exists(attDocRef) && !attDocRef.equals(centralFBDocRef)) {
+        LOGGER.debug("get meta tags from attachment document {}", attDocRef);
+        XWikiDocument attDoc = modelAccess.getOrCreateDocument(attDocRef);
+        return getMetaTagObjectsFromDoc(attDoc);
+      } else if (attDocRef.equals(centralFBDocRef)) {
+        LOGGER.debug("get meta tags for central file base image {}", attDocRef);
+        LuceneQuery query = getMetaTagsQuery(filename);
+        LuceneSearchResult searchResult = searchService.search(query, null, null);
+        List<EntityReference> resultList = Collections.emptyList();
+        try {
+          resultList = searchResult.getResults();
+        } catch (LuceneSearchException lse) {
+          LOGGER.error("Exception searching for imported images", lse);
+        }
+        LOGGER.debug("addSlideFromTemplate: lucene query = '{}'", query.getQueryString());
+        LOGGER.debug("addSlideFromTemplate: DMS-Document for {} found: {}", filename, 
+            resultList.size());
+        Map<String, String> metaTagMap = Collections.emptyMap();
+        if (resultList.size() > 0) {
+          XWikiDocument separateDoc = modelAccess.getOrCreateDocument(
+              RefBuilder.from(resultList.get(0)).build(DocumentReference.class));
+           metaTagMap = getMetaTagObjectsFromDoc(separateDoc);
+        } else {
+          LOGGER.debug("getting meta tags for file [" + filename + "] on " + attDocRef);
+          Map<String, String> map = getMetaInfoService().getAllTags(attDocRef, filename);
+          metaTagMap = new HashMap<>();
+          for (String key : map.keySet()) {
+            metaTagMap.put(cleanMetaTagKey(key), cleanMetaTagValue(key, map.get(key)));
+          }
+        }
+        return metaTagMap;
+      } else {
+        LOGGER.debug("don't get meta tags attachment doc [" + attDocRef + "] does not"
+            + "exist and is not central file base " + centralFBDocRef);
+        return Collections.emptyMap();
+      }
+  }
+
+  private LuceneQuery getMetaTagsQuery(String filename) {
+    LuceneQuery query = searchService.createQuery();
+    query.add(searchService.createRestriction("Celements2.PageType.page_type",
+        "\"DMS-Document\""));
+    query.add(searchService.createRestriction("Classes.PhotoMetainfoClass.name",
+        "\"cleared_filename\""));
+    query.add(searchService.createRestriction("Classes.PhotoMetainfoClass.description",
+        "\"" + filename + "\""));
+    return query;
+  }
+
+  private DocumentReference getCentralFBDocRef() {
+    String centralFB = getXWiki().getWebPreference("cel_centralfilebase",
+        getContext());
+    if ((centralFB != null) && !"".equals(centralFB.trim())) {
+      return modelUtils.resolveRef(centralFB, DocumentReference.class);
+    }
+    return null;
+  }
+
+  private void addToVcontext(String attFullName, Map<String, String> metaTagMap, String fullImgURL) {
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    vcontext.put("imageURL", fullImgURL);
+    vcontext.put("attFullName", attFullName);
+    vcontext.put("metaTagMap", metaTagMap);
   }
 
   Map<String, String> getMetaTagObjectsFromDoc(XWikiDocument attDoc) {
