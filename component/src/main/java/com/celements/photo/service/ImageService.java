@@ -30,6 +30,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
@@ -41,6 +42,8 @@ import com.celements.photo.container.ImageLibStrings;
 import com.celements.photo.image.GenerateThumbnail;
 import com.celements.photo.utilities.ImportFileObject;
 import com.celements.photo.utilities.Unzip;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.LuceneSearchException;
 import com.celements.search.lucene.LuceneSearchResult;
@@ -89,6 +92,9 @@ public class ImageService implements IImageService {
 
   @Requirement
   private IModelAccessFacade modelAccess;
+
+  @Requirement
+  private IRightsAccessFacadeRole rightsAccess;
 
   @Requirement
   private ModelContext context;
@@ -274,11 +280,7 @@ public class ImageService implements IImageService {
     try {
       DocumentReference newSlideDocRef = nextFreeDocName.getNextTitledPageDocRef(
           getPhotoAlbumSpaceRef(galleryDocRef), "Testname");
-      String newSlideDocFN = modelUtils.serializeRef(newSlideDocRef);
-      return (getXWiki().getRightService().hasAccessLevel("edit",
-          getContext().getUser(), newSlideDocFN, getContext()));
-    } catch (XWikiException exp) {
-      LOGGER.error("failed to checkAddSlideRights for [" + galleryDocRef + "].", exp);
+      return rightsAccess.hasAccessLevel(newSlideDocRef, EAccessLevel.EDIT);
     } catch (NoGalleryDocumentException exp) {
       LOGGER.debug("failed to checkAddSlideRights for no gallery document [" + galleryDocRef + "].",
           exp);
@@ -348,43 +350,39 @@ public class ImageService implements IImageService {
       }
       DocumentReference newSlideDocRef = nextFreeDocName.getNextTitledPageDocRef(
           getPhotoAlbumSpaceRef(galleryDocRef), slideDocName);
-      if (getXWiki().copyDocument(slideTemplateRef, newSlideDocRef, true,
-          getContext())) {
-        XWikiDocument newSlideDoc = modelAccess.getOrCreateDocument(newSlideDocRef);
-        newSlideDoc.setDefaultLanguage(context.getDefaultLanguage(getPhotoAlbumSpaceRef(galleryDocRef)));
-        // TODO refactor and use com.celements.web.plugin.cmd.CreateDocumentCommand instead
-        Date creationDate = new Date();
-        newSlideDoc.setLanguage("");
-        newSlideDoc.setCreationDate(creationDate);
-        newSlideDoc.setContentUpdateDate(creationDate);
-        newSlideDoc.setDate(creationDate);
-        newSlideDoc.setCreator(getContext().getUser());
-        newSlideDoc.setAuthor(getContext().getUser());
-        newSlideDoc.setTranslation(0);
-        Optional<UriComponents> imgUriComponent = getAttURLCmd().getAttachmentURL(attFullName, "download", "");
-        String imgURL = imgUriComponent.isPresent() ? imgUriComponent.get().toUriString() : "";
-        String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef) + "&celheight="
-            + getPhotoAlbumMaxHeight(galleryDocRef);
-        String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0) ? "?" : "&") + resizeParam;
-        VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-        vcontext.put("imageURL", fullImgURL);
-        vcontext.put("attFullName", attFullName);
-        vcontext.put("metaTagMap", metaTagMap);
-        DocumentReference slideContentRef = new DocumentReference(getContext().getDatabase(),
-            "Templates", "ImageSlideImportContent");
-        String slideContent = webUtilsService.renderInheritableDocument(slideContentRef,
-            getContext().getLanguage(), context.getDefaultLanguage());
-        newSlideDoc.setContent(slideContent);
-        fixMenuItemPosition(newSlideDoc);
-        getXWiki().saveDocument(newSlideDoc, "add default image slide" + " content",
-            true, getContext());
-        return true;
-      } else {
-        LOGGER.warn("failed to copy slideTemplateRef [" + slideTemplateRef + "] to new slide doc ["
-            + newSlideDocRef + "].");
-      }
+      XWikiDocument newSlideDoc = modelAccess.getOrCreateDocument(newSlideDocRef);
+      newSlideDoc.readFromTemplate(slideTemplateRef, getContext());
+      // newSlideDoc.setDefaultLanguage(context.getDefaultLanguage(getPhotoAlbumSpaceRef(galleryDocRef)));
+      // // TODO refactor and use com.celements.web.plugin.cmd.CreateDocumentCommand instead
+      // Date creationDate = new Date();
+      // newSlideDoc.setLanguage("");
+      // newSlideDoc.setCreationDate(creationDate);
+      // newSlideDoc.setContentUpdateDate(creationDate);
+      // newSlideDoc.setDate(creationDate);
+      // newSlideDoc.setCreator(getContext().getUser());
+      // newSlideDoc.setAuthor(getContext().getUser());
+      // newSlideDoc.setTranslation(0);
+      Optional<UriComponents> imgUriComponent = getAttURLCmd().getAttachmentURL(attFullName, "download", "");
+      String imgURL = imgUriComponent.isPresent() ? imgUriComponent.get().toUriString() : "";
+      String resizeParam = "celwidth=" + getPhotoAlbumMaxWidth(galleryDocRef) + "&celheight="
+          + getPhotoAlbumMaxHeight(galleryDocRef);
+      String fullImgURL = imgURL + ((imgURL.indexOf("?") < 0) ? "?" : "&") + resizeParam;
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      vcontext.put("imageURL", fullImgURL);
+      vcontext.put("attFullName", attFullName);
+      vcontext.put("metaTagMap", metaTagMap);
+      DocumentReference slideContentRef = new DocumentReference(getContext().getDatabase(),
+          "Templates", "ImageSlideImportContent");
+      String slideContent = webUtilsService.renderInheritableDocument(slideContentRef,
+          getContext().getLanguage(), context.getDefaultLanguage());
+      newSlideDoc.setContent(slideContent);
+      fixMenuItemPosition(newSlideDoc);
+      modelAccess.saveDocument(newSlideDoc, "add default image slide content", true);
+      return true;
     } catch (NoGalleryDocumentException exp) {
       LOGGER.error("failed to addSlideFromTemplate because no gallery doc.", exp);
+    } catch (DocumentSaveException dse) {
+      LOGGER.error("failed to addSlideFromTemplate - save document failed.", dse);
     } catch (XWikiException exp) {
       LOGGER.error("failed to addSlideFromTemplate.", exp);
     }
@@ -436,7 +434,7 @@ public class ImageService implements IImageService {
   public DocumentReference getImageSlideTemplateRef() {
     DocumentReference slideTemplateRef = new DocumentReference(getContext().getDatabase(),
         "ImageGalleryTemplates", "NewImageGallerySlide");
-    if (!getXWiki().exists(slideTemplateRef, getContext())) {
+    if (!modelAccess.exists(slideTemplateRef)) {
       slideTemplateRef = new DocumentReference("celements2web", "ImageGalleryTemplates",
           "NewImageGallerySlide");
     }
