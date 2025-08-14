@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.xhtml.p;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,9 +101,6 @@ public class ImageService implements IImageService {
   @Requirement
   private ModelUtils modelUtils;
 
-  @Requirement
-  private RefBuilder refBuilder;
-
   AttachmentURLCommand attURLCmd;
 
   private XWikiContext getContext() {
@@ -139,7 +134,7 @@ public class ImageService implements IImageService {
     if (modelAccess.exists(galleryDocRef)) {
       XWikiDocument galleryDoc = modelAccess.getOrCreateDocument(galleryDocRef);
       navObj = galleryDoc.getXObject(navigationClassConfig.getNavigationConfigClassRef(
-          refBuilder.wiki(getContext().getDatabase()).build(WikiReference.class)));
+          new RefBuilder().wiki(getContext().getDatabase()).build(WikiReference.class)));
       
     }
     if (navObj == null) {
@@ -154,7 +149,7 @@ public class ImageService implements IImageService {
     try {
       String spaceName = getPhotoAlbumNavObject(galleryDocRef).getStringValue(
           INavigationClassConfig.MENU_SPACE_FIELD);
-      return refBuilder.with(galleryDocRef).space(spaceName).build(SpaceReference.class);
+      return new RefBuilder().with(galleryDocRef).space(spaceName).build(SpaceReference.class);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to getPhotoAlbumSpaceRef.", exp);
     }
@@ -400,7 +395,7 @@ public class ImageService implements IImageService {
 
   Map<String, String> getMetaTagObjectsFromDoc(XWikiDocument attDoc) {
     Map<String, String> metaTagMap = new HashMap<>();
-    DocumentReference tagClassRef = refBuilder.space("Classes")
+    DocumentReference tagClassRef = new RefBuilder().space("Classes")
         .doc("PhotoMetainfoClass").build(DocumentReference.class);
     List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
     if (metaObjs != null) {
@@ -416,7 +411,7 @@ public class ImageService implements IImageService {
   private boolean fixMenuItemPosition(XWikiDocument newSlideDoc) {
     if (treeNodeService.isTreeNode(newSlideDoc.getDocumentReference())) {
       BaseObject menuItemObj = newSlideDoc.getXObject(navigationClassConfig.getMenuItemClassRef(
-          refBuilder.wiki(getContext().getDatabase()).build(WikiReference.class)));
+          new RefBuilder().wiki(getContext().getDatabase()).build(WikiReference.class)));
       if (menuItemObj != null) {
         int numElem = treeNodeService.getSubNodesForParent(
             newSlideDoc.getDocumentReference().getLastSpaceReference(), "").size();
@@ -583,7 +578,7 @@ public class ImageService implements IImageService {
   }
 
   DocumentReference getImportClassRef() {
-    return refBuilder.space("Classes").doc("ImportClass").build(DocumentReference.class);
+    return new RefBuilder().space("Classes").doc("ImportClass").build(DocumentReference.class);
   }
 
   private boolean isZipFile(XWikiAttachment file) {
