@@ -40,19 +40,25 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
-      <version>6.3</version>
+      <version>6.5</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-core</artifactId>
-      <version>6.10</version>
+      <version>6.13</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-search</artifactId>
       <version>6.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.celements</groupId>
+      <artifactId>celements-xwiki-core</artifactId>
+      <version>6.7</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -112,6 +118,25 @@
     <dependency>
       <groupId>org.apache.avalon.framework</groupId>
       <artifactId>avalon-framework-api</artifactId>
+    </dependency>
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>com.celements</groupId>
+      <artifactId>celements-config-source-api</artifactId>
+      <version>6.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.celements</groupId>
+      <artifactId>celements-config-source</artifactId>
+      <version>6.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+      <version>3.1.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <scm>

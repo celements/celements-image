@@ -395,8 +395,8 @@ public class ImageService implements IImageService {
 
   Map<String, String> getMetaTagObjectsFromDoc(XWikiDocument attDoc) {
     Map<String, String> metaTagMap = new HashMap<>();
-    DocumentReference tagClassRef = new RefBuilder().space("Classes")
-        .doc("PhotoMetainfoClass").build(DocumentReference.class);
+    DocumentReference tagClassRef = new RefBuilder().wiki(getContext().getDatabase())
+        .space("Classes").doc("PhotoMetainfoClass").build(DocumentReference.class);
     List<BaseObject> metaObjs = attDoc.getXObjects(tagClassRef);
     if (metaObjs != null) {
       for (BaseObject tag : metaObjs) {
@@ -578,7 +578,8 @@ public class ImageService implements IImageService {
   }
 
   DocumentReference getImportClassRef() {
-    return new RefBuilder().space("Classes").doc("ImportClass").build(DocumentReference.class);
+    return new RefBuilder().wiki(getContext().getDatabase()).space("Classes")
+        .doc("ImportClass").build(DocumentReference.class);
   }
 
   private boolean isZipFile(XWikiAttachment file) {
