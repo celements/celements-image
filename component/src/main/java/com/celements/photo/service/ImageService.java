@@ -4,20 +4,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponents;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -61,47 +64,52 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 @Component
-public class ImageService implements IImageService {
+public class ImageService<T> implements IImageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ImageService.class);
 
-  @Requirement
-  private EntityReferenceResolver<String> stringRefResolver;
-
-  @Requirement("celements.oldCoreClasses")
-  private IClassCollectionRole oldCoreClasses;
-
-  @Requirement
-  private INavigationClassConfig navigationClassConfig;
-
-  @Requirement
-  IWebUtilsService webUtilsService;
-
-  @Requirement
-  private ITreeNodeService treeNodeService;
-
-  @Requirement
-  private INextFreeDocRole nextFreeDocName;
-
-  @Requirement
-  private ILuceneSearchService searchService;
-
-  @Requirement
-  private IAttachmentServiceRole attService;
-
-  @Requirement
-  private IModelAccessFacade modelAccess;
-
-  @Requirement
-  private IRightsAccessFacadeRole rightsAccess;
-
-  @Requirement
-  private ModelContext context;
-
-  @Requirement
-  private ModelUtils modelUtils;
+  private final EntityReferenceResolver<String> stringRefResolver;
+  private final IClassCollectionRole oldCoreClasses;
+  private final INavigationClassConfig navigationClassConfig;
+  private final IWebUtilsService webUtilsService;
+  private final ITreeNodeService treeNodeService;
+  private final INextFreeDocRole nextFreeDocName;
+  private final ILuceneSearchService searchService;
+  private final IAttachmentServiceRole attService;
+  private final IModelAccessFacade modelAccess;
+  private final IRightsAccessFacadeRole rightsAccess;
+  private final ModelContext context;
+  private final ModelUtils modelUtils;
 
   AttachmentURLCommand attURLCmd;
+
+  @Inject
+  public ImageService(EntityReferenceResolver<String> stringRefResolver,
+                      @Named("celements.oldCoreClasses") IClassCollectionRole oldCoreClasses,
+                      INavigationClassConfig navigationClassConfig,
+                      IWebUtilsService webUtilsService,
+                      ITreeNodeService treeNodeService,
+                      INextFreeDocRole nextFreeDocName,
+                      ILuceneSearchService searchService,
+                      IAttachmentServiceRole attService,
+                      IModelAccessFacade modelAccess,
+                      IRightsAccessFacadeRole rightsAccess,
+                      ModelContext context,
+                      ModelUtils modelUtils) {
+    super();
+    this.stringRefResolver = stringRefResolver;
+    this.oldCoreClasses = oldCoreClasses;
+    this.navigationClassConfig = navigationClassConfig;
+    this.webUtilsService = webUtilsService;
+    this.treeNodeService = treeNodeService;
+    this.nextFreeDocName = nextFreeDocName;
+    this.searchService = searchService;
+    this.attService = attService;
+    this.modelAccess = modelAccess;
+    this.rightsAccess = rightsAccess;
+    this.context = context;
+    this.modelUtils = modelUtils;
+  }
 
   private XWikiContext getContext() {
     return context.getXWikiContext();
@@ -117,14 +125,29 @@ public class ImageService implements IImageService {
 
 
   @Override
-  public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef) throws XWikiException {
+  public <T> T getPhotoAlbumObjectValue(DocumentReference galleryDocRef, String fieldName, Class<T> clazz, T defaultValue) {
     if (modelAccess.exists(galleryDocRef)) {
       XWikiDocument galleryDoc = modelAccess.getOrCreateDocument(galleryDocRef);
       BaseObject galleryObj = galleryDoc.getXObject(getOldCoreClasses().getPhotoAlbumClassRef(
         getContext().getDatabase()));
-      return galleryObj;
+      if (clazz == Integer.class) {
+        return clazz.cast(galleryObj.getIntValue(fieldName));
+      } else if (clazz == Long.class) {
+        return clazz.cast(galleryObj.getLongValue(fieldName));
+      } else if (clazz == Float.class) {
+        return clazz.cast(galleryObj.getFloatValue(fieldName));
+      } else if (clazz == Double.class) {
+        return clazz.cast(galleryObj.getDateValue(fieldName));
+      } else if (clazz == String.class) {
+        return clazz.cast(galleryObj.getDoubleValue(fieldName));
+      } else if (clazz == Date.class) {
+        return clazz.cast(galleryObj.getStringValue(fieldName));
+      } else {
+        LOGGER.error("getPhotoAlbumObjectValue: Unsupported class type [{}] for field [{}] in "
+            + "gallery document [{}].", clazz.getName(), fieldName, galleryDocRef);
+      }
     }
-    return null;
+    return defaultValue;
   }
 
   @Override
@@ -158,27 +181,17 @@ public class ImageService implements IImageService {
 
   public int getPhotoAlbumMaxHeight(DocumentReference galleryDocRef)
       throws NoGalleryDocumentException {
-    try {
-      int maxImageHeight = getPhotoAlbumObject(galleryDocRef).getIntValue("height2");
-      // TODO allow template to reduce height
-      if (!StringUtils.isEmpty(getContext().getRequest().getParameter("slideContent"))) {
-        maxImageHeight = Math.max(maxImageHeight - 20, 0);
-      }
-      return maxImageHeight;
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to getPhotoAlbumSpaceRef.", exp);
+    int maxImageHeight = getPhotoAlbumObjectValue(galleryDocRef, "height2", Integer.class, 2000);
+    // TODO allow template to reduce height
+    if (!StringUtils.isEmpty(getContext().getRequest().getParameter("slideContent"))) {
+      maxImageHeight = Math.max(maxImageHeight - 20, 0);
     }
-    return 2000;
+    return maxImageHeight;
   }
 
   public int getPhotoAlbumMaxWidth(DocumentReference galleryDocRef)
       throws NoGalleryDocumentException {
-    try {
-      return getPhotoAlbumObject(galleryDocRef).getIntValue("photoWidth");
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to getPhotoAlbumSpaceRef.", exp);
-    }
-    return 2000;
+    return getPhotoAlbumObjectValue(galleryDocRef, "photoWidth", Integer.class, 2000);
   }
 
   private DocumentReference getDocRefFromFullName(String collDocName) {
