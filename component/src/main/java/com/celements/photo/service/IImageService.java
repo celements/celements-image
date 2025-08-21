@@ -36,7 +36,7 @@ public interface IImageService {
   public BaseObject getPhotoAlbumNavObject(DocumentReference galleryDocRef) throws XWikiException,
       NoGalleryDocumentException;
 
-  public BaseObject getPhotoAlbumObject(DocumentReference galleryDocRef) throws XWikiException;
+  public <T> T getPhotoAlbumObjectValue(DocumentReference galleryDocRef, String fieldName, Class<T> clazz, T defaultValue);
 
   public DocumentReference getImageSlideTemplateRef();
 
