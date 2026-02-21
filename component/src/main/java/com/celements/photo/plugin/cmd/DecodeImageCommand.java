@@ -243,8 +243,9 @@ public class DecodeImageCommand {
       // Need to clone entire profile, due to a JDK 7 bug
       byte[] profileData = cmykProfile.getData();
       if (profileData[ICC_Profile.icHdrRenderingIntent] == ICC_Profile.icPerceptual) {
-        intToBigEndian(ICC_Profile.icSigDisplayClass, profileData,
-            ICC_Profile.icHdrDeviceClass); // Header is first
+        intToBigEndian(ICC_Profile.icSigDisplayClass, profileData, ICC_Profile.icHdrDeviceClass);// Header
+                                                                                                 // is
+                                                                                                 // first
         cmykProfile = ICC_Profile.getInstance(profileData);
       }
     }
