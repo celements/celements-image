@@ -154,8 +154,7 @@ public class DecodeImageCommand {
       ImageReadException {
     boolean hasAdobeMarker = true;
     JpegImageParser parser = new JpegImageParser();
-    ByteSource byteSource = new ByteSourceInputStream(imgIn, filename);// new
-                                                                       // ByteSourceFile(file);
+    ByteSource byteSource = new ByteSourceInputStream(imgIn, filename);// new ByteSourceFile(file);
     List<Segment> segments = parser.readSegments(byteSource, new int[] { 0xffee }, true);
     if ((segments != null) && !segments.isEmpty()) {
       UnknownSegment app14Segment = (UnknownSegment) segments.get(0);
@@ -245,9 +244,7 @@ public class DecodeImageCommand {
       byte[] profileData = cmykProfile.getData();
       if (profileData[ICC_Profile.icHdrRenderingIntent] == ICC_Profile.icPerceptual) {
         intToBigEndian(ICC_Profile.icSigDisplayClass, profileData,
-            ICC_Profile.icHdrDeviceClass); // Header
-                                           // is
-                                           // first
+            ICC_Profile.icHdrDeviceClass); // Header is first
         cmykProfile = ICC_Profile.getInstance(profileData);
       }
     }
