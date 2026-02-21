@@ -48,6 +48,7 @@ import org.apache.commons.imaging.common.bytesource.ByteSourceInputStream;
 import org.apache.commons.imaging.formats.jpeg.JpegImageParser;
 import org.apache.commons.imaging.formats.jpeg.segments.Segment;
 import org.apache.commons.imaging.formats.jpeg.segments.UnknownSegment;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +58,6 @@ import com.sun.media.jai.codec.SeekableStream;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
-
-import edu.emory.mathcs.util.io.IOUtils;
 
 public class DecodeImageCommand {
 
@@ -244,9 +243,9 @@ public class DecodeImageCommand {
       // Need to clone entire profile, due to a JDK 7 bug
       byte[] profileData = cmykProfile.getData();
       if (profileData[ICC_Profile.icHdrRenderingIntent] == ICC_Profile.icPerceptual) {
-        intToBigEndian(ICC_Profile.icSigDisplayClass, profileData, ICC_Profile.icHdrDeviceClass); // Header
-                                                                                                  // is
-                                                                                                  // first
+        intToBigEndian(ICC_Profile.icSigDisplayClass, profileData, ICC_Profile.icHdrDeviceClass);// Header
+                                                                                                 // is
+                                                                                                 // first
         cmykProfile = ICC_Profile.getInstance(profileData);
       }
     }
