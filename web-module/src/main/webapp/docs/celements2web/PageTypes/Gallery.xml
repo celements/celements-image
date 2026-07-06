@@ -3,7 +3,7 @@
 <web>PageTypes</web>
 <name>Gallery</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent></parent>
 <creator>xwiki:XWiki.fpichler</creator>
@@ -292,6 +292,22 @@
 <unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </filepath>
+<isRteContent>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>isRteContent</name>
+<number>3</number>
+<prettyName>Is Rte Content</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators>|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>NO|BOTH|ONLY</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</isRteContent>
 <loadMode>
 <cache>0</cache>
 <disabled>0</disabled>
