@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>image-web</artifactId>
-  <version>7.2-SNAPSHOT</version>
+  <version>7.2</version>
   <packaging>war</packaging>
   <name>Celements Image Web-Module</name>
   <description>	</description>
@@ -31,6 +31,6 @@
     <connection>scm:git:git://github.com/celements/celements-image</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-image.git</developerConnection>
     <url>https://github.com/celements/celements-image/web-module</url>
-    <tag>HEAD</tag>
+    <tag>image-web-7.2</tag>
   </scm>
 </project>
