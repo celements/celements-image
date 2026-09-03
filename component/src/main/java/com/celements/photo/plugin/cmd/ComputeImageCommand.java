@@ -152,7 +152,7 @@ public class ComputeImageCommand {
                 // TODO accept CelImage instead of bufferedImage
                 BufferedImage newSource = new BufferedImage(img.getFirstImage().getWidth()
                     + (kerWidth - 1), img.getFirstImage().getHeight() + (kerHeight - 1),
-                    BufferedImage.TYPE_INT_ARGB);
+                    getAlphaCompatibleImageType(img.getFirstImage()));
                 Graphics2D g2 = newSource.createGraphics();
                 int xOffset = (kerWidth - 1) / 2;
                 int yOffset = (kerHeight - 1) / 2;
@@ -245,6 +245,11 @@ public class ComputeImageCommand {
             img.getRGB((img.getWidth() - 1), (img.getHeight() - 1)));
       }
     }
+  }
+
+  int getAlphaCompatibleImageType(BufferedImage image) {
+    return image.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB
+        : BufferedImage.TYPE_INT_RGB;
   }
 
   Color getBackgroundColour(Color defaultBg, String defaultBgStr) {

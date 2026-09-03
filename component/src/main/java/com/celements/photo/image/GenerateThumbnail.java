@@ -318,6 +318,7 @@ public class GenerateThumbnail {
       String watermark, String copyright, String type, Color defaultBg, boolean lowerBound,
       Integer lowerBoundPositioning, String overwriteType) {
     Image thumbImg = img;
+    int destinationImageType = getDestinationImageType(img, defaultBg);
     // Only generates a thumbnail if the image is larger than the desired thumbnail.
     LOGGER.debug("img: " + img + " - imgSize: " + imgSize);
     if (lowerBound) {
@@ -339,21 +340,23 @@ public class GenerateThumbnail {
           overHeight = 0;
         }
       }
-      thumbImg = new BufferedImage(imgSize.getSize().width, imgSize.getSize().height,
-          BufferedImage.TYPE_INT_ARGB);
+      int xPosition = 0;
+      int yPosition = 0;
       if (overWidth > overHeight) {
         if (lowerBoundPositioning == null) {
           lowerBoundPositioning = overWidth / 2;
         }
-        thumbImg.getGraphics().drawImage(tmpI, getLowerBoundFinalPositioning(lowerBoundPositioning,
-            tmpI.getWidth(null), imgSize.getSize().width), 0, null);
+        xPosition = getLowerBoundFinalPositioning(lowerBoundPositioning, tmpI.getWidth(null),
+            imgSize.getSize().width);
       } else {
         if (lowerBoundPositioning == null) {
           lowerBoundPositioning = overHeight / 2;
         }
-        thumbImg.getGraphics().drawImage(tmpI, 0, getLowerBoundFinalPositioning(
-            lowerBoundPositioning, tmpI.getHeight(null), imgSize.getSize().height), null);
+        yPosition = getLowerBoundFinalPositioning(lowerBoundPositioning, tmpI.getHeight(null),
+            imgSize.getSize().height);
       }
+      thumbImg = createDestinationImage(tmpI, imgSize.getSize().width, imgSize.getSize().height,
+          destinationImageType, defaultBg, xPosition, yPosition);
     } else if (defaultBg != null) {
       Image tmpI = img;
       int underWidth = img.getWidth() - imgSize.getSize().width;
@@ -376,9 +379,8 @@ public class GenerateThumbnail {
       }
       underWidth = imgSize.getSize().width - tmpI.getWidth(null);
       underHeight = imgSize.getSize().height - tmpI.getHeight(null);
-      thumbImg = new BufferedImage(imgSize.getSize().width, imgSize.getSize().height,
-          BufferedImage.TYPE_INT_ARGB);
-      thumbImg.getGraphics().drawImage(tmpI, underWidth / 2, underHeight / 2, null);
+      thumbImg = createDestinationImage(tmpI, imgSize.getSize().width, imgSize.getSize().height,
+          destinationImageType, defaultBg, underWidth / 2, underHeight / 2);
     } else {
       if ((img.getWidth() > (int) imgSize.getWidth())
           || (img.getHeight() > (int) imgSize.getHeight())) {
@@ -397,9 +399,28 @@ public class GenerateThumbnail {
     LOGGER.debug("width target: " + imgSize.getWidth() + ", height target: " + imgSize.getHeight()
         + "; width: " + thumbImg.getWidth(null) + ", height: " + thumbImg.getHeight(null));
     BufferedImage buffThumb = convertImageToBufferedImage(thumbImg, watermark, copyright,
-        defaultBg);
+        defaultBg, destinationImageType);
     encodeImage(out, buffThumb, img, type, overwriteType);
     return buffThumb;
+  }
+
+  int getDestinationImageType(BufferedImage source, Color defaultBg) {
+    boolean needsAlpha = (defaultBg == null) ? source.getColorModel().hasAlpha()
+        : defaultBg.getAlpha() < 255;
+    return needsAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+  }
+
+  BufferedImage createDestinationImage(Image source, int width, int height,
+      int destinationImageType, Color defaultBg, int xPosition, int yPosition) {
+    BufferedImage destination = new BufferedImage(width, height, destinationImageType);
+    Graphics2D graphics = destination.createGraphics();
+    if ((defaultBg != null) && (destinationImageType == BufferedImage.TYPE_INT_RGB)) {
+      graphics.setColor(defaultBg);
+      graphics.fillRect(0, 0, width, height);
+    }
+    graphics.drawImage(source, xPosition, yPosition, null);
+    graphics.dispose();
+    return destination;
   }
 
   int getLowerBoundFinalPositioning(int pos, int baseLength, int frameLength) {
@@ -527,9 +548,9 @@ public class GenerateThumbnail {
    * @return The BufferedImage representation of the Image.
    */
   BufferedImage convertImageToBufferedImage(Image thumbImg, String watermark, String copyright,
-      Color defaultBg) {
+      Color defaultBg, int destinationImageType) {
     BufferedImage thumb = new BufferedImage(thumbImg.getWidth(null), thumbImg.getHeight(null),
-        BufferedImage.TYPE_INT_ARGB);
+        destinationImageType);
     Graphics2D g2d = thumb.createGraphics();
     if (defaultBg != null) {
       g2d.setColor(defaultBg);
@@ -544,6 +565,7 @@ public class GenerateThumbnail {
     if ((copyright != null) && (!copyright.equals(""))) {
       drawCopyright(copyright, g2d, thumb.getWidth(), thumb.getHeight());
     }
+    g2d.dispose();
     LOGGER.info("thumbDimensions: " + thumb.getHeight() + "x" + thumb.getWidth());
     return thumb;
   }

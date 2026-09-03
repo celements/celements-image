@@ -23,6 +23,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -109,5 +110,14 @@ public class ComputeImageCommandTest extends AbstractComponentTest {
     assertEquals(253, col.getGreen());
     assertEquals(19, col.getBlue());
     assertEquals(160, col.getAlpha());
+  }
+
+  @Test
+  public void testGetAlphaCompatibleImageType() {
+    BufferedImage rgbImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+    BufferedImage argbImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    assertEquals(BufferedImage.TYPE_INT_RGB, computeImgCmd.getAlphaCompatibleImageType(rgbImage));
+    assertEquals(BufferedImage.TYPE_INT_ARGB,
+        computeImgCmd.getAlphaCompatibleImageType(argbImage));
   }
 }
