@@ -89,20 +89,22 @@ public class GenerateThumbnailTest extends AbstractComponentTest {
   @Test
   public void testCreateThumbnail() throws Exception {
     InputStream in = getClass().getClassLoader().getResourceAsStream("Home.Home2.jpg");
-    BufferedImage img = genThum.decodeInputStream(in);
-    in.close();
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    genThum.createThumbnail(img, out, new ImageDimensions(500, 247), null, null, "PNG", null, false,
-        null, null);
+
+    genThum.createThumbnail(in, out, new ImageDimensions(500, 247), null, null, "image/jpeg", null,
+        false, null, null);
+
     BufferedImage outImg = genThum.decodeInputStream(new ByteArrayInputStream(out.toByteArray()));
+    in.close();
     out.close();
     assertEquals(495, outImg.getWidth(null));
     assertEquals(247, outImg.getHeight(null));
+    assertFalse(outImg.getColorModel().hasAlpha());
   }
 
   @Test
-  public void testCreateThumbnail_opaqueRgbResizeProducesPngWithoutAlpha() throws Exception {
-    BufferedImage source = new BufferedImage(4, 2, BufferedImage.TYPE_INT_RGB);
+  public void testCreateThumbnail_opaqueArgbResizeProducesPngWithoutAlpha() throws Exception {
+    BufferedImage source = new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB);
     int sourceRgb = new Color(12, 34, 56).getRGB();
     for (int x = 0; x < source.getWidth(); x++) {
       for (int y = 0; y < source.getHeight(); y++) {

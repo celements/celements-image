@@ -423,6 +423,21 @@ public class GenerateThumbnail {
     return destination;
   }
 
+  BufferedImage normalizeFullyOpaqueImage(BufferedImage image) {
+    if (!image.getColorModel().hasAlpha()) {
+      return image;
+    }
+    for (int y = 0; y < image.getHeight(); y++) {
+      for (int x = 0; x < image.getWidth(); x++) {
+        if ((image.getRGB(x, y) >>> 24) < 255) {
+          return image;
+        }
+      }
+    }
+    return createDestinationImage(image, image.getWidth(), image.getHeight(),
+        BufferedImage.TYPE_INT_RGB, null, 0, 0);
+  }
+
   int getLowerBoundFinalPositioning(int pos, int baseLength, int frameLength) {
     // FIXME has a collision on 0 (left or right aligned?). Now 0 is left aligned and there
     // is no possibility for a position 0 pixels from right (workaround is to
@@ -525,6 +540,7 @@ public class GenerateThumbnail {
       type = "png"; // default for all not jpeg or gif files
     }
     try {
+      image = normalizeFullyOpaqueImage(image);
       ImageIO.write(image, saveTypes.get(type.toLowerCase()), out);
     } catch (IOException ioe) {
       LOGGER.error("Could not save image as [" + type + "]! " + ioe);
